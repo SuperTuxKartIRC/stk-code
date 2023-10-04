@@ -149,6 +149,7 @@ public:
     virtual void   collectedItem   (ItemState *item, AbstractKart *kart);
     virtual void   switchItems     ();
     bool           randomItemsForArena(const AlignedArray<btTransform>& pos);
+    bool           itemIsDesactivate(ItemState::ItemType type);
 
     // ------------------------------------------------------------------------
     /** Returns true if the items are switched atm. */

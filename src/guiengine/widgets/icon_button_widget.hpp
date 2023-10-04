@@ -90,6 +90,7 @@ namespace GUIEngine
 
         /** Whether to make the widget included in keyboard navigation order when adding */
         bool m_tab_stop;
+        bool m_state;
 
         IconButtonWidget(ScaleMode scale_mode=SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, const bool tab_stop=true,
                          const bool focusable=true, IconPathType pathType=ICON_PATH_TYPE_RELATIVE);
@@ -177,6 +178,13 @@ namespace GUIEngine
         {
             return m_list_header_icon_rect;
         }
+
+        /** Get whether the button is activated */
+        bool getState() const { return m_state; }
+
+        /** Set whether the button is activated */
+        void setState(const bool activated) { m_state = activated; }
+
     };
 }
 

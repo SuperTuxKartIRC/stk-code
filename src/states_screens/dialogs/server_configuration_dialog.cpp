@@ -16,7 +16,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "states_screens/dialogs/server_configuration_dialog.hpp"
-
+#include "graphics/stk_tex_manager.hpp"
 #include "config/user_config.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -29,6 +29,7 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+using namespace irr::video;
 using namespace GUIEngine;
 
 // ----------------------------------------------------------------------------
@@ -45,6 +46,18 @@ void ServerConfigurationDialog::beforeAddingWidgets()
     assert(m_game_mode_widget != NULL);
     m_difficulty_widget = getWidget<RibbonWidget>("difficulty");
     assert(m_difficulty_widget != NULL);
+    m_powerup_widget = getWidget<IconButtonWidget>("powerup");
+    m_powerup_widget = changeIconButtonImage(m_powerup_widget, "gift");
+    m_powerup = m_powerup_widget->getState();
+    assert(m_powerup_widget != NULL);
+    m_nitro_widget = getWidget<IconButtonWidget>("nitro");
+    m_nitro_widget = changeIconButtonImage(m_nitro_widget, "nitro");
+    m_nitro = m_nitro_widget->getState();
+    assert(m_nitro_widget != NULL);
+    m_banana_widget = getWidget<IconButtonWidget>("banana");
+    m_banana_widget = changeIconButtonImage(m_banana_widget, "banana");
+    m_banana = m_banana_widget->getState();
+    assert(m_banana_widget != NULL);
     m_ok_widget = getWidget<IconButtonWidget>("ok");
     assert(m_ok_widget != NULL);
     m_cancel_widget = getWidget<IconButtonWidget>("cancel");
@@ -135,6 +148,32 @@ GUIEngine::EventPropagation
         m_prev_mode = selection;
         return GUIEngine::EVENT_BLOCK;
     }
+    else {
+        if (m_cpt_for_options < 1) {
+            if (source == "powerup") {
+                m_powerup_widget->setTooltip("Disable power-ups");
+                m_powerup_widget = changeIconButtonImage(m_powerup_widget, "gift");
+                RaceManager::get()->setPowerupTrack(m_powerup_widget->getState());
+                m_powerup = m_powerup_widget->getState();
+            }
+            else if (source == "nitro") {
+                m_nitro_widget->setTooltip("Disable nitro");
+                m_nitro_widget = changeIconButtonImage(m_nitro_widget, "nitro");
+                RaceManager::get()->setPowerupTrack(m_nitro_widget->getState());
+                m_nitro = m_nitro_widget->getState();
+            }
+            else if (source == "banana") {
+                m_banana_widget->setTooltip("Disable banana");
+                m_banana_widget = changeIconButtonImage(m_banana_widget, "banana");
+                RaceManager::get()->setPowerupTrack(m_banana_widget->getState());
+                m_banana = m_banana_widget->getState();
+            }
+            m_cpt_for_options++;
+        }
+        else
+            m_cpt_for_options = 0;
+        
+    }
     return GUIEngine::EVENT_LET;
 }   // eventCallback
 
@@ -184,3 +223,22 @@ void ServerConfigurationDialog::updateMoreOption(int game_mode)
         }
     }
 }   // updateMoreOption
+
+IconButtonWidget* ServerConfigurationDialog::changeIconButtonImage(IconButtonWidget* iconButton, std::string name)
+{
+    ITexture* image;
+
+    if (iconButton->getState() == true) {
+        iconButton->setState(false);
+        image = STKTexManager::getInstance()->getTexture(GUIEngine::getSkin()->getThemedIcon("gui/icons/no_" + name + ".png"));
+    }
+    else {
+        iconButton->setState(true);
+        image = STKTexManager::getInstance()->getTexture(GUIEngine::getSkin()->getThemedIcon(("gui/icons/" + name + ".png")));
+    }
+
+    if (image != NULL)
+        iconButton->setImage(image);
+
+    return iconButton;
+}

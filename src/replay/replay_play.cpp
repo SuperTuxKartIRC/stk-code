@@ -201,14 +201,41 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
             rd.m_kart_color.push_back(0.0f); // Use default kart color
     }
 
-    int reverse = 0;
+    int temp = 0;
     fgets(s, 1023, fd);
-    if(sscanf(s, "reverse: %d", &reverse) != 1)
+    if(sscanf(s, "reverse: %d", &temp) != 1)
     {
         Log::warn("Replay", "No reverse info found in replay file, '%s'.", fn.c_str());
         return false;
     }
-    rd.m_reverse = reverse != 0;
+    rd.m_reverse = temp != 0;
+
+    temp = 0;
+    fgets(s, 1023, fd);
+    if (sscanf(s, "powerup: %d", &temp) != 1)
+    {
+        Log::warn("Replay", "No power-ups info found in replay file, '%s'.", fn.c_str());
+        return false;
+    }
+    rd.m_powerup = temp != 0;
+
+    temp = 0;
+    fgets(s, 1023, fd);
+    if (sscanf(s, "nitro: %d", &temp) != 1)
+    {
+        Log::warn("Replay", "No nitro info found in replay file, '%s'.", fn.c_str());
+        return false;
+    }
+    rd.m_nitro = temp != 0;
+
+    temp = 0;
+    fgets(s, 1023, fd);
+    if (sscanf(s, "banana: %d", &temp) != 1)
+    {
+        Log::warn("Replay", "No banana info found in replay file, '%s'.", fn.c_str());
+        return false;
+    }
+    rd.m_banana = temp != 0;
 
     fgets(s, 1023, fd);
     if (sscanf(s, "difficulty: %u", &rd.m_difficulty) != 1)

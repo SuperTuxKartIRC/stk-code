@@ -53,8 +53,14 @@ private:
     GUIEngine::IconButtonWidget * m_cancel_widget;
     GUIEngine::IconButtonWidget * m_back_widget;
 
+    GUIEngine::IconButtonWidget* m_powerup_widget;
+    GUIEngine::IconButtonWidget* m_nitro_widget;
+    GUIEngine::IconButtonWidget* m_banana_widget;
+
     void createServer();
     void updateMoreOption(int game_mode);
+    GUIEngine::IconButtonWidget* changeIconButtonImage(GUIEngine::IconButtonWidget* iconButton, std::string name);
+    GUIEngine::IconButtonWidget* setIconButtonImage(GUIEngine::IconButtonWidget* iconButton, std::string name);
 
 public:
 

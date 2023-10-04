@@ -25,6 +25,7 @@
 #include "guiengine/widgets/list_widget.hpp"
 #include "race/grand_prix_data.hpp"
 #include "states_screens/edit_track_screen.hpp"
+#include "states_screens/high_score_selection.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
@@ -105,8 +106,8 @@ void EditGPScreen::eventCallback(GUIEngine::Widget* widget,
         {
             EditTrackScreen* edit = EditTrackScreen::getInstance();
             assert(edit != NULL);
-            //By default, 3 laps and no reversing
-            edit->setSelection(NULL, 3, false);
+            //By default, 3 laps, no reversing, power-ups, nitro and banana
+            edit->setSelection(NULL, 3, false, true, true, true);
             edit->push();
         }
         else if (m_action == "remove")
@@ -151,6 +152,9 @@ void EditGPScreen::beforeAddingWidget()
     m_list->addColumn(_("Track"), 3);
     m_list->addColumn(_("Laps"), 1);
     m_list->addColumn(_("Reversed"), 1);
+    m_list->addColumn(_("Power-ups"), 1);
+    m_list->addColumn(_("Nitro"), 1);
+    m_list->addColumn(_("Banana"), 1);
 }
 
 // -----------------------------------------------------------------------------
@@ -178,17 +182,23 @@ void EditGPScreen::init()
         {
             bool reverse = edit->getTrack()->reverseAvailable() ? 
                            edit->getReverse() : false;
-            
+            bool powerup = edit->getTrack()->powerupAvailable() ?
+                           edit->getPowerup() : false;
+            bool nitro   = edit->getTrack()->nitroAvailable() ?
+                           edit->getNitro() : false;
+            bool banana  = edit->getTrack()->bananaAvailable() ?
+                           edit->getBanana() : false;
+
             if (m_action == "add")
             {
-                m_gp->addTrack(edit->getTrack(), edit->getLaps(), reverse,
-                               m_selected);
+                m_gp->addTrack(edit->getTrack(), edit->getLaps(), reverse, powerup, 
+                               nitro, banana, m_selected);
                 setSelected(m_selected + 1);
             }
             else if (m_action == "edit")
             {
                 m_gp->editTrack(m_selected, edit->getTrack(), edit->getLaps(),
-                                reverse);
+                                reverse, powerup, nitro, banana);
             }
             setModified(true);
         }
@@ -233,6 +243,9 @@ void EditGPScreen::loadList(const int selected)
 {
     m_list->clear();
     m_icons.clear();
+    m_icons_powerup.clear();
+    m_icons_nitro.clear();
+    m_icons_banana.clear();
     m_icon_bank->clear();
     m_icon_bank->scaleToHeight (GUIEngine::getFontHeight() * 3 / 2);
     m_list->setIcons(m_icon_bank, GUIEngine::getFontHeight() * 3 / 2);
@@ -253,12 +266,39 @@ void EditGPScreen::loadList(const int selected)
         assert (screenShot != NULL);
         m_icons.push_back(m_icon_bank->addTextureAsSprite(screenShot));
 
+        video::ITexture* powerup;
+        video::ITexture* nitro;
+        video::ITexture* banana;
+        
+        if (m_gp->getPowerup()[i] == true)
+            powerup = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI_ICON, "gift.png"));
+        else 
+            powerup = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI_ICON, "no_gift.png"));
+        if (m_gp->getNitro()[i] == true)
+            nitro = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI_ICON, "nitro.png"));
+        else
+            nitro = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI_ICON, "no_nitro.png"));
+        if (m_gp->getBanana()[i] == true)
+            banana = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI_ICON, "banana.png"));
+        else
+            banana = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI_ICON, "no_banana.png"));
+
+        m_icons_powerup.push_back(m_icon_bank->addTextureAsSprite(powerup));
+        m_icons_nitro.push_back(m_icon_bank->addTextureAsSprite(nitro));
+        m_icons_banana.push_back(m_icon_bank->addTextureAsSprite(banana));
+
         row.push_back(GUIEngine::ListWidget::ListCell(
             _(m_gp->getTrackName(i).c_str()), m_icons[i], 3, false));
         row.push_back(GUIEngine::ListWidget::ListCell(
             StringUtils::toWString<unsigned int>(m_gp->getLaps(i)), -1, 1, true));
         row.push_back(GUIEngine::ListWidget::ListCell(
             m_gp->getReverse(i) ? _("Yes") : _("No"), -1, 1, true));
+        row.push_back(GUIEngine::ListWidget::ListCell(
+            "", m_icons_powerup[i], 1, false));
+        row.push_back(GUIEngine::ListWidget::ListCell(
+            "", m_icons_nitro[i], 1, false));
+        row.push_back(GUIEngine::ListWidget::ListCell(
+            "", m_icons_banana[i], 1, false));
 
         m_list->addItem(m_gp->getId(), row);
     }
@@ -311,7 +351,10 @@ void EditGPScreen::edit()
         edit_screen->setSelection(track_manager->getTrack(
             m_gp->getTrackId(m_selected)),
             m_gp->getLaps((unsigned int)m_selected),
-            m_gp->getReverse((unsigned int)m_selected));
+            m_gp->getReverse((unsigned int)m_selected),
+            m_gp->getPowerup((unsigned int)m_selected),
+            m_gp->getNitro((unsigned int)m_selected),
+            m_gp->getBanana((unsigned int)m_selected));
         edit_screen->push();
     }
 }   // edit

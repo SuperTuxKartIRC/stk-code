@@ -74,6 +74,9 @@ DemoWorld::DemoWorld()
     }
 
     Log::info("[DemoWorld]", "Reverse mode state: %d", RaceManager::get()->getReverseTrack());
+    Log::info("[DemoWorld]", "Power-ups mode state: %d", RaceManager::get()->getPowerupTrack());
+    Log::info("[DemoWorld]", "Nitro mode state: %d", RaceManager::get()->getNitroTrack());
+    Log::info("[DemoWorld]", "Banana mode state: %d", RaceManager::get()->getBananaTrack());
     Log::info("[DemoWorld]", "Current game mode: %s", RaceManager::get()->getMinorModeName().c_str());
     Log::info("[DemoWorld]", "Current difficulty: %s", RaceManager::get()->
     getDifficultyAsString(RaceManager::get()->getDifficulty()).c_str());

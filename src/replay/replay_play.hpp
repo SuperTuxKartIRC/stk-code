@@ -45,6 +45,9 @@ public:
         SO_DEFAULT,
         SO_TRACK = SO_DEFAULT,
         SO_REV,
+        SO_POWUP,
+        SO_NITRO,
+        SO_BANANA,
         SO_KART_NUM,
         SO_DIFF,
         SO_LAPS,
@@ -66,6 +69,9 @@ public:
         std::vector<core::stringw> m_name_list;
         std::vector<float>         m_kart_color; //no sorting for this
         bool                       m_reverse;
+        bool                       m_powerup;
+        bool                       m_nitro;
+        bool                       m_banana;
         bool                       m_custom_replay_file;
         unsigned int               m_difficulty;
         unsigned int               m_laps;
@@ -85,6 +91,15 @@ public:
                     break;
                 case SO_REV:
                     return m_reverse < r.m_reverse;
+                    break;
+                case SO_POWUP:
+                    return m_powerup < r.m_powerup;
+                    break;
+                case SO_NITRO:
+                    return m_nitro < r.m_nitro;
+                    break;
+                case SO_BANANA:
+                    return m_banana < r.m_banana;
                     break;
                 case SO_DIFF:
                     return m_difficulty < r.m_difficulty;

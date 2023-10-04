@@ -1142,6 +1142,9 @@ void Kart::collectedItem(ItemState *item_state)
         break;
     case Item::ITEM_BONUS_BOX  :
         {
+            /*if (RaceManager::getPowerupTrack() == true) {
+                
+            }*/
             m_powerup->hitBonusBox(*item_state);
             break;
         }

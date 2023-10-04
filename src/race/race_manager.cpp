@@ -141,6 +141,9 @@ RaceManager::RaceManager()
     setMaxGoal(0);
     setTimeTarget(0.0f);
     setReverseTrack(false);
+    setPowerupTrack(true);
+    setNitroTrack(true);
+    setBananaTrack(true);
     setRecordRace(false);
     setRaceGhostKarts(false);
     setWatchingReplay(false);
@@ -397,6 +400,9 @@ void RaceManager::startNew(bool from_overworld)
         m_tracks        = m_grand_prix.getTrackNames();
         m_num_laps      = m_grand_prix.getLaps();
         m_reverse_track = m_grand_prix.getReverse();
+        m_powerup_track = m_grand_prix.getPowerup();
+        m_nitro_track = m_grand_prix.getNitro();
+        m_banana_track = m_grand_prix.getBanana();
 
         if (!NetworkConfig::get()->isNetworking())
         {
@@ -424,8 +430,18 @@ void RaceManager::startNew(bool from_overworld)
                     setNumKarts(m_saved_gp->getTotalKarts());
                     setupPlayerKartInfo();
                     m_grand_prix.changeReverse((GrandPrixData::GPReverseType)
-                                                m_saved_gp->getReverseType());
+                        m_saved_gp->getReverseType());
+                    m_grand_prix.changePowerup((GrandPrixData::GPPowerupType)
+                        m_saved_gp->getPowerupType());
+                    m_grand_prix.changeNitro((GrandPrixData::GPNitroType)
+                        m_saved_gp->getNitroType());
+                    m_grand_prix.changeBanana((GrandPrixData::GPBananaType)
+                        m_saved_gp->getBananaType());
+
                     m_reverse_track = m_grand_prix.getReverse();
+                    m_powerup_track = m_grand_prix.getPowerup();
+                    m_nitro_track = m_grand_prix.getNitro();
+                    m_banana_track = m_grand_prix.getBanana();
                     m_skipped_tracks_in_gp = m_saved_gp->getSkippedTracks();
                     Log::info("RaceManager","%d",isLapTrialMode());
                     if (isLapTrialMode())
@@ -789,6 +805,9 @@ void RaceManager::saveGP()
             (int)m_player_karts.size(),
             m_track_number,
             m_grand_prix.getReverseType(),
+            m_grand_prix.getPowerupType(),
+            m_grand_prix.getNitroType(),
+            m_grand_prix.getBananaType(),
             m_skipped_tracks_in_gp,
             isLapTrialMode() ? m_gp_time_target : 0.0f,
             isLapTrialMode() ? m_gp_total_laps : 0,
@@ -1267,6 +1286,9 @@ void RaceManager::clearNetworkGrandPrixResult()
     m_tracks.clear();
     m_num_laps.clear();
     m_reverse_track.clear();
+    m_powerup_track.clear();
+    m_nitro_track.clear();
+    m_banana_track.clear();
 
 }   // clearNetworkGrandPrixResult
 

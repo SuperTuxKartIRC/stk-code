@@ -221,66 +221,72 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
            const std::string& icon, const AbstractKart *owner)
     : ItemState(type, owner)
 {
-    m_icon_node = NULL;
-    m_was_available_previously = true;
-    m_animation_start_ticks = 0;
-    m_distance_2        = 1.2f;
-    initItem(type, xyz, normal);
-    m_graphical_type    = getGrahpicalType();
-
-    m_node = NULL;
-    if (mesh && !GUIEngine::isNoGraphics())
+    if(itemShouldBeRendered(type) == true)
     {
-        LODNode* lodnode =
-            new LODNode("item", irr_driver->getSceneManager()->getRootSceneNode(),
-            irr_driver->getSceneManager());
-        scene::ISceneNode* meshnode =
-            irr_driver->addMesh(mesh, StringUtils::insertValues("item_%i", (int)type));
+        m_icon_node = NULL;
+        m_was_available_previously = true;
+        m_animation_start_ticks = 0;
+        m_distance_2 = 1.2f;
+        initItem(type, xyz, normal);
+        m_graphical_type = getGrahpicalType();
 
-        if (lowres_mesh != NULL)
+        m_node = NULL;
+        if (mesh && !GUIEngine::isNoGraphics())
         {
-            lodnode->add(35, meshnode, true);
+            LODNode* lodnode =
+                new LODNode("item", irr_driver->getSceneManager()->getRootSceneNode(),
+                    irr_driver->getSceneManager());
             scene::ISceneNode* meshnode =
-                irr_driver->addMesh(lowres_mesh,
-                StringUtils::insertValues("item_lo_%i", (int)type));
-            lodnode->add(100, meshnode, true);
+                irr_driver->addMesh(mesh, StringUtils::insertValues("item_%i", (int)type));
+
+            if (lowres_mesh != NULL)
+            {
+                lodnode->add(35, meshnode, true);
+                scene::ISceneNode* meshnode =
+                    irr_driver->addMesh(lowres_mesh,
+                        StringUtils::insertValues("item_lo_%i", (int)type));
+                lodnode->add(100, meshnode, true);
+            }
+            else
+            {
+                lodnode->add(100, meshnode, true);
+            }
+            m_node = lodnode;
         }
-        else
+        setType(type);
+        handleNewMesh(getGrahpicalType());
+
+        if (!m_node)
+            return;
+#ifdef DEBUG
+        std::string debug_name("item: ");
+        debug_name += getType();
+        m_node->setName(debug_name.c_str());
+#endif
+        m_node->setAutomaticCulling(scene::EAC_FRUSTUM_BOX);
+        m_node->setPosition(xyz.toIrrVector());
+        Vec3 hpr;
+        hpr.setHPR(getOriginalRotation());
+        m_node->setRotation(hpr.toIrrHPR());
+        m_node->grab();
+
+        for (int n = 0; n < SPARK_AMOUNT; n++)
         {
-            lodnode->add(100, meshnode, true);
+            scene::ISceneNode* billboard =
+                irr_driver->addBillboard(core::dimension2df(SPARK_SIZE, SPARK_SIZE),
+                    "item_spark.png", m_node);
+#ifdef DEBUG
+            billboard->setName("spark");
+#endif
+
+            billboard->setVisible(true);
+
+            m_spark_nodes.push_back(billboard);
         }
-        m_node = lodnode;
     }
-    setType(type);
-    handleNewMesh(getGrahpicalType());
+    
 
-    if (!m_node)
-        return;
-#ifdef DEBUG
-    std::string debug_name("item: ");
-    debug_name += getType();
-    m_node->setName(debug_name.c_str());
-#endif
-    m_node->setAutomaticCulling(scene::EAC_FRUSTUM_BOX);
-    m_node->setPosition(xyz.toIrrVector());
-    Vec3 hpr;
-    hpr.setHPR(getOriginalRotation());
-    m_node->setRotation(hpr.toIrrHPR());
-    m_node->grab();
 
-    for (int n = 0; n < SPARK_AMOUNT; n++)
-    {
-        scene::ISceneNode* billboard =
-            irr_driver->addBillboard(core::dimension2df(SPARK_SIZE, SPARK_SIZE),
-                                     "item_spark.png", m_node);
-#ifdef DEBUG
-        billboard->setName("spark");
-#endif
-
-        billboard->setVisible(true);
-
-        m_spark_nodes.push_back(billboard);
-    }
 }   // Item(type, xyz, normal, mesh, lowres_mesh)
 
 //-----------------------------------------------------------------------------
@@ -292,34 +298,38 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
  */
 void Item::initItem(ItemType type, const Vec3 &xyz, const Vec3&normal)
 {
-    ItemState::initItem(type, xyz, normal);
-    // Now determine in which quad this item is, and its distance
-    // from the center within this quad.
-    m_graph_node = Graph::UNKNOWN_SECTOR;
-    m_distance_from_center = 9999.9f;
-    m_avoidance_points[0] = NULL;
-    m_avoidance_points[1] = NULL;
+    if (itemShouldBeRendered(type) == true) {
+        ItemState::initItem(type, xyz, normal);
+        // Now determine in which quad this item is, and its distance
+        // from the center within this quad.
+        m_graph_node = Graph::UNKNOWN_SECTOR;
+        m_distance_from_center = 9999.9f;
+        m_avoidance_points[0] = NULL;
+        m_avoidance_points[1] = NULL;
 
-    // Check that Graph exist (it might not in battle mode without navmesh)
-    if (Graph::get())
-    {
-        Graph::get()->findRoadSector(xyz, &m_graph_node);
+        // Check that Graph exist (it might not in battle mode without navmesh)
+        if (Graph::get())
+        {
+            Graph::get()->findRoadSector(xyz, &m_graph_node);
+        }
+        if (DriveGraph::get() && m_graph_node != Graph::UNKNOWN_SECTOR)
+        {
+            // Item is on drive graph. Pre-compute the distance from center
+            // of this item, which is used by the AI (mostly for avoiding items)
+            Vec3 distances;
+            DriveGraph::get()->spatialToTrack(&distances, getXYZ(), m_graph_node);
+            m_distance_from_center = distances.getX();
+            const DriveNode* dn = DriveGraph::get()->getNode(m_graph_node);
+            const Vec3& right = dn->getRightUnitVector();
+            // Give it 10% more space, since the kart will not always come
+            // parallel to the drive line.
+            Vec3 delta = right * sqrt(m_distance_2) * 1.3f;
+            m_avoidance_points[0] = new Vec3(getXYZ() + delta);
+            m_avoidance_points[1] = new Vec3(getXYZ() - delta);
+        }
     }
-    if (DriveGraph::get() && m_graph_node != Graph::UNKNOWN_SECTOR)
-    {
-        // Item is on drive graph. Pre-compute the distance from center
-        // of this item, which is used by the AI (mostly for avoiding items)
-        Vec3 distances;
-        DriveGraph::get()->spatialToTrack(&distances, getXYZ(), m_graph_node);
-        m_distance_from_center = distances.getX();
-        const DriveNode* dn = DriveGraph::get()->getNode(m_graph_node);
-        const Vec3& right = dn->getRightUnitVector();
-        // Give it 10% more space, since the kart will not always come
-        // parallel to the drive line.
-        Vec3 delta = right * sqrt(m_distance_2) * 1.3f;
-        m_avoidance_points[0] = new Vec3(getXYZ() + delta);
-        m_avoidance_points[1] = new Vec3(getXYZ() - delta);
-    }
+    
+    
 
 }   // initItem
 
@@ -393,37 +403,40 @@ void Item::reset()
 // ----------------------------------------------------------------------------
 void Item::handleNewMesh(ItemType type)
 {
+    if (itemShouldBeRendered(type) == true) {
 #ifndef SERVER_ONLY
-    if (m_node == NULL)
-        return;
-    setMesh(ItemManager::getItemModel(type),
-        ItemManager::getItemLowResolutionModel(type));
-    for (auto* node : m_node->getAllNodes())
-    {
-        SP::SPMeshNode* spmn = dynamic_cast<SP::SPMeshNode*>(node);
-        if (spmn)
-            spmn->setGlowColor(ItemManager::getGlowColor(type));
-    }
-    Vec3 hpr;
-    hpr.setHPR(getOriginalRotation());
-    m_node->setRotation(hpr.toIrrHPR());
+        if (m_node == NULL)
+            return;
+        setMesh(ItemManager::getItemModel(type),
+            ItemManager::getItemLowResolutionModel(type));
+        for (auto* node : m_node->getAllNodes())
+        {
+            SP::SPMeshNode* spmn = dynamic_cast<SP::SPMeshNode*>(node);
+            if (spmn)
+                spmn->setGlowColor(ItemManager::getGlowColor(type));
+        }
+        Vec3 hpr;
+        hpr.setHPR(getOriginalRotation());
+        m_node->setRotation(hpr.toIrrHPR());
 
-    if (m_icon_node)
-        m_node->removeChild(m_icon_node);
-    m_icon_node = NULL;
-    auto icon = ItemManager::getIcon(type);
+        if (m_icon_node)
+            m_node->removeChild(m_icon_node);
+        m_icon_node = NULL;
+        auto icon = ItemManager::getIcon(type);
 
-    if (!icon.empty())
-    {
-        m_icon_node = irr_driver->addBillboard(core::dimension2df(1.0f, 1.0f),
-                                        icon, m_node);
+        if (!icon.empty())
+        {
+            m_icon_node = irr_driver->addBillboard(core::dimension2df(1.0f, 1.0f),
+                icon, m_node);
 
-        m_icon_node->setPosition(core::vector3df(0.0f, 0.5f, 0.0f));
-        m_icon_node->setVisible(false);
-        ((scene::IBillboardSceneNode*)m_icon_node)
-            ->setColor(ItemManager::getGlowColor(type).toSColor());
-    }
+            m_icon_node->setPosition(core::vector3df(0.0f, 0.5f, 0.0f));
+            m_icon_node->setVisible(false);
+            ((scene::IBillboardSceneNode*)m_icon_node)
+                ->setColor(ItemManager::getGlowColor(type).toSColor());
+        }
 #endif
+    }
+
 }   // handleNewMesh
 
 // ----------------------------------------------------------------------------
@@ -561,3 +574,20 @@ void Item::updateGraphics(float dt)
 
     m_was_available_previously = isAvailable();
 }   // updateGraphics
+
+//-----------------------------------------------------------------------------
+ /** Returns true if this mesh item (for powerup, nitro, banana) can be rendered or not
+     depending of the race option*/
+bool Item::itemShouldBeRendered(ItemType type)
+{
+    if (RaceManager::get()->getPowerupTrack() == false && type == ITEM_BONUS_BOX   ||
+        RaceManager::get()->getNitroTrack()   == false && type == ITEM_NITRO_BIG   ||
+        RaceManager::get()->getNitroTrack()   == false && type == ITEM_NITRO_SMALL ||
+        RaceManager::get()->getBananaTrack()  == false && type == ITEM_BANANA) {
+        return false;
+    }
+    else {
+        return true;
+    }
+
+}   // reset

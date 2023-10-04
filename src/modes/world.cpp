@@ -1062,6 +1062,9 @@ void World::updateWorld(int ticks)
                 RaceManager::get()->setTrack( "tutorial" );
                 RaceManager::get()->setDifficulty(RaceManager::DIFFICULTY_EASY);
                 RaceManager::get()->setReverseTrack(false);
+                RaceManager::get()->setPowerupTrack(true);
+                RaceManager::get()->setNitroTrack(true);
+                RaceManager::get()->setBananaTrack(true);
 
                 // Use keyboard 0 by default (FIXME: let player choose?)
                 InputDevice* device = input_manager->getDeviceManager()->getKeyboard(0);
@@ -1265,7 +1268,10 @@ Highscores* World::getHighscores() const
                                          RaceManager::get()->getDifficulty(),
                                          RaceManager::get()->getTrackName(),
                                          RaceManager::get()->isLapTrialMode() ? RaceManager::get()->getTimeTarget() : RaceManager::get()->getNumLaps(),
-                                         RaceManager::get()->getReverseTrack());
+                                         RaceManager::get()->getReverseTrack(),
+                                         RaceManager::get()->getPowerupTrack(),
+                                         RaceManager::get()->getNitroTrack(),
+                                         RaceManager::get()->getBananaTrack());
 
     return highscores;
 }   // getHighscores
@@ -1278,6 +1284,9 @@ Highscores* World::getGPHighscores() const
                                                                 RaceManager::get()->getGrandPrix().getId(),
                                                                 RaceManager::get()->isLapTrialMode() ? RaceManager::get()->getTimeTarget() : 0,
                                                                 RaceManager::get()->getGrandPrix().getReverseType(),
+                                                                RaceManager::get()->getGrandPrix().getPowerupType(),
+                                                                RaceManager::get()->getGrandPrix().getNitroType(),
+                                                                RaceManager::get()->getGrandPrix().getBananaType(),
                                                                 RaceManager::get()->getMinorMode());
     return highscores;
 }
@@ -1723,6 +1732,18 @@ void World::updateAchievementDataEndRace()
                 PlayerManager::trackEvent(RaceManager::get()->getTrackName(), ACS::TR_FINISHED);
                 if (RaceManager::get()->getReverseTrack())
                     PlayerManager::trackEvent(RaceManager::get()->getTrackName(), ACS::TR_FINISHED_REVERSE);
+                if (RaceManager::get()->getPowerupTrack())
+                    PlayerManager::trackEvent(RaceManager::get()->getTrackName(), ACS::TR_FINISHED_POWERUP);
+                if (RaceManager::get()->getPowerupTrack())
+                    PlayerManager::trackEvent(RaceManager::get()->getTrackName(), ACS::TR_FINISHED_NO_POWERUP);
+                if (RaceManager::get()->getNitroTrack())
+                    PlayerManager::trackEvent(RaceManager::get()->getTrackName(), ACS::TR_FINISHED_NITRO);
+                if (RaceManager::get()->getNitroTrack())
+                    PlayerManager::trackEvent(RaceManager::get()->getTrackName(), ACS::TR_FINISHED_NO_NITRO);
+                if (RaceManager::get()->getBananaTrack())
+                    PlayerManager::trackEvent(RaceManager::get()->getTrackName(), ACS::TR_FINISHED_BANANA);
+                if (RaceManager::get()->getBananaTrack())
+                    PlayerManager::trackEvent(RaceManager::get()->getTrackName(), ACS::TR_FINISHED_NO_BANANA);
 
                 if (RaceManager::get()->modeHasLaps())
                 {

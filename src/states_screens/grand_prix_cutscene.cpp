@@ -54,8 +54,11 @@ void GrandPrixCutscene::setNewGPWithName(const irr::core::stringw& name)
     std::vector<std::string> tracks  = current_gp.getTrackNames();
     std::vector<int>         laps    = current_gp.getLaps();
     std::vector<bool>        reverse = current_gp.getReverse();
+    std::vector<bool>        powerup = current_gp.getPowerup();
+    std::vector<bool>        nitro   = current_gp.getNitro();
+    std::vector<bool>        banana  = current_gp.getBanana();
     for (unsigned int i = 0; i < laps.size(); i++)
-        gp->addTrack(track_manager->getTrack(tracks[i]), laps[i], reverse[i]);
+        gp->addTrack(track_manager->getTrack(tracks[i]), laps[i], reverse[i], powerup[i], nitro[i], banana[i]);
     gp->writeToFile();
 
     // Avoid double-save which can have bad side-effects

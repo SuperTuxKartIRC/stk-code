@@ -70,6 +70,9 @@ SavedGrandPrix::SavedGrandPrix(unsigned int player_id,
                                int player_karts,
                                int last_track,
                                int reverse_type,
+                               int powerup_type,
+                               int nitro_type,
+                               int banana_type,
                                int skipped_tracks,
                                float time_target,
                                int player_total_laps,
@@ -82,7 +85,10 @@ SavedGrandPrix::SavedGrandPrix(unsigned int player_id,
                 m_difficulty((int)difficulty,"difficulty", &m_savedgp_group),
                 m_player_karts(player_karts,"player_karts", &m_savedgp_group),
                 m_next_track(last_track,"last_track", &m_savedgp_group),
-                m_reverse_type(reverse_type,"reverse_type", &m_savedgp_group),
+                m_reverse_type(reverse_type, "reverse_type", &m_savedgp_group),
+                m_powerup_type(powerup_type, "powerup_type", &m_savedgp_group),
+                m_nitro_type(nitro_type, "nitro_type", &m_savedgp_group),
+                m_banana_type(banana_type,"banana_type", &m_savedgp_group),
                 m_skipped_tracks(skipped_tracks, "skipped_tracks", &m_savedgp_group),
                 m_time_target(time_target, "time_target", &m_savedgp_group),
                 m_player_total_laps(player_total_laps, "player_total_laps", &m_savedgp_group)
@@ -110,7 +116,10 @@ SavedGrandPrix::SavedGrandPrix(const XMLNode* node)
                 m_difficulty  (0,"difficulty",   &m_savedgp_group),
                 m_player_karts(0,"player_karts", &m_savedgp_group),
                 m_next_track  (0,"last_track",   &m_savedgp_group),
-                m_reverse_type(0,"reverse_type", &m_savedgp_group),
+                m_reverse_type(0, "reverse_type", &m_savedgp_group),
+                m_powerup_type(0, "powerup_type", &m_savedgp_group),
+                m_nitro_type(0, "nitro_type", &m_savedgp_group),
+                m_banana_type(0,"banana_type", &m_savedgp_group),
                 m_skipped_tracks(0, "skipped_tracks", &m_savedgp_group),
                 m_time_target(0.0f, "time_target", &m_savedgp_group),
                 m_player_total_laps(0, "player_total_laps", &m_savedgp_group)
@@ -123,6 +132,9 @@ SavedGrandPrix::SavedGrandPrix(const XMLNode* node)
     m_player_karts.findYourDataInAnAttributeOf(node);
     m_next_track.  findYourDataInAnAttributeOf(node);
     m_reverse_type.findYourDataInAnAttributeOf(node);
+    m_powerup_type.findYourDataInAnAttributeOf(node);
+    m_nitro_type.findYourDataInAnAttributeOf(node);
+    m_banana_type.findYourDataInAnAttributeOf(node);
     m_skipped_tracks.findYourDataInAnAttributeOf(node);
     m_time_target.findYourDataInAnAttributeOf(node);
     m_player_total_laps.findYourDataInAnAttributeOf(node); 

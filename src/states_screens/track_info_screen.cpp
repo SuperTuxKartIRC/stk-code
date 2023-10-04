@@ -75,6 +75,9 @@ void TrackInfoScreen::loadedFromFile()
     m_ai_kart_spinner       = getWidget<SpinnerWidget>("ai-spinner");
     m_ai_kart_label         = getWidget<LabelWidget>("ai-text");
     m_option                = getWidget<CheckBoxWidget>("option");
+    m_powerup               = getWidget<IconButtonWidget>("powerup");
+    m_nitro                 = getWidget<IconButtonWidget>("nitro");
+    m_banana                = getWidget<IconButtonWidget>("banana");
     m_record_race           = getWidget<CheckBoxWidget>("record");
     m_option->setState(false);
     m_record_race->setState(false);
@@ -289,6 +292,9 @@ void TrackInfoScreen::init()
     const bool reverse_available =     m_track->reverseAvailable()
                                    && !(RaceManager::get()->isEggHuntMode());
     const bool random_item = m_track->hasNavMesh();
+    const bool powerup_available = m_track->powerupAvailable();
+    const bool nitro_available = m_track->nitroAvailable();
+    const bool banana_available = m_track->bananaAvailable();
 
     m_option->setVisible(reverse_available || random_item);
     getWidget<LabelWidget>("option-text")->setVisible(reverse_available || random_item);
@@ -309,6 +315,20 @@ void TrackInfoScreen::init()
         m_option->setState(UserConfigParams::m_random_arena_item);
     else
         m_option->setState(false);
+
+    //if (powerup_available)
+    //    m_powerup->setState(RaceManager::get()->getPowerupTrack());
+    //if (nitro_available)
+    //    m_nitro->setState(RaceManager::get()->getNitroTrack());
+    //if (banana_available)
+    //    m_banana->setState(RaceManager::get()->getBananaTrack());
+
+    m_powerup->setState(RaceManager::get()->getPowerupTrack());
+    //m_powerup = changeIconButtonImage(m_powerup, "powerup");
+    m_nitro->setState(RaceManager::get()->getNitroTrack());
+    //m_nitro = changeIconButtonImage(m_nitro, "nitro");
+    m_banana->setState(RaceManager::get()->getBananaTrack());
+    //m_banana = changeIconButtonImage(m_banana, "banana");
 
     // Record race or not
     // -------------
@@ -493,7 +513,10 @@ void TrackInfoScreen::updateHighScores()
                                          RaceManager::get()->getDifficulty(),
                                          m_track->getIdent(),
                                          RaceManager::get()->isLapTrialMode() ? m_target_value_spinner->getValue() * 60 : RaceManager::get()->getNumLaps(),
-                                         RaceManager::get()->getReverseTrack()  );
+                                         RaceManager::get()->getReverseTrack(),
+                                         RaceManager::get()->getNitroTrack(),
+                                         RaceManager::get()->getPowerupTrack(),
+                                         RaceManager::get()->getBananaTrack());
     const int amount = highscores->getNumberEntries();
 
     std::string kart_name;
@@ -562,6 +585,12 @@ void TrackInfoScreen::onEnterPressedInternal()
                                                      : -1;
     const bool option_state = m_option == NULL ? false
                                                : m_option->getState();
+    const bool powerup_state = m_powerup == NULL ? true
+                                               : m_powerup->getState();
+    const bool nitro_state = m_nitro == NULL ? true
+                                               : m_nitro->getState();
+    const bool banana_state = m_banana == NULL ? true
+                                               : m_banana->getState();
     // Avoid negative lap numbers (after e.g. easter egg mode).
     if(num_laps>=0)
         m_track->setActualNumberOfLaps(num_laps);
@@ -570,6 +599,10 @@ void TrackInfoScreen::onEnterPressedInternal()
         UserConfigParams::m_random_arena_item = option_state;
     else
         RaceManager::get()->setReverseTrack(option_state);
+
+    RaceManager::get()->setPowerupTrack(powerup_state);
+    RaceManager::get()->setNitroTrack(nitro_state);
+    RaceManager::get()->setBananaTrack(banana_state);
 
     // Avoid invaild Ai karts number during switching game modes
     const int max_arena_players = m_track->getMaxArenaPlayers();
@@ -714,6 +747,33 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
             updateHighScores();
         }
     }
+    else if (name == "powerup")
+    {
+        m_powerup->setTooltip("Disable power-ups");
+        RaceManager::get()->setPowerupTrack(m_powerup->getState());
+        m_powerup = changeIconButtonImage(m_powerup, "gift");
+
+        // Makes sure the highscores get swapped when clicking the 'powerup' icon-button.
+        updateHighScores();
+    }
+    else if (name == "nitro")
+    {
+        m_nitro->setTooltip("Disable nitro");
+        RaceManager::get()->setNitroTrack(m_nitro->getState());
+        m_nitro = changeIconButtonImage(m_nitro, "nitro");
+
+        // Makes sure the highscores get swapped when clicking the 'nitro' icon-button.
+        updateHighScores();
+    }
+    else if (name == "banana")
+    {
+        m_banana->setTooltip("Disable banana");
+        m_banana = changeIconButtonImage(m_banana, "banana");
+        RaceManager::get()->setBananaTrack(m_banana->getState());
+        
+        // Makes sure the highscores get swapped when clicking the 'banana' icon-button.
+        updateHighScores();
+    }
     else if (name == "record")
     {
         const bool record = m_record_race->getState();
@@ -807,4 +867,22 @@ void TrackInfoScreen::soccerSpinnerUpdate(bool blue_spinner)
 
 
 } // soccerSpinnerUpdate
+IconButtonWidget* TrackInfoScreen::changeIconButtonImage(IconButtonWidget* iconButton, std::string name)
+{
+    ITexture* image;
+
+    if (iconButton->getState() == true) {
+        iconButton->setState(false);
+        image = STKTexManager::getInstance()->getTexture(GUIEngine::getSkin()->getThemedIcon("gui/icons/no_" + name + ".png"));
+    }
+    else {
+        iconButton->setState(true);
+        image = STKTexManager::getInstance()->getTexture(GUIEngine::getSkin()->getThemedIcon(("gui/icons/"  + name  + ".png")));
+    }
+
+    if (image != NULL)
+        iconButton->setImage(image);
+
+    return iconButton;
+}
 // ----------------------------------------------------------------------------

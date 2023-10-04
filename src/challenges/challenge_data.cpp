@@ -42,6 +42,9 @@ ChallengeData::ChallengeData(const std::string& filename)
     m_minor        = RaceManager::MINOR_MODE_NORMAL_RACE;
     m_num_laps     = -1;
     m_reverse      = false;
+    m_powerup      = false;
+    m_nitro        = false;
+    m_banana       = false;
     m_track_id     = "";
     m_gp_id        = "";
     m_version      = 0;
@@ -206,6 +209,24 @@ ChallengeData::ChallengeData(const std::string& filename)
                       "No reverse mode specified for challenge %s, defaulting to normal",
                       filename.c_str());
         }
+        if (!track_node->get("powerup", &m_powerup))
+        {
+            Log::warn("Challenge Data",
+                "No power-ups mode specified for challenge %s, defaulting to normal",
+                filename.c_str());
+        }
+        if (!track_node->get("nitro", &m_nitro))
+        {
+            Log::warn("Challenge Data",
+                "No nitro mode specified for challenge %s, defaulting to normal",
+                filename.c_str());
+        }
+        if (!track_node->get("banana", &m_banana))
+        {
+            Log::warn("Challenge Data",
+                "No banana mode specified for challenge %s, defaulting to normal",
+                filename.c_str());
+        }
     }
     else if (gp_node != NULL)
     {
@@ -323,6 +344,21 @@ const irr::core::stringw ChallengeData::getChallengeDescription() const
         description += core::stringw(L"\n");
         description += _("Mode: Reverse");
     }
+    if (m_powerup == true)
+    {
+        description += core::stringw(L"\n");
+        description += _("Mode: With power-ups");
+    }
+    if (m_nitro == true)
+    {
+        description += core::stringw(L"\n");
+        description += _("Mode: With nitro");
+    }
+    if (m_banana == true)
+    {
+        description += core::stringw(L"\n");
+        description += _("Mode: With banana");
+    }
     return description;
 }   // getChallengeDescription
 
@@ -437,6 +473,9 @@ void ChallengeData::setRace(RaceManager::Difficulty d) const
         RaceManager::get()->setTrack(m_track_id);
         RaceManager::get()->setNumLaps(m_num_laps);
         RaceManager::get()->setReverseTrack(m_reverse);
+        RaceManager::get()->setPowerupTrack(m_powerup);
+        RaceManager::get()->setNitroTrack(m_nitro);
+        RaceManager::get()->setBananaTrack(m_banana);
         RaceManager::get()->setNumKarts(m_default_num_karts[d]);
         RaceManager::get()->setNumPlayers(1);
         RaceManager::get()->setCoinTarget(m_energy[d]);

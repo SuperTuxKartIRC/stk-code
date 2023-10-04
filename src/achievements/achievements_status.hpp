@@ -119,7 +119,39 @@ public :
            SKIDDING_1LAP_MAX             = 53,
 
 
-           ACHIEVE_DATA_NUM              = 54
+           ACHIEVE_DATA_NUM              = 54,
+
+           // Only races with at least 3 AI count unless otherwise specified.
+           // Win differents races with no Power-ups
+           WON_RACES_NO_POWERUP = 55, // Normal, time-trial and FTL
+           WON_NORMAL_RACES_NO_POWERUP = 56, // Normal race only
+           WON_TT_RACES_NO_POWERUP = 57, // Time-trial race only
+           WON_FTL_RACES_NO_POWERUP = 58, // Follow-the-leader race on
+           // Win differents races with no Nitro
+           WON_RACES_NO_NITRO = 59, 
+           WON_NORMAL_RACES_NO_NITRO = 60, 
+           WON_TT_RACES_NO_NITRO = 61, 
+           WON_FTL_RACES_NO_NITRO = 62,
+           // Win differents races with no Banana
+           WON_RACES_NO_BANANA = 63, 
+           WON_NORMAL_RACES_NO_BANANA = 64, 
+           WON_TT_RACES_NO_BANANA = 65,
+           WON_FTL_RACES_NO_BANANA = 66, 
+           // Win differents races with Power-ups
+           WON_RACES_POWERUP = 67, 
+           WON_NORMAL_RACES_POWERUP = 68,
+           WON_TT_RACES_POWERUP = 69, 
+           WON_FTL_RACES_POWERUP = 70,
+           // Win differents races with Nitro
+           WON_RACES_NITRO = 71,
+           WON_NORMAL_RACES_NITRO = 72,
+           WON_TT_RACES_NITRO = 73,
+           WON_FTL_RACES_NITRO = 74,
+           // Win differents races with Banana
+           WON_RACES_BANANA = 75,
+           WON_NORMAL_RACES_BANANA = 76,
+           WON_TT_RACES_BANANA = 77,
+           WON_FTL_RACES_BANANA = 78
     };
 
 private:
@@ -165,8 +197,15 @@ public:
         // counters for egg hunts
         TR_EGG_HUNT_STARTED  = 8,
         TR_EGG_HUNT_FINISHED = 9,
+        // Race with special option (power-ups, nitro, banana) // doesn't count race without any other AI/player
+        TR_FINISHED_POWERUP = 10,
+        TR_FINISHED_NO_POWERUP = 11,
+        TR_FINISHED_NITRO = 12,
+        TR_FINISHED_NO_NITRO = 13,
+        TR_FINISHED_BANANA = 14,
+        TR_FINISHED_NO_BANANA = 15,
 
-        TR_DATA_NUM          = 10
+        TR_DATA_NUM          = 16
     };    
 
 private:

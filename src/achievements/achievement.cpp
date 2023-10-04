@@ -181,6 +181,12 @@ int Achievement::computeGoalProgress(AchievementInfo::goalTree &progress, Achiev
             progress.type == "race-finished-all" ||
             progress.type == "race-won-all" ||
             progress.type == "race-finished-reverse-all" ||
+            progress.type == "race-finished-powerup-all" ||
+            progress.type == "race-finished-no-powerup-all" ||
+            progress.type == "race-finished-nitro-all" ||
+            progress.type == "race-finished-no-nitro-all" ||
+            progress.type == "race-finished-banana-all" ||
+            progress.type == "race-finished-no-banana-all" ||
             progress.type == "race-finished-alone-all" ||
             progress.type == "less-laps-all" ||
             progress.type == "more-laps-all" ||
@@ -214,6 +220,12 @@ int Achievement::computeGoalProgress(AchievementInfo::goalTree &progress, Achiev
             progress.children[0].type == "race-finished-all" ||
             progress.children[0].type == "race-won-all" ||
             progress.children[0].type == "race-finished-reverse-all" ||
+            progress.children[0].type == "race-finished-powerup-all" ||
+            progress.children[0].type == "race-finished-no-powerup-all" ||
+            progress.children[0].type == "race-finished-nitro-all" ||
+            progress.children[0].type == "race-finished-no-nitro-all" ||
+            progress.children[0].type == "race-finished-banana-all" ||
+            progress.children[0].type == "race-finished-no-banana-all" ||
             progress.children[0].type == "race-finished-alone-all" ||
             progress.children[0].type == "less-laps-all" ||
             progress.children[0].type == "more-laps-all" ||

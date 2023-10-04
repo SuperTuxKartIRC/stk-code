@@ -53,6 +53,10 @@ private:
     float m_battle_time_limit;
 
     bool m_reverse;
+    bool m_powerup;
+    bool m_nitro;
+    bool m_banana;
+
 
     std::atomic_bool m_is_grand_prix;
 
@@ -75,6 +79,9 @@ public:
             m_tracks.clear();
         m_laps = 0;
         m_reverse = false;
+        m_powerup = false;
+        m_nitro = false;
+        m_banana = false;
         m_hit_capture_limit = 0;
         m_battle_time_limit = 0.0f;
     }

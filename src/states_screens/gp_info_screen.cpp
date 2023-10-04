@@ -60,8 +60,11 @@ GPInfoScreen::GPInfoScreen() : Screen("gp_info.stkgui")
 {
     m_curr_time = 0.0f;
     // Necessary to test if loadedFroMFile() was executed (in setGP)
-    m_reverse_spinner   = NULL;
-    m_max_num_tracks = 0;
+    m_reverse_spinner = NULL;
+    m_powerup_spinner = NULL;
+    m_nitro_spinner   = NULL;
+    m_banana_spinner  = NULL;
+    m_max_num_tracks  = 0;
 }   // GPInfoScreen
 
 // ----------------------------------------------------------------------------
@@ -78,6 +81,24 @@ void GPInfoScreen::loadedFromFile()
     m_reverse_spinner->addLabel(_("None"));
     m_reverse_spinner->addLabel(_("All"));
     m_reverse_spinner->addLabel(_("Random"));
+
+    m_powerup_spinner = getWidget<SpinnerWidget>("powerup-spinner");
+    m_powerup_spinner->addLabel(_("Default"));
+    m_powerup_spinner->addLabel(_("None"));
+    m_powerup_spinner->addLabel(_("All"));
+    m_powerup_spinner->addLabel(_("Random"));
+
+    m_nitro_spinner = getWidget<SpinnerWidget>("nitro-spinner");
+    m_nitro_spinner->addLabel(_("Default"));
+    m_nitro_spinner->addLabel(_("None"));
+    m_nitro_spinner->addLabel(_("All"));
+    m_nitro_spinner->addLabel(_("Random"));
+
+    m_banana_spinner = getWidget<SpinnerWidget>("banana-spinner");
+    m_banana_spinner->addLabel(_("Default"));
+    m_banana_spinner->addLabel(_("None"));
+    m_banana_spinner->addLabel(_("All"));
+    m_banana_spinner->addLabel(_("Random"));
 
     m_num_tracks_spinner = getWidget<SpinnerWidget>("track-spinner");
     // Only init the number of tracks here, this way the previously selected
@@ -120,7 +141,8 @@ void GPInfoScreen::setGP(const std::string &gp_ident)
         // right id ("random").
         m_gp.createRandomGP(1, "standard",
                             m_reverse_spinner ? getReverse()
-                                              : GrandPrixData::GP_NO_REVERSE);
+                                              : GrandPrixData::GP_NO_REVERSE, GrandPrixData::GP_DEFAULT_POWERUP, 
+                                                GrandPrixData::GP_DEFAULT_NITRO, GrandPrixData::GP_DEFAULT_BANANA);
     }
 }   // setGP
 
@@ -141,6 +163,57 @@ GrandPrixData::GPReverseType GPInfoScreen::getReverse() const
     // Avoid compiler warning
     return GrandPrixData::GP_DEFAULT_REVERSE;
 }   // getReverse
+// ----------------------------------------------------------------------------
+/** Converts the currently selected power-ups status into a value of type
+*  GPPowerupType .
+*/
+GrandPrixData::GPPowerupType GPInfoScreen::getPowerup() const
+{
+    switch (m_powerup_spinner->getValue())
+    {
+    case 0: return GrandPrixData::GP_DEFAULT_POWERUP; break;
+    case 1: return GrandPrixData::GP_NO_POWERUP;      break;
+    case 2: return GrandPrixData::GP_ALL_POWERUP;     break;
+    case 3: return GrandPrixData::GP_RANDOM_POWERUP;  break;
+    default: assert(false);
+    }   // switch
+    // Avoid compiler warning
+    return GrandPrixData::GP_DEFAULT_POWERUP;
+}   // getPowerup
+// ----------------------------------------------------------------------------
+/** Converts the currently selected nitro status into a value of type
+*  GPNitroType .
+*/
+GrandPrixData::GPNitroType GPInfoScreen::getNitro() const
+{
+    switch (m_nitro_spinner->getValue())
+    {
+    case 0: return GrandPrixData::GP_DEFAULT_NITRO; break;
+    case 1: return GrandPrixData::GP_NO_NITRO;      break;
+    case 2: return GrandPrixData::GP_ALL_NITRO;     break;
+    case 3: return GrandPrixData::GP_RANDOM_NITRO;  break;
+    default: assert(false);
+    }   // switch
+    // Avoid compiler warning
+    return GrandPrixData::GP_DEFAULT_NITRO;
+}   // getNitro
+// ----------------------------------------------------------------------------
+/** Converts the currently selected banana status into a value of type
+*  GPBananaType .
+*/
+GrandPrixData::GPBananaType GPInfoScreen::getBanana() const
+{
+    switch (m_banana_spinner->getValue())
+    {
+    case 0: return GrandPrixData::GP_DEFAULT_BANANA; break;
+    case 1: return GrandPrixData::GP_NO_BANANA;      break;
+    case 2: return GrandPrixData::GP_ALL_BANANA;     break;
+    case 3: return GrandPrixData::GP_RANDOM_BANANA;  break;
+    default: assert(false);
+    }   // switch
+    // Avoid compiler warning
+    return GrandPrixData::GP_DEFAULT_BANANA;
+}   // getBanana
 // ----------------------------------------------------------------------------
 void GPInfoScreen::beforeAddingWidget()
 {
@@ -222,7 +295,10 @@ void GPInfoScreen::init()
         m_ai_kart_spinner->setMin(min_ai);
     }   // has_AI
 
-    m_reverse_spinner->setValue( UserConfigParams::m_gp_reverse );
+    m_reverse_spinner->setValue(UserConfigParams::m_gp_reverse);
+    m_powerup_spinner->setValue(UserConfigParams::m_gp_powerup);
+    m_nitro_spinner->setValue(UserConfigParams::m_gp_nitro);
+    m_banana_spinner->setValue( UserConfigParams::m_gp_banana);
 
     if (random)
     {
@@ -282,7 +358,7 @@ void GPInfoScreen::init()
 
         // Now create the random GP:
         m_gp.createRandomGP(m_num_tracks_spinner->getValue(),
-                            m_group_name, getReverse(), true);
+                            m_group_name, getReverse(), getPowerup(), getNitro(), getBanana(), true);
 
         getWidget<LabelWidget>("name")->setText(m_gp.getName(), false);
     }
@@ -360,7 +436,7 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
         {
             // Create a new GP:
             m_gp.createRandomGP(m_num_tracks_spinner->getValue(),
-                                m_group_name, getReverse(),
+                                m_group_name, getReverse(), getPowerup(), getNitro(), getBanana(),
                                 /*new tracks*/ true );
             addTracks();
         }
@@ -380,12 +456,18 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
             }
 
             m_gp.changeReverse(getReverse());
+            m_gp.changePowerup(getPowerup());
+            m_gp.changeNitro(getNitro());
+            m_gp.changeBanana(getBanana());
             RaceManager::get()->startGP(m_gp, false, false);
         }
         else if (button == "continue")
         {
             // Normal GP: continue a saved GP
             m_gp.changeReverse(getReverse());
+            m_gp.changePowerup(getPowerup());
+            m_gp.changeNitro(getNitro());
+            m_gp.changeBanana(getBanana());
             RaceManager::get()->startGP(m_gp, false, true);
         }
     }   // name=="buttons"
@@ -402,7 +484,7 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
         // tracks might not all belong to the newly selected group.
 
         m_gp.createRandomGP(m_num_tracks_spinner->getValue(), m_group_name,
-                            getReverse(),  /*new_tracks*/true);
+                            getReverse(), getPowerup(), getNitro(), getBanana(),  /*new_tracks*/true);
         addTracks();
     }
     else if (name=="track-spinner")
@@ -427,6 +509,24 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
     {
         const int reverse = m_reverse_spinner->getValue();
         UserConfigParams::m_gp_reverse = reverse;
+        updateHighscores();
+    }
+    else if (name == "powerup-spinner")
+    {
+        const int powerup = m_powerup_spinner->getValue();
+        UserConfigParams::m_gp_powerup = powerup;
+        updateHighscores();
+    }
+    else if (name == "nitro-spinner")
+    {
+        const int nitro = m_nitro_spinner->getValue();
+        UserConfigParams::m_gp_nitro = nitro;
+        updateHighscores();
+    }
+    else if (name == "banana-spinner")
+    {
+        const int banana = m_banana_spinner->getValue();
+        UserConfigParams::m_gp_banana = banana;
         updateHighscores();
     }
     else if(name == "time-target-spinner")
@@ -513,6 +613,9 @@ void GPInfoScreen::updateHighscores()
                                                                 m_gp.getId(),
                                                                 RaceManager::get()->isLapTrialMode() ? m_time_target_spinner->getValue() * 60 : 0,
                                                                 getReverse(),
+                                                                getPowerup(),
+                                                                getNitro(),
+                                                                getBanana(),
                                                                 RaceManager::get()->getMinorMode());
     m_highscore_list->clear();
     int count = highscores->getNumberEntries();

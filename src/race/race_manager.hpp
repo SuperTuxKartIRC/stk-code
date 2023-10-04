@@ -318,6 +318,15 @@ private:
     /** Whether a track should be reversed */
     std::vector<bool>                m_reverse_track;
 
+    /** Whether a track should have power-ups */
+    std::vector<bool>                m_powerup_track;
+
+    /** Whether a track should have bootle of nitro */
+    std::vector<bool>                m_nitro_track;
+
+    /** Whether a track should have banana */
+    std::vector<bool>                m_banana_track;
+
     /** The list of default AI karts to use. This is from the command line. */
     std::vector<std::string>         m_default_ai_list;
 
@@ -481,6 +490,22 @@ public:
         m_reverse_track.clear();
         m_reverse_track.push_back(r_t);
     }   // setReverseTrack
+    void setPowerupTrack(bool r_t)
+    {
+        m_powerup_track.clear();
+        m_powerup_track.push_back(r_t);
+    }   // setPowerupTrack
+    void setNitroTrack(bool r_t)
+    {
+        m_nitro_track.clear();
+        m_nitro_track.push_back(r_t);
+    }   // setNitroTrack
+    void setBananaTrack(bool r_t)
+    {
+        m_banana_track.clear();
+        m_banana_track.push_back(r_t);
+    }   // setBananaTrack
+
     // ----------------------------------------------------------------------------------------
     void setMajorMode(MajorRaceModeType mode) { m_major_mode = mode; }
     // ----------------------------------------------------------------------------------------
@@ -592,6 +617,12 @@ public:
     // ----------------------------------------------------------------------------------------
     /** \return whether the track should be reversed */
     bool getReverseTrack() const { return m_reverse_track[m_track_number]; }
+    /** \return whether the track should be with power-ups */
+    bool getPowerupTrack() const { return m_powerup_track[m_track_number]; }
+    /** \return whether the track should be with nitro */
+    bool getNitroTrack() const { return m_nitro_track[m_track_number]; }
+    /** \return whether the track should be with banana */
+    bool getBananaTrack() const { return m_banana_track[m_track_number]; }
     // ----------------------------------------------------------------------------------------
     /** Returns the difficulty. */
     Difficulty getDifficulty() const { return m_difficulty; }

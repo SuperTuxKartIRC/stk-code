@@ -238,6 +238,9 @@ int AchievementInfo::recursiveProgressCount(goalTree &parent)
             parent.children[0].type == "race-finished-all" ||
             parent.children[0].type == "race-won-all" ||
             parent.children[0].type == "race-finished-reverse-all" ||
+            parent.children[0].type == "race-finished-powerup-all" ||
+            parent.children[0].type == "race-finished-nitro-all" ||
+            parent.children[0].type == "race-finished-banana-all" ||
             parent.children[0].type == "race-finished-alone-all" ||
             parent.children[0].type == "less-laps-all" ||
             parent.children[0].type == "more-laps-all" ||

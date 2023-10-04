@@ -94,6 +94,8 @@ HighScoreInfoDialog::HighScoreInfoDialog(Highscores* highscore, bool is_linear, 
     //        to make this unselectable by keyboard/mouse
     m_high_score_list = getWidget<GUIEngine::ListWidget>("high_score_list");
     assert(m_high_score_list != NULL);
+    m_high_score_info_list = getWidget<GUIEngine::ListWidget>("high_score_info_list");
+    assert(m_high_score_info_list != NULL);
 
     /* Used to display kart icons for the entries */
     irr::gui::STKModifiedSpriteBank *icon_bank = HighScoreSelection::getInstance()->getIconBank();
@@ -105,48 +107,77 @@ HighScoreInfoDialog::HighScoreInfoDialog(Highscores* highscore, bool is_linear, 
 
     updateHighscoreEntries();
 
-    // Setup static text labels
-    m_high_score_label = getWidget<LabelWidget>("name");
-    m_high_score_label->setText(_("Top %d High Scores", m_hs->HIGHSCORE_LEN), true);
-    m_track_name_label = getWidget<LabelWidget>("track-name");
-    m_track_name_label->setText(_("%s: %s",
-                                track_type_name.c_str(), track_name), true);
-    m_difficulty_label = getWidget<LabelWidget>("difficulty");
-    m_difficulty_label->setText(_("Difficulty: %s", RaceManager::get()->
-                                getDifficultyName((RaceManager::Difficulty)
-                                m_hs->m_difficulty)), true);
-    m_num_karts_label = getWidget<LabelWidget>("num-karts");
-    m_reverse_label = getWidget<LabelWidget>("reverse");
-    m_num_laps_label = getWidget<LabelWidget>("num-laps");
+    stringw is_reverse;
+    stringw is_powerup;
+    stringw is_nitro;
+    stringw is_banana;
+    std::vector<GUIEngine::ListWidget::ListCell> row;
 
     if (is_linear)
     {
-        m_num_karts_label->setVisible(true);
-        m_num_karts_label->setText(_("Number of karts: %d", m_hs->m_number_of_karts), true);
-
-        stringw is_reverse;
         if (m_major_mode == RaceManager::MAJOR_MODE_GRAND_PRIX)
         {
             is_reverse = GrandPrixData::reverseTypeToString((GrandPrixData::GPReverseType)m_hs->m_gp_reverse_type);
-            m_num_laps_label->setText(_("Game mode: %s", RaceManager::getNameOf(m_minor_mode)), true);
+            is_powerup = GrandPrixData::powerupTypeToString((GrandPrixData::GPPowerupType)m_hs->m_gp_powerup_type);
+            is_nitro = GrandPrixData::nitroTypeToString((GrandPrixData::GPNitroType)m_hs->m_gp_nitro_type);
+            is_banana = GrandPrixData::bananaTypeToString((GrandPrixData::GPBananaType)m_hs->m_gp_banana_type);
+            //m_num_laps_label->setText(_("Game mode: %s", RaceManager::getNameOf(m_minor_mode)), true);
         }
         else
         {
             is_reverse = m_hs->m_reverse ? _("Yes") : _("No");
-            if (m_minor_mode == RaceManager::MINOR_MODE_LAP_TRIAL)
-                m_num_karts_label->setText(_("Time target: %s",StringUtils::toWString(StringUtils::timeToString(m_hs->m_number_of_laps))),true);
-            else
-                m_num_laps_label->setText(_("Laps: %d", m_hs->m_number_of_laps), true);
-
+            is_powerup = m_hs->m_powerup ? _("Yes") : _("No");
+            is_nitro = m_hs->m_nitro ? _("Yes") : _("No");
+            is_banana = m_hs->m_banana ? _("Yes") : _("No");
         }
-        m_reverse_label->setVisible(true);
-        m_reverse_label->setText(_("Reverse: %s", is_reverse), true);
+
+        row.push_back(GUIEngine::ListWidget::ListCell(_("Track name: %s", track_name), -1, 5, false));
+        m_high_score_info_list->addItem(StringUtils::toString(1), row);
+        row.clear();
+        row.push_back(GUIEngine::ListWidget::ListCell(_("Difficulty: %s", m_hs->m_difficulty), -1, 5, false));
+        m_high_score_info_list->addItem(StringUtils::toString(1), row);
+        row.clear();
+        row.push_back(GUIEngine::ListWidget::ListCell(_("Number of karts: %d", m_hs->m_number_of_karts), -1, 5, false));
+        m_high_score_info_list->addItem(StringUtils::toString(1), row);
+        row.clear();
+        if (m_minor_mode == RaceManager::MINOR_MODE_LAP_TRIAL)
+            row.push_back(GUIEngine::ListWidget::ListCell(_("Time target: %s", StringUtils::toWString(StringUtils::timeToString(m_hs->m_number_of_laps))), -1, 5, false));
+        else
+            row.push_back(GUIEngine::ListWidget::ListCell(_("Laps: %d", m_hs->m_number_of_laps), -1, 5, false));
+        m_high_score_info_list->addItem(StringUtils::toString(1), row);
+        row.clear();
+        row.push_back(GUIEngine::ListWidget::ListCell(_("Reverse: %s", is_reverse), -1, 5, false));
+        m_high_score_info_list->addItem(StringUtils::toString(1), row);
+        row.clear();
+        row.push_back(GUIEngine::ListWidget::ListCell(_("Power-ups: %s", is_powerup), -1 ,5, false));
+        m_high_score_info_list->addItem(StringUtils::toString(1), row);
+        row.clear();
+        row.push_back(GUIEngine::ListWidget::ListCell(_("Nitro: %s", is_nitro), -1, 5, false));
+        m_high_score_info_list->addItem(StringUtils::toString(1), row);
+        row.clear();
+        row.push_back(GUIEngine::ListWidget::ListCell(_("Banana: %s", is_banana), -1, 5, false));
+        m_high_score_info_list->addItem(StringUtils::toString(1), row);
     }
     else
     {
-        m_num_karts_label->setVisible(false);
-        m_num_laps_label->setVisible(false);
-        m_reverse_label->setVisible(false);
+        row.push_back(GUIEngine::ListWidget::ListCell(_("Track name: %s", track_name), -1, 5, false));
+        m_high_score_info_list->addItem(StringUtils::toString(1), row);
+        row.clear();
+
+        row.push_back(GUIEngine::ListWidget::ListCell(_("Difficulty: %s", m_hs->m_difficulty), -1, 5, false));
+        m_high_score_info_list->addItem(StringUtils::toString(1), row);
+        row.clear();
+
+        row.push_back(GUIEngine::ListWidget::ListCell(_("Power-ups: %s", is_powerup), -1, 5, false));
+        m_high_score_info_list->addItem(StringUtils::toString(1), row);
+        row.clear();
+
+        row.push_back(GUIEngine::ListWidget::ListCell(_("Nitro: %s", is_nitro), -1, 5, false));
+        m_high_score_info_list->addItem(StringUtils::toString(1), row);
+        row.clear();
+
+        row.push_back(GUIEngine::ListWidget::ListCell(_("Banana: %s", is_banana), -1, 5, false));
+        m_high_score_info_list->addItem(StringUtils::toString(1), row);
     }
 
     m_start_widget = getWidget<IconButtonWidget>("start");
@@ -278,6 +309,13 @@ GUIEngine::EventPropagation
 
             bool reverse = m_hs->m_reverse;
             GrandPrixData::GPReverseType gp_reverse = (GrandPrixData::GPReverseType)m_hs->m_gp_reverse_type;
+            bool powerup = m_hs->m_powerup;
+            GrandPrixData::GPPowerupType gp_powerup = (GrandPrixData::GPPowerupType)m_hs->m_gp_powerup_type;
+            bool nitro = m_hs->m_nitro;
+            GrandPrixData::GPNitroType gp_nitro = (GrandPrixData::GPNitroType)m_hs->m_gp_nitro_type;
+            bool banana = m_hs->m_banana;
+            GrandPrixData::GPBananaType gp_banana = (GrandPrixData::GPBananaType)m_hs->m_gp_banana_type;
+
             std::string track_name = m_hs->m_track;
             int laps = m_hs->m_number_of_laps;
             RaceManager::MajorRaceModeType major_mode = m_major_mode;
@@ -293,11 +331,17 @@ GUIEngine::EventPropagation
             {
                 GrandPrixData gp = *grand_prix_manager->getGrandPrix(track_name);
                 gp.changeReverse(gp_reverse);
+                gp.changePowerup(gp_powerup);
+                gp.changeNitro(gp_nitro);
+                gp.changeBanana(gp_banana);
                 RaceManager::get()->startGP(gp, false, false);
             }
             else
             {
                 RaceManager::get()->setReverseTrack(reverse);
+                RaceManager::get()->setPowerupTrack(powerup);
+                RaceManager::get()->setNitroTrack(nitro);
+                RaceManager::get()->setBananaTrack(banana);
                 RaceManager::get()->startSingleRace(track_name, RaceManager::get()->isLapTrialMode() ? -1 : laps, false);
             }
             return GUIEngine::EVENT_BLOCK;

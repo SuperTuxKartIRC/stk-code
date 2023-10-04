@@ -151,7 +151,7 @@ void HighScoreSelection::beforeAddingWidget()
         {
             m_high_scores_list_widget->addColumn(_C("column_name", "Laps"), 3);
         }
-            m_high_scores_list_widget->addColumn(_C("column_name", "Reverse"), 3);
+        m_high_scores_list_widget->addColumn(_C("column_name", "Reverse"), 3);
     }
 
     if (m_active_mode == RaceManager::MINOR_MODE_LAP_TRIAL)

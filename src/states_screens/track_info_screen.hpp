@@ -53,6 +53,10 @@ class TrackInfoScreen : public GUIEngine::Screen,
 
     bool m_show_ffa_spinner;
 
+    bool m_powerup_s;
+    bool m_nitro_s;
+    bool m_banana_s;
+
     // When there is no need to tab through / click on images/labels, we can add directly
     // irrlicht labels (more complicated uses require the use of our widget set)
         
@@ -89,6 +93,15 @@ class TrackInfoScreen : public GUIEngine::Screen,
     /** Check box for reverse mode or random item in arena. */
     GUIEngine::CheckBoxWidget* m_option;
 
+    /** Icon button for powerup mode */
+    GUIEngine::IconButtonWidget* m_powerup;
+
+    /** Icon button for nitro mode */
+    GUIEngine::IconButtonWidget* m_nitro;
+
+    /** Icon button for banana mode */
+    GUIEngine::IconButtonWidget* m_banana;
+
     /** Check box for record race. */
     GUIEngine::CheckBoxWidget* m_record_race;
 
@@ -106,6 +119,7 @@ class TrackInfoScreen : public GUIEngine::Screen,
     void setSoccerWidgets(bool has_AI);
     void setSoccerTarget(bool time_limit);
     void soccerSpinnerUpdate(bool blue_spinner);
+    GUIEngine::IconButtonWidget* changeIconButtonImage(GUIEngine::IconButtonWidget* iconButton, std::string name);
 
 public:
     TrackInfoScreen();

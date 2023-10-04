@@ -252,6 +252,15 @@ private:
     /** Whether this track should be available in reverse version */
     bool                     m_reverse_available;
 
+    /** Whether this track should be available with power-ups */
+    bool                     m_powerup_available;
+
+    /** Whether this track should be available with nitro */
+    bool                     m_nitro_available;
+
+    /** Whether this track should be available with banana */
+    bool                     m_banana_available;
+
     /** If true a player kart will automatically be rescued if it is
      *  e.g. on a side, .... */
     bool                     m_enable_auto_rescue;
@@ -507,6 +516,12 @@ public:
     // ------------------------------------------------------------------------
     /** Returns true if this race can be driven in reverse. */
     bool reverseAvailable() const { return m_reverse_available; }
+    /** Returns true if this race can be driven with power-ups. */
+    bool powerupAvailable() const { return m_powerup_available; }
+    /** Returns true if this race can be driven with nitro. */
+    bool nitroAvailable() const { return m_nitro_available; }
+    /** Returns true if this race can be driven with banana. */
+    bool bananaAvailable() const { return m_banana_available; }
     // ------------------------------------------------------------------------
     /** Returns true if this track navmesh. */
     bool hasNavMesh() const { return m_has_navmesh; }

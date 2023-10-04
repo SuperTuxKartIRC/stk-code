@@ -437,6 +437,14 @@ public:
     {
         return (scene::ISceneNode *) m_node;
     }
+private :
+
+    /** Stores if the item should be rendered */
+    bool m_item_rendered = true;
+    // ------------------------------------------------------------------------
+    /** Returns true if this mesh item (for powerup, nitro, banana) can be rendered or not 
+        depending of the race option*/
+    bool Item::itemShouldBeRendered(ItemType type);
 };   // class Item
 
 #endif

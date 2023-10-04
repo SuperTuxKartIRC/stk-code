@@ -557,6 +557,9 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
             std::string track_name = RaceManager::get()->getTrackName();
             int laps = RaceManager::get()->getNumLaps();
             bool reverse = RaceManager::get()->getReverseTrack();
+            bool powerup = RaceManager::get()->getPowerupTrack();
+            bool nitro = RaceManager::get()->getNitroTrack();
+            bool banana = RaceManager::get()->getBananaTrack();
             bool new_ghost_race = RaceManager::get()->isRecordingRace();
 
             RaceManager::get()->exitRace();
@@ -584,6 +587,9 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                 PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
 
                 RaceManager::get()->setReverseTrack(reverse);
+                RaceManager::get()->setPowerupTrack(powerup);
+                RaceManager::get()->setNitroTrack(nitro);
+                RaceManager::get()->setBananaTrack(banana);
                 RaceManager::get()->startSingleRace(track_name, laps, false);
             }
             else

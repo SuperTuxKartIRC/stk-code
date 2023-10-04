@@ -275,7 +275,19 @@ core::stringw AchievementProgressDialog::niceGoalName(std::string internal_name)
     // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="race-won") { nice_name =_("Races won"); nice_name += _(" (maximum on one official track)"); } 
     // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-    if(internal_name=="race-finished-reverse") { nice_name =_("Reverse direction races finished"); nice_name += _(" (maximum on one official track)"); } 
+    if(internal_name=="race-finished-reverse") { nice_name =_("Reverse direction races finished"); nice_name += _(" (maximum on one official track)"); }
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    if (internal_name == "race-finished-powerup") { nice_name = _("Races with power-ups activated finished"); nice_name += _(" (maximum on one official track)"); }
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    if (internal_name == "race-finished-no-powerup") { nice_name = _("Races with no power-ups activated finished"); nice_name += _(" (maximum on one official track)"); }
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    if (internal_name == "race-finished-nitro") { nice_name = _("Races with nitro activated finished"); nice_name += _(" (maximum on one official track)"); }
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    if (internal_name == "race-finished-no-nitro") { nice_name = _("Races with no nitro activated finished"); nice_name += _(" (maximum on one official track)"); }
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    if (internal_name == "race-finished-banana") { nice_name = _("Races with banana activated finished"); nice_name += _(" (maximum on one official track)"); }
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    if (internal_name == "race-finished-no-banana") { nice_name = _("Races with no banana activated finished"); nice_name += _(" (maximum on one official track)"); }
     // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="race-finished-alone") { nice_name =_("Races finished alone"); nice_name += _(" (maximum on one official track)"); } 
     // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
@@ -301,6 +313,18 @@ core::stringw AchievementProgressDialog::niceGoalName(std::string internal_name)
     if(internal_name=="race-won-all") { nice_name =_("Races won"); nice_name += _(" (official tracks matching the goal)"); } 
     // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="race-finished-reverse-all") { nice_name =_("Reverse direction races finished"); nice_name += _(" (official tracks matching the goal)"); } 
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    if (internal_name == "race-finished-powerup-all") { nice_name = _("Races with power-ups activated finished"); nice_name += _(" (official tracks matching the goal)"); }
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    if (internal_name == "race-finished-no-powerup-all") { nice_name = _("Races with no power-ups activated finished"); nice_name += _(" (official tracks matching the goal)"); }
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    if (internal_name == "race-finished-nitro-all") { nice_name = _("Races with nitro activated finished"); nice_name += _(" (official tracks matching the goal)"); }
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    if (internal_name == "race-finished-no-nitro-all") { nice_name = _("Races with no nitro activated finished"); nice_name += _(" (official tracks matching the goal)"); }
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    if (internal_name == "race-finished-banana-all") { nice_name = _("Races with banana activated finished"); nice_name += _(" (official tracks matching the goal)"); }
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    if (internal_name == "race-finished-no-banana-all") { nice_name = _("Races with no banana activated finished"); nice_name += _(" (official tracks matching the goal)"); }
     // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="race-finished-alone-all") { nice_name =_("Races finished alone"); nice_name += _(" (official tracks matching the goal)"); } 
     // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.

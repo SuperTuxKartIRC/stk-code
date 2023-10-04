@@ -48,7 +48,10 @@ public:
         SO_KART_NUM,            // Sorted by amount of karts used
         SO_DIFF,                // Sorted by difficulty level
         SO_LAPS,                // Sorted by number of laps
-        SO_REV                  // Sorted by if using reverse mode
+        SO_REV,                 // Sorted by if using reverse mode
+        SO_POWUP,               // Sorted by if using power-ups mode
+        SO_NITRO,               // Sorted by if using nitro mode
+        SO_BANANA               // Sorted by if using banana mode
     };
 
     typedef std::string HighscoreType;
@@ -60,7 +63,13 @@ public:
     int                 m_difficulty;
     int                 m_number_of_laps;
     bool                m_reverse;
+    bool                m_powerup;
+    bool                m_nitro;
+    bool                m_banana;
     int                 m_gp_reverse_type;
+    int                 m_gp_powerup_type;
+    int                 m_gp_nitro_type;
+    int                 m_gp_banana_type;
     int                 m_gp_minor_mode;
 
 private:
@@ -82,11 +91,13 @@ public:
     Highscores (const Highscores::HighscoreType &highscore_type,
                 int num_karts, const RaceManager::Difficulty &difficulty,
                 const std::string &trackName, const int number_of_laps,
-                const bool reverse);
+                const bool reverse, const bool powerup, const bool nitro, const bool banana);
     /** Constructor for grandprix highscores */
     Highscores (int num_karts, const RaceManager::Difficulty &difficulty,
                 const std::string &trackName, const int target,
-                const GrandPrixData::GPReverseType reverse_type, RaceManager::MinorRaceModeType minor_mode);
+                const GrandPrixData::GPReverseType reverse_type, const GrandPrixData::GPPowerupType powerup_type,
+                const GrandPrixData::GPNitroType nitro_type, const GrandPrixData::GPBananaType banana_type,
+                RaceManager::MinorRaceModeType minor_mode);
     /** Creates an entry from a file
      */
     Highscores (const XMLNode &node);
@@ -98,13 +109,15 @@ public:
     int  matches   (const HighscoreType &highscore_type, int num_karts,
                     const RaceManager::Difficulty &difficulty,
                     const std::string &track, const int number_of_laps,
-                    const bool reverse);
+                    const bool reverse, const bool powerup, const bool nitro, const bool banana);
     // ------------------------------------------------------------------------
     /** matches method for grandprix highscores */
     int matches(int num_karts,
                 const RaceManager::Difficulty &difficulty,
                 const std::string &track, const int target,
-                const GrandPrixData::GPReverseType reverse_type, RaceManager::MinorRaceModeType minor_mode);
+                const GrandPrixData::GPReverseType reverse_type, GrandPrixData::GPPowerupType powerup_type,
+                GrandPrixData::GPNitroType nitro_type, GrandPrixData::GPBananaType banana_type,
+                RaceManager::MinorRaceModeType minor_mode);
     // ------------------------------------------------------------------------
     int  addData   (const std::string& kart_name,
                     const irr::core::stringw& name, const float time);

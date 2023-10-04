@@ -48,6 +48,9 @@ GrandPrixData::GrandPrixData(const std::string& filename, enum GPGroupType group
     m_editable = (filename.find(file_manager->getGPDir(), 0) == 0);
     m_group    = group;
     m_reverse_type = GP_NO_REVERSE;
+    m_powerup_type = GP_DEFAULT_POWERUP;
+    m_nitro_type = GP_DEFAULT_NITRO;
+    m_banana_type = GP_DEFAULT_BANANA;
 
     reload();
 }   // GrandPrixData
@@ -57,6 +60,9 @@ GrandPrixData::GrandPrixData(const std::string& filename, enum GPGroupType group
  *  \param number_of_tracks How many tracks to select.
  *  \param track_group From which track group to select the tracks.
  *  \param use_reverse How the reverse setting is to be determined.
+ *  \param use_powerup How the powerup setting is to be determined.
+ *  \param use_nitro How the nitro setting is to be determined.
+ *  \param use_banana How the banana setting is to be determined.
  *  \param new_tracks If true, new tracks are selected, otherwise existing
  *         tracks will not be changed (used to e.g. increase the number of
  *         tracks in an already existing random grand prix).
@@ -65,6 +71,9 @@ GrandPrixData::GrandPrixData(const std::string& filename, enum GPGroupType group
 void GrandPrixData::createRandomGP(const unsigned int number_of_tracks,
                                    const std::string &track_group,
                                    const GPReverseType use_reverse,
+                                   const GPPowerupType use_powerup,
+                                   const GPNitroType use_nitro,
+                                   const GPBananaType use_banana,
                                    bool new_tracks)
 {
     m_filename = "Random GP - Not loaded from a file!";
@@ -73,19 +82,31 @@ void GrandPrixData::createRandomGP(const unsigned int number_of_tracks,
     m_editable = false;
     m_group    = GP_NONE;
     m_reverse_type = use_reverse;
+    m_powerup_type = use_powerup;
+    m_nitro_type = use_nitro;
+    m_banana_type = use_banana;
 
     if(new_tracks)
     {
         m_tracks.clear();
         m_laps.clear();
         m_reversed.clear();
+        m_powerup.clear();
+        m_nitro.clear();
+        m_banana.clear();
     }
     m_tracks.reserve(number_of_tracks);
     m_laps.reserve(number_of_tracks);
     m_reversed.reserve(number_of_tracks);
+    m_powerup.reserve(number_of_tracks);
+    m_nitro.reserve(number_of_tracks);
+    m_banana.reserve(number_of_tracks);
 
     changeTrackNumber(number_of_tracks, track_group);
     changeReverse(use_reverse);
+    changePowerup(use_powerup);
+    changeNitro(use_nitro);
+    changeBanana(use_banana);
 }   // createRandomGP
 
 // ----------------------------------------------------------------------------
@@ -153,6 +174,9 @@ void GrandPrixData::changeTrackNumber(const unsigned int number_of_tracks,
                 m_tracks.push_back(id);
                 m_laps.push_back(track->getDefaultNumberOfLaps());
                 m_reversed.push_back(false); // This will be changed later in the code
+                m_powerup.push_back(false); // This will be changed later in the code
+                m_nitro.push_back(false); // This will be changed later in the code
+                m_banana.push_back(false); // This will be changed later in the code
             }
 
             track_indices.erase(track_indices.begin()+index);
@@ -165,11 +189,15 @@ void GrandPrixData::changeTrackNumber(const unsigned int number_of_tracks,
             m_tracks.pop_back();
             m_laps.pop_back();
             m_reversed.pop_back();
+            m_powerup.pop_back();
+            m_nitro.pop_back();
+            m_banana.pop_back();
         }
     }
 
     assert(m_tracks.size() == m_laps.size()    );
     assert(m_laps.size()   == m_reversed.size());
+    // TODO : assert() ...
 }   // changeTrackNumber
 
 // ----------------------------------------------------------------------------
@@ -198,6 +226,87 @@ void GrandPrixData::changeReverse(const GrandPrixData::GPReverseType use_reverse
         }
     }   // for i < m_tracks.size()
 }   // changeReverse
+
+// ----------------------------------------------------------------------------
+/** Updates the GP data with newly decided power-ups requirements.
+ *  \param use_powerup How power-ups setting for each track is to be determined.
+ */
+void GrandPrixData::changePowerup(const GrandPrixData::GPPowerupType use_powerup)
+{
+    m_powerup_type = use_powerup;
+    for (unsigned int i = 0; i < m_tracks.size(); i++)
+    {
+        if (use_powerup == GP_NO_POWERUP)
+        {
+            m_powerup[i] = false;
+        }
+        else if (use_powerup == GP_ALL_POWERUP) // all with power-ups
+        {
+            m_powerup[i] = track_manager->getTrack(m_tracks[i])->powerupAvailable();
+        }
+        else if (use_powerup == GP_RANDOM_POWERUP)
+        {
+            if (track_manager->getTrack(m_tracks[i])->powerupAvailable())
+                m_powerup[i] = (rand() % 2 != 0);
+            else
+                m_powerup[i] = false;
+        }
+    }   // for i < m_tracks.size()
+} //changePowerup
+
+// ----------------------------------------------------------------------------
+/** Updates the GP data with newly decided nitro requirements.
+ *  \param use_nitro How nitro setting for each track is to be determined.
+ */
+void GrandPrixData::changeNitro(const GrandPrixData::GPNitroType use_nitro)
+{
+    m_nitro_type = use_nitro;
+    for (unsigned int i = 0; i < m_tracks.size(); i++)
+    {
+        if (use_nitro == GP_NO_NITRO)
+        {
+            m_nitro[i] = false;
+        }
+        else if (use_nitro == GP_ALL_NITRO) // all with nitro
+        {
+            m_nitro[i] = track_manager->getTrack(m_tracks[i])->nitroAvailable();
+        }
+        else if (use_nitro == GP_RANDOM_NITRO)
+        {
+            if (track_manager->getTrack(m_tracks[i])->nitroAvailable())
+                m_nitro[i] = (rand() % 2 != 0);
+            else
+                m_nitro[i] = false;
+        }
+    }   // for i < m_tracks.size()
+} // changeNitro
+
+// ----------------------------------------------------------------------------
+/** Updates the GP data with newly decided banana requirements.
+ *  \param use_banana How banana setting for each track is to be determined.
+ */
+void GrandPrixData::changeBanana(const GrandPrixData::GPBananaType use_banana)
+{
+    m_banana_type = use_banana;
+    for (unsigned int i = 0; i < m_tracks.size(); i++)
+    {
+        if (use_banana == GP_NO_BANANA)
+        {
+            m_banana[i] = false;
+        }
+        else if (use_banana == GP_ALL_BANANA) // all with banana
+        {
+            m_banana[i] = track_manager->getTrack(m_tracks[i])->bananaAvailable();
+        }
+        else if (use_banana == GP_RANDOM_BANANA)
+        {
+            if (track_manager->getTrack(m_tracks[i])->bananaAvailable())
+                m_banana[i] = (rand() % 2 != 0);
+            else
+                m_banana[i] = false;
+        }
+    }   // for i < m_tracks.size()
+} // changeBanana
 
 // ----------------------------------------------------------------------------
 /** Sets the id of this grand prix.
@@ -252,6 +361,9 @@ void GrandPrixData::reload()
     m_tracks.clear();
     m_laps.clear();
     m_reversed.clear();
+    m_powerup.clear();
+    m_nitro.clear();
+    m_banana.clear();
 
     std::unique_ptr<XMLNode> root(file_manager->createXMLTree(m_filename));
     if (root.get() == NULL)
@@ -346,13 +458,35 @@ void GrandPrixData::reload()
         if (!t->reverseAvailable())
             reversed = false;
 
+        // 4. Parsing the powerup attribute
+        bool powerup = false; // Stays false if not found
+        node->get("powerup", &powerup);
+        if (!t->powerupAvailable())
+            powerup = true;
+
+        // 5. Parsing the nitro attribute
+        bool nitro = false; // Stays false if not found
+        node->get(" nitro", &nitro);
+        if (!t->nitroAvailable())
+            nitro = true;
+
+        // 6. Parsing the banana attribute
+        bool banana = false; // Stays false if not found
+        node->get("banana", &banana);
+        if (!t->bananaAvailable())
+            banana = true;
+
         // Adding parsed data
         m_tracks.push_back(track_id);
         m_laps.push_back(number_of_laps);
         m_reversed.push_back(reversed);
+        m_powerup.push_back(powerup);
+        m_nitro.push_back(nitro);
+        m_banana.push_back(banana);
 
         assert(m_tracks.size() == m_laps.size()    );
         assert(m_laps.size()   == m_reversed.size());
+        // TODO : ASSERT 
     }   // end for all root nodes
 }   // reload()
 
@@ -373,8 +507,11 @@ bool GrandPrixData::writeToFile()
                 file <<
                     "\t<track id=\"" << m_tracks[i] <<
                     "\" laps=\""     << m_laps[i] <<
-                    "\" reverse=\""  << (m_reversed[i] ? L"true" : L"false")
-                                      <<  "\" />\n";
+                    "\" reverse=\""  << (m_reversed[i] ? L"true" : L"false") <<
+                    "\" powerup=\""  << (m_powerup[i] ? L"true" : L"false") <<
+                    "\" nitro=\""    << (m_nitro[i] ? L"true" : L"false") <<
+                    "\" banana=\""   << (m_banana[i] ? L"true" : L"false")
+                                     <<  "\" />\n";
             }
             file << "\n</supertuxkart_grand_prix>\n";
 
@@ -487,6 +624,51 @@ std::vector<bool> GrandPrixData::getReverse(bool include_locked) const
 }   // getReverse
 
 // ----------------------------------------------------------------------------
+/** Returns the power-ups setting for each available grand prix.
+ *  \param include_locked If data for locked tracks should be included or not.
+ *  \return A copy of alist with the powerup status for each track.
+ */
+std::vector<bool> GrandPrixData::getPowerup(bool include_locked) const
+{
+    std::vector<bool> powerup;
+    for (unsigned int i = 0; i < m_tracks.size(); i++)
+        if (isTrackAvailable(m_tracks[i], include_locked))
+            powerup.push_back(m_powerup[i]);
+
+    return powerup;
+}   // getPowerup
+
+// ----------------------------------------------------------------------------
+/** Returns the nitro setting for each available grand prix.
+ *  \param include_locked If data for locked tracks should be included or not.
+ *  \return A copy of alist with the nitro status for each track.
+ */
+std::vector<bool> GrandPrixData::getNitro(bool include_locked) const
+{
+    std::vector<bool> nitro;
+    for (unsigned int i = 0; i < m_tracks.size(); i++)
+        if (isTrackAvailable(m_tracks[i], include_locked))
+            nitro.push_back(m_nitro[i]);
+
+    return nitro;
+}   // getNitro
+
+// ----------------------------------------------------------------------------
+/** Returns the banana setting for each available grand prix.
+ *  \param include_locked If data for locked tracks should be included or not.
+ *  \return A copy of alist with the banana status for each track.
+ */
+std::vector<bool> GrandPrixData::getBanana(bool include_locked) const
+{
+    std::vector<bool> banana;
+    for (unsigned int i = 0; i < m_tracks.size(); i++)
+        if (isTrackAvailable(m_tracks[i], include_locked))
+            banana.push_back(m_banana[i]);
+
+    return banana;
+}   // getBanana
+
+// ----------------------------------------------------------------------------
 /** Returns true if this grand prix can be edited.
  */
 bool GrandPrixData::isEditable() const
@@ -545,6 +727,27 @@ bool GrandPrixData::getReverse(const unsigned int track) const
 }
 
 // ----------------------------------------------------------------------------
+bool GrandPrixData::getPowerup(const unsigned int track) const
+{
+    assert(track < getNumberOfTracks(true));
+    return m_powerup[track];
+}
+
+// ----------------------------------------------------------------------------
+bool GrandPrixData::getNitro(const unsigned int track) const
+{
+    assert(track < getNumberOfTracks(true));
+    return m_nitro[track];
+}
+
+// ----------------------------------------------------------------------------
+bool GrandPrixData::getBanana(const unsigned int track) const
+{
+    assert(track < getNumberOfTracks(true));
+    return m_banana[track];
+}
+
+// ----------------------------------------------------------------------------
 void GrandPrixData::moveUp(const unsigned int track)
 {
     assert (track > 0 && track < getNumberOfTracks(true));
@@ -554,6 +757,15 @@ void GrandPrixData::moveUp(const unsigned int track)
     bool tmp              = m_reversed[track    ];
     m_reversed[track]     = m_reversed[track - 1];
     m_reversed[track - 1] = tmp;
+    bool tmp2             = m_powerup[track];
+    m_powerup[track]      = m_powerup[track - 1];
+    m_powerup[track - 1]  = tmp2;
+    bool tmp3             = m_nitro[track];
+    m_nitro[track]        = m_nitro[track - 1];
+    m_nitro[track - 1]    = tmp3;
+    bool tmp4             = m_banana[track];
+    m_banana[track]       = m_banana[track - 1];
+    m_banana[track - 1]   = tmp4;
 }
 
 // ----------------------------------------------------------------------------
@@ -566,11 +778,20 @@ void GrandPrixData::moveDown(const unsigned int track)
     bool tmp              = m_reversed[track    ];
     m_reversed[track    ] = m_reversed[track + 1];
     m_reversed[track + 1] = tmp;
+    bool tmp2             = m_powerup[track];
+    m_powerup[track]      = m_powerup[track + 1];
+    m_powerup[track + 1]  = tmp2;
+    bool tmp3             = m_nitro[track];
+    m_nitro[track]        = m_nitro[track + 1];
+    m_nitro[track + 1]    = tmp3;
+    bool tmp4             = m_banana[track];
+    m_banana[track]       = m_banana[track + 1];
+    m_banana[track + 1]   = tmp4;
 }
 
 // ----------------------------------------------------------------------------
 void GrandPrixData::addTrack(Track* track, unsigned int laps, bool reverse,
-                             int position)
+                             bool powerup, bool nitro, bool banana, int position)
 {
     int n = getNumberOfTracks(true);
     assert (track != NULL);
@@ -583,6 +804,9 @@ void GrandPrixData::addTrack(Track* track, unsigned int laps, bool reverse,
         m_tracks.push_back(track->getIdent());
         m_laps.push_back(laps);
         m_reversed.push_back(reverse);
+        m_powerup.push_back(powerup);
+        m_nitro.push_back(nitro);
+        m_banana.push_back(banana);
     }
     else
     {
@@ -591,12 +815,15 @@ void GrandPrixData::addTrack(Track* track, unsigned int laps, bool reverse,
         m_tracks.  insert(m_tracks.begin()   + position + 1, track->getIdent());
         m_laps.    insert(m_laps.begin()     + position + 1, laps             );
         m_reversed.insert(m_reversed.begin() + position + 1, reverse          );
+        m_powerup .insert(m_powerup.begin()  + position + 1, powerup          );
+        m_nitro   .insert(m_nitro.begin()    + position + 1, nitro            );
+        m_banana  .insert(m_banana.begin()   + position + 1, banana           );
     }
 }
 
 // ----------------------------------------------------------------------------
 void GrandPrixData::editTrack(unsigned int index, Track* track,
-                              unsigned int laps, bool reverse)
+                              unsigned int laps, bool reverse, bool powerup, bool nitro, bool banana)
 {
     assert (index < getNumberOfTracks(true));
     assert (track != NULL);
@@ -605,6 +832,9 @@ void GrandPrixData::editTrack(unsigned int index, Track* track,
     m_tracks[index]   = track->getIdent();
     m_laps[index]     = laps;
     m_reversed[index] = reverse;
+    m_powerup[index] = powerup;
+    m_nitro[index] = nitro;
+    m_banana[index] = banana;
 }
 
 // ----------------------------------------------------------------------------
@@ -615,6 +845,9 @@ void GrandPrixData::remove(const unsigned int track)
     m_tracks.erase(m_tracks.begin() + track);
     m_laps.erase(m_laps.begin() + track);
     m_reversed.erase(m_reversed.begin() + track);
+    m_powerup.erase(m_powerup.begin() + track);
+    m_nitro.erase(m_nitro.begin() + track);
+    m_banana.erase(m_banana.begin() + track);
 }
 
 // ----------------------------------------------------------------------------
@@ -642,6 +875,60 @@ irr::core::stringw GrandPrixData::reverseTypeToString(GPReverseType reverse_type
     case GrandPrixData::GP_ALL_REVERSE:
         return _("All");
     case GrandPrixData::GP_RANDOM_REVERSE:
+        return _("Random");
+    default:
+        return "N/A";
+    }
+    return "N/A";
+}
+// ----------------------------------------------------------------------------
+irr::core::stringw GrandPrixData::powerupTypeToString(GPPowerupType powerup_type)
+{
+    switch (powerup_type)
+    {
+    case GrandPrixData::GP_DEFAULT_POWERUP:
+        return _("Default");
+    case GrandPrixData::GP_NO_POWERUP:
+        return _("None");
+    case GrandPrixData::GP_ALL_POWERUP:
+        return _("All");
+    case GrandPrixData::GP_RANDOM_POWERUP:
+        return _("Random");
+    default:
+        return "N/A";
+    }
+    return "N/A";
+}
+// ----------------------------------------------------------------------------
+irr::core::stringw GrandPrixData::nitroTypeToString(GPNitroType nitro_type)
+{
+    switch (nitro_type)
+    {
+    case GrandPrixData::GP_DEFAULT_NITRO:
+        return _("Default");
+    case GrandPrixData::GP_NO_NITRO:
+        return _("None");
+    case GrandPrixData::GP_ALL_NITRO:
+        return _("All");
+    case GrandPrixData::GP_RANDOM_NITRO:
+        return _("Random");
+    default:
+        return "N/A";
+    }
+    return "N/A";
+}
+// ----------------------------------------------------------------------------
+irr::core::stringw GrandPrixData::bananaTypeToString(GPBananaType banana_type)
+{
+    switch (banana_type)
+    {
+    case GrandPrixData::GP_DEFAULT_BANANA:
+        return _("Default");
+    case GrandPrixData::GP_NO_BANANA:
+        return _("None");
+    case GrandPrixData::GP_ALL_BANANA:
+        return _("All");
+    case GrandPrixData::GP_RANDOM_BANANA:
         return _("Random");
     default:
         return "N/A";

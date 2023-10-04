@@ -159,7 +159,10 @@ void History::Save()
     fprintf(fd, "numkarts:         %d\n",   num_karts);
     fprintf(fd, "numplayers:       %d\n", RaceManager::get()->getNumPlayers());
     fprintf(fd, "difficulty:       %d\n", RaceManager::get()->getDifficulty());
-    fprintf(fd, "reverse: %c\n", RaceManager::get()->getReverseTrack() ? 'y' : 'n');
+    fprintf(fd, "reverse:          %c\n", RaceManager::get()->getReverseTrack() ? 'y' : 'n');
+    fprintf(fd, "powerup:          %c\n", RaceManager::get()->getPowerupTrack() ? 'y' : 'n');
+    fprintf(fd, "nitro:            %c\n", RaceManager::get()->getNitroTrack()   ? 'y' : 'n');
+    fprintf(fd, "banana:           %c\n", RaceManager::get()->getBananaTrack()  ? 'y' : 'n');
 
     fprintf(fd, "track: %s\n", Track::getCurrentTrack()->getIdent().c_str());
 
@@ -259,6 +262,24 @@ void History::Load()
     if (sscanf(s, "reverse: %c", &r) != 1)
         Log::fatal("History", "Could not read reverse information: '%s'", s);
     RaceManager::get()->setReverseTrack(r == 'y');
+
+    fgets(s, 1023, fd);
+    char pwd;
+    if (sscanf(s, "powerup: %c", &pwd) != 1)
+        Log::fatal("History", "Could not read powerup information: '%s'", s);
+    RaceManager::get()->setPowerupTrack(pwd == 'y');
+
+    fgets(s, 1023, fd);
+    char nit;
+    if (sscanf(s, "nitro: %c", &nit) != 1)
+        Log::fatal("History", "Could not read nitro information: '%s'", s);
+    RaceManager::get()->setPowerupTrack(nit == 'y');
+
+    fgets(s, 1023, fd);
+    char b;
+    if (sscanf(s, "banana: %c", &b) != 1)
+        Log::fatal("History", "Could not read banana information: '%s'", s);
+    RaceManager::get()->setPowerupTrack(b == 'y');
 
     fgets(s, 1023, fd);
     if(sscanf(s, "track: %1023s",s1)!=1)

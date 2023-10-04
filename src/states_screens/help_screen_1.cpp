@@ -67,6 +67,9 @@ void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const i
         RaceManager::get()->setTrack( "tutorial" );
         RaceManager::get()->setDifficulty(RaceManager::DIFFICULTY_EASY);
         RaceManager::get()->setReverseTrack(false);
+        RaceManager::get()->setPowerupTrack(true);
+        RaceManager::get()->setNitroTrack(true);
+        RaceManager::get()->setBananaTrack(true);
 
         // Use the last used device
         InputDevice* device = input_manager->getDeviceManager()->getLatestUsedDevice();

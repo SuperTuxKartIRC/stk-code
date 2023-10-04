@@ -57,7 +57,10 @@ public:
                               const RaceManager::Difficulty difficulty,
                               const std::string &trackName,
                               const int number_of_laps,
-                              const bool reverse);
+                              const bool reverse,
+                              const bool powerup,
+                              const bool nitro,
+                              const bool banana);
     // ------------------------------------------------------------------------
     /** getHighscores method for grandprix highscores */
     Highscores *getGPHighscores(int num_karts,
@@ -65,6 +68,9 @@ public:
                                 const std::string &trackName,
                                 const int target,
                                 GrandPrixData::GPReverseType reverse_type,
+                                GrandPrixData::GPPowerupType powerup_type,
+                                GrandPrixData::GPNitroType nitro_type,
+                                GrandPrixData::GPBananaType banana_type,
                                 RaceManager::MinorRaceModeType minor_mode);
     // ------------------------------------------------------------------------
     void deleteHighscores(int i)        { m_all_scores.erase

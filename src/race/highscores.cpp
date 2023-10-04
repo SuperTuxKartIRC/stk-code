@@ -36,7 +36,8 @@ Highscores::Highscores(const HighscoreType &highscore_type,
                        const RaceManager::Difficulty &difficulty,
                        const std::string &track_name,
                        const int number_of_laps,
-                       const bool reverse)
+                       const bool reverse, const bool powerup,
+                       const bool nitro, const bool banana)
 {
     m_track           = track_name;
     m_highscore_type  = highscore_type;
@@ -44,7 +45,13 @@ Highscores::Highscores(const HighscoreType &highscore_type,
     m_difficulty      = difficulty;
     m_number_of_laps  = number_of_laps;
     m_reverse         = reverse;
+    m_powerup         = powerup;
+    m_nitro           = nitro;
+    m_banana          = banana;
     m_gp_reverse_type = (int)GrandPrixData::GP_DEFAULT_REVERSE;
+    m_gp_powerup_type = (int)GrandPrixData::GP_DEFAULT_POWERUP;
+    m_gp_nitro_type = (int)GrandPrixData::GP_DEFAULT_NITRO;
+    m_gp_banana_type = (int)GrandPrixData::GP_DEFAULT_BANANA;
     m_gp_minor_mode   = (int)RaceManager::MINOR_MODE_NORMAL_RACE;
 
     for(int i=0; i<HIGHSCORE_LEN; i++)
@@ -57,7 +64,9 @@ Highscores::Highscores(const HighscoreType &highscore_type,
 // ----------------------------------------------------------------------------
 Highscores::Highscores(int num_karts, const RaceManager::Difficulty &difficulty,
                        const std::string &track_name, const int target,
-                       const GrandPrixData::GPReverseType reverse_type, RaceManager::MinorRaceModeType minor_mode)
+                       const GrandPrixData::GPReverseType reverse_type, const GrandPrixData::GPPowerupType powerup_type,
+                       const GrandPrixData::GPNitroType nitro_type, const GrandPrixData::GPBananaType banana_type, 
+                       RaceManager::MinorRaceModeType minor_mode)
 {
     m_track           = track_name;
     m_highscore_type  = "HST_GRANDPRIX";
@@ -65,7 +74,13 @@ Highscores::Highscores(int num_karts, const RaceManager::Difficulty &difficulty,
     m_difficulty      = difficulty;
     m_number_of_laps  = target;
     m_reverse         = false;
+    m_powerup         = false;
+    m_nitro           = false;
+    m_banana          = false;
     m_gp_reverse_type = reverse_type;
+    m_gp_powerup_type = powerup_type;
+    m_gp_nitro_type   = nitro_type;
+    m_gp_banana_type  = banana_type;
     m_gp_minor_mode   = minor_mode;
 
     for(int i=0; i<HIGHSCORE_LEN; i++)
@@ -84,7 +99,13 @@ Highscores::Highscores(const XMLNode &node)
     m_difficulty      = -1;
     m_number_of_laps  = 0;
     m_reverse         = false;
+    m_powerup         = false;
+    m_nitro           = false;
+    m_banana          = false;
     m_gp_reverse_type = (int)GrandPrixData::GP_DEFAULT_REVERSE;
+    m_gp_powerup_type = (int)GrandPrixData::GP_DEFAULT_POWERUP;
+    m_gp_nitro_type   = (int)GrandPrixData::GP_DEFAULT_NITRO;
+    m_gp_banana_type  = (int)GrandPrixData::GP_DEFAULT_BANANA;
     m_gp_minor_mode   = (int)RaceManager::MINOR_MODE_NORMAL_RACE;
 
     for(int i=0; i<HIGHSCORE_LEN; i++)
@@ -110,11 +131,17 @@ void Highscores::readEntry(const XMLNode &node)
     if (hst == "HST_GRANDPRIX")
     {
         node.get("reverse-type", &m_gp_reverse_type);
+        node.get("powerup-type", &m_gp_powerup_type);
+        node.get("nitro-type", &m_gp_nitro_type);
+        node.get("banana-type", &m_gp_banana_type);
         node.get("minor-mode", &m_gp_minor_mode);
     }
     else
     {
         node.get("reverse", &m_reverse);
+        node.get("powerup", &m_powerup);
+        node.get("nitro", &m_nitro);
+        node.get("banana", &m_banana);
     }
     for(unsigned int i=0; i<node.getNumNodes(); i++)
     {
@@ -156,18 +183,24 @@ void Highscores::writeEntry(UTFWriter &writer)
         one_is_set |= m_time[i]>=0;
     if(!one_is_set) return;
 
-    writer << "  <highscore track-name    =\"" << m_track.c_str()           << "\"\n";
-    writer << "             number-karts  =\"" << m_number_of_karts         << "\"\n";
-    writer << "             difficulty    =\"" << m_difficulty              << "\"\n";
-    writer << "             hscore-type   =\"" << m_highscore_type.c_str()  << "\"\n";
-    writer << "             number-of-laps=\"" << m_number_of_laps          << "\"\n";
+    writer << "  <highscore track-name        =\"" << m_track.c_str()           << "\"\n";
+    writer << "             number-karts      =\"" << m_number_of_karts         << "\"\n";
+    writer << "             difficulty        =\"" << m_difficulty              << "\"\n";
+    writer << "             hscore-type       =\"" << m_highscore_type.c_str()  << "\"\n";
+    writer << "             number-of-laps    =\"" << m_number_of_laps          << "\"\n";
     if (m_highscore_type == "HST_GRANDPRIX")
     {
-        writer << "             reverse-type  =\"" << m_gp_reverse_type       << "\"\n";
-        writer << "             minor-mode    =\"" << m_gp_minor_mode       << "\">\n";
+        writer << "             reverse-type  =\"" << m_gp_reverse_type         << "\"\n";
+        writer << "             powerup-type  =\"" << m_gp_powerup_type         << "\"\n";
+        writer << "             nitro-type    =\"" << m_gp_nitro_type           << "\"\n";
+        writer << "             banana-type   =\"" << m_gp_banana_type          << "\"\n";
+        writer << "             minor-mode    =\"" << m_gp_minor_mode           << "\">\n";
     }
     else
-        writer << "             reverse       =\"" << m_reverse             << "\">\n";
+        writer << "             reverse       =\"" << m_reverse                 << "\">\n";
+        writer << "             powerup       =\"" << m_powerup                 << "\">\n";
+        writer << "             nitro         =\"" << m_nitro                   << "\">\n";
+        writer << "             banana        =\"" << m_banana                  << "\">\n";
 
     for(int i=0; i<HIGHSCORE_LEN; i++)
     {
@@ -187,20 +220,25 @@ void Highscores::writeEntry(UTFWriter &writer)
 int Highscores::matches(const HighscoreType &highscore_type,
                         int num_karts, const RaceManager::Difficulty &difficulty,
                         const std::string &track, const int number_of_laps,
-                        const bool reverse)
+                        const bool reverse, const bool powerup, const bool nitro, const bool banana)
 {
     return (m_highscore_type  == highscore_type   &&
             m_track           == track            &&
             m_difficulty      == difficulty       &&
             m_number_of_laps  == number_of_laps   &&
             m_number_of_karts == num_karts        &&
-            m_reverse         == reverse            );
+            m_reverse         == reverse          &&
+            m_powerup         == powerup          &&  
+            m_nitro           == nitro            &&           
+            m_banana          == banana);
 }   // matches
 // -----------------------------------------------------------------------------
 int Highscores::matches(int num_karts,
                         const RaceManager::Difficulty &difficulty,
                         const std::string &track, const int target,
-                        const GrandPrixData::GPReverseType reverse_type, RaceManager::MinorRaceModeType minor_mode)
+                        const GrandPrixData::GPReverseType reverse_type, const GrandPrixData::GPPowerupType powerup_type,
+                        const GrandPrixData::GPNitroType nitro_type, const GrandPrixData::GPBananaType banana_type, 
+                        RaceManager::MinorRaceModeType minor_mode)
 {
     return (m_highscore_type  == "HST_GRANDPRIX"  &&
             m_track           == track            &&
@@ -208,6 +246,9 @@ int Highscores::matches(int num_karts,
             m_number_of_laps  == target           &&
             m_number_of_karts == num_karts        &&
             m_gp_reverse_type == reverse_type     &&
+            m_gp_powerup_type == powerup_type     &&
+            m_gp_nitro_type   == nitro_type       &&
+            m_gp_banana_type  == banana_type      &&
             m_gp_minor_mode   == minor_mode         );
 }
 
@@ -260,6 +301,9 @@ int Highscores::addData(const std::string& kart_name,
         else
             m_number_of_laps  = RaceManager::get()->getNumLaps();
         m_reverse             = RaceManager::get()->getReverseTrack();
+        m_powerup             = RaceManager::get()->getPowerupTrack();
+        m_nitro               = RaceManager::get()->getNitroTrack();
+        m_banana              = RaceManager::get()->getBananaTrack();
         m_name[position]      = name;
         m_time[position]      = time;
         m_kart_name[position] = kart_name;
@@ -282,6 +326,9 @@ int Highscores::addGPData(const std::string& kart_name,
         else
             m_number_of_laps  = 0;
         m_gp_reverse_type     = RaceManager::get()->getGrandPrix().getReverseType();
+        m_gp_powerup_type     = RaceManager::get()->getGrandPrix().getPowerupType();
+        m_gp_nitro_type       = RaceManager::get()->getGrandPrix().getNitroType();
+        m_gp_banana_type      = RaceManager::get()->getGrandPrix().getBananaType();
         m_gp_minor_mode       = RaceManager::get()->getMinorMode();
         m_name[position]      = name;
         m_time[position]      = time;
@@ -343,6 +390,12 @@ bool Highscores::operator < (const Highscores& hi) const
             return m_number_of_laps < hi.m_number_of_laps;
         case SO_REV:
             return m_reverse < hi.m_reverse;
+        case SO_POWUP:
+            return m_powerup < hi.m_powerup;
+        case SO_NITRO:
+            return m_nitro < hi.m_nitro;
+        case SO_BANANA:
+            return m_banana < hi.m_banana;
     }   // switch
     return true;
 }   // operator <

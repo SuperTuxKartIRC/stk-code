@@ -476,6 +476,8 @@ void TracksScreen::init()
             m_reversed->setState(UserConfigParams::m_random_arena_item);
             if (vote)
                 m_reversed->setState(vote->m_reverse);
+
+            m_powerup_ib->setVisible(false);
         }
         else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
         {

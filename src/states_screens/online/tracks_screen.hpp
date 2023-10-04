@@ -36,6 +36,7 @@ namespace GUIEngine
     class ListWidget;
     class SpinnerWidget;
     class ProgressBarWidget;
+    class IconButtonWidget;
 }
 
 namespace irr
@@ -63,6 +64,9 @@ private:
     GUIEngine::SpinnerWidget* m_laps;
     GUIEngine::ListWidget* m_vote_list;
     GUIEngine::TextBoxWidget* m_search_track;
+    GUIEngine::IconButtonWidget* m_powerup_ib;
+    GUIEngine::IconButtonWidget* m_nitro_ib;
+    GUIEngine::IconButtonWidget* m_banana_ib;
 
     /** Pointer to progress bar widget which is used as a timer
     *  (going backwards). */

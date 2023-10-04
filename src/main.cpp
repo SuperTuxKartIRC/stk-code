@@ -581,6 +581,9 @@ void cmdLineHelp()
     "       --capture-limit    Specify capture limit for CTF.\n"
     "       --time-limit       Specify time limit for current game mode.\n"
     "       --reverse          Play track in reverse (if allowed)\n"
+    "       --powerup          Play track with power-ups or not (if allowed)\n"
+    "       --nitro            Play track with nitro or not (if allowed)\n"
+    "       --banana           Play track with banana or not (if allowed)\n"
     "  -f,  --fullscreen       Use fullscreen display.\n"
     "  -w,  --windowed         Use windowed display (default).\n"
     "  -s,  --screensize=WxH   Set the display size (e.g. 320x200).\n"
@@ -1585,6 +1588,21 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
     if(CommandLine::has("--reverse"))
     {
         RaceManager::get()->setReverseTrack(true);
+    }
+
+    if (CommandLine::has("--powerup"))
+    {
+        RaceManager::get()->setPowerupTrack(true);
+    }
+
+    if (CommandLine::has("--nitro"))
+    {
+        RaceManager::get()->setNitroTrack(true);
+    }
+
+    if (CommandLine::has("--banana"))
+    {
+        RaceManager::get()->setBananaTrack(true);
     }
 
     if(CommandLine::has("--track", &s) || CommandLine::has("-t", &s))

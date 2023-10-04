@@ -82,6 +82,15 @@ protected:
     /** GPReverseType of the GP as int */
     IntUserConfigParam          m_reverse_type;
 
+    /** GPPowerupType of the GP as int */
+    IntUserConfigParam          m_powerup_type;
+
+    /** GPNitroType of the GP as int */
+    IntUserConfigParam          m_nitro_type;
+
+    /** GPBananaType of the GP as int */
+    IntUserConfigParam          m_banana_type;
+
     /** Count of tracks that player skipped */
     IntUserConfigParam          m_skipped_tracks;
 
@@ -105,6 +114,9 @@ public:
                    int player_karts,
                    int last_track,
                    int reverse_type,
+                   int powerup_type,
+                   int nitro_type,
+                   int banana_type,
                    int skipped_tracks,
                    float time_target,
                    int player_total_laps,
@@ -149,6 +161,18 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the reverse Type. */
     int getReverseType() const { return m_reverse_type; }
+
+    // ------------------------------------------------------------------------
+    /** Returns the powerup Type. */
+    int getPowerupType() const { return m_powerup_type; }
+
+    // ------------------------------------------------------------------------
+    /** Returns the nitro Type. */
+    int getNitroType() const { return m_nitro_type; }
+
+    // ------------------------------------------------------------------------
+    /** Returns the banana Type. */
+    int getBananaType() const { return m_banana_type; }
 
     // ------------------------------------------------------------------------
     /** Returns skipped tracks count */

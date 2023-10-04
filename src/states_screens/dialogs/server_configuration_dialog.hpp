@@ -43,10 +43,20 @@ private:
     GUIEngine::RibbonWidget* m_difficulty_widget;
     GUIEngine::RibbonWidget* m_game_mode_widget;
     GUIEngine::RibbonWidget* m_options_widget;
+    GUIEngine::IconButtonWidget* m_powerup_widget;
+    GUIEngine::IconButtonWidget* m_nitro_widget;
+    GUIEngine::IconButtonWidget* m_banana_widget;
     GUIEngine::IconButtonWidget* m_ok_widget;
     GUIEngine::IconButtonWidget* m_cancel_widget;
 
+    bool m_powerup = true;
+    bool m_nitro = true;
+    bool m_banana = true;
+    int  m_cpt_for_options = 0;
+
     void updateMoreOption(int game_mode);
+    GUIEngine::IconButtonWidget* ServerConfigurationDialog::changeIconButtonImage(GUIEngine::IconButtonWidget* iconButton, std::string name);
+
 public:
     ServerConfigurationDialog(bool soccer_goal) : ModalDialog(0.8f, 0.8f)
     {

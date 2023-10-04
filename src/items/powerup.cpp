@@ -574,8 +574,13 @@ void Powerup::hitBonusBox(const ItemState &item_state)
     random_number ^= (random_number >> 16);
     random_number ^= (random_number >> 8);
 
-    new_powerup = powerup_manager->getRandomPowerup(position, &n, 
-                                                    random_number);
+    new_powerup = powerup_manager->getRandomPowerup(position, &n, random_number);
+
+    // Temporary condition. If the no banana option is selected we don't want the Switch banana and gift Power-up
+    // TODO : NEED CHANGE 
+    if (new_powerup == PowerupManager::POWERUP_SWITCH && RaceManager::get()->getBananaTrack() == false) {
+        new_powerup = PowerupManager::POWERUP_BOWLING;
+    }
 
     // Always add a new powerup in ITEM_MODE_NEW (or if the kart
     // doesn't have a powerup atm).

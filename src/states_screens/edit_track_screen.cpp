@@ -31,6 +31,7 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+using namespace irr::video;
 using namespace GUIEngine;
 using namespace irr::core;
 
@@ -39,7 +40,7 @@ const char* EditTrackScreen::ALL_TRACKS_GROUP_ID = "all";
 // -----------------------------------------------------------------------------
 EditTrackScreen::EditTrackScreen()
     : Screen("edit_track.stkgui"), m_track_group("standard"),
-    m_track(NULL), m_laps(0), m_reverse(false), m_result(false)
+    m_track(NULL), m_laps(0), m_reverse(false), m_powerup(false), m_nitro(false), m_banana(false), m_result(false)
 {
 
 }
@@ -51,12 +52,15 @@ EditTrackScreen::~EditTrackScreen()
 }
 
 // -----------------------------------------------------------------------------
-void EditTrackScreen::setSelection(Track* track, unsigned int laps, bool reverse)
+void EditTrackScreen::setSelection(Track* track, unsigned int laps, bool reverse, bool powerup, bool nitro, bool banana)
 {
     assert(laps > 0);
     m_track = track;
     m_laps = laps;
     m_reverse = reverse;
+    m_powerup = powerup;
+    m_nitro = nitro;
+    m_banana = banana;
 }
 
 // -----------------------------------------------------------------------------
@@ -75,6 +79,24 @@ unsigned int EditTrackScreen::getLaps() const
 bool EditTrackScreen::getReverse() const
 {
     return m_reverse;
+}
+
+// -----------------------------------------------------------------------------
+bool EditTrackScreen::getPowerup() const
+{
+    return m_powerup;
+}
+
+// -----------------------------------------------------------------------------
+bool EditTrackScreen::getNitro() const
+{
+    return m_nitro;
+}
+
+// -----------------------------------------------------------------------------
+bool EditTrackScreen::getBanana() const
+{
+    return m_banana;
 }
 
 // -----------------------------------------------------------------------------
@@ -123,6 +145,12 @@ void EditTrackScreen::init()
     assert(laps != NULL);
     CheckBoxWidget* reverse = getWidget<CheckBoxWidget>("reverse");
     assert(reverse != NULL);
+    IconButtonWidget* powerup = getWidget<IconButtonWidget>("powerup");
+    assert(powerup != NULL);
+    IconButtonWidget* nitro = getWidget<IconButtonWidget>("nitro");
+    assert(nitro != NULL);
+    IconButtonWidget* banana = getWidget<IconButtonWidget>("banana");
+    assert(banana != NULL);
 
     if (m_track_group.empty())
         tabs->select (ALL_TRACKS_GROUP_ID, PLAYER_ID_GAME_MASTER);
@@ -130,6 +158,9 @@ void EditTrackScreen::init()
         tabs->select (m_track_group, PLAYER_ID_GAME_MASTER);
     laps->setValue(m_laps);
     reverse->setState(m_reverse);
+    powerup->setState(m_powerup);
+    nitro->setState(m_nitro);
+    banana->setState(m_banana);
 
     loadTrackList();
     if (m_track == NULL)
@@ -177,6 +208,36 @@ void EditTrackScreen::eventCallback(GUIEngine::Widget* widget, const std::string
         assert(reverse != NULL);
         m_reverse = reverse->getState();
     }
+    else if (name == "powerup")
+    {
+        IconButtonWidget* powerup = getWidget<IconButtonWidget>("powerup");
+        assert(powerup != NULL);
+
+        powerup->setTooltip("Disable power-ups");
+        RaceManager::get()->setPowerupTrack(powerup->getState());
+        powerup = changeIconButtonImage(powerup, "gift");
+        m_powerup = powerup->getState();
+    }
+    else if (name == "nitro")
+    {
+        IconButtonWidget* nitro = getWidget<IconButtonWidget>("nitro");
+        assert(nitro != NULL);
+
+        nitro->setTooltip("Disable nitro");
+        RaceManager::get()->setNitroTrack(nitro->getState());
+        nitro = changeIconButtonImage(nitro, "nitro");
+        m_nitro = nitro->getState();
+    }
+    else if (name == "banana")
+    {
+        IconButtonWidget* banana = getWidget<IconButtonWidget>("banana");
+        assert(banana != NULL);
+
+        banana->setTooltip("Disable banana");
+        RaceManager::get()->setBananaTrack(banana->getState());
+        banana = changeIconButtonImage(banana, "banana");
+        m_banana = banana->getState();
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -219,8 +280,19 @@ void EditTrackScreen::selectTrack(const std::string& id)
     assert(label_reverse != NULL);
     CheckBoxWidget* reverse = getWidget<CheckBoxWidget>("reverse");
     assert(reverse != NULL);
+    IconButtonWidget* powerup = getWidget<IconButtonWidget>("powerup");
+    powerup = setIconButtonImage(powerup, "gift");
+    assert(powerup != NULL);
+    IconButtonWidget* nitro = getWidget<IconButtonWidget>("nitro");
+    nitro = setIconButtonImage(nitro, "nitro");
+    assert(nitro != NULL);
+    IconButtonWidget* banana = getWidget<IconButtonWidget>("banana");
+    banana = setIconButtonImage(banana, "banana");
+    assert(banana != NULL);
     ButtonWidget* ok_button = getWidget<ButtonWidget>("ok");
     assert(ok_button != NULL);
+
+
 
     m_track = track_manager->getTrack(id);
     ok_button->setActive(m_track!=NULL);
@@ -234,6 +306,10 @@ void EditTrackScreen::selectTrack(const std::string& id)
 
         reverse->setVisible(m_track->reverseAvailable());
         label_reverse->setVisible(m_track->reverseAvailable());
+
+        powerup->setVisible(m_track->powerupAvailable());
+        nitro->setVisible(m_track->nitroAvailable());
+        banana->setVisible(m_track->bananaAvailable());
 
         // Display the track's preview picture in a box,
         // so that the current selection remains obvious even
@@ -261,5 +337,47 @@ void EditTrackScreen::selectTrack(const std::string& id)
         reverse->setVisible(true);
         reverse->setState(false);
 
+        powerup->setVisible(true);
+        powerup->setState(true);
+        nitro->setVisible(true);
+        nitro->setState(true);
+        banana->setVisible(true);
+        banana->setState(true);
     }
+}
+
+IconButtonWidget* EditTrackScreen::changeIconButtonImage(IconButtonWidget* iconButton, std::string name)
+{
+    ITexture* image;
+
+    if (iconButton->getState() == true) {
+        iconButton->setState(false);
+        image = STKTexManager::getInstance()->getTexture(GUIEngine::getSkin()->getThemedIcon("gui/icons/no_" + name + ".png"));
+    }
+    else {
+        iconButton->setState(true);
+        image = STKTexManager::getInstance()->getTexture(GUIEngine::getSkin()->getThemedIcon(("gui/icons/" + name + ".png")));
+    }
+
+    if (image != NULL)
+        iconButton->setImage(image);
+
+    return iconButton;
+}
+
+GUIEngine::IconButtonWidget* EditTrackScreen::setIconButtonImage(GUIEngine::IconButtonWidget* iconButton, std::string name)
+{
+    ITexture* image;
+
+    if (iconButton->getState() == true) {
+        image = STKTexManager::getInstance()->getTexture(GUIEngine::getSkin()->getThemedIcon(("gui/icons/" + name + ".png")));
+    }
+    else {
+        image = STKTexManager::getInstance()->getTexture(GUIEngine::getSkin()->getThemedIcon("gui/icons/no_" + name + ".png"));
+    }
+
+    if (image != NULL)
+        iconButton->setImage(image);
+
+    return iconButton;
 }

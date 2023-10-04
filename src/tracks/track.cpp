@@ -148,6 +148,9 @@ Track::Track(const std::string &filename)
     m_enable_auto_rescue    = true;  // Below set to false in arenas
     m_enable_push_back      = true;
     m_reverse_available     = false;
+    m_powerup_available     = true;
+    m_nitro_available       = true;
+    m_banana_available      = true;
     m_is_arena              = false;
     m_is_ctf                = false;
     m_max_arena_players     = 0;
@@ -569,6 +572,9 @@ void Track::loadTrackInfo()
     root->get("groups",                &m_groups);
     root->get("internal",              &m_internal);
     root->get("reverse",               &m_reverse_available);
+    root->get("powerup",               &m_powerup_available);
+    root->get("nitro",                 &m_nitro_available);
+    root->get("banana",                &m_banana_available);
     root->get("default-number-of-laps",&m_default_number_of_laps);
     root->get("push-back",             &m_enable_push_back);
     root->get("bloom",                 &m_bloom);

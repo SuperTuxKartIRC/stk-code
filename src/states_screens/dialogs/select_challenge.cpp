@@ -77,6 +77,24 @@ core::stringw getLabel(RaceManager::Difficulty difficulty, const ChallengeData* 
             //I18N: In the Select challenge dialog, tell user this challenge has reversed laps
             description += _("Mode: Reverse");
         }
+        if (c_data->getPowerup())
+        {
+            description += L" - ";
+            //I18N: In the Select challenge dialog, tell user this challenge has ower-ups
+            description += _("Mode: Power-ups");
+        }
+        if (c_data->getNitro())
+        {
+            description += L" - ";
+            //I18N: In the Select challenge dialog, tell user this challenge has bottle of nitro
+            description += _("Mode: Nitro");
+        }
+        if (c_data->getBanana())
+        {
+            description += L" - ";
+            //I18N: In the Select challenge dialog, tell user this challenge has banana
+            description += _("Mode: Banana");
+        }
     } // if !isGrandPrix
     //I18N: In the Select challenge dialog, type of this challenge
     label = _("Type: %s", description);

@@ -49,6 +49,9 @@ class EditTrackScreen :
     Track*              m_track;
     unsigned int        m_laps;
     bool                m_reverse;
+    bool                m_powerup;
+    bool                m_nitro;
+    bool                m_banana;
     bool                m_result;
 
     GUIEngine::IconButtonWidget* m_screenshot;
@@ -57,10 +60,13 @@ public:
 
                 ~EditTrackScreen();
 
-    void         setSelection(Track* track, unsigned int laps, bool reverse);
+    void         setSelection(Track* track, unsigned int laps, bool reverse, bool powerup, bool nitro, bool banana);
     Track*       getTrack() const;
     unsigned int getLaps() const;
     bool         getReverse() const;
+    bool         getPowerup() const;
+    bool         getNitro() const;
+    bool         getBanana() const;
     bool         getResult() const;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
@@ -75,6 +81,11 @@ public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
+
+private :
+    GUIEngine::IconButtonWidget* changeIconButtonImage(GUIEngine::IconButtonWidget* iconButton, std::string name);
+    GUIEngine::IconButtonWidget* setIconButtonImage(GUIEngine::IconButtonWidget* iconButton, std::string name);
+
 };
 
 #endif

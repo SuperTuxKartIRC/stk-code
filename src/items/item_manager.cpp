@@ -345,24 +345,49 @@ Item* ItemManager::dropNewItem(ItemState::ItemType type,
 Item* ItemManager::placeItem(ItemState::ItemType type, const Vec3& xyz,
                              const Vec3 &normal)
 {
-    // Make sure this subroutine is not used otherwise (since networking
-    // needs to be aware of items added to the track, so this would need
-    // to be added).
-    assert(World::getWorld()->getPhase() == WorldStatus::SETUP_PHASE ||
-           ProfileWorld::isProfileMode()                               );
-    ItemState::ItemType mesh_type = type;
-
-    Item* item = new Item(type, xyz, normal, m_item_mesh[mesh_type],
-                          m_item_lowres_mesh[mesh_type], m_icon[mesh_type],
-                          /*prev_owner*/NULL);
-
-    insertItem(item);
-    if (m_switch_ticks >= 0)
-    {
-        ItemState::ItemType new_type = m_switch_to[item->getType()];
-        item->switchTo(new_type);
+    if (type == ItemState::ITEM_BONUS_BOX) {
+        Log::info("Item type : ", "Gift_Box");
     }
-    return item;
+    if (type == ItemState::ITEM_NITRO_BIG || type == ItemState::ITEM_NITRO_SMALL) {
+        Log::info("Item type : ", "Nitro");
+    }
+    if (type == ItemState::ITEM_BANANA) {
+        Log::info("Item type : ", "Banana");
+    }
+
+
+    if (itemIsDesactivate(type) == false) {
+
+        if (type == ItemState::ITEM_BONUS_BOX) {
+            Log::info("ItemP : ", "Gift_Box");
+        }
+        if (type == ItemState::ITEM_NITRO_BIG || type == ItemState::ITEM_NITRO_SMALL) {
+            Log::info("ItemP : ", "Nitro");
+        }
+        if (type == ItemState::ITEM_BANANA) {
+            Log::info("ItemP : ", "Banana");
+        }
+
+
+        // Make sure this subroutine is not used otherwise (since networking
+        // needs to be aware of items added to the track, so this would need
+        // to be added).
+        assert(World::getWorld()->getPhase() == WorldStatus::SETUP_PHASE ||
+            ProfileWorld::isProfileMode());
+        ItemState::ItemType mesh_type = type;
+
+        Item* item = new Item(type, xyz, normal, m_item_mesh[mesh_type],
+            m_item_lowres_mesh[mesh_type], m_icon[mesh_type],
+            /*prev_owner*/NULL);
+
+        insertItem(item);
+        if (m_switch_ticks >= 0)
+        {
+            ItemState::ItemType new_type = m_switch_to[item->getType()];
+            item->switchTo(new_type);
+        }
+        return item;
+    }
 }   // placeItem
 
 //-----------------------------------------------------------------------------
@@ -711,3 +736,32 @@ bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos)
 
     return true;
 }   // randomItemsForArena
+
+//-----------------------------------------------------------------------------
+ /** Returns true if this mesh item (for powerup, nitro, banana) can be rendered or not
+     depending of the race option*/
+bool ItemManager::itemIsDesactivate(ItemState::ItemType type)
+{
+    bool powerup = RaceManager::get()->getPowerupTrack();
+    bool nitro = RaceManager::get()->getNitroTrack();
+    bool banana = RaceManager::get()->getBananaTrack();
+
+    if ((RaceManager::get()->getPowerupTrack() == false && type == ItemState::ItemType::ITEM_BONUS_BOX) ||
+        (RaceManager::get()->getNitroTrack() == false   && type == ItemState::ItemType::ITEM_NITRO_BIG) ||
+        (RaceManager::get()->getNitroTrack() == false   && type == ItemState::ItemType::ITEM_NITRO_SMALL) ||
+        (RaceManager::get()->getBananaTrack() == false  && type == ItemState::ItemType::ITEM_BANANA)) {
+        return true; 
+    }
+    else {
+        return false;
+    }
+
+
+    //if ((type == ItemState::ItemType::ITEM_BONUS_BOX) ||
+    //    (type == ItemState::ItemType::ITEM_NITRO_BIG) ||
+    //    (type == ItemState::ItemType::ITEM_NITRO_SMALL) ||
+    //    (type == ItemState::ItemType::ITEM_BANANA)) {
+    //    return true;
+    //}
+
+}   // reset

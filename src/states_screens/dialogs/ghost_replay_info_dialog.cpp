@@ -145,6 +145,12 @@ void GhostReplayInfoDialog::updateReplayDisplayedInfo()
         row.push_back(GUIEngine::ListWidget::ListCell
             (_C("column_name", "Reverse"), -1, 3, true));
     row.push_back(GUIEngine::ListWidget::ListCell
+            (_C("column_name", "Power-ups"), -1, 3, true));
+    row.push_back(GUIEngine::ListWidget::ListCell
+            (_C("column_name", "Nitro"), -1, 3, true));
+    row.push_back(GUIEngine::ListWidget::ListCell
+            (_C("column_name", "Banana"), -1, 3, true));
+    row.push_back(GUIEngine::ListWidget::ListCell
         (_C("column_name", "Difficulty"), -1, 4, true));
     if (is_linear)
         row.push_back(GUIEngine::ListWidget::ListCell
@@ -199,6 +205,13 @@ void GhostReplayInfoDialog::updateReplayDisplayedInfo()
             row.push_back(GUIEngine::ListWidget::ListCell
                 (rd.m_reverse ? _("Yes") : _("No"), -1, 3, true));
         row.push_back(GUIEngine::ListWidget::ListCell
+                (rd.m_powerup ? _("Yes") : _("No"), -1, 3, true));
+        row.push_back(GUIEngine::ListWidget::ListCell
+                (rd.m_nitro ? _("Yes") : _("No"), -1, 3, true));
+        row.push_back(GUIEngine::ListWidget::ListCell
+                (rd.m_banana ? _("Yes") : _("No"), -1, 3, true));
+
+        row.push_back(GUIEngine::ListWidget::ListCell
             (RaceManager::get()->
                 getDifficultyName((RaceManager::Difficulty) rd.m_difficulty),
                                                               -1, 4, true));
@@ -234,6 +247,9 @@ GUIEngine::EventPropagation
             RaceManager::get()->setMinorMode(GhostReplaySelection::getInstance()->getActiveMode());
 
             bool reverse = m_rd.m_reverse;
+            bool powerup = m_rd.m_powerup;
+            bool nitro   = m_rd.m_nitro;
+            bool banana  = m_rd.m_banana;
             std::string track_name = m_rd.m_track_name;
             int laps = m_rd.m_laps;
             int replay_id = m_replay_id;
@@ -262,6 +278,12 @@ GUIEngine::EventPropagation
             PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
 
             RaceManager::get()->setReverseTrack(reverse);
+
+            RaceManager::get()->setPowerupTrack(powerup);
+
+            RaceManager::get()->setNitroTrack(nitro);
+
+            RaceManager::get()->setBananaTrack(banana);
 
             //Reset comparison if active
             GhostReplaySelection::getInstance()->setCompare(false);

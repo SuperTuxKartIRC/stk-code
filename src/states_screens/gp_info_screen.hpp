@@ -49,6 +49,15 @@ private:
     /** Spinner for reverse mode. */
     GUIEngine::SpinnerWidget *m_reverse_spinner;
 
+    /** Spinner for power-ups mode. */
+    GUIEngine::SpinnerWidget* m_powerup_spinner;
+
+    /** Spinner for nitro mode. */
+    GUIEngine::SpinnerWidget* m_nitro_spinner;
+
+    /** Spinner for banana mode. */
+    GUIEngine::SpinnerWidget* m_banana_spinner;
+
     /** Spinner for number of tracks (in case of random GP). */
     GUIEngine::SpinnerWidget *m_num_tracks_spinner;
 
@@ -94,7 +103,9 @@ protected: // Necessary for RandomGPInfoScreen
     void addScreenshot();
     void updateRandomGP();
     GrandPrixData::GPReverseType getReverse() const;
-
+    GrandPrixData::GPPowerupType getPowerup() const;
+    GrandPrixData::GPNitroType getNitro() const;
+    GrandPrixData::GPBananaType getBanana() const;
 public:
     GPInfoScreen();
     /** Places the focus back on the selected GP, in the case that the dialog

@@ -67,6 +67,15 @@ private:
     /** Whether the track in question should be done in reverse mode */
     std::vector<bool> m_reversed;
 
+    /** Whether the track in question should be done with power-ups */
+    std::vector<bool> m_powerup;
+
+    /** Whether the track in question should be done with nitro */
+    std::vector<bool> m_nitro;
+
+    /** Whether the track in question should be done with banana */
+    std::vector<bool> m_banana;
+
     /** Wether the user can edit this grand prix or not */
     bool m_editable;
 
@@ -93,8 +102,34 @@ public:
         GP_DEFAULT_REVERSE = 3
     };   // GPReverseType
 
+    enum GPPowerupType
+    {
+        GP_NO_POWERUP = 0,
+        GP_ALL_POWERUP = 1,
+        GP_RANDOM_POWERUP = 2,
+        GP_DEFAULT_POWERUP = 3
+    };   // GPPowerupType
+
+    enum GPNitroType
+    {
+        GP_NO_NITRO = 0,
+        GP_ALL_NITRO = 1,
+        GP_RANDOM_NITRO = 2,
+        GP_DEFAULT_NITRO = 3
+    };
+
+    enum GPBananaType
+    {
+        GP_NO_BANANA = 0,
+        GP_ALL_BANANA = 1,
+        GP_RANDOM_BANANA = 2,
+        GP_DEFAULT_BANANA = 3
+    };   // GPBananaType
 private:
     GPReverseType m_reverse_type;
+    GPPowerupType m_powerup_type;
+    GPNitroType m_nitro_type;
+    GPBananaType m_banana_type;
 
 public:
 #if (defined(WIN32) || defined(_WIN32)) && !defined(__MINGW32__)
@@ -109,6 +144,9 @@ public:
         m_editable = false;
         m_group = GP_NONE;
         m_reverse_type = GP_NO_REVERSE;
+        m_powerup_type = GP_DEFAULT_POWERUP;
+        m_nitro_type = GP_DEFAULT_NITRO;
+        m_banana_type = GP_DEFAULT_BANANA;
     }
 
     virtual ~GrandPrixData() {}
@@ -118,10 +156,15 @@ public:
     void changeTrackNumber(const unsigned int number_of_tracks,
                            const std::string& track_group);
     void changeReverse(const GPReverseType use_reverse);
-
+    void changePowerup(const GPPowerupType use_powerup);
+    void changeNitro(const GPNitroType use_nitro);
+    void changeBanana(const GPBananaType use_banana);
     void createRandomGP(const unsigned int number_of_tracks,
                         const std::string& track_group,
                         const GPReverseType use_reverse,
+                        const GPPowerupType use_powerup,
+                        const GPNitroType   use_nitro,
+                        const GPBananaType  use_banana,
                         bool new_tracks=false);
 
     // Methods for the GP editor
@@ -137,19 +180,25 @@ public:
 
     bool                     checkConsistency(bool log_error=true) const;
     std::vector<int>         getLaps(const bool includeLocked=false) const;
-    std::vector<bool>        getReverse(const bool includeLocked=false) const;
+    std::vector<bool>        getReverse(const bool includeLocked = false) const;
+    std::vector<bool>        getPowerup(const bool includeLocked = false) const;
+    std::vector<bool>        getNitro(const bool includeLocked = false) const;
+    std::vector<bool>        getBanana(const bool includeLocked=false) const;
     bool                     isEditable() const;
     const std::string&       getTrackId(const unsigned int track) const;
     irr::core::stringw       getTrackName(const unsigned int track) const;
     bool                     containsUnavailableTracks() const;
     unsigned int             getLaps(const unsigned int track) const;
     bool                     getReverse(const unsigned int track) const;
+    bool                     getPowerup(const unsigned int track) const;
+    bool                     getNitro(const unsigned int track) const;
+    bool                     getBanana(const unsigned int track) const;
     void                     moveUp(const unsigned int track);
     void                     moveDown(const unsigned int track);
     void                     addTrack(Track* track, unsigned int laps,
-                                      bool reverse, int position=-1);
+                                      bool reverse, bool powerup, bool nitro, bool banana, int position=-1);
     void                     editTrack(unsigned int index, Track* track,
-                                       unsigned int laps, bool reverse);
+                                       unsigned int laps, bool reverse, bool powerup, bool nitro, bool banana);
     void                     remove(const unsigned int track);
 
     // -------------------------------------------------------------------------
@@ -172,9 +221,27 @@ public:
     // -------------------------------------------------------------------------
     enum GPReverseType getReverseType()
                                       const { return m_reverse_type;           }
+    // -------------------------------------------------------------------------
+    enum GPPowerupType getPowerupType()
+        const {
+        return m_powerup_type;
+    }
+    // -------------------------------------------------------------------------
+    enum GPNitroType getNitroType()
+        const {
+        return m_nitro_type;
+    }
+    // -------------------------------------------------------------------------
+    enum GPBananaType getBananaType()
+        const {
+        return m_banana_type;
+    }
     static const char*        getRandomGPID()   { return "random";             }
     static irr::core::stringw getRandomGPName();
     static irr::core::stringw reverseTypeToString(GPReverseType reverse_type);
+    static irr::core::stringw powerupTypeToString(GPPowerupType powerup_type);
+    static irr::core::stringw nitroTypeToString(GPNitroType nitro_type);
+    static irr::core::stringw bananaTypeToString(GPBananaType banana_type);
 };   // GrandPrixData
 
 #endif

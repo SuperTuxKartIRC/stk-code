@@ -442,6 +442,15 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam          m_gp_reverse
             PARAM_DEFAULT(  IntUserConfigParam(0, "gp-reverse",
             &m_race_setup_group, "Default direction of GP tracks. 0=default, 1=no reverse, 2=all reverse, 3=Random") );
+    PARAM_PREFIX IntUserConfigParam          m_gp_powerup
+            PARAM_DEFAULT(IntUserConfigParam(0, "gp-powerup",
+            &m_race_setup_group, "Default power-ups mode of GP tracks. 0=default, 1=no power-ups, 2=all power-ups, 3=Random"));
+    PARAM_PREFIX IntUserConfigParam          m_gp_nitro
+            PARAM_DEFAULT(IntUserConfigParam(0, "gp-nitro",
+            &m_race_setup_group, "Default nitro mode of GP tracks. 0=default, 1=no nitro, 2=all nitro, 3=Random"));
+    PARAM_PREFIX IntUserConfigParam          m_gp_banana
+            PARAM_DEFAULT(IntUserConfigParam(0, "gp-banana",
+            &m_race_setup_group, "Default banana mode of GP tracks. 0=default, 1=no banana, 2=all banana, 3=Random"));
     PARAM_PREFIX IntUserConfigParam          m_rand_gp_num_tracks
             PARAM_DEFAULT(  IntUserConfigParam(1, "random-gp-num-tracks",
             &m_race_setup_group, "Default number of tracks for random GP.") );            

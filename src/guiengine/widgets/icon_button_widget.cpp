@@ -61,6 +61,8 @@ IconButtonWidget::IconButtonWidget(ScaleMode scale_mode, const bool tab_stop,
     m_scale_mode = scale_mode;
 
     m_icon_path_type = pathType;
+
+    m_state = true;
 }
 // -----------------------------------------------------------------------------
 void IconButtonWidget::add()

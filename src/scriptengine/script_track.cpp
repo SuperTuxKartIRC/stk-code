@@ -181,6 +181,21 @@ namespace Scripting
         {
             return RaceManager::get()->getReverseTrack();
         }
+
+        bool isTrackHavePowerup()
+        {
+            return RaceManager::get()->getPowerupTrack();
+        }
+
+        bool isTrackHaveNitro()
+        {
+            return RaceManager::get()->getNitroTrack();
+        }
+
+        bool isTrackHaveBanana()
+        {
+            return RaceManager::get()->getBananaTrack();
+        }
         
         /**
           * Gets the difficulty setting for this race.
@@ -586,6 +601,18 @@ namespace Scripting
                                                
             r = engine->RegisterGlobalFunction("bool isReverse()", 
                                                mp ? WRAP_FN(isTrackReverse) : asFUNCTION(isTrackReverse), 
+                                               call_conv); assert(r >= 0);
+
+            r = engine->RegisterGlobalFunction("bool isPowerup()",
+                                               mp ? WRAP_FN(isTrackHavePowerup) : asFUNCTION(isTrackHavePowerup),
+                                               call_conv); assert(r >= 0);
+
+            r = engine->RegisterGlobalFunction("bool isNitro()",
+                                               mp ? WRAP_FN(isTrackHaveNitro) : asFUNCTION(isTrackHaveNitro),
+                                               call_conv); assert(r >= 0);
+
+            r = engine->RegisterGlobalFunction("bool isBanana()",
+                                               mp ? WRAP_FN(isTrackHaveBanana) : asFUNCTION(isTrackHaveBanana),
                                                call_conv); assert(r >= 0);
             
             r = engine->RegisterGlobalFunction("int getDifficulty()", 

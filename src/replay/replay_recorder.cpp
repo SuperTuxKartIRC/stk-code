@@ -328,8 +328,15 @@ uint64_t ReplayRecorder::computeUID(float min_time)
     date_uid = date_uid*12 + (month-1);;
     date_uid = date_uid*31 + (day-1);
 
-    int reverse = RaceManager::get()->getReverseTrack() ? 1 : 0;
-    unique_identifier += reverse;
+    int temp = 0;
+    temp = RaceManager::get()->getReverseTrack() ? 1 : 0;
+    unique_identifier += temp;
+    temp = RaceManager::get()->getPowerupTrack() ? 1 : 0;
+    unique_identifier += temp;
+    temp = RaceManager::get()->getNitroTrack() ? 1 : 0;
+    unique_identifier += temp;
+    temp = RaceManager::get()->getBananaTrack() ? 1 : 0;
+    unique_identifier += temp;
     unique_identifier += RaceManager::get()->getDifficulty()*2;
     unique_identifier += (RaceManager::get()->getNumLaps()-1)*8;
     unique_identifier += min_time_uid*160;
@@ -424,6 +431,9 @@ void ReplayRecorder::save()
 
     fprintf(fd, "kart_list_end\n");
     fprintf(fd, "reverse: %d\n",    (int)RaceManager::get()->getReverseTrack());
+    fprintf(fd, "powerup: %d\n",    (int)RaceManager::get()->getPowerupTrack());
+    fprintf(fd, "nitro: %d\n",      (int)RaceManager::get()->getNitroTrack());
+    fprintf(fd, "banana: %d\n",     (int)RaceManager::get()->getBananaTrack());
     fprintf(fd, "difficulty: %d\n", RaceManager::get()->getDifficulty());
     fprintf(fd, "mode: %s\n",       RaceManager::get()->getMinorModeName().c_str());
     fprintf(fd, "track: %s\n",      Track::getCurrentTrack()->getIdent().c_str());

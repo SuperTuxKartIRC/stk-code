@@ -36,14 +36,8 @@ private:
     GUIEngine::RibbonWidget*      m_action_widget;
     GUIEngine::IconButtonWidget*  m_start_widget;
 
-    GUIEngine::LabelWidget*       m_high_score_label;
-    GUIEngine::LabelWidget*       m_track_name_label;
-    GUIEngine::LabelWidget*       m_num_karts_label;
-    GUIEngine::LabelWidget*       m_difficulty_label;
-    GUIEngine::LabelWidget*       m_reverse_label;
-    GUIEngine::LabelWidget*       m_num_laps_label;
-
     GUIEngine::ListWidget*        m_high_score_list;
+    GUIEngine::ListWidget*        m_high_score_info_list;
     GUIEngine::IconButtonWidget*  m_track_screenshot_widget;
 
     void updateHighscoreEntries();

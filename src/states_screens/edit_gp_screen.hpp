@@ -62,6 +62,9 @@ class EditGPScreen :
     GUIEngine::ListWidget*             m_list;
     irr::gui::STKModifiedSpriteBank*   m_icon_bank;
     std::vector<int>                   m_icons;
+    std::vector<int>                   m_icons_powerup;
+    std::vector<int>                   m_icons_nitro;
+    std::vector<int>                   m_icons_banana;
     int                                m_selected;
     bool                               m_modified;
 
