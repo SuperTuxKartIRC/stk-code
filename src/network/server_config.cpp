@@ -237,6 +237,27 @@ std::pair<RaceManager::MinorRaceModeType, RaceManager::MajorRaceModeType>
         case 8:
             return { RaceManager::MINOR_MODE_CAPTURE_THE_FLAG,
                 RaceManager::MAJOR_MODE_SINGLE };
+        case 9:
+            return { RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM,
+                RaceManager::MAJOR_MODE_SINGLE };
+        case 10:
+            return { RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER,
+                RaceManager::MAJOR_MODE_SINGLE };
+        case 11:
+            return { RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_TIMER,
+                RaceManager::MAJOR_MODE_SINGLE };
+        case 12:
+            return { RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE,
+                RaceManager::MAJOR_MODE_SINGLE };
+        case 13:
+            return { RaceManager::MINOR_MODE_TAG_ARENA_BATTLE,
+                RaceManager::MAJOR_MODE_SINGLE };
+        case 14:
+            return { RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA,
+                RaceManager::MAJOR_MODE_SINGLE };
+        case 15:
+            return { RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA,
+                RaceManager::MAJOR_MODE_SINGLE };
         default:
             break;
     }
@@ -273,6 +294,20 @@ core::stringw getModeName(unsigned id)
             return _("Free-For-All");
         case 8:
             return _("Capture The Flag");
+        case 9:
+            return _("Team Arena Team Points");
+        case 10:
+            return _("Team Arena Player Points");
+        case 11:
+            return _("Team Arena Timer");
+        case 12:
+            return _("Team Arena Life");
+        case 13:
+            return _("Tag Arena");
+        case 14:
+            return _("Monster Arena");
+        case 15:
+            return _("Murder Mystery");
         default:
             return L"";
     }
@@ -319,7 +354,7 @@ void loadServerLobbyFromConfig()
         m_player_reports_expired_days.revertToDefaults();
     if (m_server_difficulty > RaceManager::DIFFICULTY_LAST)
         m_server_difficulty = RaceManager::DIFFICULTY_LAST;
-    if (m_server_mode > 8)
+    if (m_server_mode > 15)
         m_server_mode = 3;
 
     if (m_official_karts_threshold > 1.0f)
@@ -339,6 +374,17 @@ void loadServerLobbyFromConfig()
 
     if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL &&
         m_server_max_players > 10)
+        m_server_max_players = 10;
+    if ((RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM   || 
+         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER ||
+         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_TIMER         ||
+         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE)         &&
+        m_server_max_players > 10) // TODO : Changer 10 to 20 si possible
+        m_server_max_players = 10;
+    if ((RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ARENA_BATTLE      ||
+         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA  ||
+         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA) &&
+        m_server_max_players > 10) // TODO : Changer 10 to 20 si possible
         m_server_max_players = 10;
 
     m_max_players_in_game = (m_max_players_in_game <= 0) ? m_server_max_players :
@@ -364,6 +410,8 @@ void loadServerLobbyFromConfig()
             m_min_start_game_players = 1;
         if (!m_live_players)
             m_team_choosing = false;
+        if (!m_live_players)
+            m_teams_choosing = false;
         m_server_configurable = false;
     }
     if (modes.second == RaceManager::MAJOR_MODE_GRAND_PRIX)

@@ -33,6 +33,7 @@
 
 class STKPeer;
 enum KartTeam : int8_t;
+enum KartTeams : int8_t;
 enum HandicapLevel : uint8_t;
 
 /*! \class NetworkPlayerProfile
@@ -69,6 +70,8 @@ private:
     float m_overall_time;
 
     std::atomic<KartTeam> m_team;
+
+    std::atomic<KartTeams> m_teams;
 
     /** 2-letter country code of player. */
     std::string m_country_code;
@@ -112,6 +115,39 @@ public:
         m_local_player_id       = local_player_id;
         m_team.store(team);
         m_country_code          = country_code;
+        resetGrandPrixData();
+    }
+    // ------------------------------------------------------------------------
+/* Placeholder profile for reserved player in live join, which its host id
+ * is uint32_t max. */
+    NetworkPlayerProfile(KartTeams team)
+    {
+        m_kart_name = "tux";
+        m_host_id = std::numeric_limits<uint32_t>::max();
+        m_default_kart_color = 0.0f;
+        m_online_id = 0;
+        m_handicap.store((HandicapLevel)0);
+        m_local_player_id = 0;
+        m_teams.store(team);
+        resetGrandPrixData();
+    }
+    // ------------------------------------------------------------------------
+    NetworkPlayerProfile(std::shared_ptr<STKPeer> peer,
+        const irr::core::stringw& name, uint32_t host_id,
+        float default_kart_color, uint32_t online_id,
+        HandicapLevel handicap,
+        uint8_t local_player_id, KartTeams team,
+        const std::string& country_code)
+    {
+        m_peer = peer;
+        m_player_name = name;
+        m_host_id = host_id;
+        m_default_kart_color = default_kart_color;
+        m_online_id = online_id;
+        m_handicap.store(handicap);
+        m_local_player_id = local_player_id;
+        m_teams.store(team);
+        m_country_code = country_code;
         resetGrandPrixData();
     }
     // ------------------------------------------------------------------------
@@ -168,6 +204,10 @@ public:
     void setTeam(KartTeam team)                         { m_team.store(team); }
     // ------------------------------------------------------------------------
     KartTeam getTeam() const                          { return m_team.load(); }
+    // ------------------------------------------------------------------------
+    void setTeams(KartTeams team) { m_teams.store(team); }
+    // ------------------------------------------------------------------------
+    KartTeams getTeams() const { return m_teams.load(); }
     // ------------------------------------------------------------------------
     const std::string& getCountryCode() const        { return m_country_code; }
     // ------------------------------------------------------------------------

@@ -53,6 +53,7 @@ using namespace irr;
 #include "modes/linear_world.hpp"
 #include "modes/world.hpp"
 #include "modes/soccer_world.hpp"
+#include "modes/team_arena_battle.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/race_gui_multitouch.hpp"
@@ -100,6 +101,11 @@ RaceGUI::RaceGUI()
     // Load icon textures for later reuse
     m_red_team = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_red.png");
     m_blue_team = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_blue.png");
+    // TODO : Change image path depending of the color team 
+    m_team1 = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_red.png");
+    m_team2 = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_blue.png");
+    m_team3 = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_green.png");
+    m_team4 = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_orange.png");
     m_red_flag = irr_driver->getTexture(FileManager::GUI_ICON, "red_flag.png");
     m_blue_flag = irr_driver->getTexture(FileManager::GUI_ICON, "blue_flag.png");
     m_soccer_ball = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_normal.png");
@@ -541,6 +547,34 @@ void RaceGUI::drawLiveDifference()
     font->setBlackBorder(false);
 }   // drawLiveDifference
 
+
+video::SColor RaceGUI::rgbaColorKartTeamsColor(KartTeamsColor teamColor)
+{
+    return teamColor == KART_TEAM_COLOR_BLUE ? video::SColor(255, 0, 0, 255) :
+
+        KART_TEAM_COLOR_RED ? video::SColor(255, 255, 0, 0) :
+
+        KART_TEAM_COLOR_GREEN ? video::SColor(255, 0, 255, 0) :
+
+        KART_TEAM_COLOR_YELLOW ? video::SColor(255, 255, 255, 0) :
+
+        KART_TEAM_COLOR_ORANGE ? video::SColor(255, 255, 165, 0) :
+
+        KART_TEAM_COLOR_PURPLE ? video::SColor(255, 128, 0, 128) :
+
+        KART_TEAM_COLOR_PINK ? video::SColor(255, 255, 192, 203) :
+
+        KART_TEAM_COLOR_TURQUOISE ? video::SColor(255, 0, 206, 209) :
+
+        KART_TEAM_COLOR_DARK_BLUE ? video::SColor(255, 0, 0, 139) :
+
+        KART_TEAM_COLOR_CYAN ? video::SColor(255, 0, 255, 255) :
+
+        KART_TEAM_COLOR_DEFAULT ? video::SColor(255, 255, 182, 193) :
+
+        video::SColor(255, 255, 182, 193);
+} // rgbaColorKartTeamsColor
+
 //-----------------------------------------------------------------------------
 /** Draws the mini map and the position of all karts on it.
  */
@@ -574,7 +608,8 @@ void RaceGUI::drawGlobalMiniMap()
 
     World* world = World::getWorld();
     CaptureTheFlag *ctf_world = dynamic_cast<CaptureTheFlag*>(World::getWorld());
-    SoccerWorld *soccer_world = dynamic_cast<SoccerWorld*>(World::getWorld());
+    SoccerWorld* soccer_world = dynamic_cast<SoccerWorld*>(World::getWorld());
+    TeamArenaBattle* team_arena_world = dynamic_cast<TeamArenaBattle*>(World::getWorld());
 
     if (ctf_world)
     {
@@ -681,9 +716,10 @@ void RaceGUI::drawGlobalMiniMap()
                                  lower_y   -(int)(draw_at.getY()-marker_half_size));
 
         bool has_teams = (ctf_world || soccer_world);
+        bool has_teams_4 = team_arena_world;
         
         // Highlight the player icons with some background image.
-        if ((has_teams || is_local) && m_icons_frame != NULL)
+        if ((has_teams || has_teams_4 || is_local) && m_icons_frame != NULL)
         {
             video::SColor color = kart->getKartProperties()->getColor();
             
@@ -699,6 +735,34 @@ void RaceGUI::drawGlobalMiniMap()
                 {
                     color = video::SColor(255, 0, 0, 200);
                 }
+            }
+            if (has_teams_4) {
+                KartTeams team = world->getKartTeams(kart->getWorldKartId());
+                /*KartTeamsColor teamColor = world->getKartTeamsColor(kart->getWorldKartId());
+
+                video::SColor kartColor = rgbaColorKartTeamsColor(teamColor);*/
+                if (team == KART_TEAM_1)
+                {
+                    color = video::SColor(255, 200, 0, 0);
+                    //color = kartColor;
+                }
+                else if (team == KART_TEAM_2)
+                {
+                    color = video::SColor(255, 0, 0, 200);
+                    //color = kartColor;
+                }
+                else if (team == KART_TEAM_3)
+                {
+                    //color = video::SColor(255, 0, 0, 0);
+                    color = video::SColor(255, 0, 255, 0);
+                    //color = kartColor;
+                }
+                else if (team == KART_TEAM_4)
+                {
+                    color = video::SColor(255, 255, 165, 0);
+                    //color = kartColor;
+                }
+                //color = kartColor;
             }
                                   
             video::SColor colors[4] = {color, color, color, color};

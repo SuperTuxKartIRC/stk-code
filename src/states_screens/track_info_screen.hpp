@@ -49,13 +49,24 @@ class TrackInfoScreen : public GUIEngine::Screen,
 
     bool m_is_soccer;
 
+    bool m_is_team_arena;
+
     bool m_is_lap_trial;
+
+    bool m_is_team_arena_battle;
+
+    bool m_is_teams_mode;
+
+    bool m_is_arena_mode;
 
     bool m_show_ffa_spinner;
 
     // When there is no need to tab through / click on images/labels, we can add directly
     // irrlicht labels (more complicated uses require the use of our widget set)
         
+    /** The div that contains the highscores. */
+    GUIEngine::Widget* m_race_highscores_div;
+
     /** Spinner for target types. */
     GUIEngine::SpinnerWidget* m_target_type_spinner;
 
@@ -71,6 +82,24 @@ class TrackInfoScreen : public GUIEngine::Screen,
     /* The div that contains the blue ai spinner and label */
     GUIEngine::Widget* m_ai_blue_div;
 
+    /** Spinner for number of blue AI karts. */
+    GUIEngine::SpinnerWidget* m_ai_team3_spinner;
+
+    /** The label besides the blue AI karts spinner. */
+    GUIEngine::LabelWidget* m_ai_team3_label;
+
+    /* The div that contains the blue ai spinner and label */
+    GUIEngine::Widget* m_ai_team3_div;
+
+    /** Spinner for number of blue AI karts. */
+    GUIEngine::SpinnerWidget* m_ai_team4_spinner;
+
+    /** The label besides the blue AI karts spinner. */
+    GUIEngine::LabelWidget* m_ai_team4_label;
+
+    /* The div that contains the blue ai spinner and label */
+    GUIEngine::Widget* m_ai_team4_div;
+
     /* The div that contains the target type spinner and label */
     GUIEngine::Widget* m_target_type_div;
 
@@ -79,6 +108,24 @@ class TrackInfoScreen : public GUIEngine::Screen,
 
     /** The label besides the target value spinner. */
     GUIEngine::LabelWidget* m_target_value_label;
+
+    /** Spinner for life value e.g. in battle mode. */
+    GUIEngine::SpinnerWidget* m_life_value_spinner;
+
+    /** The label besides the life value spinner. */
+    GUIEngine::LabelWidget* m_life_value_label;
+
+    /* The div that contains the kart life spinner and label */
+    GUIEngine::Widget* m_number_life_div;
+
+    /** Spinner for points condition value e.g. in battle mode. */
+    GUIEngine::SpinnerWidget* m_point_value_spinner;
+
+    /** The label besides the points value spinner. */
+    GUIEngine::LabelWidget* m_point_value_label;
+
+    /* The div that contains the winning point spinner and label */
+    GUIEngine::Widget* m_number_point_div;
 
     /** Spinner for number of AI karts. */
     GUIEngine::SpinnerWidget* m_ai_kart_spinner;
@@ -106,6 +153,9 @@ class TrackInfoScreen : public GUIEngine::Screen,
     void setSoccerWidgets(bool has_AI);
     void setSoccerTarget(bool time_limit);
     void soccerSpinnerUpdate(bool blue_spinner);
+    void teamsSpinnerUpdate(std::string team);
+    void setTeamArenaBattleWidgets(bool has_AI);
+    void setWidgetsValueZeroDeactivateText(GUIEngine::SpinnerWidget* spinner, GUIEngine::LabelWidget* label, const std::string& normalText, const std::string& zeroText);
 
 public:
     TrackInfoScreen();

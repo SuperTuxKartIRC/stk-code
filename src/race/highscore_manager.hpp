@@ -57,7 +57,7 @@ public:
                               const RaceManager::Difficulty difficulty,
                               const std::string &trackName,
                               const int number_of_laps,
-                              const bool reverse);
+                              const bool banana);
     // ------------------------------------------------------------------------
     /** getHighscores method for grandprix highscores */
     Highscores *getGPHighscores(int num_karts,

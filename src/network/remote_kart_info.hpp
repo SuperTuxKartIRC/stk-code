@@ -37,6 +37,30 @@ enum KartTeam : int8_t
     KART_TEAM_BLUE=1,
 };
 
+enum KartTeams : int8_t
+{
+    KART_TEAM_N = -1,
+    KART_TEAM_1 = 0,
+    KART_TEAM_2 = 1,
+    KART_TEAM_3 = 2,
+    KART_TEAM_4 = 3,
+};
+
+enum KartTeamsColor : int8_t
+{
+    KART_TEAM_COLOR_BLUE = 0,
+    KART_TEAM_COLOR_RED = 1,
+    KART_TEAM_COLOR_GREEN = 2,
+    KART_TEAM_COLOR_YELLOW = 3,
+    KART_TEAM_COLOR_ORANGE = 4,
+    KART_TEAM_COLOR_PURPLE = 5,
+    KART_TEAM_COLOR_PINK = 6,
+    KART_TEAM_COLOR_TURQUOISE = 7,
+    KART_TEAM_COLOR_DARK_BLUE = 8,
+    KART_TEAM_COLOR_CYAN = 9,
+    KART_TEAM_COLOR_DEFAULT = 10
+};
+
 /** Handicap per player. */
 enum HandicapLevel : uint8_t
 {
@@ -55,6 +79,8 @@ class RemoteKartInfo
         int                 m_global_player_id;
         uint32_t            m_host_id;
         KartTeam            m_kart_team;
+        KartTeams           m_kart_teams;
+        KartTeamsColor      m_kart_team_color;
         bool                m_network_player;
         HandicapLevel       m_handicap;
         float               m_default_kart_color;
@@ -88,37 +114,40 @@ public:
                     m_handicap(HANDICAP_NONE),
                     m_default_kart_color(0.0f), m_online_id(0)
      {}
-    void setKartName(const std::string& n)   { m_kart_name = n;           }
-    void setPlayerName(const irr::core::stringw& u) { m_user_name = u;    }
-    void setHostId(uint32_t id)              { m_host_id = id;            }
-    void setLocalPlayerId(int id)            { m_local_player_id = id;    }
-    void setGlobalPlayerId(int id)           { m_global_player_id = id;   }
-    void setKartTeam(KartTeam team)      { m_kart_team = team;      }
-    void setNetworkPlayer(bool value)        { m_network_player = value;  }
-    void setDefaultKartColor(float value) { m_default_kart_color = value; }
-    void setHandicap(HandicapLevel value)    { m_handicap = value;        }
-    void setOnlineId(uint32_t id)            { m_online_id = id;          }
-    uint32_t getHostId() const               { return m_host_id;          }
-    int  getLocalPlayerId() const            { return m_local_player_id;  }
-    int  getGlobalPlayerId() const           { return m_global_player_id; }
-    bool  isNetworkPlayer() const            { return m_network_player;   }
-    const std::string& getKartName() const   { return m_kart_name;        }
-    const irr::core::stringw& getPlayerName() const { return m_user_name; }
-    KartTeam getKartTeam() const               { return m_kart_team;      }
-    HandicapLevel getHandicap() const        { return m_handicap;         }
-    float getDefaultKartColor() const      { return m_default_kart_color; }
-    uint32_t getOnlineId() const           { return m_online_id;          }
-    void setCountryCode(const std::string& id) { m_country_code = id;     }
-    const std::string& getCountryCode() const { return m_country_code;    }
-    void setKartData(const KartData& data)          { m_kart_data = data; }
-    const KartData& getKartData() const             { return m_kart_data; }
-    void setNetworkPlayerProfile(
-        std::weak_ptr<NetworkPlayerProfile> npp)       { m_profile = npp; }
-    std::weak_ptr<NetworkPlayerProfile> getNetworkPlayerProfile() const
-                                                      { return m_profile; }
-    bool disconnected() const               { return m_profile.expired(); }
-    bool isReserved() const
-              { return m_host_id == std::numeric_limits<uint32_t>::max(); }
+    void setKartName(const std::string& n)                           { m_kart_name = n;              }
+    void setPlayerName(const irr::core::stringw& u)                  { m_user_name = u;              }
+    void setHostId(uint32_t id)                                      { m_host_id = id;               }
+    void setLocalPlayerId(int id)                                    { m_local_player_id = id;       }
+    void setGlobalPlayerId(int id)                                   { m_global_player_id = id;      }
+    void setKartTeam(KartTeam team)                                  { m_kart_team = team;           }
+    void setKartTeams(KartTeams teams, KartTeamsColor kartTeamColor) { m_kart_teams = teams; m_kart_team_color = kartTeamColor; }
+    void setNetworkPlayer(bool value)                                { m_network_player = value;     }
+    void setDefaultKartColor(float value)                            { m_default_kart_color = value; }
+    void setHandicap(HandicapLevel value)                            { m_handicap = value;           }
+    void setOnlineId(uint32_t id)                                    { m_online_id = id;             }
+    uint32_t getHostId() const                                       { return m_host_id;             }
+    int  getLocalPlayerId() const                                    { return m_local_player_id;     }
+    int  getGlobalPlayerId() const                                   { return m_global_player_id;    }
+    bool  isNetworkPlayer() const                                    { return m_network_player;      }
+    const std::string& getKartName() const                           { return m_kart_name;           }
+    const irr::core::stringw& getPlayerName() const                  { return m_user_name;           }
+    KartTeam getKartTeam() const                                     { return m_kart_team;           }
+    KartTeams getKartTeams() const                                   { return m_kart_teams;          }
+    KartTeamsColor getKartTeamsColor() const                         { return m_kart_team_color;     }
+    HandicapLevel getHandicap() const                                { return m_handicap;            }
+    float getDefaultKartColor() const                                { return m_default_kart_color;  }
+    uint32_t getOnlineId() const                                     { return m_online_id;           }
+    void setCountryCode(const std::string& id)                       { m_country_code = id;          }
+    const std::string& getCountryCode() const                        { return m_country_code;        }
+    void setKartData(const KartData& data)                           { m_kart_data = data;           }
+    const KartData& getKartData() const                              { return m_kart_data;           }
+    void setNetworkPlayerProfile(                                                             
+        std::weak_ptr<NetworkPlayerProfile> npp)                     { m_profile = npp;              }
+    std::weak_ptr<NetworkPlayerProfile> getNetworkPlayerProfile() const      
+                                                                     { return m_profile;             }
+    bool disconnected() const                                        { return m_profile.expired();   }
+    bool isReserved() const                                                  
+              { return m_host_id == std::numeric_limits<uint32_t>::max();    }
     void makeReserved()
     {
         m_host_id = std::numeric_limits<uint32_t>::max();

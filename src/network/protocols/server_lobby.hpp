@@ -270,6 +270,7 @@ private:
     void finishedLoadingLiveJoinClient(Event *event);
     void kickHost(Event* event);
     void changeTeam(Event* event);
+    void changeTeams(Event* event);
     void handleChat(Event* event);
     void unregisterServer(bool now,
         std::weak_ptr<ServerLobby> sl = std::weak_ptr<ServerLobby>());

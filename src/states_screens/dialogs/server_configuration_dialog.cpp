@@ -87,34 +87,49 @@ GUIEngine::EventPropagation
         {
             m_self_destroy = true;
             NetworkString change(PROTOCOL_LOBBY_ROOM);
-            change.addUInt8(LobbyProtocol::LE_CONFIG_SERVER);
-            change.addUInt8((uint8_t)m_difficulty_widget
+            // À VÉRIFIER // DE base addUInt8 au lieu de addUInt16 // Fait planter le code ???
+            change.addUInt16(LobbyProtocol::LE_CONFIG_SERVER);
+            change.addUInt16((uint16_t)m_difficulty_widget
                 ->getSelection(PLAYER_ID_GAME_MASTER));
             switch (m_game_mode_widget->getSelection(PLAYER_ID_GAME_MASTER))
             {
                 case 0:
                 {
-                    change.addUInt8(3).addUInt8(0);
+                    change.addUInt16(3).addUInt16(0);
                     break;
                 }
                 case 1:
                 {
-                    change.addUInt8(4).addUInt8(0);
+                    change.addUInt16(4).addUInt16(0);
                     break;
                 }
                 case 2:
                 {
                     int v = m_more_options_spinner->getValue();
                     if (v == 0)
-                        change.addUInt8(7).addUInt8(0);
+                        change.addUInt16(7).addUInt16(0);
+                    else if (v == 1)
+                        change.addUInt16(8).addUInt16(0);
+                    else if (v == 2)
+                        change.addUInt16(9).addUInt16(0);
+                    else if (v == 3)
+                        change.addUInt16(10).addUInt16(0);
+                    else if (v == 4)
+                        change.addUInt16(11).addUInt16(0);
+                    else if (v == 5)
+                        change.addUInt16(12).addUInt16(0);
+                    else if (v == 6)
+                        change.addUInt16(13).addUInt16(0);
+                    else if (v == 7)
+                        change.addUInt16(14).addUInt16(0);
                     else
-                        change.addUInt8(8).addUInt8(0);
+                        change.addUInt16(15).addUInt16(0);
                     break;
                 }
                 case 3:
                 {
                     int v = m_more_options_spinner->getValue();
-                    change.addUInt8(6).addUInt8((uint8_t)v);
+                    change.addUInt16(6).addUInt16((uint8_t)v);
                     break;
                 }
                 default:

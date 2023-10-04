@@ -345,6 +345,12 @@ void Swatter::chooseTarget()
             world->getKartTeam(m_kart->getWorldKartId()))
             continue;
 
+        // Don't hit teammates in teams world
+        if (world->hasTeams() &&
+            world->getKartTeams(kart->getWorldKartId()) ==
+            world->getKartTeams(m_kart->getWorldKartId()))
+            continue;
+
         float dist2 = (kart->getXYZ()-m_kart->getXYZ()).length2();
         if(dist2<min_dist2)
         {
