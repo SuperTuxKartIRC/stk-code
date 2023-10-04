@@ -1185,7 +1185,6 @@ void World::updateWorld(int ticks)
 #define MEASURE_FPS 0
 
 //-----------------------------------------------------------------------------
-
 void World::scheduleTutorial()
 {
     m_schedule_exit_race = true;
