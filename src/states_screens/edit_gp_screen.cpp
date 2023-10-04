@@ -151,6 +151,9 @@ void EditGPScreen::beforeAddingWidget()
     m_list->addColumn(_("Track"), 3);
     m_list->addColumn(_("Laps"), 1);
     m_list->addColumn(_("Reversed"), 1);
+    m_list->addColumn(_("Power-ups"), 1);
+    m_list->addColumn(_("Boost"), 1);
+    m_list->addColumn(_("Banana"), 1);
 }
 
 // -----------------------------------------------------------------------------
@@ -259,6 +262,12 @@ void EditGPScreen::loadList(const int selected)
             StringUtils::toWString<unsigned int>(m_gp->getLaps(i)), -1, 1, true));
         row.push_back(GUIEngine::ListWidget::ListCell(
             m_gp->getReverse(i) ? _("Yes") : _("No"), -1, 1, true));
+        row.push_back(GUIEngine::ListWidget::ListCell(
+            "", m_icons[i], 1, false));
+        row.push_back(GUIEngine::ListWidget::ListCell(
+            "", m_icons[i], 1, false));
+        row.push_back(GUIEngine::ListWidget::ListCell(
+            "", m_icons[i], 1, false));
 
         m_list->addItem(m_gp->getId(), row);
     }

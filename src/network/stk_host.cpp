@@ -1524,6 +1524,29 @@ std::pair<int, int> STKHost::getAllPlayersTeamInfo() const
 }   // getAllPlayersTeamInfo
 
 // ----------------------------------------------------------------------------
+std::tuple<int, int, int, int> STKHost::getAllPlayersTeamsInfo() const
+{
+    int team1_count = 0;
+    int team2_count = 0;
+    int team3_count = 0;
+    int team4_count = 0;
+    auto pp = getAllPlayerProfiles();
+    for (auto& player : pp)
+    {
+        if (player->getTeams() == KART_TEAM_1)
+            team1_count++;
+        else if (player->getTeams() == KART_TEAM_2)
+            team2_count++;
+        else if (player->getTeams() == KART_TEAM_3)
+            team3_count++;
+        else if (player->getTeams() == KART_TEAM_4)
+            team4_count++;
+    }
+    return std::make_tuple(team1_count, team2_count, team3_count, team4_count);
+
+}   // getAllPlayersTeamsInfo
+
+// ----------------------------------------------------------------------------
 /** Get the players for starting a new game.
  *  \return A vector containing pointers on the players profiles. */
 std::vector<std::shared_ptr<NetworkPlayerProfile> >

@@ -70,6 +70,7 @@
 #include "utils/translation.hpp"
 
 #include <algorithm>
+#include <modes/team_arena_battle.hpp>
 
 /** Constructor, initialises internal data structures.
  */
@@ -843,6 +844,21 @@ void RaceResultGUI::unload()
         float max_finish_time = 0;
 
         FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
+        TeamArenaBattle* teamArena = nullptr; // Separate variable for TeamArenaBattle
+
+        switch (RaceManager::get()->getMinorMode())
+        {
+        case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE:
+            teamArena = dynamic_cast<TeamArenaBattle*>(World::getWorld());
+            break;
+        case RaceManager::MINOR_MODE_FREE_FOR_ALL:
+            break;
+        default:
+            // You can keep this case as is if it's intended to use FreeForAll in default
+            break;
+        }
+
+
 
         int time_precision = RaceManager::get()->currentModeTimePrecision();
         bool active_gp = (RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX);
@@ -853,8 +869,15 @@ void RaceResultGUI::unload()
         {
             const AbstractKart *kart = rank_world->getKartAtPosition(position);
 
-            if (ffa && kart->isEliminated())
-                continue;
+            if (ffa) {
+                if (ffa && kart->isEliminated())
+                    continue;
+            }
+            else if (teamArena) {
+                if (teamArena && kart->isEliminated())
+                    continue;
+            }
+            
             // Save a pointer to the current row_info entry
             RowInfo *ri = &(m_all_row_infos[position - first_position]);
             ri->m_kart_id = kart->getWorldKartId();
@@ -885,12 +908,27 @@ void RaceResultGUI::unload()
             {
                 ri->m_finish_time_string = core::stringw(_("Eliminated"));
             }
-            else if (   RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL
-                     || RaceManager::get()->isCTFMode())
+            else if ( RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL                     ||
+                      RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM    ||
+                      RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER  ||
+                      RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_TIMER          ||
+                      RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE           ||
+                      RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ARENA_BATTLE                 ||
+                      RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA             ||
+                      RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA             ||
+                      RaceManager::get()->isCTFMode())
             {
-                assert(ffa);
-                ri->m_finish_time_string =
-                    StringUtils::toWString(ffa->getKartScore(kart->getWorldKartId()));
+                if (teamArena) {
+                        assert(teamArena);
+                        ri->m_finish_time_string =
+                            StringUtils::toWString(teamArena->getKartScore(kart->getWorldKartId())) + "        Points équipe:" + StringUtils::toWString(teamArena->getTeamsKartScore(kart->getWorldKartId()));
+                }
+                else {
+                        assert(ffa);
+                        ri->m_finish_time_string =
+                            StringUtils::toWString(ffa->getKartScore(kart->getWorldKartId()));
+                }
+                
             }
             else
             {
@@ -1396,7 +1434,7 @@ void RaceResultGUI::unload()
         // Draw rank order
         // (only when num. of karts >=10 )
         if (RaceManager::get()->getMinorMode() != RaceManager::MINOR_MODE_FREE_FOR_ALL &&
-            !ri->m_finish_time_string.empty() &&
+            !ri->m_finish_time_string.empty() && // TODO : Besoins de modification// Avec nos mode de jeu
             RaceManager::get()->getNumberOfKarts() >= 10)
         {
             int rankNo = (

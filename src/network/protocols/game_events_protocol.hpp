@@ -17,7 +17,13 @@ public:
         GE_CTF_SCORED = 4,
         GE_RESET_BALL = 5,
         GE_PLAYER_GOAL = 6,
-        GE_CHECK_LINE = 7
+        GE_CHECK_LINE = 7,
+        GE_TEAM_A_SCORED = 8,
+        GE_TAG_A_SCORED = 9,
+        GE_MONSTER_A_SCORED = 10,
+        GE_MURDER_MYSTERY_A_SCORED = 11,
+        GE_BATTLE_KART_LIFE = 12,
+
     };   // GameEventType
 private:
     int m_last_finished_position;

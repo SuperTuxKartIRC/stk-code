@@ -59,6 +59,8 @@ public:
     // ------------------------------------------------------------------------
     virtual bool kartHit(int kart_id, int hitter = -1) OVERRIDE;
     // ------------------------------------------------------------------------
+    virtual bool hasTeams() const OVERRIDE { return false; }
+    // ------------------------------------------------------------------------
     virtual void update(int ticks) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void countdownReachedZero() OVERRIDE;

@@ -53,6 +53,7 @@ using namespace irr;
 #include "modes/linear_world.hpp"
 #include "modes/world.hpp"
 #include "modes/soccer_world.hpp"
+#include "modes/team_arena_battle.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/race_gui_multitouch.hpp"
@@ -100,6 +101,11 @@ RaceGUI::RaceGUI()
     // Load icon textures for later reuse
     m_red_team = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_red.png");
     m_blue_team = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_blue.png");
+    // TODO : Change image path depending of the color team 
+    m_team1 = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_red.png");
+    m_team2 = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_blue.png");
+    m_team3 = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_green.png");
+    m_team4 = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_orange.png");
     m_red_flag = irr_driver->getTexture(FileManager::GUI_ICON, "red_flag.png");
     m_blue_flag = irr_driver->getTexture(FileManager::GUI_ICON, "blue_flag.png");
     m_soccer_ball = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_normal.png");
@@ -119,6 +125,7 @@ void RaceGUI::initSize()
     core::dimension2du area = font->getDimension(L"99:99.999");
     m_timer_width = area.Width;
     m_font_height = area.Height;
+    m_Team_width = area.Width;
 
     area = font->getDimension(L"99.999");
     m_small_precise_timer_width = area.Width;
@@ -321,6 +328,12 @@ void RaceGUI::renderGlobal(float dt)
     FontDrawer::startBatching();
     drawGlobalTimer();
 
+    // TODO ajouter ma méthode ici (OlivierM)
+    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM ||
+        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE) {
+        //drawTeamPoints();
+    }
+
     if (!m_is_tutorial)
     {
         if (RaceManager::get()->isLinearRaceMode() &&
@@ -477,6 +490,78 @@ void RaceGUI::drawGlobalTimer()
 
 }   // drawGlobalTimer
 
+// Méthode pour afficher les points d'équipe (OlivierM)
+void RaceGUI::drawTeamPoints()
+{
+
+    TeamArenaBattle* sw = (TeamArenaBattle*)World::getWorld();
+    video::SColor team1_color = video::SColor(255, 255, 0, 0);
+    video::SColor team2_color = video::SColor(255, 0, 128, 255);
+    video::SColor team3_color = video::SColor(255, 0, 225, 0);
+    video::SColor team4_color = video::SColor(255, 225, 128, 0);
+
+    int dist_from_center1 = m_Team_width * 5;
+
+    int dist_from_center2 = m_Team_width * 4;
+
+    int dist_from_center3 = m_Team_width * 3;
+
+    int dist_from_center4 = m_Team_width * 2;
+
+    bool use_digit_font = true;
+
+    core::stringw PointTeams1 =  (core::stringw)sw->getTeam1Score();
+
+    core::stringw PointTeams2 = (core::stringw)sw->getTeam2Score();
+
+    core::stringw PointTeams3 = (core::stringw)sw->getTeam3Score();
+
+    core::stringw PointTeams4 = (core::stringw)sw->getTeam4Score();
+
+    core::rect<s32> pos1(irr_driver->getActualScreenSize().Width - dist_from_center1,
+        irr_driver->getActualScreenSize().Height * 2 / 100,
+        irr_driver->getActualScreenSize().Width,
+        irr_driver->getActualScreenSize().Height * 6 / 100);
+
+    core::rect<s32> pos2(irr_driver->getActualScreenSize().Width - dist_from_center2,
+        irr_driver->getActualScreenSize().Height * 2 / 100,
+        irr_driver->getActualScreenSize().Width,
+        irr_driver->getActualScreenSize().Height * 6 / 100);
+
+
+    core::rect<s32> pos3(irr_driver->getActualScreenSize().Width - dist_from_center3,
+        irr_driver->getActualScreenSize().Height * 2 / 100,
+        irr_driver->getActualScreenSize().Width,
+        irr_driver->getActualScreenSize().Height * 6 / 100);
+
+
+    core::rect<s32> pos4(irr_driver->getActualScreenSize().Width - dist_from_center4,
+        irr_driver->getActualScreenSize().Height * 2 / 100,
+        irr_driver->getActualScreenSize().Width,
+        irr_driver->getActualScreenSize().Height * 6 / 100);
+
+    gui::ScalableFont* font = (use_digit_font ? GUIEngine::getHighresDigitFont() : GUIEngine::getFont());
+    font->setScale(1.0f);
+    font->setBlackBorder(true);
+
+    if (sw->getTeamsNum(KART_TEAM_1) > 0)
+    font->draw(PointTeams1, pos1, team1_color, false, false, NULL,
+        true /* ignore RTL */);
+    if (sw->getTeamsNum(KART_TEAM_2) > 0)
+        font->draw(PointTeams2, pos2, team2_color, false, false, NULL,
+            true /* ignore RTL */);
+    if (sw->getTeamsNum(KART_TEAM_3) > 0)
+        font->draw(PointTeams3, pos3, team3_color, false, false, NULL,
+            true /* ignore RTL */);
+    if (sw->getTeamsNum(KART_TEAM_4) > 0)
+        font->draw(PointTeams4, pos4, team4_color, false, false, NULL,
+            true /* ignore RTL */);
+
+    font->setBlackBorder(false);
+
+
+}
+
 
 //-----------------------------------------------------------------------------
 /** Displays the live difference with a ghost on screen.
@@ -541,6 +626,34 @@ void RaceGUI::drawLiveDifference()
     font->setBlackBorder(false);
 }   // drawLiveDifference
 
+
+video::SColor RaceGUI::rgbaColorKartTeamsColor(KartTeamsColor teamColor)
+{
+    return teamColor == KART_TEAM_COLOR_BLUE ? video::SColor(255, 0, 0, 255) :
+
+        KART_TEAM_COLOR_RED ? video::SColor(255, 255, 0, 0) :
+
+        KART_TEAM_COLOR_GREEN ? video::SColor(255, 0, 255, 0) :
+
+        KART_TEAM_COLOR_YELLOW ? video::SColor(255, 255, 255, 0) :
+
+        KART_TEAM_COLOR_ORANGE ? video::SColor(255, 255, 165, 0) :
+
+        KART_TEAM_COLOR_PURPLE ? video::SColor(255, 128, 0, 128) :
+
+        KART_TEAM_COLOR_PINK ? video::SColor(255, 255, 192, 203) :
+
+        KART_TEAM_COLOR_TURQUOISE ? video::SColor(255, 0, 206, 209) :
+
+        KART_TEAM_COLOR_DARK_BLUE ? video::SColor(255, 0, 0, 139) :
+
+        KART_TEAM_COLOR_CYAN ? video::SColor(255, 0, 255, 255) :
+
+        KART_TEAM_COLOR_DEFAULT ? video::SColor(255, 255, 182, 193) :
+
+        video::SColor(255, 255, 182, 193);
+} // rgbaColorKartTeamsColor
+
 //-----------------------------------------------------------------------------
 /** Draws the mini map and the position of all karts on it.
  */
@@ -574,7 +687,8 @@ void RaceGUI::drawGlobalMiniMap()
 
     World* world = World::getWorld();
     CaptureTheFlag *ctf_world = dynamic_cast<CaptureTheFlag*>(World::getWorld());
-    SoccerWorld *soccer_world = dynamic_cast<SoccerWorld*>(World::getWorld());
+    SoccerWorld* soccer_world = dynamic_cast<SoccerWorld*>(World::getWorld());
+    TeamArenaBattle* team_arena_world = dynamic_cast<TeamArenaBattle*>(World::getWorld());
 
     if (ctf_world)
     {
@@ -681,9 +795,10 @@ void RaceGUI::drawGlobalMiniMap()
                                  lower_y   -(int)(draw_at.getY()-marker_half_size));
 
         bool has_teams = (ctf_world || soccer_world);
+        bool has_teams_4 = team_arena_world;
         
         // Highlight the player icons with some background image.
-        if ((has_teams || is_local) && m_icons_frame != NULL)
+        if ((has_teams || has_teams_4 || is_local) && m_icons_frame != NULL)
         {
             video::SColor color = kart->getKartProperties()->getColor();
             
@@ -699,6 +814,34 @@ void RaceGUI::drawGlobalMiniMap()
                 {
                     color = video::SColor(255, 0, 0, 200);
                 }
+            }
+            if (has_teams_4) {
+                KartTeams team = world->getKartTeams(kart->getWorldKartId());
+                /*KartTeamsColor teamColor = world->getKartTeamsColor(kart->getWorldKartId());
+
+                video::SColor kartColor = rgbaColorKartTeamsColor(teamColor);*/
+                if (team == KART_TEAM_1)
+                {
+                    color = video::SColor(255, 200, 0, 0);
+                    //color = kartColor;
+                }
+                else if (team == KART_TEAM_2)
+                {
+                    color = video::SColor(255, 0, 0, 200);
+                    //color = kartColor;
+                }
+                else if (team == KART_TEAM_3)
+                {
+                    //color = video::SColor(255, 0, 0, 0);
+                    color = video::SColor(255, 0, 255, 0);
+                    //color = kartColor;
+                }
+                else if (team == KART_TEAM_4)
+                {
+                    color = video::SColor(255, 255, 165, 0);
+                    //color = kartColor;
+                }
+                //color = kartColor;
             }
                                   
             video::SColor colors[4] = {color, color, color, color};
@@ -1268,6 +1411,7 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
     SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
     FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
+    TeamArenaBattle* team_arena_battle = dynamic_cast<TeamArenaBattle*>(World::getWorld());
 
     static video::SColor color = video::SColor(255, 255, 255, 255);
     int hit_capture_limit =
@@ -1276,6 +1420,7 @@ void RaceGUI::drawLap(const AbstractKart* kart,
         ? RaceManager::get()->getHitCaptureLimit() : -1;
     int score_limit = sw && !RaceManager::get()->hasTimeTarget() ?
         RaceManager::get()->getMaxGoal() : ctf ? hit_capture_limit : -1;
+
     if (!ctf && ffa && hit_capture_limit != -1)
     {
         int icon_width = irr_driver->getActualScreenSize().Height/19;
@@ -1343,6 +1488,96 @@ void RaceGUI::drawLap(const AbstractKart* kart,
             text = StringUtils::toWString(score_limit);
             font->draw(text, pos, video::SColor(255, 255, 255, 255));
         }
+        font->setBlackBorder(false);
+        return;
+    }
+    if (team_arena_battle) {
+        int team1_score = team_arena_battle->getTeam1Score();
+        int team2_score = team_arena_battle->getTeam2Score();
+        int team3_score = team_arena_battle->getTeam3Score();
+        int team4_score = team_arena_battle->getTeam4Score();
+
+        gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
+        font->setBlackBorder(true);
+        font->setScale(1.0f);
+        core::dimension2du d;
+
+
+        core::stringw text;
+        //if (team_arena_battle->getTeamsNum(KART_TEAM_1) > 0) {
+
+        //}
+
+        pos -= core::position2di(130, 0);;
+
+        text = StringUtils::toWString(team1_score);
+        font->draw(text, pos, video::SColor(255, 255, 0, 0), false, false, NULL, true /* ignore RTL */);
+        d = font->getDimension(text.c_str());
+        pos += core::position2di(d.Width, 0);
+
+        //if (team_arena_battle->getTeamsNum(KART_TEAM_2) > 0) {
+
+        //}
+
+        text = L"-";
+        font->draw(text, pos, video::SColor(255, 255, 255, 255));
+        d = font->getDimension(text.c_str());
+        pos += core::position2di(d.Width, 0);
+
+        text = StringUtils::toWString(team2_score);
+        font->draw(text, pos, video::SColor(255, 0, 128, 255), false, false, NULL, true /* ignore RTL */);
+        d = font->getDimension(text.c_str());
+        pos += core::position2di(d.Width, 0);
+
+        //if (team_arena_battle->getTeamsNum(KART_TEAM_3) > 0) {
+
+        //}
+
+        text = L"-";
+        font->draw(text, pos, video::SColor(255, 255, 255, 255));
+        d = font->getDimension(text.c_str());
+        pos += core::position2di(d.Width, 0);
+
+        text = StringUtils::toWString(team3_score);
+        font->draw(text, pos, video::SColor(255, 0, 225, 0), false, false, NULL, true /* ignore RTL */);
+        d = font->getDimension(text.c_str());
+        pos += core::position2di(d.Width, 0);
+
+        //if (team_arena_battle->getTeamsNum(KART_TEAM_4) > 0) {
+
+        //}
+
+        text = L"-";
+        font->draw(text, pos, video::SColor(255, 255, 255, 255));
+        d = font->getDimension(text.c_str());
+        pos += core::position2di(d.Width, 0);
+
+        text = StringUtils::toWString(team4_score);
+        font->draw(text, pos, video::SColor(255, 225, 128, 0), false, false, NULL, true /* ignore RTL */);
+        d = font->getDimension(text.c_str());
+        pos += core::position2di(d.Width, 0);
+
+        text = L"  ";
+        font->draw(text, pos, video::SColor(255, 255, 255, 255));
+        d = font->getDimension(text.c_str());
+        pos += core::position2di(d.Width, 0);
+
+        text = StringUtils::toWString(hit_capture_limit);
+        font->draw(text, pos, video::SColor(255, 225, 225, 255), false, false, NULL, true /* ignore RTL */);
+        d = font->getDimension(text.c_str());
+        pos += core::position2di(d.Width, 0);
+
+        int icon_width = irr_driver->getActualScreenSize().Height / 19;
+        core::rect<s32> indicator_pos(viewport.LowerRightCorner.X - (icon_width + 10),
+            pos.UpperLeftCorner.Y,
+            viewport.LowerRightCorner.X - 10,
+            pos.UpperLeftCorner.Y + icon_width);
+        core::rect<s32> source_rect(core::position2d<s32>(0, 0),
+            m_champion->getSize());
+        draw2DImage(m_champion, indicator_pos, source_rect,
+            NULL, NULL, true);
+
+
         font->setBlackBorder(false);
         return;
     }

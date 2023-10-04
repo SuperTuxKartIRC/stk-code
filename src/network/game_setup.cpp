@@ -202,12 +202,20 @@ void GameSetup::sortPlayersForGame(
         std::mt19937 g(rd());
         std::shuffle(players.begin(), players.end(), g);
     }
-    if (!RaceManager::get()->teamEnabled() ||
-        ServerConfig::m_team_choosing)
+    if (!RaceManager::get()->teamEnabled() || ServerConfig::m_team_choosing) {
+        for (unsigned i = 0; i < players.size(); i++)
+        {
+            players[i]->setTeam((KartTeam)(i % 2));
+        }
+    }
+    if (RaceManager::get()->teamsEnabled() || ServerConfig::m_teams_choosing) {
+        for (unsigned i = 0; i < players.size(); i++)
+        {
+            players[i]->setTeams((KartTeams)(i % 2));
+        }
+    }
+    else {
         return;
-    for (unsigned i = 0; i < players.size(); i++)
-    {
-        players[i]->setTeam((KartTeam)(i % 2));
     }
 }   // sortPlayersForGame
 

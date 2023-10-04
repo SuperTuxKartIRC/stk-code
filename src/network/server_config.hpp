@@ -244,6 +244,12 @@ namespace ServerConfig
         "If owner-less is enabled and live-spectate is not enabled, than this "
         "option is always disabled."));
 
+    SERVER_CFG_PREFIX BoolServerConfigParam m_teams_choosing
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(true, "teams-choosing",
+            "Enable team choosing in lobby in team game (Team Arena only for now). "
+            "If owner-less is enabled and live-spectate is not enabled, than this "
+            "option is always disabled."));
+
     SERVER_CFG_PREFIX BoolServerConfigParam m_strict_players
         SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "strict-players",
         "If strict-players is on, no duplicated online id or split screen "

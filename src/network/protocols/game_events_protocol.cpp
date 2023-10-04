@@ -5,6 +5,7 @@
 #include "modes/capture_the_flag.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/soccer_world.hpp"
+#include "modes/team_arena_battle_life.hpp"
 #include "network/event.hpp"
 #include "network/game_setup.hpp"
 #include "network/network_config.hpp"
@@ -17,6 +18,7 @@
 #include "race/race_manager.hpp"
 
 #include <stdint.h>
+
 
 /** This class handles all 'major' game events. E.g.
  *  finishing a race or goal etc. The game events manager is notified from the
@@ -61,6 +63,7 @@ bool GameEventsProtocol::notifyEvent(Event* event)
     uint8_t type = data.getUInt8();
     CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
     FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
+    TeamArenaBattlelife* tal = dynamic_cast<TeamArenaBattlelife*>(World::getWorld());
     SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
     LinearWorld* lw = dynamic_cast<LinearWorld*>(World::getWorld());
     switch (type)
@@ -88,6 +91,13 @@ bool GameEventsProtocol::notifyEvent(Event* event)
         ffa->setKartScoreFromServer(data);
         break;
     }
+    case GE_BATTLE_KART_LIFE:
+    {
+        if (!tal)
+            throw std::invalid_argument("No free-for-all world");
+        tal->setKartScoreFromServer(data);
+        break;
+    }
     case GE_CTF_SCORED:
     {
         if (!ctf)
@@ -101,6 +111,21 @@ bool GameEventsProtocol::notifyEvent(Event* event)
             new_red_scores, new_blue_scores);
         break;
     }
+    case GE_TEAM_A_SCORED:
+    {
+        // TODO : Besoins de modification!!!
+        if (!ctf)
+            throw std::invalid_argument("No Team Arena world");
+        uint8_t kart_id = data.getUInt8();
+        bool red_team_scored = data.getUInt8() == 1;
+        int16_t new_kart_scores = data.getUInt16();
+        int new_red_scores = data.getUInt8();
+        int new_blue_scores = data.getUInt8();
+        ctf->ctfScored(kart_id, red_team_scored, new_kart_scores,
+            new_red_scores, new_blue_scores);
+        break;
+    }
+    // Need the other case for the other gamemode 
     case GE_STARTUP_BOOST:
     {
         if (NetworkConfig::get()->isServer())

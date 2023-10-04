@@ -1441,6 +1441,33 @@ void ClientLobby::handleKartInfo(Event* event)
             msg = _("%s joined the blue team.", player_name);
         }
     }
+    if (RaceManager::get()->teamsEnabled())
+    {
+        if (w->getKartTeams(kart_id) == KART_TEAM_1)
+        {
+            // I18N: Show when player join red team of the started game in
+            // network
+            msg = _("%s joined the team 1.", player_name);
+        }
+        else if (w->getKartTeams(kart_id) == KART_TEAM_2)
+        {
+            // I18N: Show when player join red team of the started game in
+            // network
+            msg = _("%s joined the team 2.", player_name);
+        }
+        else if (w->getKartTeams(kart_id) == KART_TEAM_3)
+        {
+            // I18N: Show when player join red team of the started game in
+            // network
+            msg = _("%s joined the team 3.", player_name);
+        }
+        else
+        {
+            // I18N: Show when player join blue team of the started game in
+            // network
+            msg = _("%s joined the team 4.", player_name);
+        }
+    }
     else
     {
         // I18N: Show when player join the started game in network
@@ -1523,6 +1550,68 @@ void ClientLobby::sendChat(irr::core::stringw text, KartTeam team)
         chat->encodeString16(name + L": " + text, 1000/*max_len*/);
 
         if (team != KART_TEAM_NONE)
+            chat->addUInt8(team);
+
+        STKHost::get()->sendToServer(chat, true);
+        delete chat;
+    }
+}   // sendChat
+
+// ----------------------------------------------------------------------------
+void ClientLobby::sendChats(irr::core::stringw text, KartTeams team)
+{
+    text = text.trim().removeChars(L"\n\r");
+    if (text.size() > 0)
+    {
+        NetworkString* chat = getNetworkString();
+        chat->addUInt8(LobbyProtocol::LE_CHAT);
+
+        core::stringw name;
+        PlayerProfile* player = PlayerManager::getCurrentPlayer();
+        if (PlayerManager::getCurrentOnlineState() ==
+            PlayerProfile::OS_SIGNED_IN)
+            name = PlayerManager::getCurrentOnlineProfile()->getUserName();
+        else
+            name = player->getName();
+        // Make message look better by aligning to left or right side depends
+        // on name and text
+        // (LTR: RTL text always right; RTL : LTR text always left)
+#ifndef SERVER_ONLY
+        if (!name.empty() && !text.empty())
+        {
+            SBCodepointSequence codepoint_sequence;
+            codepoint_sequence.stringEncoding = sizeof(wchar_t) == 2 ?
+                SBStringEncodingUTF16 : SBStringEncodingUTF32;
+            codepoint_sequence.stringBuffer = (void*)name.c_str();
+            codepoint_sequence.stringLength = name.size();
+            SBAlgorithmRef bidi_algorithm =
+                SBAlgorithmCreate(&codepoint_sequence);
+            SBParagraphRef first_paragraph =
+                SBAlgorithmCreateParagraph(bidi_algorithm, 0, (int32_t)-1,
+                    SBLevelDefaultLTR);
+            SBLevel name_level = SBParagraphGetBaseLevel(first_paragraph);
+            SBParagraphRelease(first_paragraph);
+            SBAlgorithmRelease(bidi_algorithm);
+
+            codepoint_sequence.stringBuffer = (void*)text.c_str();
+            codepoint_sequence.stringLength = text.size();
+            bidi_algorithm =
+                SBAlgorithmCreate(&codepoint_sequence);
+            first_paragraph =
+                SBAlgorithmCreateParagraph(bidi_algorithm, 0, (int32_t)-1,
+                    SBLevelDefaultLTR);
+            SBLevel text_level = SBParagraphGetBaseLevel(first_paragraph);
+            SBParagraphRelease(first_paragraph);
+            SBAlgorithmRelease(bidi_algorithm);
+            if (name_level % 2 == 0 && text_level % 2 != 0)
+                name = core::stringw(L"\u200F") + name;
+            else if (name_level % 2 != 0 && text_level % 2 == 0)
+                name = core::stringw(L"\u200E") + name;
+        }
+#endif
+        chat->encodeString16(name + L": " + text, 1000/*max_len*/);
+
+        if (team != KART_TEAM_N)
             chat->addUInt8(team);
 
         STKHost::get()->sendToServer(chat, true);
