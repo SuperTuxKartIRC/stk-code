@@ -47,79 +47,99 @@ public :
     enum AchievementData {
            // Won races values share the following properties :
            // 1. Only races with at least 3 AI count unless otherwise specified.
-           WON_RACES                     = 0, // Normal, time-trial and FTL
-           WON_NORMAL_RACES              = 1, // Normal race only
-           WON_TT_RACES                  = 2, // Time-trial race only
-           WON_FTL_RACES                 = 3, // Follow-the-leader race only
+           WON_RACES = 0, // Normal, time-trial and FTL
+           WON_NORMAL_RACES = 1, // Normal race only
+           WON_TT_RACES = 2, // Time-trial race only
+           WON_FTL_RACES = 3, // Follow-the-leader race only
            // Consecutive won race values :
            // 1. Ignore races with not enough AIs for incrementation
            // 2. Reset the counter in case of loss against any number of AIs
-           CONS_WON_RACES                = 4,
-           CONS_WON_RACES_MAX            = 5,
+           CONS_WON_RACES = 4,
+           CONS_WON_RACES_MAX = 5,
            // Won races in (at least) hard requires at least 5 AI opponents
-           CONS_WON_RACES_HARD           = 6,
-           CONS_WON_RACES_HARD_MAX       = 7,
+           CONS_WON_RACES_HARD = 6,
+           CONS_WON_RACES_HARD_MAX = 7,
            // Count how many normal, TT & FTL races were started and finished by difficulty
-           EASY_STARTED                  = 8,
-           EASY_FINISHED                 = 9,
-           MEDIUM_STARTED                = 10,
-           MEDIUM_FINISHED               = 11,
-           HARD_STARTED                  = 12,
-           HARD_FINISHED                 = 13,
-           BEST_STARTED                  = 14,
-           BEST_FINISHED                 = 15,
+           EASY_STARTED = 8,
+           EASY_FINISHED = 9,
+           MEDIUM_STARTED = 10,
+           MEDIUM_FINISHED = 11,
+           HARD_STARTED = 12,
+           HARD_FINISHED = 13,
+           BEST_STARTED = 14,
+           BEST_FINISHED = 15,
            // Count how many time a race/match was started and finished by game mode.
            // Races with ghost replays technically belong to TT or egg hunt race mode,
            // they increment both the with_ghost counter and the relevant mode counter.
-           NORMAL_STARTED                = 16,
-           NORMAL_FINISHED               = 17,
-           TT_STARTED                    = 18,
-           TT_FINISHED                   = 19,
-           FTL_STARTED                   = 20,
-           FTL_FINISHED                  = 21,
-           THREE_STRIKES_STARTED         = 22,
-           THREE_STRIKES_FINISHED        = 23,
-           SOCCER_STARTED                = 24,
-           SOCCER_FINISHED               = 25,
-           EGG_HUNT_STARTED              = 26,
-           EGG_HUNT_FINISHED             = 27,
-           WITH_GHOST_STARTED            = 28,
-           WITH_GHOST_FINISHED           = 29,
-           CTF_STARTED                   = 30,
-           CTF_FINISHED                  = 31,
-           FFA_STARTED                   = 32,
-           FFA_FINISHED                  = 33,
-
+           NORMAL_STARTED = 16,
+           NORMAL_FINISHED = 17,
+           TT_STARTED = 18,
+           TT_FINISHED = 19,
+           FTL_STARTED = 20,
+           FTL_FINISHED = 21,
+           THREE_STRIKES_STARTED = 22,
+           THREE_STRIKES_FINISHED = 23,
+           SOCCER_STARTED = 24,
+           SOCCER_FINISHED = 25,
+           EGG_HUNT_STARTED = 26,
+           EGG_HUNT_FINISHED = 27,
+           WITH_GHOST_STARTED = 28,
+           WITH_GHOST_FINISHED = 29,
+           CTF_STARTED = 30,
+           CTF_FINISHED = 31,
+           FFA_STARTED = 32,
+           FFA_FINISHED = 33,
+           
            // Count the number of powerups used by the player.
-           POWERUP_USED                  = 34,
-           POWERUP_USED_1RACE            = 35,
-           POWERUP_USED_1RACE_MAX        = 36,
+           POWERUP_USED = 34,
+           POWERUP_USED_1RACE = 35,
+           POWERUP_USED_1RACE_MAX = 36,
            // Count how many times a bowling ball from the player hit a kart
-           BOWLING_HIT                   = 37,
-           BOWLING_HIT_1RACE             = 38,
-           BOWLING_HIT_1RACE_MAX         = 39,
+           BOWLING_HIT = 37,
+           BOWLING_HIT_1RACE = 38,
+           BOWLING_HIT_1RACE_MAX = 39,
            // Count how many times a swatter from the player hit a kart
-           SWATTER_HIT                   = 40,
-           SWATTER_HIT_1RACE             = 41,
-           SWATTER_HIT_1RACE_MAX         = 42,
+           SWATTER_HIT = 40,
+           SWATTER_HIT_1RACE = 41,
+           SWATTER_HIT_1RACE_MAX = 42,
            // Count how many times a swatter, bowling ball or cake from
            // the player hit a kart (excluding the player's own kart)
-           ALL_HITS                      = 43,
-           ALL_HITS_1RACE                = 44,
-           ALL_HITS_1RACE_MAX            = 45,
+           ALL_HITS = 43,
+           ALL_HITS_1RACE = 44,
+           ALL_HITS_1RACE_MAX = 45,
            // Count the number of bananas hit
-           BANANA                        = 46,
-           BANANA_1RACE                  = 47,
-           BANANA_1RACE_MAX              = 48,
+           BANANA = 46,
+           BANANA_1RACE = 47,
+           BANANA_1RACE_MAX = 48,
            // Count how many times the player skidded
-           SKIDDING                      = 49,
-           SKIDDING_1RACE                = 50,
-           SKIDDING_1RACE_MAX            = 51,
-           SKIDDING_1LAP                 = 52,
-           SKIDDING_1LAP_MAX             = 53,
+           SKIDDING = 49,
+           SKIDDING_1RACE = 50,
+           SKIDDING_1RACE_MAX = 51,
+           SKIDDING_1LAP = 52,
+           SKIDDING_1LAP_MAX = 53,
 
 
-           ACHIEVE_DATA_NUM              = 54
+           // New GameMode 
+           // Count how many time a race/match was started and finished by game mode.
+           // Races with ghost replays technically belong to TT or egg hunt race mode,
+           // they increment both the with_ghost counter and the relevant mode counter.
+           TEAM_ARENA_POINTS_TEAM_STARTED = 54,
+           TEAM_ARENA_POINTS_TEAM_FINISHED = 55,
+           TEAM_ARENA_POINTS_PLAYER_STARTED = 56,
+           TEAM_ARENA_POINTS_PLAYER_FINISHED = 57,
+           TEAM_ARENA_TIMER_STARTED = 58,
+           TEAM_ARENA_TIMER_FINISHED = 59,
+           TEAM_ARENA_LIFE_STARTED = 60,
+           TEAM_ARENA_LIFE_FINISHED = 61,
+           TAG_ARENA_STARTED = 62,
+           TAG_ARENA_FINISHED = 63,
+           MONSTER_ARENA_STARTED = 64,
+           MONSTER_ARENA_FINISHED = 65,
+           MURDER_MYSTERY_STARTED = 66,
+           MURDER_MYSTERY_FINISHED = 67,
+
+
+           ACHIEVE_DATA_NUM        = 68
     };
 
 private:

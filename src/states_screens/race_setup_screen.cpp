@@ -30,19 +30,24 @@
 #include "states_screens/easter_egg_screen.hpp"
 #include "states_screens/ghost_replay_selection.hpp"
 #include "states_screens/soccer_setup_screen.hpp"
+#include "states_screens/teams_setup_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/tracks_and_gp_screen.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
-const int CONFIG_CODE_NORMAL    = 0;
-const int CONFIG_CODE_TIMETRIAL = 1;
-const int CONFIG_CODE_FTL       = 2;
-const int CONFIG_CODE_3STRIKES  = 3;
-const int CONFIG_CODE_EASTER    = 4;
-const int CONFIG_CODE_SOCCER    = 5;
-const int CONFIG_CODE_GHOST     = 6;
-const int CONFIG_CODE_LAP_TRIAL = 7;
+const int CONFIG_CODE_NORMAL            = 0;
+const int CONFIG_CODE_TIMETRIAL         = 1;
+const int CONFIG_CODE_FTL               = 2;
+const int CONFIG_CODE_3STRIKES          = 3;
+const int CONFIG_CODE_EASTER            = 4;
+const int CONFIG_CODE_SOCCER            = 5;
+const int CONFIG_CODE_GHOST             = 6;
+const int CONFIG_CODE_LAP_TRIAL         = 7;
+const int CONFIG_CODE_TEAM_ARENA        = 8;
+const int CONFIG_CODE_TAG_ARENA         = 9;
+const int CONFIG_CODE_MONSTER_ARENA     = 10;
+const int CONFIG_CODE_MURDER_MYSTERY    = 11;
 
 using namespace GUIEngine;
 
@@ -120,6 +125,27 @@ void RaceSetupScreen::init()
     name5 += _("Push the ball into the opposite cage to score goals.");
     w2->addItem( name5, IDENT_SOCCER, RaceManager::getIconOf(RaceManager::MINOR_MODE_SOCCER));
 
+    irr::core::stringw name8 = irr::core::stringw(_("Battle")) + L"\n";
+    //FIXME: avoid duplicating descriptions from the help menu!
+    name8 += _("Hit other players' teams with weapons to score points.");
+    w2->addItem(name8, IDENT_TEAM_L, RaceManager::getIconOf(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE));
+
+    irr::core::stringw name9 = irr::core::stringw(_("Battle")) + L"\n";
+    //FIXME: avoid duplicating descriptions from the help menu!
+    name9 += _("Surviving tags. Tags must kill (or touch) all other people.");
+    w2->addItem(name9, IDENT_TAG, RaceManager::getIconOf(RaceManager::MINOR_MODE_TAG_ARENA_BATTLE));
+
+    irr::core::stringw name10 = irr::core::stringw(_("Battle")) + L"\n";
+    //FIXME: avoid duplicating descriptions from the help menu!
+    name10 += _("Surviving monsters. Monsters must kill all other people.");
+    w2->addItem(name10, IDENT_MONSTER, RaceManager::getIconOf(RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA));
+
+    irr::core::stringw name11 = irr::core::stringw(_("Battle")) + L"\n";
+    //FIXME: avoid duplicating descriptions from the help menu!
+    name11 += _("Surviving the killer. The sheriff must kill the killer.");
+    w2->addItem(name11, IDENT_MURDER_MYSTERY, RaceManager::getIconOf(RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA));
+
+
 #define ENABLE_EASTER_EGG_MODE
 #ifdef ENABLE_EASTER_EGG_MODE
     if(RaceManager::get()->getNumLocalPlayers() == 1)
@@ -171,6 +197,18 @@ void RaceSetupScreen::init()
         break;
     case CONFIG_CODE_LAP_TRIAL:
         w2->setSelection(IDENT_LAP_TRIAL, PLAYER_ID_GAME_MASTER, true);
+        break;
+    case CONFIG_CODE_TEAM_ARENA:
+        w2->setSelection(IDENT_TEAM_PT, PLAYER_ID_GAME_MASTER, true);
+        break;
+    case CONFIG_CODE_TAG_ARENA:
+        w2->setSelection(IDENT_TAG, PLAYER_ID_GAME_MASTER, true);
+        break;
+    case CONFIG_CODE_MONSTER_ARENA:
+        w2->setSelection(IDENT_MONSTER, PLAYER_ID_GAME_MASTER, true);
+        break;
+    case CONFIG_CODE_MURDER_MYSTERY:
+        w2->setSelection(IDENT_MURDER_MYSTERY, PLAYER_ID_GAME_MASTER, true);
         break;
     }
 
@@ -261,6 +299,48 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name,
             RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_LAP_TRIAL);
             UserConfigParams::m_game_mode = CONFIG_CODE_LAP_TRIAL;
             TracksAndGPScreen::getInstance()->push();
+        }
+        else if (selectedMode == IDENT_TEAM_PT)
+        {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM);
+            UserConfigParams::m_game_mode = CONFIG_CODE_TEAM_ARENA;
+            TeamsSetupScreen::getInstance()->push();
+        }
+        else if (selectedMode == IDENT_TEAM_PP)
+        {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER);
+            UserConfigParams::m_game_mode = CONFIG_CODE_TEAM_ARENA;
+            TeamsSetupScreen::getInstance()->push();
+        }
+        else if (selectedMode == IDENT_TEAM_T)
+        {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_TIMER);
+            UserConfigParams::m_game_mode = CONFIG_CODE_TEAM_ARENA;
+            TeamsSetupScreen::getInstance()->push();
+        }
+        else if (selectedMode == IDENT_TEAM_L)
+        {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE);
+            UserConfigParams::m_game_mode = CONFIG_CODE_TEAM_ARENA;
+            TeamsSetupScreen::getInstance()->push();
+        }
+        else if (selectedMode == IDENT_TAG)
+        {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TAG_ARENA_BATTLE);
+            UserConfigParams::m_game_mode = CONFIG_CODE_TAG_ARENA;
+            ArenasScreen::getInstance()->push();
+        }
+        else if (selectedMode == IDENT_MONSTER)
+        {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA);
+            UserConfigParams::m_game_mode = CONFIG_CODE_MONSTER_ARENA;
+            ArenasScreen::getInstance()->push();
+        }
+        else if (selectedMode == IDENT_MURDER_MYSTERY)
+        {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA);
+            UserConfigParams::m_game_mode = CONFIG_CODE_MURDER_MYSTERY;
+            ArenasScreen::getInstance()->push();
         }
         else if (selectedMode == "locked")
         {

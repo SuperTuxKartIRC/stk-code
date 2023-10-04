@@ -655,6 +655,14 @@ void ServerLobby::updateTracksForMode()
         }
         case RaceManager::MINOR_MODE_FREE_FOR_ALL:
         case RaceManager::MINOR_MODE_CAPTURE_THE_FLAG:
+        // TODO : NEED CHANGES ???
+        case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM:
+        case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER:
+        case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_TIMER:
+        case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE:
+        case RaceManager::MINOR_MODE_TAG_ARENA_BATTLE:
+        case RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA:
+        case RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA:
         {
             auto it = m_available_kts.second.begin();
             while (it != m_available_kts.second.end())
@@ -899,6 +907,34 @@ void ServerLobby::changeTeam(Event* event)
     }
     updatePlayerList();
 }   // changeTeam
+
+//-----------------------------------------------------------------------------
+void ServerLobby::changeTeams(Event* event)
+{
+    if (!ServerConfig::m_teams_choosing ||
+        !RaceManager::get()->teamsEnabled())
+        return;
+    if (!checkDataSize(event, 1)) return;
+    NetworkString& data = event->data();
+    uint8_t local_id = data.getUInt8();
+    auto& player = event->getPeer()->getPlayerProfiles().at(local_id);
+    auto team = STKHost::get()->getAllPlayersTeamsInfo();
+    // At most 7 players on each team (for live join)
+    if (player->getTeams() == KART_TEAM_1)
+    { // TODO : Besoins de modification!!!!
+        if (team._Myfirst._Val >= 7)
+            return;
+        player->setTeams(KART_TEAM_2);
+    }
+    else
+    {
+        if (team._Myfirst._Val >= 7)
+            return;
+        player->setTeams(KART_TEAM_1);
+    }
+    updatePlayerList();
+}   // changeTeam
+
 
 //-----------------------------------------------------------------------------
 void ServerLobby::kickHost(Event* event)
@@ -1909,6 +1945,7 @@ std::vector<std::shared_ptr<NetworkPlayerProfile> >
             }
             else
             {
+                // TODO : Besoins de modification// Pour prendre en compte notre mode équipe 
                 player = NetworkPlayerProfile::getReservedProfile(
                     RaceManager::get()->getMinorMode() ==
                     RaceManager::MINOR_MODE_FREE_FOR_ALL ?
@@ -2599,6 +2636,34 @@ void ServerLobby::startSelection(const Event *event)
                 it++;
         }
     }
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM)
+    {
+        // TODO : NEED CHANGES 
+    }
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER)
+    {
+        // TODO : NEED CHANGES 
+    }
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_TIMER)
+    {
+        // TODO : NEED CHANGES 
+    }
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE)
+    {
+        // TODO : NEED CHANGES 
+    }
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ARENA_BATTLE)
+    {
+
+    }
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA)
+    {
+
+    }
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA)
+    {
+
+    }
 
     if (m_available_kts.second.empty())
     {
@@ -2640,6 +2705,49 @@ void ServerLobby::startSelection(const Event *event)
         {
             m_default_vote->m_num_laps = 0;
             m_default_vote->m_reverse = 0;
+            break;
+        }
+        // TODO : NEED CHANGES 
+        case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM:
+        {
+            m_default_vote->m_num_laps = 0;
+            m_default_vote->m_reverse = rg.get(2) == 0;
+            break;
+        }
+        case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER:
+        {
+            m_default_vote->m_num_laps = 0;
+            m_default_vote->m_reverse = rg.get(2) == 0;
+            break;
+        }
+        case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_TIMER:
+        {
+            m_default_vote->m_num_laps = 0;
+            m_default_vote->m_reverse = rg.get(2) == 0;
+            break;
+        }
+        case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE:
+        {
+            m_default_vote->m_num_laps = 0;
+            m_default_vote->m_reverse = rg.get(2) == 0;
+            break;
+        }
+        case RaceManager::MINOR_MODE_TAG_ARENA_BATTLE:
+        {
+            m_default_vote->m_num_laps = 0;
+            m_default_vote->m_reverse = rg.get(2) == 0;
+            break;
+        }
+        case RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA:
+        {
+            m_default_vote->m_num_laps = 0;
+            m_default_vote->m_reverse = rg.get(2) == 0;
+            break;
+        }
+        case RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA:
+        {
+            m_default_vote->m_num_laps = 0;
+            m_default_vote->m_reverse = rg.get(2) == 0;
             break;
         }
         case RaceManager::MINOR_MODE_SOCCER:
@@ -4231,13 +4339,19 @@ void ServerLobby::handlePlayerVote(Event* event)
                 vote.m_num_laps = (uint8_t)7;
         }
     }
-    else if (RaceManager::get()->getMinorMode() ==
-        RaceManager::MINOR_MODE_FREE_FOR_ALL)
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL                       || 
+             // TODO : NEED CHANGES ???
+             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM      || 
+             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER    ||
+             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_TIMER            ||
+             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE             ||
+             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ARENA_BATTLE                   || 
+             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA               ||
+             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA                )
     {
         vote.m_num_laps = 0;
     }
-    else if (RaceManager::get()->getMinorMode() ==
-        RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
     {
         vote.m_num_laps = 0;
         vote.m_reverse = false;
@@ -5307,6 +5421,29 @@ void ServerLobby::addLiveJoinPlaceholder(
             players.push_back(
                 NetworkPlayerProfile::getReservedProfile(KART_TEAM_NONE));
         }
+    }
+    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM   ||
+        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER ||
+        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_TIMER         ||
+        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE)
+    {
+         // TODO : NEED CHANGES 
+         // Faire la même chose pour les autre modes de jeux
+    }
+    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ARENA_BATTLE)
+    {
+        // TODO : NEED CHANGES 
+        // Faire la même chose pour les autre modes de jeux
+    }
+    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA)
+    {
+        // TODO : NEED CHANGES 
+        // Faire la même chose pour les autre modes de jeux
+    }
+    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA)
+    {
+        // TODO : NEED CHANGES 
+        // Faire la même chose pour les autre modes de jeux
     }
     else
     {

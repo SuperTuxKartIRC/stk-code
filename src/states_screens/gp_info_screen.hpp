@@ -94,7 +94,9 @@ protected: // Necessary for RandomGPInfoScreen
     void addScreenshot();
     void updateRandomGP();
     GrandPrixData::GPReverseType getReverse() const;
-
+    GrandPrixData::GPReverseType getPowerup() const;
+    GrandPrixData::GPReverseType getNitro() const;
+    GrandPrixData::GPReverseType getBanana() const;
 public:
     GPInfoScreen();
     /** Places the focus back on the selected GP, in the case that the dialog

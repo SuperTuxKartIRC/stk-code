@@ -574,8 +574,8 @@ void cmdLineHelp()
     "                          for battle server and --soccer-timed / goals for soccer server\n"
     "                          to control verbosely, see below:\n"
     "       --difficulty=N     N=0 Beginner, N=1 Intermediate, N=2 Expert, N=3 SuperTux.\n"
-    "       --battle-mode=n    Specify battle mode in network, 0 is Free-For-All and\n"
-    "                          1 is Capture The Flag.\n"
+    "       --battle-mode=n    Specify battle mode in network, 0 is Free-For-All, 1 is Capture The Flag, \n"
+    "                          2 is Team Arena, 3 is Tag Arena, 4 is Monster Arena and 5 is Murder Mystery.\n"
     "       --soccer-timed     Use time limit mode in network soccer game.\n"
     "       --soccer-goals     Use goals limit mode in network soccer game.\n"
     "       --capture-limit    Specify capture limit for CTF.\n"
@@ -1220,6 +1220,48 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
             RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_CAPTURE_THE_FLAG);
             break;
         }
+        case 6:
+        {
+            ServerConfig::m_server_mode = 9;
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM);
+            break;
+        }
+        case 7:
+        {
+            ServerConfig::m_server_mode = 10;
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER);
+            break;
+        }
+        case 8:
+        {
+            ServerConfig::m_server_mode = 11;
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_TIMER);
+            break;
+        }
+        case 9:
+        {
+            ServerConfig::m_server_mode = 12;
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE);
+            break;
+        }
+        case 10:
+        {
+            ServerConfig::m_server_mode = 13;
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TAG_ARENA_BATTLE);
+            break;
+        }
+        case 11:
+        {
+            ServerConfig::m_server_mode = 14;
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA);
+            break;
+        }
+        case 12:
+        {
+            ServerConfig::m_server_mode = 15;
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA);
+            break;
+        }
         default:
             Log::warn("main", "Invalid race mode '%d' - ignored.", n);
         }
@@ -1252,6 +1294,27 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
                 break;
             case 1:
                 ServerConfig::m_server_mode = 8;
+                break;
+            case 2:
+                ServerConfig::m_server_mode = 9;
+                break;
+            case 3:
+                ServerConfig::m_server_mode = 10;
+                break;
+            case 4:
+                ServerConfig::m_server_mode = 11;
+                break;
+            case 5:
+                ServerConfig::m_server_mode = 12;
+                break;
+            case 6:
+                ServerConfig::m_server_mode = 13;
+                break;
+            case 7:
+                ServerConfig::m_server_mode = 14;
+                break;
+            case 8:
+                ServerConfig::m_server_mode = 15;
                 break;
             default:
                 break;

@@ -27,6 +27,7 @@
 using namespace irr;
 
 #include "states_screens/race_gui_base.hpp"
+#include "network/remote_kart_info.hpp"
 
 class AbstractKart;
 class InputMap;
@@ -92,6 +93,10 @@ private:
         their location on every frame) */
     irr::video::ITexture *m_red_team;
     irr::video::ITexture *m_blue_team;
+    irr::video::ITexture* m_team1;
+    irr::video::ITexture* m_team2;
+    irr::video::ITexture* m_team3;
+    irr::video::ITexture* m_team4;
     irr::video::ITexture *m_red_flag;
     irr::video::ITexture *m_blue_flag;
     irr::video::ITexture *m_soccer_ball;
@@ -145,6 +150,8 @@ private:
     void drawGlobalTimer       ();
     void drawLiveDifference    ();
 
+    // RGBA color for KartTeamsColor
+    video::SColor rgbaColorKartTeamsColor(KartTeamsColor teamColor);
 public:
 
          RaceGUI();

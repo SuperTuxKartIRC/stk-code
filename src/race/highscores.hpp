@@ -61,6 +61,9 @@ public:
     int                 m_number_of_laps;
     bool                m_reverse;
     int                 m_gp_reverse_type;
+    int                 m_gp_powerup_type;
+    int                 m_gp_nitro_type;
+    int                 m_gp_banana_type;
     int                 m_gp_minor_mode;
 
 private:
@@ -104,7 +107,8 @@ public:
     int matches(int num_karts,
                 const RaceManager::Difficulty &difficulty,
                 const std::string &track, const int target,
-                const GrandPrixData::GPReverseType reverse_type, RaceManager::MinorRaceModeType minor_mode);
+                const GrandPrixData::GPReverseType reverse_type,
+                RaceManager::MinorRaceModeType minor_mode);
     // ------------------------------------------------------------------------
     int  addData   (const std::string& kart_name,
                     const irr::core::stringw& name, const float time);
