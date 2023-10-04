@@ -101,6 +101,21 @@ bool GameEventsProtocol::notifyEvent(Event* event)
             new_red_scores, new_blue_scores);
         break;
     }
+    case GE_TEAM_A_SCORED:
+    {
+        // TODO : Besoins de modification!!!
+        if (!ctf)
+            throw std::invalid_argument("No Team Arena world");
+        uint8_t kart_id = data.getUInt8();
+        bool red_team_scored = data.getUInt8() == 1;
+        int16_t new_kart_scores = data.getUInt16();
+        int new_red_scores = data.getUInt8();
+        int new_blue_scores = data.getUInt8();
+        ctf->ctfScored(kart_id, red_team_scored, new_kart_scores,
+            new_red_scores, new_blue_scores);
+        break;
+    }
+    // Need the other case for the other gamemode 
     case GE_STARTUP_BOOST:
     {
         if (NetworkConfig::get()->isServer())

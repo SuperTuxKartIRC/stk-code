@@ -137,13 +137,16 @@ public:
 
     bool                     checkConsistency(bool log_error=true) const;
     std::vector<int>         getLaps(const bool includeLocked=false) const;
-    std::vector<bool>        getReverse(const bool includeLocked=false) const;
+    std::vector<bool>        getReverse(const bool includeLocked = false) const;
     bool                     isEditable() const;
     const std::string&       getTrackId(const unsigned int track) const;
     irr::core::stringw       getTrackName(const unsigned int track) const;
     bool                     containsUnavailableTracks() const;
     unsigned int             getLaps(const unsigned int track) const;
     bool                     getReverse(const unsigned int track) const;
+    bool                     getPowerup(const unsigned int track) const;
+    bool                     getNitro(const unsigned int track) const;
+    bool                     getBanana(const unsigned int track) const;
     void                     moveUp(const unsigned int track);
     void                     moveDown(const unsigned int track);
     void                     addTrack(Track* track, unsigned int laps,
@@ -172,6 +175,7 @@ public:
     // -------------------------------------------------------------------------
     enum GPReverseType getReverseType()
                                       const { return m_reverse_type;           }
+    // -------------------------------------------------------------------------
     static const char*        getRandomGPID()   { return "random";             }
     static irr::core::stringw getRandomGPName();
     static irr::core::stringw reverseTypeToString(GPReverseType reverse_type);

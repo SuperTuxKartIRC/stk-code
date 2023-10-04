@@ -142,6 +142,57 @@ GrandPrixData::GPReverseType GPInfoScreen::getReverse() const
     return GrandPrixData::GP_DEFAULT_REVERSE;
 }   // getReverse
 // ----------------------------------------------------------------------------
+/** Converts the currently selected power-ups status into a value of type
+*  GPReverseType .
+*/
+GrandPrixData::GPReverseType GPInfoScreen::getPowerup() const
+{
+    switch (m_reverse_spinner->getValue())
+    {
+    case 0: return GrandPrixData::GP_DEFAULT_REVERSE; break;
+    case 1: return GrandPrixData::GP_NO_REVERSE;      break;
+    case 2: return GrandPrixData::GP_ALL_REVERSE;     break;
+    case 3: return GrandPrixData::GP_RANDOM_REVERSE;  break;
+    default: assert(false);
+    }   // switch
+    // Avoid compiler warning
+    return GrandPrixData::GP_DEFAULT_REVERSE;
+}   // getPowerup
+// ----------------------------------------------------------------------------
+/** Converts the currently selected nitro status into a value of type
+*  GPReverseType .
+*/
+GrandPrixData::GPReverseType GPInfoScreen::getNitro() const
+{
+    switch (m_reverse_spinner->getValue())
+    {
+    case 0: return GrandPrixData::GP_DEFAULT_REVERSE; break;
+    case 1: return GrandPrixData::GP_NO_REVERSE;      break;
+    case 2: return GrandPrixData::GP_ALL_REVERSE;     break;
+    case 3: return GrandPrixData::GP_RANDOM_REVERSE;  break;
+    default: assert(false);
+    }   // switch
+    // Avoid compiler warning
+    return GrandPrixData::GP_DEFAULT_REVERSE;
+}   // getNitro
+// ----------------------------------------------------------------------------
+/** Converts the currently selected banana status into a value of type
+*  GPReverseType .
+*/
+GrandPrixData::GPReverseType GPInfoScreen::getBanana() const
+{
+    switch (m_reverse_spinner->getValue())
+    {
+    case 0: return GrandPrixData::GP_DEFAULT_REVERSE; break;
+    case 1: return GrandPrixData::GP_NO_REVERSE;      break;
+    case 2: return GrandPrixData::GP_ALL_REVERSE;     break;
+    case 3: return GrandPrixData::GP_RANDOM_REVERSE;  break;
+    default: assert(false);
+    }   // switch
+    // Avoid compiler warning
+    return GrandPrixData::GP_DEFAULT_REVERSE;
+}   // getBanana
+// ----------------------------------------------------------------------------
 void GPInfoScreen::beforeAddingWidget()
 {
     bool random = m_gp.isRandomGP();

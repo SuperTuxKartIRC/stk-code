@@ -229,6 +229,18 @@ void RaceManager::setKartTeam(unsigned int player_id, KartTeam team)
 }   // setKartTeam
 
 //---------------------------------------------------------------------------------------------
+/** Sets additional information for a player to indicate which soccer team it
+ *  belongs to.
+*/
+void RaceManager::setKartTeams(unsigned int player_id, KartTeams teams, KartTeamsColor teamColor)
+{
+    assert(player_id < m_player_karts.size());
+
+    m_player_karts[player_id].setKartTeams(teams, teamColor);
+}   // setKartTeams
+
+
+//---------------------------------------------------------------------------------------------
 /** Sets the handicap for a player.
  */
 void RaceManager::setPlayerHandicap(unsigned int player_id, HandicapLevel handicap)
@@ -369,6 +381,26 @@ void RaceManager::computeRandomKartList()
     }
 
 }   // computeRandomKartList
+
+KartTeamsColor& RaceManager::getTeamColor(KartTeams team)
+{
+    KartTeamsColor teamColor;
+    // TODO : Rendre ça dymanique 
+    if (team == KART_TEAM_1) {
+        return teamColor = KART_TEAM_COLOR_RED;
+    }
+    else if (team == KART_TEAM_2) {
+        return teamColor = KART_TEAM_COLOR_BLUE;
+    }
+    else if (team == KART_TEAM_3) {
+        return teamColor = KART_TEAM_COLOR_GREEN;
+    }
+    else if (team == KART_TEAM_4) {
+        return teamColor = KART_TEAM_COLOR_ORANGE;
+    }
+
+    // TODO: insérer une instruction return ici
+}
 
 //---------------------------------------------------------------------------------------------
 /** \brief Starts a new race or GP (or other mode).
@@ -671,6 +703,21 @@ void RaceManager::startNextRace()
             World::setWorld(new FreeForAll());
         else if (m_minor_mode == MINOR_MODE_CAPTURE_THE_FLAG)
             World::setWorld(new CaptureTheFlag());
+        // TODO : NEED CHANGES 
+        else if (m_minor_mode == MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM)
+            World::setWorld(new FreeForAll()); // World::setWorld(new ());
+        else if (m_minor_mode == MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER)
+            World::setWorld(new FreeForAll()); // World::setWorld(new ());
+        else if (m_minor_mode == MINOR_MODE_TEAM_ARENA_BATTLE_TIMER)
+            World::setWorld(new FreeForAll()); // World::setWorld(new ());
+        else if (m_minor_mode == MINOR_MODE_TEAM_ARENA_BATTLE_LIFE)
+            World::setWorld(new FreeForAll()); // World::setWorld(new ());
+        else if (m_minor_mode == MINOR_MODE_TAG_ARENA_BATTLE)
+            World::setWorld(new FreeForAll());
+        else if (m_minor_mode == MINOR_MODE_MONSTER_ATTACK_ARENA)
+            World::setWorld(new FreeForAll());
+        else if (m_minor_mode == MINOR_MODE_MURDER_MYSTERY_ARENA)
+            World::setWorld(new FreeForAll());
     }
     else if(m_minor_mode==MINOR_MODE_SOCCER)
         World::setWorld(new SoccerWorld());
@@ -1279,23 +1326,37 @@ const core::stringw RaceManager::getNameOf(const MinorRaceModeType mode)
     switch (mode)
     {
         //I18N: Game mode
-        case MINOR_MODE_NORMAL_RACE:    return _("Normal Race");
-        //I18N: Game mode
-        case MINOR_MODE_TIME_TRIAL:     return _("Time Trial");
-        //I18N: Game mode
-        case MINOR_MODE_FOLLOW_LEADER:  return _("Follow the Leader");
-        //I18N: Game mode
-        case MINOR_MODE_LAP_TRIAL:      return _("Lap Trial");
-        //I18N: Game mode
-        case MINOR_MODE_3_STRIKES:      return _("3 Strikes Battle");
-        //I18N: Game mode
-        case MINOR_MODE_FREE_FOR_ALL:   return _("Free-For-All");
-        //I18N: Game mode
-        case MINOR_MODE_CAPTURE_THE_FLAG: return _("Capture The Flag");
-        //I18N: Game mode
-        case MINOR_MODE_EASTER_EGG:     return _("Egg Hunt");
-        //I18N: Game mode
-        case MINOR_MODE_SOCCER:         return _("Soccer");
+        case MINOR_MODE_NORMAL_RACE:                         return _("Normal Race");
+        //I18N: Game mode                                    
+        case MINOR_MODE_TIME_TRIAL:                          return _("Time Trial");
+        //I18N: Game mode                                    
+        case MINOR_MODE_FOLLOW_LEADER:                       return _("Follow the Leader");
+        //I18N: Game mode                                    
+        case MINOR_MODE_LAP_TRIAL:                           return _("Lap Trial");
+        //I18N: Game mode                                    
+        case MINOR_MODE_3_STRIKES:                           return _("3 Strikes Battle");
+        //I18N: Game mode                                    
+        case MINOR_MODE_FREE_FOR_ALL:                        return _("Free-For-All");
+        //I18N: Game mode                                   
+        case MINOR_MODE_CAPTURE_THE_FLAG:                    return _("Capture The Flag");
+        //I18N: Game mode 
+        case MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM:       return _("Team Arena Team Points");
+        //I18N: Game mode 
+        case MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER:     return _("Team Arena Player Points");
+        //I18N: Game mode 
+        case MINOR_MODE_TEAM_ARENA_BATTLE_TIMER:             return _("Team Arena Timer");
+        //I18N: Game mode                               
+        case MINOR_MODE_TEAM_ARENA_BATTLE_LIFE:              return _("Team Arena Life");
+        //I18N: Game mode                               
+        case MINOR_MODE_TAG_ARENA_BATTLE:                    return _("Tag Arena");
+        //I18N: Game mode                                   
+        case MINOR_MODE_MONSTER_ATTACK_ARENA:                return _("Monster Arena");
+        //I18N: Game mode                                   
+        case MINOR_MODE_MURDER_MYSTERY_ARENA:                return _("Murder Mystery");
+        //I18N: Game mode                                   
+        case MINOR_MODE_EASTER_EGG:                          return _("Egg Hunt");
+        //I18N: Game mode                                    
+        case MINOR_MODE_SOCCER:                              return _("Soccer");
         default: return L"";
     }
 }   // getNameOf

@@ -274,6 +274,10 @@ void Flyable::getClosestKart(const AbstractKart **minKart,
             world->getKartTeam(kart->getWorldKartId()) ==
             world->getKartTeam(m_owner->getWorldKartId()))
             continue;
+        if (world->hasTeams() &&
+            world->getKartTeams(kart->getWorldKartId()) ==
+            world->getKartTeams(m_owner->getWorldKartId()))
+            continue;
 
         btTransform t=kart->getTrans();
 
@@ -581,6 +585,11 @@ void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object,
         if (world->hasTeam() &&
             world->getKartTeam(kart->getWorldKartId()) ==
             world->getKartTeam(m_owner->getWorldKartId()))
+            continue;
+
+        if (world->hasTeams() &&
+            world->getKartTeams(kart->getWorldKartId()) ==
+            world->getKartTeams(m_owner->getWorldKartId()))
             continue;
 
         if (kart->isGhostKart()) continue;

@@ -37,6 +37,7 @@
 #include "input/keyboard_device.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/controller/battle_ai.hpp"
+#include "karts/controller/battle_team_ai.hpp"
 #include "karts/ghost_kart.hpp"
 #include "karts/controller/end_controller.hpp"
 #include "karts/controller/local_player_controller.hpp"
@@ -201,7 +202,7 @@ void World::init()
     Physics::create();
     main_loop->renderGUI(1300);
     unsigned int num_karts = RaceManager::get()->getNumberOfKarts();
-    //assert(num_karts > 0);
+    assert(num_karts > 0);
 
     // Load the track models - this must be done before the karts so that the
     // karts can be positioned properly on (and not in) the tracks.
@@ -222,8 +223,15 @@ void World::init()
     }
 
     // Shuffles the start transforms with playing 3-strikes or free for all battles.
-    if ((RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ||
-         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL) &&
+    if ((RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES                        ||
+         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL                     || 
+         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM    ||
+         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER  || 
+         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_TIMER          || 
+         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE           || 
+         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ARENA_BATTLE                 || // TODO : Besoins de changement
+         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA             || //
+         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA              ) &&
          !NetworkConfig::get()->isNetworking())
     {
         track->shuffleStartTransforms();
@@ -242,6 +250,10 @@ void World::init()
     if (hasTeam())
         setAITeam();
 
+    // Assign team of AIs for teams mode before createKart
+    if (hasTeams())
+        setAITeams();
+
     for(unsigned int i=0; i<num_karts; i++)
     {
         main_loop->renderGUI(7000, i, num_karts);
@@ -255,6 +267,12 @@ void World::init()
         if (hasTeam())
         {
             new_kart = createKartWithTeam(kart_ident, i, local_player_id,
+                global_player_id, RaceManager::get()->getKartType(i),
+                RaceManager::get()->getPlayerHandicap(i));
+        }
+        else if (hasTeams())
+        {
+            new_kart = createKartWithTeams(kart_ident, i, local_player_id,
                 global_player_id, RaceManager::get()->getKartType(i),
                 RaceManager::get()->getPlayerHandicap(i));
         }
@@ -303,6 +321,8 @@ void World::init()
     const unsigned int kart_amount = (unsigned int)m_karts.size();
     for (unsigned int i = 0; i < kart_amount; i++)
         initTeamArrows(m_karts[i].get());
+    for (unsigned int i = 0; i < kart_amount; i++)
+        initTeamsArrows(m_karts[i].get());
 
     main_loop->renderGUI(7300);
 }   // init
@@ -313,7 +333,7 @@ void World::initTeamArrows(AbstractKart* k)
     if (!hasTeam() || GUIEngine::isNoGraphics())
         return;
 #ifndef SERVER_ONLY
-    //Loading the indicator textures
+    //Loading the indicator textures // À changer pour prendre en compte la couleur de l'équipe
     std::string red_path =
             file_manager->getAsset(FileManager::GUI_ICON, "red_arrow.png");
     std::string blue_path =
@@ -328,16 +348,58 @@ void World::initTeamArrows(AbstractKart* k)
         return;
 
     float arrow_pos_height = km->getHeight() + 0.5f;
-    KartTeam team = getKartTeam(k->getWorldKartId());
+    KartTeams team = getKartTeams(k->getWorldKartId());
+
 
     arrow_node = irr_driver->addBillboard(
         core::dimension2d<irr::f32>(0.3f,0.3f),
-        team == KART_TEAM_BLUE ? blue_path : red_path,
+        team == KART_TEAM_RED ? red_path :
+        blue_path,
         k->getNode());
 
     arrow_node->setPosition(core::vector3df(0, arrow_pos_height, 0));
 #endif
 }   // initTeamArrows
+
+void World::initTeamsArrows(AbstractKart* k)
+{
+    if (!hasTeam() || GUIEngine::isNoGraphics())
+        return;
+#ifndef SERVER_ONLY
+    //Loading the indicator textures
+    // Find a better way to do that taking into account the colors chosen for the teams // Add the other arrow colors
+    std::string red_path =
+        file_manager->getAsset(FileManager::GUI_ICON, "red_arrow.png");
+    std::string blue_path =
+        file_manager->getAsset(FileManager::GUI_ICON, "blue_arrow.png");
+    std::string green_path =
+        file_manager->getAsset(FileManager::GUI_ICON, "green_arrow.png");
+    std::string orange_path =
+        file_manager->getAsset(FileManager::GUI_ICON, "down.png");
+
+    // Assigning indicators
+    scene::ISceneNode* arrow_node = NULL;
+
+    KartModel* km = k->getKartModel();
+    // Color of karts can be changed using shaders if the model supports
+    if (km->supportColorization() && CVS->supportsColorization())
+        return;
+
+    float arrow_pos_height = km->getHeight() + 0.5f;
+    KartTeams team = getKartTeams(k->getWorldKartId());
+    KartTeamsColor teamColor = getKartTeamsColor(k->getWorldKartId());
+
+    arrow_node = irr_driver->addBillboard(
+        core::dimension2d<irr::f32>(0.3f, 0.3f),
+        teamColor == KART_TEAM_COLOR_RED ? red_path :
+                     KART_TEAM_COLOR_BLUE ? blue_path :
+                     KART_TEAM_COLOR_GREEN ? green_path : orange_path,
+        k->getNode());
+
+    arrow_node->setPosition(core::vector3df(0, arrow_pos_height, 0));
+#endif
+}   // initTeamArrows
+
 
 //-----------------------------------------------------------------------------
 /** This function is called before a race is started (i.e. either after
@@ -572,11 +634,20 @@ Controller* World::loadAIController(AbstractKart* kart)
     Controller *controller;
     int turn=0;
 
-    if(RaceManager::get()->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES
-        || RaceManager::get()->getMinorMode()==RaceManager::MINOR_MODE_FREE_FOR_ALL)
-        turn=1;
+    if(RaceManager::get()->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES || 
+       RaceManager::get()->getMinorMode()==RaceManager::MINOR_MODE_FREE_FOR_ALL)
+        turn = 1;
     else if(RaceManager::get()->getMinorMode()==RaceManager::MINOR_MODE_SOCCER)
-        turn=2;
+        turn = 2;
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM   ||
+             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER ||
+             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_TIMER         ||
+             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE)
+        turn = 3;
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ARENA_BATTLE     ||
+             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA ||
+             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA)
+        turn = 4;
     // If different AIs should be used, adjust turn (or switch randomly
     // or dependent on difficulty)
     switch(turn)
@@ -594,6 +665,12 @@ Controller* World::loadAIController(AbstractKart* kart)
             break;
         case 2:
             controller = new SoccerAI(kart);
+            break;
+        case 3:
+            controller = new BattleTeamAI(kart);
+            break;
+        case 4:
+            controller = new BattleTeamAI(kart);
             break;
         default:
             Log::warn("[World]", "Unknown AI, using default.");
@@ -1807,6 +1884,21 @@ void World::updateAchievementModeCounters(bool start)
             PlayerManager::increaseAchievement(start ? ACS::CTF_STARTED : ACS::CTF_FINISHED,1);
         else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
             PlayerManager::increaseAchievement(start ? ACS::FFA_STARTED : ACS::FFA_FINISHED,1);
+
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM)
+            PlayerManager::increaseAchievement(start ? ACS::TEAM_ARENA_POINTS_TEAM_STARTED : ACS::TEAM_ARENA_POINTS_TEAM_FINISHED, 1);
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER)
+            PlayerManager::increaseAchievement(start ? ACS::TEAM_ARENA_POINTS_PLAYER_STARTED : ACS::TEAM_ARENA_POINTS_PLAYER_FINISHED, 1);
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_TIMER)
+            PlayerManager::increaseAchievement(start ? ACS::TEAM_ARENA_TIMER_STARTED : ACS::TEAM_ARENA_TIMER_FINISHED, 1);
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE)
+            PlayerManager::increaseAchievement(start ? ACS::TEAM_ARENA_LIFE_STARTED : ACS::TEAM_ARENA_LIFE_FINISHED, 1);
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ARENA_BATTLE)
+            PlayerManager::increaseAchievement(start ? ACS::TAG_ARENA_STARTED : ACS::TAG_ARENA_FINISHED, 1);
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA)
+            PlayerManager::increaseAchievement(start ? ACS::MONSTER_ARENA_STARTED : ACS::MONSTER_ARENA_FINISHED, 1);
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA)
+            PlayerManager::increaseAchievement(start ? ACS::MURDER_MYSTERY_STARTED : ACS::MURDER_MYSTERY_FINISHED, 1);
     }
     else // normal races
         PlayerManager::increaseAchievement(start ? ACS::NORMAL_STARTED : ACS::NORMAL_FINISHED,1);
@@ -1815,3 +1907,210 @@ void World::updateAchievementModeCounters(bool start)
         PlayerManager::increaseAchievement(start ? ACS::WITH_GHOST_STARTED : ACS::WITH_GHOST_FINISHED,1);
 } // updateAchievementModeCounters
 #undef ACS
+
+
+
+//-----------------------------------------------------------------------------
+std::shared_ptr<AbstractKart> World::createKartWithTeams
+(const std::string& kart_ident, int index, int local_player_id,
+    int global_player_id, RaceManager::KartType kart_type,
+    HandicapLevel handicap)
+{
+    int cur_t1 = getTeamsNum(KART_TEAM_1);
+    int cur_t2 = getTeamsNum(KART_TEAM_2);
+    int cur_t3 = getTeamsNum(KART_TEAM_3);
+    int cur_t4 = getTeamsNum(KART_TEAM_4);
+    int pos_index = 0;
+    int position = index + 1;
+    KartTeams team = KART_TEAM_2;
+    KartTeamsColor teamColor;
+
+    if (kart_type == RaceManager::KT_AI)
+    {
+        if (index < m_team1_ai)
+            team = KART_TEAM_1;
+        else if (index < m_team1_ai + m_team2_ai)
+            team = KART_TEAM_2;
+        else if (index < m_team1_ai + m_team2_ai + m_team3_ai)
+            team = KART_TEAM_3;
+        else
+            team = KART_TEAM_4;
+        m_kart_teams_map[index] = team;
+        teamColor = RaceManager::get()->getTeamColor(team);
+        //m_kart_teams_color_map[index] = teamColor;
+    }
+    else if (NetworkConfig::get()->isNetworking())
+    {
+        team = RaceManager::get()->getKartInfo(index).getKartTeams();
+        teamColor = RaceManager::get()->getKartInfo(index).getKartTeamsColor();
+        m_kart_teams_map[index] = team;
+    }
+    else
+    {
+        int rm_id = index -
+            (RaceManager::get()->getNumberOfKarts() - RaceManager::get()->getNumPlayers());
+
+        assert(rm_id >= 0);
+        team = RaceManager::get()->getKartInfo(rm_id).getKartTeams();
+        teamColor = RaceManager::get()->getKartInfo(rm_id).getKartTeamsColor();
+        m_kart_teams_map[index] = team;
+    }
+
+    core::stringw online_name;
+    if (global_player_id > -1)
+    {
+        online_name = RaceManager::get()->getKartInfo(global_player_id)
+            .getPlayerName();
+    }
+
+    // Notice: In blender, please set 1,3,5,7... for blue starting position;
+    // 2,4,6,8... for red.
+    if (team == KART_TEAM_1)
+        pos_index = 1 + 2 * cur_t1;
+    if (team == KART_TEAM_2)
+        pos_index = 1 + 2 * cur_t2;
+    if (team == KART_TEAM_3)
+        pos_index = 1 + 2 * cur_t3;
+    else
+        pos_index = 2 + 2 * cur_t4;
+
+    btTransform init_pos = getStartTransform(pos_index - 1);
+    m_kart_position_map[index] = (unsigned)(pos_index - 1);
+
+    std::shared_ptr<GE::GERenderInfo> ri = std::make_shared<GE::GERenderInfo>();
+
+    // TODO : en faire une méthode 
+    //ri = getGERenderInfo(teamColor);
+
+    ri = teamColor == KART_TEAM_COLOR_RED ? std::make_shared < GE::GERenderInfo>(1.00f) :
+        teamColor == KART_TEAM_COLOR_BLUE ? std::make_shared < GE::GERenderInfo>(0.6f) :
+        teamColor == KART_TEAM_COLOR_GREEN ? std::make_shared < GE::GERenderInfo>(0.33f) :
+        teamColor == KART_TEAM_COLOR_PURPLE ? std::make_shared < GE::GERenderInfo>(0.75f) :
+        teamColor == KART_TEAM_COLOR_PINK ? std::make_shared < GE::GERenderInfo>(0.95f) :
+        teamColor == KART_TEAM_COLOR_ORANGE ? std::make_shared < GE::GERenderInfo>(0.065f) :
+        teamColor == KART_TEAM_COLOR_YELLOW ? std::make_shared < GE::GERenderInfo>(0.16f) :
+        teamColor == KART_TEAM_COLOR_TURQUOISE ? std::make_shared < GE::GERenderInfo>(0.45f) :
+        teamColor == KART_TEAM_COLOR_DARK_BLUE ? std::make_shared < GE::GERenderInfo>(0.66f) :
+        teamColor == KART_TEAM_COLOR_CYAN ? std::make_shared < GE::GERenderInfo>(0.5f) :
+        teamColor == KART_TEAM_COLOR_DEFAULT ? std::make_shared < GE::GERenderInfo>(0.99f) :
+        std::make_shared < GE::GERenderInfo>(0.99f);
+
+    std::shared_ptr<AbstractKart> new_kart;
+    if (RewindManager::get()->isEnabled())
+    {
+        auto kr = std::make_shared<KartRewinder>(kart_ident, index, position,
+            init_pos, handicap, ri);
+        kr->rewinderAdd();
+        new_kart = kr;
+    }
+    else
+    {
+        new_kart = std::make_shared<Kart>(kart_ident, index, position,
+            init_pos, handicap, ri);
+    }
+
+    new_kart->init(RaceManager::get()->getKartType(index));
+    Controller* controller = NULL;
+
+    switch (kart_type)
+    {
+    case RaceManager::KT_PLAYER:
+        controller = new LocalPlayerController(new_kart.get(), local_player_id, handicap);
+        m_num_players++;
+        break;
+    case RaceManager::KT_NETWORK_PLAYER:
+        controller = new NetworkPlayerController(new_kart.get());
+        if (!online_name.empty())
+            new_kart->setOnScreenText(online_name.c_str());
+        m_num_players++;
+        break;
+    case RaceManager::KT_AI:
+        controller = loadAIController(new_kart.get());
+        break;
+    case RaceManager::KT_GHOST:
+    case RaceManager::KT_LEADER:
+    case RaceManager::KT_SPARE_TIRE:
+        break;
+    }
+
+    new_kart->setController(controller);
+
+    return new_kart;
+}   // createKartWithTeams
+
+//-----------------------------------------------------------------------------
+int World::getTeamsNum(KartTeams team) const
+{
+    int total = 0;
+    if (m_kart_teams_map.empty()) return total;
+
+    for (unsigned int i = 0; i < (unsigned)m_karts.size(); ++i)
+    {
+        if (team == getKartTeams(m_karts[i]->getWorldKartId())) total++;
+    }
+
+    return total;
+}   // getTeamsNum
+
+//-----------------------------------------------------------------------------
+KartTeams World::getKartTeams(unsigned int kart_id) const
+{
+    std::map<int, KartTeams>::const_iterator n =
+        m_kart_teams_map.find(kart_id);
+
+    assert(n != m_kart_teams_map.end());
+    return n->second;
+}   // getKartTeams
+
+//-----------------------------------------------------------------------------
+KartTeamsColor World::getKartTeamsColor(unsigned int kart_id) const
+{
+    std::map<int, KartTeamsColor>::const_iterator n =
+        m_kart_teams_color_map.find(kart_id);
+
+    assert(n != m_kart_teams_color_map.end());
+    return n->second;
+}   // getKartTeamsColor
+
+
+//-----------------------------------------------------------------------------
+void World::setAITeams()
+{
+    m_team1_ai = RaceManager::get()->getNumberOfTeam1AIKarts();
+    m_team2_ai = RaceManager::get()->getNumberOfTeam2AIKarts();
+    m_team3_ai = RaceManager::get()->getNumberOfTeam3AIKarts();
+    m_team4_ai = RaceManager::get()->getNumberOfTeam4AIKarts();
+
+    for (int i = 0; i < (int)RaceManager::get()->getNumLocalPlayers(); i++)
+    {
+        KartTeams team = RaceManager::get()->getKartInfo(i).getKartTeams();
+        KartTeamsColor teamColors = RaceManager::get()->getKartInfo(i).getKartTeamsColor();
+
+        // Happen in profiling mode
+        if (team == KART_TEAM_N)
+        {
+            RaceManager::get()->setKartTeams(i, KART_TEAM_2, teamColors);
+            team = KART_TEAM_2;
+            continue; //FIXME, this is illogical
+        }
+    }
+
+    Log::debug("World", "Team1 AI: %d Team2 AI: %d Team3 AI: %d Team4 AI: %d", m_team1_ai, m_team2_ai, m_team3_ai, m_team4_ai); // TODO : Besoins de modification???
+
+}   // setAITeams
+
+//std::shared_ptr<GE::GERenderInfo> getGERenderInfo(KartTeamsColor teamColor)
+//{
+//    return teamColor == KART_TEAM_COLOR_RED ? std::make_shared < GE::GERenderInfo>(1.00f) :
+//        teamColor == KART_TEAM_COLOR_BLUE ? std::make_shared < GE::GERenderInfo>(0.6f) :
+//        teamColor == KART_TEAM_COLOR_GREEN ? std::make_shared < GE::GERenderInfo>(0.33f) :
+//        teamColor == KART_TEAM_COLOR_PURPLE ? std::make_shared < GE::GERenderInfo>(0.75f) :
+//        teamColor == KART_TEAM_COLOR_PINK ? std::make_shared < GE::GERenderInfo>(0.95f) :
+//        teamColor == KART_TEAM_COLOR_ORANGE ? std::make_shared < GE::GERenderInfo>(0.065f) :
+//        teamColor == KART_TEAM_COLOR_YELLOW ? std::make_shared < GE::GERenderInfo>(0.16f) :
+//        teamColor == KART_TEAM_COLOR_TURQUOISE ? std::make_shared < GE::GERenderInfo>(0.45f) :
+//        teamColor == KART_TEAM_COLOR_DARK_BLUE ? std::make_shared < GE::GERenderInfo>(0.66f) :
+//        teamColor == KART_TEAM_COLOR_CYAN ? std::make_shared < GE::GERenderInfo>(0.5f) :
+//        teamColor == KART_TEAM_COLOR_DEFAULT ? std::make_shared < GE::GERenderInfo>(0.99f) :
+//        std::make_shared < GE::GERenderInfo>(0.99f);
+//}

@@ -93,9 +93,14 @@ private:
     static World *m_world[PT_COUNT];
     // ------------------------------------------------------------------------
     void setAITeam();
+    void setAITeams();
     // ------------------------------------------------------------------------
     std::shared_ptr<AbstractKart> createKartWithTeam
         (const std::string &kart_ident, int index, int local_player_id,
+        int global_player_id, RaceManager::KartType type,
+        HandicapLevel handicap);
+    std::shared_ptr<AbstractKart> createKartWithTeams
+    (const std::string& kart_ident, int index, int local_player_id,
         int global_player_id, RaceManager::KartType type,
         HandicapLevel handicap);
 
@@ -108,7 +113,13 @@ protected:
     /* Team related variables. */
     int m_red_ai;
     int m_blue_ai;
+    int m_team1_ai;
+    int m_team2_ai;
+    int m_team3_ai;
+    int m_team4_ai;
     std::map<int, KartTeam> m_kart_team_map;
+    std::map<int, KartTeams> m_kart_teams_map;
+    std::map<int, KartTeamsColor> m_kart_teams_color_map;
     std::map<int, unsigned int> m_kart_position_map;
 
     /** The list of all karts. */
@@ -395,10 +406,19 @@ public:
     // ------------------------------------------------------------------------
     virtual bool hasTeam() const                              { return false; }
     // ------------------------------------------------------------------------
+    virtual bool hasTeams() const                             { return false; }
+    // ------------------------------------------------------------------------
     /** Get the team of kart in world (including AIs) */
     KartTeam getKartTeam(unsigned int kart_id) const;
     // ------------------------------------------------------------------------
     int getTeamNum(KartTeam team) const;
+    // ------------------------------------------------------------------------
+    /** Get the team of kart in world (including AIs) */
+    KartTeams getKartTeams(unsigned int kart_id) const;
+    /** Get the team color of kart in world (including AIs) */
+    KartTeamsColor getKartTeamsColor(unsigned int kart_id) const;
+    // ------------------------------------------------------------------------
+    int getTeamsNum(KartTeams team) const;
     // ------------------------------------------------------------------------
     /** Set the network mode (true if networked) */
     void setNetworkWorld(bool is_networked) { m_is_network_world = is_networked; }
@@ -407,6 +427,8 @@ public:
     // ------------------------------------------------------------------------
     /** Set the team arrow on karts if necessary*/
     void initTeamArrows(AbstractKart* k);
+    /** Set the teams arrow on karts if necessary*/
+    void initTeamsArrows(AbstractKart* k);
     // ------------------------------------------------------------------------
     /** Used by server to get the current started game progress in either or
      *  both remaining time or progress in percent. uint32_t max for either or
@@ -418,6 +440,9 @@ public:
     }
     // ------------------------------------------------------------------------
     virtual bool isGoalPhase() const { return false; }
+
+    //std::shared_ptr<GE::GERenderInfo> getGERenderInfo(KartTeamsColor kartTeamsColor);
+
 };   // World
 
 #endif

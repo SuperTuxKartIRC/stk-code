@@ -451,6 +451,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam         m_use_ffa_mode
         PARAM_DEFAULT(BoolUserConfigParam(false, "use-ffa-mode",
             &m_race_setup_group, "Use ffa mode instead of 3 strikes battle."));
+    PARAM_PREFIX IntUserConfigParam         m_use_team_arena_battle_mode
+        PARAM_DEFAULT(IntUserConfigParam(0, "use-team-arena-battle-mode",
+            &m_race_setup_group, "The type of team arena mode. 0 = Team Points, 1= Player Points, 2= Player Points All, 3= Life"));
     PARAM_PREFIX IntUserConfigParam          m_lap_trial_time_limit
         PARAM_DEFAULT(IntUserConfigParam(3, "lap-trial-time-limit",
             &m_race_setup_group, "Time limit in lap trial mode."));
@@ -466,9 +469,26 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam         m_soccer_use_time_limit
             PARAM_DEFAULT(  BoolUserConfigParam(false, "soccer-use-time-limit",
             &m_race_setup_group, "Enable time limit in soccer mode.") );
+    PARAM_PREFIX IntUserConfigParam          m_default_team_teams
+            PARAM_DEFAULT(IntUserConfigParam(0, "default-team",
+            &m_race_setup_group, "Default team in teams mode for local mode."));
+    PARAM_PREFIX IntUserConfigParam          m_default_team_color
+        PARAM_DEFAULT(IntUserConfigParam(0, "default-team-color",
+            &m_race_setup_group, "Default team color in teams mode for local mode."));
     PARAM_PREFIX BoolUserConfigParam         m_random_arena_item
             PARAM_DEFAULT(  BoolUserConfigParam(false, "random-arena-item",
             &m_race_setup_group, "Enable random location of items in an arena.") );
+    PARAM_PREFIX IntUserConfigParam          m_arena_battle_time_limit
+        PARAM_DEFAULT(IntUserConfigParam(3, "Time limit in arena battle mode.",
+            &m_race_setup_group, "Time limit in ffa mode."));
+
+    PARAM_PREFIX IntUserConfigParam          m_kart_lifes_arena
+        PARAM_DEFAULT(IntUserConfigParam(3, "Time number life of kart in battle mode.",
+            &m_race_setup_group, "Time kart life in arena mode."));
+    PARAM_PREFIX IntUserConfigParam          m_win_points_condition_arena
+        PARAM_DEFAULT(IntUserConfigParam(3, "Time winning point condition in arena battle mode.",
+            &m_race_setup_group, "Time winning point condition in arena mode."));
+
     PARAM_PREFIX IntUserConfigParam          m_difficulty
             PARAM_DEFAULT(  IntUserConfigParam(0, "difficulty",
                             &m_race_setup_group,
@@ -476,9 +496,7 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam          m_game_mode
             PARAM_DEFAULT(  IntUserConfigParam(0, "game_mode",
                             &m_race_setup_group,
-                            "Game mode. 0=standard, 1=time trial, 2=follow "
-                            "the leader, 3=3 strikes, 4=easter egg hunt, "
-                            "5=soccer, 6=ghost replay") );
+                            "Game mode. 0=standard, 1=time trial, 2=follow the leader, 3=3 strikes, 4=easter egg hunt, 5=soccer, 6=ghost replay, 7=teams arena, 8=tag arena, 9=monster arena, 10=murder mystery"));
     PARAM_PREFIX StringUserConfigParam m_default_kart
             PARAM_DEFAULT( StringUserConfigParam("tux", "kart",
                            "Kart to select by default (the last used kart)") );
@@ -491,6 +509,18 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam          m_soccer_blue_ai_num
             PARAM_DEFAULT(  IntUserConfigParam(0, "soccer-blue-ai-num",
             &m_race_setup_group, "Number of blue AI karts in soccer mode.") );
+    PARAM_PREFIX IntUserConfigParam           m_team1_ai_num
+        PARAM_DEFAULT(IntUserConfigParam(0, "team1-ai-num",
+            &m_race_setup_group, "Number of Team1 AI karts."));
+    PARAM_PREFIX IntUserConfigParam           m_team2_ai_num
+        PARAM_DEFAULT(IntUserConfigParam(0, "team2-ai-num",
+            &m_race_setup_group, "Number of Team2 AI karts."));
+    PARAM_PREFIX IntUserConfigParam           m_team3_ai_num
+        PARAM_DEFAULT(IntUserConfigParam(0, "team3-ai-num",
+            &m_race_setup_group, "Number of Team3 AI karts."));
+    PARAM_PREFIX IntUserConfigParam           m_team4_ai_num
+        PARAM_DEFAULT(IntUserConfigParam(0, "team4-ai-num",
+            &m_race_setup_group, "Number of Team4 AI karts."));
     PARAM_PREFIX BoolUserConfigParam          m_karts_powerup_gui
             PARAM_DEFAULT(  BoolUserConfigParam(false, "karts-powerup-gui",
             &m_race_setup_group, "Show other karts' held powerups in race gui.") );

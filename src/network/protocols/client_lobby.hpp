@@ -20,6 +20,7 @@
 #define CLIENT_LOBBY_HPP
 
 #include "input/input.hpp"
+#include "network/remote_kart_info.hpp"
 #include "network/protocols/lobby_protocol.hpp"
 #include "utils/cpp2011.hpp"
 
@@ -143,6 +144,7 @@ private:
 
     void liveJoinAcknowledged(Event* event);
     void handleKartInfo(Event* event);
+    void sendChats(irr::core::stringw text, KartTeams team);
     void finishLiveJoin();
     std::vector<std::shared_ptr<NetworkPlayerProfile> >
          decodePlayers(const BareNetworkString& data,

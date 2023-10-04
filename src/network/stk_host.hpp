@@ -369,6 +369,8 @@ public:
     // ------------------------------------------------------------------------
     std::pair<int, int> getAllPlayersTeamInfo() const;
     // ------------------------------------------------------------------------
+    std::tuple<int, int, int, int> getAllPlayersTeamsInfo() const;
+    // ------------------------------------------------------------------------
     /* Return upload speed in bytes per second. */
     unsigned getUploadSpeed() const           { return m_upload_speed.load(); }
     // ------------------------------------------------------------------------

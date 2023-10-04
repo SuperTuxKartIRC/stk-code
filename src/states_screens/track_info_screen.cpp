@@ -64,14 +64,27 @@ TrackInfoScreen::TrackInfoScreen()
 /* Saves some often used pointers. */
 void TrackInfoScreen::loadedFromFile()
 {
-    m_target_type_spinner   = getWidget<SpinnerWidget>("target-type-spinner");
+    m_race_highscores_div   = getWidget<Widget>("race-highscores-div");
+    m_target_type_spinner   = getWidget<SpinnerWidget>("target-type-spinner"); 
     m_target_type_label     = getWidget <LabelWidget>("target-type-text");
     m_ai_blue_spinner       = getWidget<SpinnerWidget>("ai-blue-spinner");
     m_ai_blue_label         = getWidget <LabelWidget>("ai-blue-text");
     m_ai_blue_div           = getWidget<Widget>("ai-blue-div");
+    m_ai_team3_spinner      = getWidget<SpinnerWidget>("ai-team3-spinner");
+    m_ai_team3_label        = getWidget <LabelWidget>("ai-team3-text");
+    m_ai_team3_div          = getWidget<Widget>("ai-team3-div");
+    m_ai_team4_spinner      = getWidget<SpinnerWidget>("ai-team4-spinner");
+    m_ai_team4_label        = getWidget <LabelWidget>("ai-team4-text");
+    m_ai_team4_div          = getWidget<Widget>("ai-team4-div");
     m_target_type_div       = getWidget<Widget>("target-type-div");
     m_target_value_spinner  = getWidget<SpinnerWidget>("target-value-spinner");
     m_target_value_label    = getWidget<LabelWidget>("target-value-text");
+    m_life_value_spinner    = getWidget<SpinnerWidget>("lifes-value-spinner");
+    m_number_life_div       = getWidget<Widget>("number-life-div");
+    m_life_value_label      = getWidget<LabelWidget>("lifes-value-text");
+    m_point_value_spinner   = getWidget<SpinnerWidget>("points-value-spinner");
+    m_point_value_label     = getWidget<LabelWidget>("points-value-text");
+    m_number_point_div      = getWidget<Widget>("number-point-div");
     m_ai_kart_spinner       = getWidget<SpinnerWidget>("ai-spinner");
     m_ai_kart_label         = getWidget<LabelWidget>("ai-text");
     m_option                = getWidget<CheckBoxWidget>("option");
@@ -116,11 +129,29 @@ void TrackInfoScreen::beforeAddingWidget()
     m_is_lap_trial = RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_LAP_TRIAL;
     m_show_ffa_spinner = RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES
                         || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL;
+    m_is_arena_mode = RaceManager::get()->isBattleMode();
 
-    m_target_type_div->setCollapsed(!m_is_soccer && !m_show_ffa_spinner, this);
+    m_is_team_arena_battle = RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER
+        || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM
+        || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE
+        || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_TIMER;
 
-    // show 'Number of blue team AI karts' if soccer
-    m_ai_blue_div->setCollapsed(!(RaceManager::get()->isSoccerMode()), this);
+    m_is_teams_mode = m_is_team_arena_battle;
+
+    m_target_type_div->setCollapsed(!m_is_soccer && !m_show_ffa_spinner && !m_is_team_arena_battle, this);
+
+    // show 'Number of blue team AI karts' if soccer or teams mode
+    m_ai_blue_div->setCollapsed((!(RaceManager::get()->isSoccerMode()) && !m_is_teams_mode), this);
+
+    // show 'Number of team 3 and 4 AI karts' if teams mode
+    m_ai_team3_div->setCollapsed((!m_is_teams_mode), this);
+    m_ai_team4_div->setCollapsed((!m_is_teams_mode), this);
+
+    m_number_life_div->setCollapsed((!m_is_team_arena_battle), this);
+    m_number_point_div->setCollapsed((!m_is_team_arena_battle), this);
+
+    m_race_highscores_div->setCollapsed((m_is_team_arena_battle), this);
+
 } // beforeAddingWidget
 
 // ----------------------------------------------------------------------------
@@ -178,12 +209,37 @@ void TrackInfoScreen::init()
     m_ai_blue_label->setVisible(false);
     m_ai_blue_label->setActive(false);
 
+    m_ai_team3_spinner->setVisible(false);
+    m_ai_team3_label->setVisible(false);
+    m_ai_team3_label->setActive(false);
+    m_ai_team4_spinner->setVisible(false);
+    m_ai_team4_label->setVisible(false);
+    m_ai_team4_label->setActive(false);
+
+    m_life_value_spinner->setVisible(false);
+    m_life_value_label->setVisible(false);
+    m_life_value_label->setActive(false);
+    m_point_value_spinner->setVisible(false);
+    m_point_value_label->setVisible(false);
+    m_point_value_label->setActive(false);
+
+    m_ai_kart_label->setText(_("Number of red team AI karts"), false);
+    m_ai_blue_label->setText(_("Number of blue team AI karts"), false);
+
     // Number of AIs
     // -------------
     const bool has_AI =
-        (   RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES
-         || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL
-         || m_is_soccer ?
+        (   RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES                       ||
+            RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL                    || 
+            RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM   ||
+            RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER ||
+            RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_TIMER         ||
+            RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE          ||
+            // À vérifier plus tard pour les 3 autre mode de jeux. Tag, monstre, meurtre et mystères 
+            RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ARENA_BATTLE                ||
+            RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA            ||
+            RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA            ||
+            m_is_soccer ?
          m_track->hasNavMesh() && (max_arena_players - local_players) > 0 :
          RaceManager::get()->hasAI());
 
@@ -258,6 +314,17 @@ void TrackInfoScreen::init()
         m_target_value_label->setVisible(UserConfigParams::m_use_ffa_mode);
         m_target_value_spinner->setVisible(UserConfigParams::m_use_ffa_mode);
     }
+
+    // options for team arena mode 
+    // -------------
+    if (m_is_team_arena_battle)
+    {
+        m_target_value_spinner->setMin(0);
+        m_life_value_spinner->setMin(0);
+        m_point_value_spinner->setMin(0);
+        setTeamArenaBattleWidgets(has_AI);
+    }
+
 
     // Lap count m_lap_spinner
     // -----------------------
@@ -443,6 +510,127 @@ void TrackInfoScreen::setSoccerWidgets(bool has_AI)
     }
 } // setSoccerWidgets
 
+void TrackInfoScreen::setTeamArenaBattleWidgets(bool has_AI)
+{
+    // Set up the spinner for the choice between 4 variation of the game mode :
+    // Points team, Points player, Points player all and life
+    m_target_type_label->setText(_("Game mode (teams)"), false);
+
+    m_target_value_spinner->setVisible(true);
+    m_target_value_label->setVisible(true);
+    m_target_value_label->setText(_("Maximum time (min.)"), false);
+
+    m_life_value_spinner->setVisible(true);
+    m_life_value_label->setVisible(true);
+    m_point_value_spinner->setVisible(true);
+    m_point_value_label->setVisible(true);
+
+    m_target_type_spinner->clearLabels();
+    m_target_type_spinner->addLabel(_("Team Points"));
+    //m_target_type_spinner->addLabel(_("Player with most points"));
+    //m_target_type_spinner->addLabel(_("All Player Points"));
+    //m_target_type_spinner->addLabel(_("Last team standing"));
+    m_target_type_spinner->setValue(0);
+
+
+    m_ai_kart_label->setText(_("Number of Team1 AI karts"), false);
+    m_ai_kart_spinner->setValue(UserConfigParams::m_team1_ai_num);
+
+    if (has_AI)
+    {
+        const int max_arena_players = m_track->getMaxArenaPlayers();
+        const int local_players = RaceManager::get()->getNumLocalPlayers();
+        // Set up the spinners for the number of team1, team2, team3 and team4 AIs
+        m_ai_blue_spinner->setVisible(true);
+        m_ai_blue_label->setVisible(true);
+        m_ai_blue_spinner->setActive(true);
+
+        m_ai_team3_spinner->setVisible(true);
+        m_ai_team3_label->setVisible(true);
+        m_ai_team4_spinner->setVisible(true);
+        m_ai_team4_label->setVisible(true);
+
+        m_ai_kart_label->setText(_("Number of Team1 AI karts"), false);
+        m_ai_blue_label->setText(_("Number of Team2 AI karts"), false);
+
+        m_ai_kart_spinner->setValue(UserConfigParams::m_team1_ai_num);
+        m_ai_blue_spinner->setValue(UserConfigParams::m_team2_ai_num);
+        m_ai_team3_spinner->setValue(UserConfigParams::m_team3_ai_num);
+        m_ai_team4_spinner->setValue(UserConfigParams::m_team4_ai_num);
+
+        // Check if there's any local players in both team
+        int num_team1_players = 0, num_team2_players = 0, num_team3_players = 0, num_team4_players = 0;
+
+        for (int i = 0; i < local_players; i++)
+        {
+            KartTeams team = RaceManager::get()->getKartInfo(i).getKartTeams();
+            // Happens in profiling mode
+            if (team == KART_TEAM_N)
+                num_team1_players++; // No team will be set to team2 (blue) 
+            else
+                team == KART_TEAM_1 ? num_team1_players++ :
+                        KART_TEAM_2 ? num_team2_players++ :
+                        KART_TEAM_4 ? num_team3_players++ : num_team4_players++;
+        }
+
+        const int max_num_ai = max_arena_players - local_players;
+
+        // Make sure that if there's only one local player, there's at least one AI player.
+        bool reuse_ai = ((local_players == 1) &&
+            ((num_team1_players + UserConfigParams::m_team1_ai_num) == 0) &&
+            ((num_team2_players + UserConfigParams::m_team2_ai_num) == 0) &&
+            ((num_team3_players + UserConfigParams::m_team3_ai_num) == 0) &&
+            ((num_team4_players + UserConfigParams::m_team4_ai_num) == 0) &&
+            ((UserConfigParams::m_team1_ai_num + UserConfigParams::m_team2_ai_num +
+              UserConfigParams::m_team3_ai_num + UserConfigParams::m_team4_ai_num) <= max_num_ai));
+
+        // Try the saved values.
+        // If they can't be used, use default balanced values (0)
+        if (!reuse_ai)
+        {
+            int num_blue_ai  = 0;
+            int num_red_ai   = 0; 
+            int num_team3_ai = 0;
+            int num_team4_ai = 0;
+
+            UserConfigParams::m_team1_ai_num = num_red_ai;
+            UserConfigParams::m_team2_ai_num = num_blue_ai;
+            UserConfigParams::m_team3_ai_num = num_team3_ai;
+            UserConfigParams::m_team4_ai_num = num_team4_ai;
+            m_ai_kart_spinner->setValue(UserConfigParams::m_team1_ai_num);
+            m_ai_blue_spinner->setValue(UserConfigParams::m_team2_ai_num);
+            m_ai_team3_spinner->setValue(UserConfigParams::m_team3_ai_num);
+            m_ai_team4_spinner->setValue(UserConfigParams::m_team4_ai_num);
+        }
+
+        if (local_players == 1
+            && !UserConfigParams::m_artist_debug_mode)
+        {
+            if (num_team1_players == 0)
+                m_ai_blue_spinner->setMin(0);
+            if (num_team2_players == 0)
+                m_ai_kart_spinner->setMin(0);
+            if (num_team3_players == 0)
+                m_ai_team3_spinner->setMin(0);
+            if (num_team4_players == 0)
+                m_ai_team4_spinner->setMin(0);
+        }
+
+        if (num_team1_players == 0 && !UserConfigParams::m_artist_debug_mode)
+            m_ai_kart_spinner->setMax(max_arena_players - local_players - UserConfigParams::m_team2_ai_num
+            - UserConfigParams::m_team3_ai_num - UserConfigParams::m_team4_ai_num - 1);
+        if (num_team2_players == 0 && !UserConfigParams::m_artist_debug_mode)
+            m_ai_blue_spinner->setMax(max_arena_players - local_players - UserConfigParams::m_team1_ai_num
+                - UserConfigParams::m_team3_ai_num - UserConfigParams::m_team4_ai_num - 1);
+        if (num_team3_players == 0 && !UserConfigParams::m_artist_debug_mode)
+            m_ai_team3_spinner->setMax(max_arena_players - local_players - UserConfigParams::m_team1_ai_num
+                - UserConfigParams::m_team2_ai_num - UserConfigParams::m_team4_ai_num - 1);
+        if (num_team4_players == 0 && !UserConfigParams::m_artist_debug_mode)
+            m_ai_team4_spinner->setMax(max_arena_players - local_players - UserConfigParams::m_team1_ai_num
+                - UserConfigParams::m_team2_ai_num - UserConfigParams::m_team3_ai_num - 1);
+    }
+} // setTeamArenaBattleWidgets
+
 void TrackInfoScreen::setSoccerTarget(bool time_limit)
 {
     if (time_limit)
@@ -493,7 +681,7 @@ void TrackInfoScreen::updateHighScores()
                                          RaceManager::get()->getDifficulty(),
                                          m_track->getIdent(),
                                          RaceManager::get()->isLapTrialMode() ? m_target_value_spinner->getValue() * 60 : RaceManager::get()->getNumLaps(),
-                                         RaceManager::get()->getReverseTrack()  );
+                                         RaceManager::get()->getReverseTrack());
     const int amount = highscores->getNumberEntries();
 
     std::string kart_name;
@@ -575,8 +763,16 @@ void TrackInfoScreen::onEnterPressedInternal()
     const int max_arena_players = m_track->getMaxArenaPlayers();
     const int local_players = RaceManager::get()->getNumLocalPlayers();
     const bool has_AI =
-        (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ||
-         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
+        (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES                       ||
+         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL                    ||
+         // TODO : Besoins de modification
+         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM   ||
+         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER ||
+         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_TIMER         ||
+         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE          ||
+         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ARENA_BATTLE                ||
+         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA            ||
+         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA            ||
          RaceManager::get()->isSoccerMode() ?
          m_track->hasNavMesh() && (max_arena_players - local_players) > 0 :
          RaceManager::get()->hasAI());
@@ -608,7 +804,18 @@ void TrackInfoScreen::onEnterPressedInternal()
         else
             RaceManager::get()->setMaxGoal(selected_target_value);
     }
-
+    if (m_is_team_arena_battle) {
+        if (m_target_type_spinner->getValue() == 1) {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE);
+            RaceManager::get()->setLifeTarget(m_life_value_spinner->getValue());
+        }
+        else {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM);
+        }
+        RaceManager::get()->setTimeTarget(m_target_value_spinner->getValue() * 60);
+        RaceManager::get()->setHitCaptureLimit(m_point_value_spinner->getValue());
+        UserConfigParams::m_kart_lifes_arena = m_life_value_spinner->getValue();
+    }
     if (m_is_lap_trial)
     {
         RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_LAP_TRIAL);
@@ -629,6 +836,12 @@ void TrackInfoScreen::onEnterPressedInternal()
     {
         RaceManager::get()->setNumRedAI(m_ai_kart_spinner->getValue());
         RaceManager::get()->setNumBlueAI(m_ai_blue_spinner->getValue());
+    }
+    if (m_is_teams_mode) {
+        RaceManager::get()->setNumTeam1AI(m_ai_kart_spinner->getValue());
+        RaceManager::get()->setNumTeam2AI(m_ai_blue_spinner->getValue());
+        RaceManager::get()->setNumTeam3AI(m_ai_team3_spinner->getValue());
+        RaceManager::get()->setNumTeam4AI(m_ai_team4_spinner->getValue());
     }
     RaceManager::get()->startSingleRace(m_track->getIdent(), num_laps, false);
 }   // onEnterPressedInternal
@@ -668,6 +881,10 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
             m_target_value_label->setVisible(enable_ffa);
             m_target_value_spinner->setVisible(enable_ffa);
         }
+        else if (m_is_team_arena_battle)
+        {
+
+        }
     }
     else if (name == "target-value-spinner")
     {
@@ -686,6 +903,11 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
             if (enable_ffa)
                 UserConfigParams::m_ffa_time_limit = m_target_value_spinner->getValue();
         }
+        else if (m_is_team_arena_battle)
+        {
+            UserConfigParams::m_arena_battle_time_limit = m_target_value_spinner->getValue();
+            setWidgetsValueZeroDeactivateText(m_target_value_spinner, m_target_value_label, "Maximum time (min.)", "Deactivate");
+        }
         else if (m_is_lap_trial)
         {
             UserConfigParams::m_lap_trial_time_limit = m_target_value_spinner->getValue();
@@ -699,6 +921,20 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
             UserConfigParams::m_num_laps = num_laps;
             updateHighScores();
         }
+    }
+    else if (name == "lifes-value-spinner")
+    {
+        if (m_is_team_arena_battle){
+            UserConfigParams::m_kart_lifes_arena = m_life_value_spinner->getValue();
+        }
+        setWidgetsValueZeroDeactivateText(m_life_value_spinner, m_life_value_label,"Number of lifes", "Deactivate");
+    }
+    else if (name == "points-value-spinner")
+    {
+        if (m_is_team_arena_battle){
+            UserConfigParams::m_win_points_condition_arena = m_point_value_spinner->getValue();
+        }
+        setWidgetsValueZeroDeactivateText(m_point_value_spinner, m_point_value_label,"Number of points to win", "Deactivate");
     }
     else if (name == "option")
     {
@@ -730,9 +966,9 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
     else if (name=="ai-spinner")
     {
         if (m_is_soccer) // Soccer mode
-        {            
-            soccerSpinnerUpdate(false /* blue spinner */);            
-        }
+            soccerSpinnerUpdate(false /* blue spinner */);
+        else if (m_is_teams_mode) // Teams mode
+            teamsSpinnerUpdate("team1");
         else // Other modes
         {
             const int num_ai = m_ai_kart_spinner->getValue();
@@ -741,9 +977,20 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
             updateHighScores();
         }
     }
-    else if (name == "ai-blue-spinner" && m_is_soccer)
+    else if (name == "ai-blue-spinner")
     {
-        soccerSpinnerUpdate(true /* blue spinner */);  
+        if (m_is_soccer) // Soccer mode
+            soccerSpinnerUpdate(true /* blue spinner */);
+        else if (m_is_teams_mode) // Teams mode
+            teamsSpinnerUpdate("team2");
+    }
+    else if (name == "ai-team3-spinner" && m_is_teams_mode)
+    {
+        teamsSpinnerUpdate("team3");
+    }
+    else if (name == "ai-team4-spinner" && m_is_teams_mode)
+    {
+        teamsSpinnerUpdate("team4");
     }
 }   // eventCallback
 
@@ -807,4 +1054,53 @@ void TrackInfoScreen::soccerSpinnerUpdate(bool blue_spinner)
 
 
 } // soccerSpinnerUpdate
+
+void TrackInfoScreen::teamsSpinnerUpdate(std::string team)
+{
+    const int max_arena_players = m_track->getMaxArenaPlayers();
+    const int local_players = RaceManager::get()->getNumLocalPlayers();
+    const int num_ai = max_arena_players - local_players;
+
+    // Reduce the value of the other spinner if going over the max total num of AI
+    if (m_ai_kart_spinner->getValue() + m_ai_blue_spinner->getValue() +
+        m_ai_team3_spinner->getValue() + m_ai_team4_spinner->getValue() >= num_ai)
+    {
+        // Une mini modif pourrais être fait pour que si aucun autres IA peut être ajouter et que ex : 
+        // c'est bloquer a 5 AI pour l'équipe 1, si un IA supplémentaire tante d'être ajouter, le nombre d'IA sera a 0 
+        // 5->0 // 0->1 // 1->2
+        if (team == "team1")
+            m_ai_kart_spinner->setValue(num_ai - m_ai_blue_spinner->getValue() - m_ai_team3_spinner->getValue() - m_ai_team4_spinner->getValue());
+        else if (team == "team2")
+            m_ai_blue_spinner->setValue(num_ai - m_ai_kart_spinner->getValue() - m_ai_team3_spinner->getValue() - m_ai_team4_spinner->getValue());
+        else if (team == "team3")
+            m_ai_team3_spinner->setValue(num_ai - m_ai_blue_spinner->getValue() - m_ai_kart_spinner->getValue() - m_ai_team4_spinner->getValue());
+        else if (team == "team4")
+            m_ai_team4_spinner->setValue(num_ai - m_ai_blue_spinner->getValue() - m_ai_kart_spinner->getValue() - m_ai_team3_spinner->getValue());
+    }
+
+    unsigned num_team1 = 0, num_team2 = 0, num_team3 = 0, num_team4 = 0;
+    for (unsigned i = 0; i < RaceManager::get()->getNumLocalPlayers(); i++)
+    {
+        RaceManager::get()->getKartInfo(i).getKartTeams() == KART_TEAM_1 ? num_team1++ :
+            RaceManager::get()->getKartInfo(i).getKartTeams() == KART_TEAM_2 ? num_team2++ :
+            RaceManager::get()->getKartInfo(i).getKartTeams() == KART_TEAM_2 ? num_team3++ :
+            num_team4++;
+    }
+
+    UserConfigParams::m_team1_ai_num = m_ai_kart_spinner->getValue();
+    UserConfigParams::m_team2_ai_num = m_ai_blue_spinner->getValue();
+    UserConfigParams::m_team3_ai_num = m_ai_team3_spinner->getValue();
+    UserConfigParams::m_team4_ai_num = m_ai_team4_spinner->getValue();
+
+
+} // teamsSpinnerUpdate
+
+void TrackInfoScreen::setWidgetsValueZeroDeactivateText(GUIEngine::SpinnerWidget* spinner, GUIEngine::LabelWidget* label, const std::string& normalText, const std::string& zeroText)
+{
+    if (spinner->getValue() == 0)
+        label->setText(_(zeroText.c_str()), true);
+    else 
+        label->setText(_(normalText.c_str()), true);
+} // setWidgetsValueZeroDeactivateText
+
 // ----------------------------------------------------------------------------
