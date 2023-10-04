@@ -38,3 +38,17 @@ The export utilities  perform the needed transformation, so in Blender you just 
 ## Building from source
 
 Building instructions can be found in [`INSTALL.md`](/INSTALL.md)
+
+
+# Features we haven't finished but are supposed to be there
+- Victory screen for 4 teams in the life version (the victory screen is currently not correct)
+- Finish online mode (currently not working)
+- The player or the AI do not appear in the right place at the start of the game.
+  Especially if the number of players or AIs in a team is high.
+- Some online thing ...
+- A beter team systems and team color system ??
+- Did a forgot something ...
+
+# If you have any suggestions for improving what I've done, let me know.
+- Discord SuperTuxKart IRC chanel:  https://discord.com/channels/376120568908611594/588002848051036169
+
