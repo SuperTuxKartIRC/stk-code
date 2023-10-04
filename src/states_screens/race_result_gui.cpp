@@ -885,8 +885,15 @@ void RaceResultGUI::unload()
             {
                 ri->m_finish_time_string = core::stringw(_("Eliminated"));
             }
-            else if (   RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL
-                     || RaceManager::get()->isCTFMode())
+            else if ( RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL                     ||
+                      RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM    ||
+                      RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER  ||
+                      RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_TIMER          ||
+                      RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE           ||
+                      RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ARENA_BATTLE                 ||
+                      RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA             ||
+                      RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA             ||
+                      RaceManager::get()->isCTFMode())
             {
                 assert(ffa);
                 ri->m_finish_time_string =
@@ -1396,7 +1403,7 @@ void RaceResultGUI::unload()
         // Draw rank order
         // (only when num. of karts >=10 )
         if (RaceManager::get()->getMinorMode() != RaceManager::MINOR_MODE_FREE_FOR_ALL &&
-            !ri->m_finish_time_string.empty() &&
+            !ri->m_finish_time_string.empty() && // TODO : NEED MODIFICATIONS // Avec nos mode de jeu
             RaceManager::get()->getNumberOfKarts() >= 10)
         {
             int rankNo = (

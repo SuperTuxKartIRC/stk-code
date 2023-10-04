@@ -72,6 +72,8 @@ private:
     /** The position of all four wheels in the 3d model */
     const Vec3* m_wheel_graphics_position;
 
+    KartTeams m_kart_team;
+
     /** Index of kart in world. */
     unsigned int m_world_kart_id;
 

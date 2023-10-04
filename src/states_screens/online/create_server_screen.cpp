@@ -398,8 +398,22 @@ void CreateServerScreen::createServer()
         {
             if (esi == 0)
                 ServerConfig::m_server_mode = 7;
-            else
+            else if (esi == 1)
                 ServerConfig::m_server_mode = 8;
+            else if (esi == 2)
+                ServerConfig::m_server_mode = 9;
+            else if (esi == 3)
+                ServerConfig::m_server_mode = 10;
+            else if (esi == 4)
+                ServerConfig::m_server_mode = 11;
+            else if (esi == 5)
+                ServerConfig::m_server_mode = 12;
+            else if (esi == 6)
+                ServerConfig::m_server_mode = 13;
+            else if (esi == 7)
+                ServerConfig::m_server_mode = 14;
+            else
+                ServerConfig::m_server_mode = 15;
         }
         else
         {

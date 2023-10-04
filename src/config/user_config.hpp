@@ -466,6 +466,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam         m_soccer_use_time_limit
             PARAM_DEFAULT(  BoolUserConfigParam(false, "soccer-use-time-limit",
             &m_race_setup_group, "Enable time limit in soccer mode.") );
+    PARAM_PREFIX IntUserConfigParam          m_default_team_teams
+            PARAM_DEFAULT(IntUserConfigParam(0, "default-team",
+            &m_race_setup_group, "Default team in teams mode for single player."));
     PARAM_PREFIX BoolUserConfigParam         m_random_arena_item
             PARAM_DEFAULT(  BoolUserConfigParam(false, "random-arena-item",
             &m_race_setup_group, "Enable random location of items in an arena.") );
@@ -476,9 +479,7 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam          m_game_mode
             PARAM_DEFAULT(  IntUserConfigParam(0, "game_mode",
                             &m_race_setup_group,
-                            "Game mode. 0=standard, 1=time trial, 2=follow "
-                            "the leader, 3=3 strikes, 4=easter egg hunt, "
-                            "5=soccer, 6=ghost replay") );
+                            "Game mode. 0=standard, 1=time trial, 2=follow the leader, 3=3 strikes, 4=easter egg hunt, 5=soccer, 6=ghost replay, 7=teams arena, 8=tag arena, 9=monster arena, 10=murder mystery"));
     PARAM_PREFIX StringUserConfigParam m_default_kart
             PARAM_DEFAULT( StringUserConfigParam("tux", "kart",
                            "Kart to select by default (the last used kart)") );

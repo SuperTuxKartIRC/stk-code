@@ -200,7 +200,8 @@ int Highscores::matches(const HighscoreType &highscore_type,
 int Highscores::matches(int num_karts,
                         const RaceManager::Difficulty &difficulty,
                         const std::string &track, const int target,
-                        const GrandPrixData::GPReverseType reverse_type, RaceManager::MinorRaceModeType minor_mode)
+                        const GrandPrixData::GPReverseType reverse_type,
+                        RaceManager::MinorRaceModeType minor_mode)
 {
     return (m_highscore_type  == "HST_GRANDPRIX"  &&
             m_track           == track            &&

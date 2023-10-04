@@ -1089,6 +1089,7 @@ void Kart::setRaceResult()
         }
     }
     else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER ||
+             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE ||
              RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
     {
         // the kart wins if it isn't eliminated
@@ -1096,6 +1097,42 @@ void Kart::setRaceResult()
     }
     else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
     {
+        FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
+        m_race_result = ffa->getKartFFAResult(getWorldKartId());
+    }
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM)
+    {
+        // TODO : NEED MODIFICATIONS
+        FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
+        m_race_result = ffa->getKartFFAResult(getWorldKartId());
+    }
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER)
+    {
+        // TODO : NEED MODIFICATIONS
+        FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
+        m_race_result = ffa->getKartFFAResult(getWorldKartId());
+    }
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_TIMER)
+    {
+        // TODO : NEED MODIFICATIONS
+        FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
+        m_race_result = ffa->getKartFFAResult(getWorldKartId());
+    }
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ARENA_BATTLE)
+    {
+        // TODO : NEED MODIFICATIONS
+        FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
+        m_race_result = ffa->getKartFFAResult(getWorldKartId());
+    }
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA)
+    {
+        // TODO : NEED MODIFICATIONS
+        FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
+        m_race_result = ffa->getKartFFAResult(getWorldKartId());
+    }
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA)
+    {
+        // TODO : NEED MODIFICATIONS
         FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
         m_race_result = ffa->getKartFFAResult(getWorldKartId());
     }
@@ -1142,6 +1179,9 @@ void Kart::collectedItem(ItemState *item_state)
         break;
     case Item::ITEM_BONUS_BOX  :
         {
+            /*if (RaceManager::getPowerupTrack() == true) {
+                
+            }*/
             m_powerup->hitBonusBox(*item_state);
             break;
         }

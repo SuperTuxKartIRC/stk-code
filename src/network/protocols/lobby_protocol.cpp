@@ -152,6 +152,9 @@ void LobbyProtocol::configRemoteKart(
         rki.setOnlineId(profile->getOnlineId());
         if (RaceManager::get()->teamEnabled())
             rki.setKartTeam(profile->getTeam());
+        //  TODO : NEED MODIFICATIONS 
+        //if (RaceManager::get()->teamsEnabled())
+        //    rki.setKartTeams(profile->getTeams(), profil->getDefaultKartColor());
         rki.setCountryCode(profile->getCountryCode());
         rki.setKartData(profile->getKartData());
         rki.setNetworkPlayerProfile(profile);

@@ -49,7 +49,11 @@ class TrackInfoScreen : public GUIEngine::Screen,
 
     bool m_is_soccer;
 
+    bool m_is_team_arena;
+
     bool m_is_lap_trial;
+
+    bool m_is_team_arena_battle;
 
     bool m_show_ffa_spinner;
 
