@@ -1220,6 +1220,48 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
             RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_CAPTURE_THE_FLAG);
             break;
         }
+        case 6:
+        {
+            ServerConfig::m_server_mode = 9;
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM);
+            break;
+        }
+        case 7:
+        {
+            ServerConfig::m_server_mode = 10;
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER);
+            break;
+        }
+        case 8:
+        {
+            ServerConfig::m_server_mode = 11;
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER);
+            break;
+        }
+        case 9:
+        {
+            ServerConfig::m_server_mode = 12;
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE);
+            break;
+        }
+        case 10:
+        {
+            ServerConfig::m_server_mode = 13;
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE);
+            break;
+        }
+        case 11:
+        {
+            ServerConfig::m_server_mode = 14;
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA);
+            break;
+        }
+        case 12:
+        {
+            ServerConfig::m_server_mode = 15;
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA);
+            break;
+        }
         default:
             Log::warn("main", "Invalid race mode '%d' - ignored.", n);
         }

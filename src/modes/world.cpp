@@ -223,8 +223,15 @@ void World::init()
 
     // Shuffles the start transforms with playing 3-strikes or free for all battles.
     if ((RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ||
-         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL) &&
-         !NetworkConfig::get()->isNetworking())
+        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
+        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM ||
+        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER ||
+        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER ||
+        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE ||
+        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE || //
+        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA || //
+        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA) &&
+        !NetworkConfig::get()->isNetworking())
     {
         track->shuffleStartTransforms();
     }
@@ -577,6 +584,17 @@ Controller* World::loadAIController(AbstractKart* kart)
         turn=1;
     else if(RaceManager::get()->getMinorMode()==RaceManager::MINOR_MODE_SOCCER)
         turn=2;
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM       ||
+             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER     ||
+             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER ||
+             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE)
+        turn = 3;
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE)
+        turn = 4;
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA ||
+             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA)
+        turn = 5;
+
     // If different AIs should be used, adjust turn (or switch randomly
     // or dependent on difficulty)
     switch(turn)
@@ -593,6 +611,15 @@ Controller* World::loadAIController(AbstractKart* kart)
             controller = new BattleAI(kart);
             break;
         case 2:
+            controller = new SoccerAI(kart);
+            break;
+        case 3: // TODO : Besoins de modifications 
+            controller = new SoccerAI(kart);
+            break;
+        case 4:
+            controller = new SoccerAI(kart);
+            break;
+        case 5:
             controller = new SoccerAI(kart);
             break;
         default:
@@ -1674,6 +1701,8 @@ void World::setAITeam()
 {
     m_red_ai  = RaceManager::get()->getNumberOfRedAIKarts();
     m_blue_ai = RaceManager::get()->getNumberOfBlueAIKarts();
+    m_green_ai = RaceManager::get()->getNumberOfGreenAIKarts();
+    m_orange_ai = RaceManager::get()->getNumberOfOrangeAIKarts();
 
     for (int i = 0; i < (int)RaceManager::get()->getNumLocalPlayers(); i++)
     {
@@ -1688,7 +1717,7 @@ void World::setAITeam()
         }
     }
 
-    Log::debug("World", "Blue AI: %d red AI: %d", m_blue_ai, m_red_ai);
+    Log::debug("World", "Blue AI: %d Red AI: %d Green AI: %d Orange AI: %d", m_blue_ai, m_red_ai, m_green_ai, m_orange_ai);
 
 }   // setAITeam
 
@@ -1807,6 +1836,21 @@ void World::updateAchievementModeCounters(bool start)
             PlayerManager::increaseAchievement(start ? ACS::CTF_STARTED : ACS::CTF_FINISHED,1);
         else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
             PlayerManager::increaseAchievement(start ? ACS::FFA_STARTED : ACS::FFA_FINISHED,1);
+
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM)
+            PlayerManager::increaseAchievement(start ? ACS::TEAM_ARENA_POINTS_TEAM_STARTED : ACS::TEAM_ARENA_POINTS_TEAM_FINISHED, 1);
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER)
+            PlayerManager::increaseAchievement(start ? ACS::TEAM_ARENA_POINTS_PLAYER_STARTED : ACS::TEAM_ARENA_POINTS_PLAYER_FINISHED, 1);
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER)
+            PlayerManager::increaseAchievement(start ? ACS::TEAM_ARENA_ALL_POINTS_PLAYER_STARTED : ACS::TEAM_ARENA_ALL_POINTS_PLAYER_FINISHED, 1);
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE)
+            PlayerManager::increaseAchievement(start ? ACS::TEAM_ARENA_LIFE_STARTED : ACS::TEAM_ARENA_LIFE_FINISHED, 1);
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE)
+            PlayerManager::increaseAchievement(start ? ACS::TAG_ZOMBIE_ARENA_STARTED : ACS::TAG_ZOMBIE_ARENA_FINISHED, 1);
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA)
+            PlayerManager::increaseAchievement(start ? ACS::MONSTER_ARENA_STARTED : ACS::MONSTER_ARENA_FINISHED, 1);
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA)
+            PlayerManager::increaseAchievement(start ? ACS::MURDER_MYSTERY_STARTED : ACS::MURDER_MYSTERY_FINISHED, 1);
     }
     else // normal races
         PlayerManager::increaseAchievement(start ? ACS::NORMAL_STARTED : ACS::NORMAL_FINISHED,1);

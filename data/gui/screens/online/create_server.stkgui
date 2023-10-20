@@ -65,6 +65,7 @@
             <div width="100%" height="fit" layout="horizontal-row" >
                 <label id="more-options"  proportion="1" text_align="left"/>
                 <spinner id="more-options-spinner" proportion="1" wrap_around="true"/>
+                <button id="more_options" text="More options"/>
             </div>
 
             <label id="info" proportion="1" width="100%" align="center" text_align="center" word_wrap="true" text=""/>

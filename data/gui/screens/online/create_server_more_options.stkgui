@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <icon-button id="back" x="1%" y="0" height="9%" icon="gui/icons/back.png"/>
+    <div x="0" y="1%" width="100%" height="99%" layout="vertical-row" >
+        <header id="title" text_align="center" height="8%" width="80%" align="center" I18N="In the server creation screen" text="Server Game Options Configuration"/>
+        <spacer width="100%" height="1%"/>
+
+        <box proportion="1" width="89%" layout="vertical-row" align="center">
+
+            <div width="100%" height="fit" layout="horizontal-row" id="time-div">
+                <label id="time-value-text" proportion="1" text_align="left" I18N="In the server creation screen" text="Duration of the game (min)"/>
+                <spinner id="time-value-spinner" proportion="1" min_value="0" max_value="30"/>
+            </div>
+
+            <spacer height="1%" width="20"/>
+
+            <div width="100%" height="fit" layout="horizontal-row" id="nb-ia-div">
+                <label id="nb-ia-value-text" proportion="1" text_align="left" I18N="In the server creation screen" text="Max. number of IA players"/>
+                <spinner id="nb-ia-value-spinner" proportion="1" min_value="0" max_value="30"/>/>
+            </div>
+
+            <spacer height="1%" width="20"/>
+
+            <div width="100%" height="fit" layout="horizontal-row" id="winning-div">
+                <label id="winning-value-text" proportion="1" text_align="left" I18N="In the server creation screen" text="Number of points to win"/>
+                <spinner id="winning-value-spinner" proportion="1" min_value="0" max_value="30"/>
+            </div>
+
+            <div width="100%" height="fit" layout="horizontal-row" id="number-life-div">
+                <label id="life-value-text" proportion="1" text_align="left" I18N="In the server creation screen" text="Number of life"/>
+                <spinner id="life-value-spinner" proportion="1" min_value="0" max_value="30"/>
+            </div>
+
+            <spacer height="2%" width="20"/>
+
+            <div width="100%" height="19%" layout="horizontal-row" >
+                <label align="center" text_align="left" I18N="In the server creation screen" text="Power-ups / Objects settings"/>
+                <spacer width="5%" height="5"/>
+                <ribbon id="difficulty" height="100%" proportion="1" align="center">
+                    <icon-button id="novice" width="128" height="128" icon="gui/icons/red_flag.png"
+                            I18N="Difficulty" text="red"/>
+                    <icon-button id="intermediate" width="128" height="128" icon="gui/icons/green_flag.png"
+                            I18N="Difficulty" text="green"/>
+                    <icon-button id="expert" width="128" height="128" icon="gui/icons/blue_flag.png"
+                            I18N="Difficulty"  text="blue"/>
+                    <icon-button id="best" width="128" height="128" icon="gui/icons/orange_flag.png"
+                            I18N="Difficulty"  text="orange"/>
+            </ribbon>
+            </div>
+
+        </box>
+        <spacer width="10" height="2%"/>
+    </div>
+</stkgui>

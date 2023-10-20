@@ -119,7 +119,24 @@ public :
            SKIDDING_1LAP_MAX             = 53,
 
 
-           ACHIEVE_DATA_NUM              = 54
+           // Count how many time a race/match was started and finished by game mode.
+           TEAM_ARENA_POINTS_TEAM_STARTED = 54,
+           TEAM_ARENA_POINTS_TEAM_FINISHED = 55,
+           TEAM_ARENA_POINTS_PLAYER_STARTED = 56,
+           TEAM_ARENA_POINTS_PLAYER_FINISHED = 57,
+           TEAM_ARENA_ALL_POINTS_PLAYER_STARTED = 58,
+           TEAM_ARENA_ALL_POINTS_PLAYER_FINISHED = 59,
+           TEAM_ARENA_LIFE_STARTED = 60,
+           TEAM_ARENA_LIFE_FINISHED = 61,
+           TAG_ZOMBIE_ARENA_STARTED = 62,
+           TAG_ZOMBIE_ARENA_FINISHED = 63,
+           MONSTER_ARENA_STARTED = 64,
+           MONSTER_ARENA_FINISHED = 65,
+           MURDER_MYSTERY_STARTED = 66,
+           MURDER_MYSTERY_FINISHED = 67,
+
+
+ACHIEVE_DATA_NUM = 68
     };
 
 private:

@@ -1099,6 +1099,36 @@ void Kart::setRaceResult()
         FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
         m_race_result = ffa->getKartFFAResult(getWorldKartId());
     }
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM)
+    {
+        //TeamArenaBattle* tag = dynamic_cast<TeamArenaBattle*>(World::getWorld());
+        //m_race_result = tag->getKartFFAResult(getWorldKartId());
+    }
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER)
+    {
+        //TeamArenaBattle* tag = dynamic_cast<TeamArenaBattle*>(World::getWorld());
+        //m_race_result = tag->getKartFFAResult(getWorldKartId());
+    }
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER)
+    {
+        //TeamArenaBattle* tag = dynamic_cast<TeamArenaBattle*>(World::getWorld());
+        //m_race_result = tag->getKartFFAResult(getWorldKartId());
+    }
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE)
+    {
+        //FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
+        //m_race_result = ffa->getKartFFAResult(getWorldKartId());
+    }
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA)
+    {
+        //FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
+        //m_race_result = ffa->getKartFFAResult(getWorldKartId());
+    }
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA)
+    {
+        //FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
+        //m_race_result = ffa->getKartFFAResult(getWorldKartId());
+    }
     else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
     {
         CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());

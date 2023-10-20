@@ -839,6 +839,15 @@ msgid "Game mode"
 msgstr "Mode de jeu"
 
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: In the server configuration screen
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: In the server creation screen
+#: src/states_screens/high_score_selection.cpp:148
+#: src/states_screens/track_info_screen.cpp:249
+msgid "Game mode (teams)"
+msgstr "Mode de jeu (équipes)"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: ./data/gui/screens/high_score_selection.stkgui
 #. I18N: In the high score selection screen
@@ -870,6 +879,38 @@ msgstr "Contre-la-montre"
 #: src/states_screens/race_setup_screen.cpp:113 supertuxkart.appdata.xml:37
 msgid "Battle"
 msgstr "Bataille"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Multiplayer game mode
+#: src/states_screens/race_setup_screen.cpp:113 supertuxkart.appdata.xml:37
+msgid "Team Points"
+msgstr "Points d'équipe"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Multiplayer game mode
+#: src/states_screens/race_setup_screen.cpp:113 supertuxkart.appdata.xml:37
+msgid "Player with most points"
+msgstr "Joueur avec le plus de points"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Multiplayer game mode
+#: src/states_screens/race_setup_screen.cpp:113 supertuxkart.appdata.xml:37
+msgid "All Player Points"
+msgstr "Les points de tous les joueurs"
+
+#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Multiplayer game mode
+#: src/states_screens/race_setup_screen.cpp:113 supertuxkart.appdata.xml:37
+msgid "Last team standing"
+msgstr "Dernière équipe en vie"
 
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: Multiplayer game mode
@@ -2402,6 +2443,46 @@ msgstr "L'équipe des rouges"
 msgid "Blue Team"
 msgstr "L'équipe des bleus"
 
+#. I18N: ./data/gui/screens/teams_setup.stkgui
+#. I18N: In teams setup screen
+msgid "Green Team"
+msgstr "L'équipe des verts"
+
+#. I18N: ./data/gui/screens/teams_setup.stkgui
+#. I18N: In teams setup screen
+msgid "Orange Team"
+msgstr "L'équipe des oranges"
+
+#. I18N: ./data/gui/screens/teams_setup.stkgui
+#. I18N: In teams setup screen
+msgid "Dark Blue Team"
+msgstr "L'équipe des bleus foncés"
+
+#. I18N: ./data/gui/screens/teams_setup.stkgui
+#. I18N: In teams setup screen
+msgid "Turquoise Team"
+msgstr "L'équipe des turquoises"
+
+#. I18N: ./data/gui/screens/teams_setup.stkgui
+#. I18N: In teams setup screen
+msgid "Yellow Team"
+msgstr "L'équipe des jaunes"
+
+#. I18N: ./data/gui/screens/teams_setup.stkgui
+#. I18N: In teams setup screen
+msgid "Cyan Team"
+msgstr "L'équipe des cyans"
+
+#. I18N: ./data/gui/screens/teams_setup.stkgui
+#. I18N: In teams setup screen
+msgid "Pink Team"
+msgstr "L'équipe des roses"
+
+#. I18N: ./data/gui/screens/teams_setup.stkgui
+#. I18N: In teams setup screen
+msgid "Purple Team"
+msgstr "L'équipe des mauves"
+
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
 #: src/states_screens/online/tracks_screen.cpp:541
@@ -2420,6 +2501,41 @@ msgstr "Nombre de karts IA"
 #. I18N: In the track info screen
 msgid "Number of blue team AI karts"
 msgstr "Nombre de karts IA équipe bleu"
+
+#. I18N: ./data/gui/screens/track_info.stkgui
+#. I18N: In the track info screen
+msgid "Number of Team1 AI karts"
+msgstr "Nombre de karts IA équipe 1"
+
+#. I18N: ./data/gui/screens/track_info.stkgui
+#. I18N: In the track info screen
+msgid "Number of Team2 AI karts"
+msgstr "Nombre de karts IA équipe 2"
+
+#. I18N: ./data/gui/screens/track_info.stkgui
+#. I18N: In the track info screen
+msgid "Number of Team3 AI karts"
+msgstr "Nombre de karts IA équipe 3"
+
+#. I18N: ./data/gui/screens/track_info.stkgui
+#. I18N: In the track info screen
+msgid "Number of Team4 AI karts"
+msgstr "Nombre de karts IA équipe 4"
+
+#. I18N: ./data/gui/screens/track_info.stkgui
+#. I18N: In the track info screen
+msgid "Number of lifes"
+msgstr "Nombre de vie"
+
+#. I18N: ./data/gui/screens/track_info.stkgui
+#. I18N: In the track info screen
+msgid "Number of points to win"
+msgstr "Nombre de points pour gagné"
+
+#. I18N: ./data/gui/screens/track_info.stkgui
+#. I18N: In the track info screen
+msgid "Deactivate"
+msgstr "Désactivé"
 
 #. I18N: ./data/gui/screens/tracks_and_gp.stkgui
 #. I18N: In the track and grand prix selection screen
@@ -6265,8 +6381,20 @@ msgid "Keep up with the leader kart but don't overtake it!"
 msgstr "Talonne le meneur, mais sans le dépasser !"
 
 #: src/states_screens/race_setup_screen.cpp:115
-msgid "Hit others with weapons until they lose all their lives."
-msgstr "Tire sur tes rivaux jusqu’à ce qu’ils perdent toutes leurs vies."
+msgid "Hit other players' teams with weapons to score points."
+msgstr "Tire sur les membres des autres équipes pour faire des points"
+
+#: src/states_screens/race_setup_screen.cpp:115
+msgid "Surviving tags. Tags must kill (or touch) all other people."
+msgstr "Survivre aux tags. Les tags doivent tuer (ou toucher) toutes les autres personnes."
+
+#: src/states_screens/race_setup_screen.cpp:115
+msgid "Surviving monsters. Monsters must kill all other people."
+msgstr "Survivre aux monstres. Les monstres doivent tuer tous les autres personnes."
+
+#: src/states_screens/race_setup_screen.cpp:115
+msgid "Surviving the killer. The sheriff must kill the killer."
+msgstr "Survivre au tueur. Le shérif doit tuer le tueur."
 
 #: src/states_screens/race_setup_screen.cpp:120
 msgid "Push the ball into the opposite cage to score goals."

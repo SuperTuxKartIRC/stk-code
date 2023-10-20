@@ -237,6 +237,27 @@ std::pair<RaceManager::MinorRaceModeType, RaceManager::MajorRaceModeType>
         case 8:
             return { RaceManager::MINOR_MODE_CAPTURE_THE_FLAG,
                 RaceManager::MAJOR_MODE_SINGLE };
+        case 9:
+            return { RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM,
+                RaceManager::MAJOR_MODE_SINGLE };
+        case 10:
+            return { RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER,
+                RaceManager::MAJOR_MODE_SINGLE };
+        case 11:
+            return { RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER,
+                RaceManager::MAJOR_MODE_SINGLE };
+        case 12:
+            return { RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE,
+                RaceManager::MAJOR_MODE_SINGLE };
+        case 13:
+            return { RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE,
+                RaceManager::MAJOR_MODE_SINGLE };
+        case 14:
+            return { RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA,
+                RaceManager::MAJOR_MODE_SINGLE };
+        case 15:
+            return { RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA,
+                RaceManager::MAJOR_MODE_SINGLE };
         default:
             break;
     }

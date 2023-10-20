@@ -83,6 +83,48 @@ public:
                 m_prev_value = soccer_goal ? 1 : 0;
                 break;
             }
+            case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM:
+            {
+                m_prev_mode = 2;
+                m_prev_value = 2;
+                break;
+            }
+            case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER:
+            {
+                m_prev_mode = 2;
+                m_prev_value = 3;
+                break;
+            }
+            case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER:
+            {
+                m_prev_mode = 2;
+                m_prev_value = 4;
+                break;
+            }
+            case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE:
+            {
+                m_prev_mode = 2;
+                m_prev_value = 5;
+                break;
+            }
+            case RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE:
+            {
+                m_prev_mode = 2;
+                m_prev_value = 6;
+                break;
+            }
+            case RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA:
+            {
+                m_prev_mode = 2;
+                m_prev_value = 7;
+                break;
+            }
+            case RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA:
+            {
+                m_prev_mode = 2;
+                m_prev_value = 8;
+                break;
+            }
             default:
             {
                 m_prev_mode = 0;

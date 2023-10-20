@@ -32,17 +32,23 @@
 #include "states_screens/soccer_setup_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/tracks_and_gp_screen.hpp"
+#include "states_screens/teams_setup_screen.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
-const int CONFIG_CODE_NORMAL    = 0;
-const int CONFIG_CODE_TIMETRIAL = 1;
-const int CONFIG_CODE_FTL       = 2;
-const int CONFIG_CODE_3STRIKES  = 3;
-const int CONFIG_CODE_EASTER    = 4;
-const int CONFIG_CODE_SOCCER    = 5;
-const int CONFIG_CODE_GHOST     = 6;
-const int CONFIG_CODE_LAP_TRIAL = 7;
+const int CONFIG_CODE_NORMAL          = 0;
+const int CONFIG_CODE_TIMETRIAL       = 1;
+const int CONFIG_CODE_FTL             = 2;
+const int CONFIG_CODE_3STRIKES        = 3;
+const int CONFIG_CODE_EASTER          = 4;
+const int CONFIG_CODE_SOCCER          = 5;
+const int CONFIG_CODE_GHOST           = 6;
+const int CONFIG_CODE_LAP_TRIAL       = 7;
+const int CONFIG_CODE_TEAM_ARENA      = 8;
+const int CONFIG_CODE_TAG_Z_ARENA     = 9;
+const int CONFIG_CODE_MONSTER_ARENA   = 10;
+const int CONFIG_CODE_MURDER_MYSTERY  = 11;
+const int CONFIG_CODE_TEAM_ARENA_LIFE = 12;
 
 using namespace GUIEngine;
 
@@ -172,8 +178,22 @@ void RaceSetupScreen::init()
     case CONFIG_CODE_LAP_TRIAL:
         w2->setSelection(IDENT_LAP_TRIAL, PLAYER_ID_GAME_MASTER, true);
         break;
+    case CONFIG_CODE_TEAM_ARENA:
+        w2->setSelection(IDENT_TEAM_PT, PLAYER_ID_GAME_MASTER, true);
+        break;
+    case CONFIG_CODE_TAG_Z_ARENA:
+        w2->setSelection(IDENT_TAG_Z, PLAYER_ID_GAME_MASTER, true);
+        break;
+    case CONFIG_CODE_MONSTER_ARENA:
+        w2->setSelection(IDENT_MONSTER, PLAYER_ID_GAME_MASTER, true);
+        break;
+    case CONFIG_CODE_MURDER_MYSTERY:
+        w2->setSelection(IDENT_MURDER_MYSTERY, PLAYER_ID_GAME_MASTER, true);
+        break;
+    case CONFIG_CODE_TEAM_ARENA_LIFE:
+        w2->setSelection(IDENT_TEAM_L, PLAYER_ID_GAME_MASTER, true);
+        break;
     }
-
     {
         RibbonWidget* w = getWidget<RibbonWidget>("difficulty");
         assert(w != NULL);
@@ -261,6 +281,48 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name,
             RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_LAP_TRIAL);
             UserConfigParams::m_game_mode = CONFIG_CODE_LAP_TRIAL;
             TracksAndGPScreen::getInstance()->push();
+        }
+        else if (selectedMode == IDENT_TEAM_PT)
+        {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM);
+            UserConfigParams::m_game_mode = CONFIG_CODE_TEAM_ARENA;
+            //TeamsSetupScreen::getInstance()->push();
+        }
+        else if (selectedMode == IDENT_TEAM_PP)
+        {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER);
+            UserConfigParams::m_game_mode = CONFIG_CODE_TEAM_ARENA;
+            //TeamsSetupScreen::getInstance()->push();
+        }
+        else if (selectedMode == IDENT_TEAM_APP)
+        {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER);
+            UserConfigParams::m_game_mode = CONFIG_CODE_TEAM_ARENA;
+            //TeamsSetupScreen::getInstance()->push();
+        }
+        else if (selectedMode == IDENT_TEAM_L)
+        {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE);
+            UserConfigParams::m_game_mode = CONFIG_CODE_TEAM_ARENA_LIFE;
+            //TeamsSetupScreen::getInstance()->push();
+        }
+        else if (selectedMode == IDENT_TAG_Z)
+        {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE);
+            UserConfigParams::m_game_mode = CONFIG_CODE_TAG_Z_ARENA;
+            ArenasScreen::getInstance()->push();
+        }
+        else if (selectedMode == IDENT_MONSTER)
+        {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA);
+            UserConfigParams::m_game_mode = CONFIG_CODE_MONSTER_ARENA;
+            ArenasScreen::getInstance()->push();
+        }
+        else if (selectedMode == IDENT_MURDER_MYSTERY)
+        {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA);
+            UserConfigParams::m_game_mode = CONFIG_CODE_MURDER_MYSTERY;
+            ArenasScreen::getInstance()->push();
         }
         else if (selectedMode == "locked")
         {

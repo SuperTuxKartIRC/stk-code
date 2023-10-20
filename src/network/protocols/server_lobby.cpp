@@ -655,6 +655,13 @@ void ServerLobby::updateTracksForMode()
         }
         case RaceManager::MINOR_MODE_FREE_FOR_ALL:
         case RaceManager::MINOR_MODE_CAPTURE_THE_FLAG:
+        case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM:
+        case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER:
+        case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER:
+        case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE:
+        case RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE:
+        case RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA:
+        case RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA:
         {
             auto it = m_available_kts.second.begin();
             while (it != m_available_kts.second.end())
@@ -2631,6 +2638,13 @@ void ServerLobby::startSelection(const Event *event)
             break;
         }
         case RaceManager::MINOR_MODE_FREE_FOR_ALL:
+        case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM:
+        case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER:
+        case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER:
+        case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE:
+        case RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE:
+        case RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA:
+        case RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA:
         {
             m_default_vote->m_num_laps = 0;
             m_default_vote->m_reverse = rg.get(2) == 0;
@@ -4231,7 +4245,7 @@ void ServerLobby::handlePlayerVote(Event* event)
                 vote.m_num_laps = (uint8_t)7;
         }
     }
-    else if (RaceManager::get()->getMinorMode() ==
+    else if (RaceManager::get()->getMinorMode() == 
         RaceManager::MINOR_MODE_FREE_FOR_ALL)
     {
         vote.m_num_laps = 0;
@@ -4241,6 +4255,16 @@ void ServerLobby::handlePlayerVote(Event* event)
     {
         vote.m_num_laps = 0;
         vote.m_reverse = false;
+    }
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM ||
+             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER ||
+             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER ||
+             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE ||
+             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE ||
+             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA ||
+             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA)
+    {
+        vote.m_num_laps = 0;
     }
 
     // Store vote:
@@ -5292,9 +5316,10 @@ void ServerLobby::handlePlayerDisconnection() const
 void ServerLobby::addLiveJoinPlaceholder(
     std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const
 {
+    const RaceManager::MinorRaceModeType mode = RaceManager::get()->getMinorMode();
     if (!ServerConfig::m_live_players || !RaceManager::get()->supportsLiveJoining())
         return;
-    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
+    if (mode == RaceManager::MINOR_MODE_FREE_FOR_ALL)
     {
         Track* t = track_manager->getTrack(m_game_setup->getCurrentTrack());
         assert(t);
@@ -5307,6 +5332,16 @@ void ServerLobby::addLiveJoinPlaceholder(
             players.push_back(
                 NetworkPlayerProfile::getReservedProfile(KART_TEAM_NONE));
         }
+    }
+    if (mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM ||
+        mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER ||
+        mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER ||
+        mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE ||
+        mode == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE ||
+        mode == RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA ||
+        mode == RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA)
+    {
+        // TODO : Besoins de modification 
     }
     else
     {

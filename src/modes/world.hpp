@@ -108,6 +108,8 @@ protected:
     /* Team related variables. */
     int m_red_ai;
     int m_blue_ai;
+    int m_green_ai;
+    int m_orange_ai;
     std::map<int, KartTeam> m_kart_team_map;
     std::map<int, unsigned int> m_kart_position_map;
 
