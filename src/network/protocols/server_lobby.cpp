@@ -1925,7 +1925,7 @@ std::vector<std::shared_ptr<NetworkPlayerProfile> >
  */
 int ServerLobby::getReservedId(std::shared_ptr<NetworkPlayerProfile>& p,
                                unsigned local_id) const
-{
+{ // TODO : TEAM Modification
     const bool is_ffa =
         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL;
     int red_count = 0;
@@ -3778,7 +3778,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
             handicap, (uint8_t)i, KART_TEAM_NONE,
             country_code);
         if (ServerConfig::m_team_choosing)
-        {
+        { // TODO : TEAM Modification
             KartTeam cur_team = KART_TEAM_NONE;
             if (red_blue.first > red_blue.second)
             {
@@ -5279,7 +5279,7 @@ void ServerLobby::handlePlayerDisconnection() const
     }
 
     // If live players is enabled, don't end the game if unfair team
-    if (!ServerConfig::m_live_players &&
+    if (!ServerConfig::m_live_players && // // TODO : TEAM Modification
         total != 1 && World::getWorld()->hasTeam() &&
         (red_count == 0 || blue_count == 0))
         World::getWorld()->setUnfairTeam(true);
@@ -5332,7 +5332,7 @@ void ServerLobby::addLiveJoinPlaceholder(
             players.push_back(
                 NetworkPlayerProfile::getReservedProfile(KART_TEAM_BLUE));
         }
-    }
+    } // TODO : TEAM Modification
 }   // addLiveJoinPlaceholder
 
 //-----------------------------------------------------------------------------

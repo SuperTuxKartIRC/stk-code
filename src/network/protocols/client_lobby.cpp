@@ -1427,7 +1427,7 @@ void ClientLobby::handleKartInfo(Event* event)
 
     core::stringw msg;
     if (RaceManager::get()->teamEnabled())
-    {
+    { // // TODO : TEAM Modification
         if (w->getKartTeam(kart_id) == KART_TEAM_RED)
         {
             // I18N: Show when player join red team of the started game in

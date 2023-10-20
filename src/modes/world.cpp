@@ -1555,8 +1555,8 @@ std::shared_ptr<AbstractKart> World::createKartWithTeam
     KartTeam team = KART_TEAM_BLUE;
 
     if (kart_type == RaceManager::KT_AI)
-    {
-        if (index < m_red_ai)
+    { // TODO : TEAM Modification
+        if (index < m_red_ai) 
             team = KART_TEAM_RED;
         else
             team = KART_TEAM_BLUE;

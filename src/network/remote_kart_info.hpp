@@ -32,9 +32,11 @@
 
 enum KartTeam : int8_t
 {
-    KART_TEAM_NONE=-1,
-    KART_TEAM_RED=0,
-    KART_TEAM_BLUE=1,
+    KART_TEAM_NONE   = -1,
+    KART_TEAM_RED    = 0,
+    KART_TEAM_BLUE   = 1,
+    KART_TEAM_GREEN  = 2,
+    KART_TEAM_ORANGE = 3,
 };
 
 /** Handicap per player. */

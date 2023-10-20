@@ -230,7 +230,7 @@ const PeerVote* LobbyProtocol::getVote(uint32_t host_id) const
 //-----------------------------------------------------------------------------
 void LobbyProtocol::addLiveJoiningKart(int kart_id, const RemoteKartInfo& rki,
                                        int live_join_util_ticks) const
-{
+{ // TODO : TEAM Modification
     AbstractKart* k = World::getWorld()->getKart(kart_id);
     k->changeKart(rki.getKartName(), rki.getHandicap(),
         rki.getKartTeam() == KART_TEAM_RED ?

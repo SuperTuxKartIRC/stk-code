@@ -206,7 +206,7 @@ void GameSetup::sortPlayersForGame(
         ServerConfig::m_team_choosing)
         return;
     for (unsigned i = 0; i < players.size(); i++)
-    {
+    { // TODO : TEAM Modification
         players[i]->setTeam((KartTeam)(i % 2));
     }
 }   // sortPlayersForGame
