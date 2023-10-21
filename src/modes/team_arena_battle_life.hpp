@@ -96,6 +96,8 @@ public:
     // ------------------------------------------------------------------------
     virtual bool hasTeam() const OVERRIDE { return true; }
     // ------------------------------------------------------------------------
+    virtual bool has4Team() const OVERRIDE { return true; }
+    // ------------------------------------------------------------------------
     virtual bool isRaceOver() OVERRIDE;
     // ------------------------------------------------------------------------
     virtual bool kartHit(int kart_id, int hitter = -1) OVERRIDE;
