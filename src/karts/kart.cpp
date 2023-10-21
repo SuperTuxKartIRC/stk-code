@@ -66,6 +66,8 @@
 #include "modes/linear_world.hpp"
 #include "modes/overworld.hpp"
 #include "modes/soccer_world.hpp"
+#include "modes/team_arena_battle.hpp"
+#include "modes/team_arena_battle_life.hpp"
 #include "network/compress_network_body.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/client_lobby.hpp"
@@ -1101,18 +1103,18 @@ void Kart::setRaceResult()
     }
     else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM)
     {
-        //TeamArenaBattle* tag = dynamic_cast<TeamArenaBattle*>(World::getWorld());
-        //m_race_result = tag->getKartFFAResult(getWorldKartId());
+        TeamArenaBattle* tab = dynamic_cast<TeamArenaBattle*>(World::getWorld());
+        m_race_result = tab->getKartFFAResult(getWorldKartId());
     }
     else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER)
     {
-        //TeamArenaBattle* tag = dynamic_cast<TeamArenaBattle*>(World::getWorld());
-        //m_race_result = tag->getKartFFAResult(getWorldKartId());
+        TeamArenaBattle* tab = dynamic_cast<TeamArenaBattle*>(World::getWorld());
+        m_race_result = tab->getKartFFAResult(getWorldKartId());
     }
     else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER)
     {
-        //TeamArenaBattle* tag = dynamic_cast<TeamArenaBattle*>(World::getWorld());
-        //m_race_result = tag->getKartFFAResult(getWorldKartId());
+        TeamArenaBattle* tab = dynamic_cast<TeamArenaBattle*>(World::getWorld());
+        m_race_result = tab->getKartFFAResult(getWorldKartId());
     }
     else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE)
     {

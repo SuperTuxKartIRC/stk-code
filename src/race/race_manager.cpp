@@ -47,6 +47,8 @@
 #include "modes/world.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "modes/soccer_world.hpp"
+#include "modes/team_arena_battle.hpp"
+#include "modes/team_arena_battle_life.hpp"
 #include "modes/lap_trial.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/network_config.hpp"
@@ -671,21 +673,20 @@ void RaceManager::startNextRace()
             World::setWorld(new FreeForAll());
         else if (m_minor_mode == MINOR_MODE_CAPTURE_THE_FLAG)
             World::setWorld(new CaptureTheFlag());
-        // TODO : Besoins de modifications
-        //else if (m_minor_mode == MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM)
-        //    World::setWorld(new TeamArenaBattle());
-        //else if (m_minor_mode == MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER)
-        //    World::setWorld(new TeamArenaBattle());
-        //else if (m_minor_mode == MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER)
-        //    World::setWorld(new TeamArenaBattle());
-        //else if (m_minor_mode == MINOR_MODE_TEAM_ARENA_BATTLE_LIFE)
-        //    World::setWorld(new TeamArenaBattlelife());
-        //else if (m_minor_mode == MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE)
-        //    World::setWorld(new FreeForAll());
-        //else if (m_minor_mode == MINOR_MODE_MONSTER_ATTACK_ARENA)
-        //    World::setWorld(new FreeForAll());
-        //else if (m_minor_mode == MINOR_MODE_MURDER_MYSTERY_ARENA)
-        //    World::setWorld(new FreeForAll());
+        else if (m_minor_mode == MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM)
+            World::setWorld(new TeamArenaBattle());
+        else if (m_minor_mode == MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER)
+            World::setWorld(new TeamArenaBattle());
+        else if (m_minor_mode == MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER)
+            World::setWorld(new TeamArenaBattle());
+        else if (m_minor_mode == MINOR_MODE_TEAM_ARENA_BATTLE_LIFE)
+            World::setWorld(new TeamArenaBattlelife());
+        else if (m_minor_mode == MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE)
+            World::setWorld(new FreeForAll());
+        else if (m_minor_mode == MINOR_MODE_MONSTER_ATTACK_ARENA)
+            World::setWorld(new FreeForAll());
+        else if (m_minor_mode == MINOR_MODE_MURDER_MYSTERY_ARENA)
+            World::setWorld(new FreeForAll());
     }
     else if(m_minor_mode==MINOR_MODE_SOCCER)
         World::setWorld(new SoccerWorld());
