@@ -1226,10 +1226,7 @@ void RaceResultGUI::unload()
                  RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER ||
                  RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE)
         {
-            if (cpt <= 2) {
-                cpt++;
-                displayTeamsArenaResults();
-            }
+            displayTeamsArenaResults();
         }
         else
         {

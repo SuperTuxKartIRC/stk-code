@@ -220,8 +220,6 @@ private:
         int y;
     };
 
-    int cpt = 0;
-
 public:
 
                  RaceResultGUI();
