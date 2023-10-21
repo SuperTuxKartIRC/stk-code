@@ -91,6 +91,16 @@ void BattleAI::findClosestKart(bool consider_difficulty, bool find_sta)
         if (kart->getWorldKartId() == m_kart->getWorldKartId())
             continue; // Skip the same kart
 
+        if (m_world->getKartTeam(kart->getWorldKartId()) == m_world->getKartTeam(m_kart->getWorldKartId()))
+        {
+            continue;
+        }// skip kart with same team
+
+        if (RaceManager::get()->getMinorMode() == RaceManager::MinorRaceModeType::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE) {
+            if (m_world->getKartTeam(kart->getWorldKartId()) == KART_TEAM_BLUE && m_world->getKartTeam(m_kart->getWorldKartId()) == KART_TEAM_GREEN)
+                continue; // TODO : Besoins de modification // William Lussier 
+        } // the player skip the zombie kart
+
         // Test whether takes current difficulty into account for closest kart
         // Notice: it don't affect aiming, this function will be called once
         // more when use items, which ignore difficulty.

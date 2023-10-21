@@ -636,14 +636,14 @@ Controller* World::loadAIController(AbstractKart* kart)
         case 2:
             controller = new SoccerAI(kart);
             break;
-        case 3: // TODO : Besoins de modifications 
-            controller = new SoccerAI(kart);
+        case 3:
+            controller = new BattleAI(kart);
             break;
         case 4:
-            controller = new SoccerAI(kart);
+            controller = new BattleAI(kart);
             break;
-        case 5:
-            controller = new SoccerAI(kart);
+        case 5: // TODO : Besoins de modifications 
+            controller = new BattleAI(kart);
             break;
         default:
             Log::warn("[World]", "Unknown AI, using default.");
