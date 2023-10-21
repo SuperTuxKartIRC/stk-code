@@ -1290,8 +1290,8 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
     SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
     FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
-    TeamArenaBattle* team_arena_battle = dynamic_cast<TeamArenaBattle*>(World::getWorld());
-    TeamArenaBattlelife* team_arena_battle_life = dynamic_cast<TeamArenaBattlelife*>(World::getWorld());
+    TeamArenaBattle* tab = dynamic_cast<TeamArenaBattle*>(World::getWorld());
+    TeamArenaBattlelife* tabl = dynamic_cast<TeamArenaBattlelife*>(World::getWorld());
 
     static video::SColor color = video::SColor(255, 255, 255, 255);
     int hit_capture_limit =
@@ -1372,11 +1372,12 @@ void RaceGUI::drawLap(const AbstractKart* kart,
         return;
     }
     // TODO : Besoins de modifications. Affichages des points pour 4 équipes // William Lussier 2023-10-21 14h44
-    if (team_arena_battle || team_arena_battle_life) {
-        int team1_score = team_arena_battle->getTeamScore(0);
-        int team2_score = team_arena_battle->getTeamScore(1);
-        int team3_score = team_arena_battle->getTeamScore(2);
-        int team4_score = team_arena_battle->getTeamScore(3);
+    if (tab || tabl) {
+        int team1_score, team2_score, team3_score, team4_score;
+        team1_score = tab != NULL ? tab->getTeamScore(0) : tabl != NULL ? tabl->getTeamScore(0) : 0;
+        team2_score = tab != NULL ? tab->getTeamScore(1) : tabl != NULL ? tabl->getTeamScore(1) : 0;
+        team3_score = tab != NULL ? tab->getTeamScore(2) : tabl != NULL ? tabl->getTeamScore(2) : 0;
+        team4_score = tab != NULL ? tab->getTeamScore(3) : tabl != NULL ? tabl->getTeamScore(3) : 0;
 
         gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
         font->setBlackBorder(true);
@@ -1443,9 +1444,9 @@ void RaceGUI::drawLap(const AbstractKart* kart,
         d = font->getDimension(text.c_str());
         pos += core::position2di(d.Width, 0);
 
-        if (team_arena_battle)
+        if (tab)
             text = StringUtils::toWString(hit_capture_limit);
-        else if (team_arena_battle_life)
+        else if (tabl)
             text = StringUtils::toWString(number_life);
         font->draw(text, pos, video::SColor(255, 225, 225, 255), false, false, NULL, true /* ignore RTL */);
         d = font->getDimension(text.c_str());
@@ -1459,9 +1460,9 @@ void RaceGUI::drawLap(const AbstractKart* kart,
             pos.UpperLeftCorner.Y + icon_width);
         core::rect<s32> source_rect(core::position2d<s32>(0, 0),
             m_champion->getSize());
-        if(team_arena_battle)
+        if(tab)
             draw2DImage(m_champion, indicator_pos, source_rect,NULL, NULL, true);
-        else if (team_arena_battle_life)
+        else if (tabl)
             draw2DImage(m_heart_icon, indicator_pos, source_rect, NULL, NULL, true);
 
         font->setBlackBorder(false);
