@@ -50,6 +50,8 @@
 #include "modes/capture_the_flag.hpp"
 #include "modes/overworld.hpp"
 #include "modes/soccer_world.hpp"
+#include <modes/team_arena_battle.hpp>
+#include <modes/team_arena_battle_life.hpp>
 #include "network/network_config.hpp"
 #include "network/stk_host.hpp"
 #include "network/protocols/client_lobby.hpp"
@@ -1219,6 +1221,16 @@ void RaceResultGUI::unload()
         {
             displayCTFResults();
         }
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM       ||
+                 RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER     ||
+                 RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER ||
+                 RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE)
+        {
+            if (cpt <= 2) {
+                cpt++;
+                displayTeamsArenaResults();
+            }
+        }
         else
         {
             for (unsigned int i = 0; i < m_all_row_infos.size(); i++)
@@ -1504,6 +1516,162 @@ void RaceResultGUI::unload()
         }
 #endif
     }   // displayOneEntry
+
+    void RaceResultGUI::displayTeamsArenaResults() {
+        World* world = (World*)World::getWorld();
+        std::vector <int> winningTeams = world->getWinningTeam();
+        std::vector<TeamData> teamsData;
+        gui::IGUIFont* font = GUIEngine::getTitleFont();
+
+        int screenWidth = UserConfigParams::m_width;
+        int screenHeight = UserConfigParams::m_height;
+
+        int numTeams = world->getNumTeams();
+        int current_x = UserConfigParams::m_width / 2;
+        RowInfo* ri = &(m_all_row_infos[0]);
+        int current_y = (int)ri->m_y_pos;
+
+        // Calcul des positions des équipes de manière dynamique
+        for (int i = 0; i < numTeams; ++i) {
+            TeamData data;
+            data.team = world->getTeamsInGame(i);
+            data.x = (i * screenWidth) / numTeams;
+            data.y = current_y;  // Vous pouvez ajuster cette valeur selon vos besoins
+            teamsData.push_back(data);
+        }
+
+        // Affichage du texte en fonction du nombre d'équipes gagnantes
+        std::string winText;
+        core::stringw winTextw;
+        if (winningTeams.size() == 1) {
+            winText = ("Team " + std::to_string(winningTeams[0] + 1) + " Wins!");
+        }
+        else {
+            winText = "It's a draw between Teams ";
+            for (size_t i = 0; i < winningTeams.size(); ++i) {
+                winText += (winningTeams[i]);
+                if (i < winningTeams.size() - 1) {
+                    winText += ", ";
+                }
+            }
+        }
+
+        winTextw = (winText.c_str());
+
+        core::rect<s32> pos(current_x, current_y, current_x, current_y);
+        font->draw(winText.c_str(), pos, video::SColor(255, 255, 255, 0), true, true);
+        core::dimension2du rect = font->getDimension(winTextw.c_str());
+
+        // Affichage des scores et des joueurs par équipe
+        for (const auto& teamData : teamsData) {
+            displayTeamPlayers(teamData.team, teamData.x, teamData.y + rect.Height);
+        }
+    }
+
+
+    void RaceResultGUI::displayTeamPlayers(KartTeam teams, int x, int y) {
+        TeamArenaBattle* tab = (TeamArenaBattle*)World::getWorld();
+        TeamArenaBattlelife* tabl = (TeamArenaBattlelife*)World::getWorld();
+        std::vector<AbstractKart*> players;
+
+        int score;
+
+        RaceManager::MinorRaceModeType mode = RaceManager::get()->getMinorMode();
+        if (mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM || mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER ||
+            mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER) {
+            score = tab->getTeamScore(teams);
+        }
+        else if (mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE) {
+            score = tabl->getTeamScore(teams);
+        }
+
+        //video::SColor red_color = video::SColor(255, 255, 0, 0);
+        //video::SColor blue_color = video::SColor(255, 51, 153, 255);
+        //video::SColor orange_color = video::SColor(255, 255, 128, 0);
+        //video::SColor green_color = video::SColor(255, 0, 255, 0);
+
+        video::SColor white_color = video::SColor(255, 255, 255, 255);
+        video::SColor black_color = video::SColor(255, 0, 0, 0);
+
+        //Draw win text
+        core::stringw result_text;
+        irr::video::ITexture* kart_icon;
+        gui::IGUIFont* font = GUIEngine::getSmallFont();
+
+        // TODO : Besoins de modification // William Lussier 2023-10-13
+        auto teamsColor = teams == KART_TEAM_RED ? KART_TEAM_COLOR_RED :
+            teams == KART_TEAM_BLUE ? KART_TEAM_COLOR_BLUE :
+            teams == KART_TEAM_GREEN ? KART_TEAM_COLOR_GREEN :
+            KART_TEAM_COLOR_ORANGE;
+        auto color = RaceGUIBase::rgbaColorKartTeamsColor(teamsColor);
+        auto colorName = RaceGUIBase::getKartTeamsColorName(teamsColor);
+
+        irr::video::ITexture* team_icon = irr_driver->getTexture(FileManager::GUI_ICON,
+            colorName + "_flag.png");
+
+        int team_icon_height = font->getDimension(L"A").Height;
+        int team_icon_width = team_icon_height * (team_icon->getSize().Width / team_icon->getSize().Height);
+        core::recti source_rect(core::vector2di(0, 0), team_icon->getSize());
+        x -= team_icon_width / 2;
+        core::recti dest_rect(x, y,
+            x + team_icon_width,
+            y + team_icon_height);
+        draw2DImage(team_icon, dest_rect, source_rect,
+            NULL, NULL, true);
+
+        // À vérifier 
+        core::dimension2du rect;
+        result_text = StringUtils::toWString(score);
+        rect = font->getDimension(result_text.c_str());
+        x += team_icon_width / 2;
+        y += team_icon_height + rect.Height / 4;
+        font->draw(result_text.c_str(), core::rect<s32>(x, y, x, y), black_color, true, false);
+        rect = font->getDimension(result_text.c_str());
+        y += rect.Height; // ??? 
+
+        const unsigned num_karts = tab->getNumKarts(); // Modif
+        for (unsigned int i = 0; i < num_karts; i++)
+        {
+            AbstractKart* kart = tab->getKartAtPosition(i + 1); // Modif
+            unsigned kart_id = kart->getWorldKartId();
+            if (tab->getKartTeam(kart_id) != teams)
+                continue;
+            result_text = kart->getController()->getName();
+            if (RaceManager::get()->getKartGlobalPlayerId(kart_id) > -1)
+            {
+                const core::stringw& flag = StringUtils::getCountryFlag(
+                    RaceManager::get()->getKartInfo(kart_id).getCountryCode());
+                if (!flag.empty())
+                {
+                    result_text += L" ";
+                    result_text += flag;
+                }
+            }
+            result_text.append("  ");
+            if (kart->isEliminated())
+            {
+                continue;
+            }
+            else
+            {
+                result_text.append(
+                    StringUtils::toWString(tab->getKartScore(kart_id)));
+            }
+
+
+            // y + team_icon_height
+            font->draw(result_text, core::rect<s32>(x, y, x + 200, y + 30), kart->getController()->isLocalPlayerController() ? color : black_color, true, false);
+            kart_icon = kart->getKartProperties()->getIconMaterial()->getTexture();
+
+            //source_rect = core::recti(core::vector2di(0, 0), kart_icon->getSize());
+            //irr::u32 offset_x =
+            //    (irr::u32)(font->getDimension(result_text.c_str()).Width / 1.5f);
+            //dest_rect = core::recti(current_x - offset_x - m_width_icon, current_y,
+            //    current_x - offset_x, current_y + m_width_icon);
+            //draw2DImage(kart_icon, dest_rect, source_rect, NULL, NULL, true);
+            y += 30;
+        }
+    }
 
     //-----------------------------------------------------------------------------
     void RaceResultGUI::displaySoccerResults()

@@ -208,9 +208,19 @@ private:
     void displayPostRaceInfo();
     void displayCTFResults();
     void displaySoccerResults();
+    void displayTeamsArenaResults();
+    void displayTeamPlayers(KartTeam teams, int x, int y);
     void displayScreenShots();
 
     int  getFontHeight () const;
+
+    struct TeamData {
+        KartTeam team;
+        int x;
+        int y;
+    };
+
+    int cpt = 0;
 
 public:
 
