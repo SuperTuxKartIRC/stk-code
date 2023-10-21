@@ -231,6 +231,17 @@ void RaceManager::setKartTeam(unsigned int player_id, KartTeam team)
 }   // setKartTeam
 
 //---------------------------------------------------------------------------------------------
+/** Sets additional information for a player to indicate which team it
+ *  belongs to.
+*/
+void RaceManager::setKartTeam(unsigned int player_id, KartTeam team, KartTeamsColor teamColor)
+{
+    assert(player_id < m_player_karts.size());
+
+    m_player_karts[player_id].setKartTeam(team); // TODO : Besoins de modification // William Lussier 2023-10-21 10h51
+}   // setKartTeam
+
+//---------------------------------------------------------------------------------------------
 /** Sets the handicap for a player.
  */
 void RaceManager::setPlayerHandicap(unsigned int player_id, HandicapLevel handicap)

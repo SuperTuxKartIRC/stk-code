@@ -443,6 +443,10 @@ public:
     */
     void setKartTeam(unsigned int player_id, KartTeam team);
 
+    /** Sets additional information for a player to indicate which team it belong to
+    */
+    void RaceManager::setKartTeam(unsigned int player_id, KartTeam team, KartTeamsColor teamColor);
+
     /** Sets the handicap for a player.
      */
     void setPlayerHandicap(unsigned int player_id, HandicapLevel handicap);

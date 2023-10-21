@@ -85,7 +85,7 @@ bool TeamArenaBattle::getKartFFAResult(int kart_id) const
             maxIndex = i; // Update maxIndex if a higher score is found
         }
     }
-    int a = getKartTeams(kart_id);
+    int a = getKartTeam(kart_id);
     return (a == maxIndex);
 }   // getKartFFAResult
 // ----------------------------------------------------------------------------
@@ -100,13 +100,13 @@ void TeamArenaBattle::getKartsDisplayInfo(
         RaceGUIBase::KartIconDisplayInfo& rank_info = (*info)[i];
         rank_info.lap = -1;
         rank_info.m_outlined_font = true;
-        if (getKartTeams(i) == KART_TEAM_1)
+        if (getKartTeam(i) == KART_TEAM_RED)
             rank_info.m_color = video::SColor(255, 255, 0, 0);
-        else if (getKartTeams(i) == KART_TEAM_2)
+        else if (getKartTeam(i) == KART_TEAM_BLUE)
             rank_info.m_color = video::SColor(255, 0, 0, 255);
-        else if (getKartTeams(i) == KART_TEAM_3)
+        else if (getKartTeam(i) == KART_TEAM_GREEN)
             rank_info.m_color = video::SColor(255, 0, 255, 0);
-        else if (getKartTeams(i) == KART_TEAM_4)
+        else if (getKartTeam(i) == KART_TEAM_ORANGE)
             rank_info.m_color = video::SColor(255, 255, 165, 0);
         rank_info.m_text = getKart(i)->getController()->getName(); // A corriger plus tard 
         if (RaceManager::get()->getKartGlobalPlayerId(i) > -1)
@@ -160,13 +160,13 @@ void TeamArenaBattle::handleScoreInServer(int kart_id, int hitter)
     if (kart_id == hitter || hitter == -1) {
         // banana
         m_scores[kart_id]--;
-        team = (int)getKartTeams(kart_id);
+        team = (int)getKartTeam(kart_id);
         new_score = m_teams[team].m_scoresTeams--;
     }
     
     else {
         m_scores[hitter]++;
-        team = (int)getKartTeams(hitter);
+        team = (int)getKartTeam(hitter);
         new_score = m_teams[team].m_scoresTeams++;
     }
 
@@ -184,7 +184,7 @@ void TeamArenaBattle::handleScoreInServer(int kart_id, int hitter)
 
         NetworkString p(PROTOCOL_GAME_EVENTS);
         p.setSynchronous(true);
-        p.addUInt8(GameEventsProtocol::GE_TEAM_ARENA_BATTLE_TEAMS_SCORED);
+        p.addUInt8(GameEventsProtocol::GE_BATTLE_KART_SCORE);
         if (kart_id == hitter || hitter == -1)
             p.addUInt8((uint8_t)kart_id).addUInt16((int16_t)m_scores[kart_id]).addUInt8((uint8_t)team).addUInt8((uint8_t)new_score);
         else
@@ -209,7 +209,7 @@ void TeamArenaBattle::setScoreFromServer(int kart_id, int new_kart_score, int te
 
 int TeamArenaBattle::getTeamsKartScore(int kart_id)
 {
-    return m_teams[(int)getKartTeams(kart_id)].m_scoresTeams;
+    return m_teams[(int)getKartTeam(kart_id)].m_scoresTeams;
 }
 
 
@@ -333,8 +333,8 @@ const std::string& TeamArenaBattle::getIdent() const
         return IDENT_TEAM_PT;
     else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER)
         return IDENT_TEAM_PP;
-    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_TIMER)
-        return IDENT_TEAM_T;
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER)
+        return IDENT_TEAM_APP;
 }   // getIdent
 
 // ----------------------------------------------------------------------------

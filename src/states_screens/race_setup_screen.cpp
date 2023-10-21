@@ -198,7 +198,7 @@ void RaceSetupScreen::init()
     case CONFIG_CODE_LAP_TRIAL:
         w2->setSelection(IDENT_LAP_TRIAL, PLAYER_ID_GAME_MASTER, true);
         break;
-    case CONFIG_CODE_TEAM_ARENA:
+    case CONFIG_CODE_TEAM_ARENA: // TODO : Besoins de modification // William Lussier 2023-10-21 11h10
         w2->setSelection(IDENT_TEAM_PT, PLAYER_ID_GAME_MASTER, true);
         break;
     case CONFIG_CODE_TAG_Z_ARENA:
@@ -306,25 +306,25 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name,
         {
             RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM);
             UserConfigParams::m_game_mode = CONFIG_CODE_TEAM_ARENA;
-            //TeamsSetupScreen::getInstance()->push();
+            TeamsSetupScreen::getInstance()->push();
         }
         else if (selectedMode == IDENT_TEAM_PP)
         {
             RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER);
             UserConfigParams::m_game_mode = CONFIG_CODE_TEAM_ARENA;
-            //TeamsSetupScreen::getInstance()->push();
+            TeamsSetupScreen::getInstance()->push();
         }
         else if (selectedMode == IDENT_TEAM_APP)
         {
             RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER);
             UserConfigParams::m_game_mode = CONFIG_CODE_TEAM_ARENA;
-            //TeamsSetupScreen::getInstance()->push();
+            TeamsSetupScreen::getInstance()->push();
         }
         else if (selectedMode == IDENT_TEAM_L)
         {
             RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE);
             UserConfigParams::m_game_mode = CONFIG_CODE_TEAM_ARENA_LIFE;
-            //TeamsSetupScreen::getInstance()->push();
+            TeamsSetupScreen::getInstance()->push();
         }
         else if (selectedMode == IDENT_TAG_Z)
         {
