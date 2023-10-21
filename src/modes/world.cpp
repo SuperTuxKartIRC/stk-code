@@ -275,6 +275,29 @@ void World::init()
         m_karts.push_back(new_kart);
     }  // for i
 
+    std::vector<KartTeam> teamsGame;
+
+    for (const auto& pair : m_kart_team_map) {
+        KartTeam team = pair.second;
+        bool isDuplicate = false;
+
+        for (const KartTeam& existingTeam : teamsGame) {
+            if (team == existingTeam) {
+                isDuplicate = true;
+                break;
+            }
+        }
+
+        if (!isDuplicate) {
+            teamsGame.push_back(team);
+        }
+    }
+
+
+    int numDifferentTeams = teamsGame.size();
+    setNumTeams(numDifferentTeams);
+    setTeamsInGame(teamsGame);
+
     main_loop->renderGUI(7050);
     // Load other custom models if needed
     loadCustomModels();

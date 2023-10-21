@@ -112,6 +112,7 @@ protected:
     int m_orange_ai;
     std::map<int, KartTeam> m_kart_team_map;
     std::map<int, unsigned int> m_kart_position_map;
+    std::vector<KartTeam> m_teamsInGame;
 
     /** The list of all karts. */
     KartList                  m_karts;
@@ -119,11 +120,15 @@ protected:
 
     AbstractKart* m_fastest_kart;
     /** Number of eliminated karts. */
-    int         m_eliminated_karts;
+    int              m_eliminated_karts;
     /** Number of eliminated players. */
-    int         m_eliminated_players;
-    /** OVerall number of players. */
-    int         m_num_players;
+    int              m_eliminated_players;
+    /** Overall number of players. */
+    int              m_num_players;
+    /** Overall number of teams. */
+    int              m_num_teams;
+    /** Number of winning teams. */
+    std::vector<int> m_winning_teams;
 
     bool        m_faster_music_active; // true if faster music was activated
 
@@ -401,6 +406,20 @@ public:
     KartTeam getKartTeam(unsigned int kart_id) const;
     // ------------------------------------------------------------------------
     int getTeamNum(KartTeam team) const;
+    // ------------------------------------------------------------------------
+    int getNumTeams() const { return m_num_teams; }
+    // ------------------------------------------------------------------------
+    void setNumTeams(int numTeams) { m_num_teams = numTeams; }
+    // ------------------------------------------------------------------------
+    KartTeam getTeamsInGame(int index) { return m_teamsInGame[index]; }
+    // ------------------------------------------------------------------------
+    void setTeamsInGame(std::vector<KartTeam> kartTeams) { m_teamsInGame = kartTeams; }
+    // ------------------------------------------------------------------------
+    std::vector<int> getWinningTeam() const { return m_winning_teams; }
+    // ------------------------------------------------------------------------
+    void setWinningTeam(int team) { m_winning_teams.clear(); m_winning_teams.push_back(team); }
+    // ------------------------------------------------------------------------
+    void setWinningTeam(std::vector<int> teams) { m_winning_teams = teams; }
     // ------------------------------------------------------------------------
     /** Set the network mode (true if networked) */
     void setNetworkWorld(bool is_networked) { m_is_network_world = is_networked; }
