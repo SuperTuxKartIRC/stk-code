@@ -29,6 +29,7 @@
 #include "network/stk_host.hpp"
 #include "online/online_profile.hpp"
 #include "states_screens/state_manager.hpp"
+#include "states_screens/online/more_options_server_screen.hpp"
 #include "states_screens/online/networking_lobby.hpp"
 #include "utils/stk_process.hpp"
 #include "utils/string_utils.hpp"
@@ -77,6 +78,8 @@ void CreateServerScreen::loadedFromFile()
 
     m_options_widget = getWidget<RibbonWidget>("options");
     assert(m_options_widget != NULL);
+    m_more_options_widget = getWidget<ButtonWidget>("more_options");
+    assert(m_more_options_widget != NULL);
     m_game_mode_widget = getWidget<RibbonWidget>("gamemode");
     assert(m_game_mode_widget != NULL);
     m_create_widget = getWidget<IconButtonWidget>("create");
@@ -156,6 +159,10 @@ void CreateServerScreen::eventCallback(Widget* widget, const std::string& name,
         {
             createServer();
         }   // is create_widget
+    }
+    else if (name == m_more_options_widget->m_properties[PROP_ID])
+    {
+        MoreOptionsServerScreen::getInstance()->push();
     }
     else if (name == m_game_mode_widget->m_properties[PROP_ID])
     {

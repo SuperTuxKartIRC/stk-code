@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013-2015 Glenn De Jonghe
+//  Copyright (C) 2023 William Lussier 
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -15,50 +15,42 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_CREATE_SERVER_SCREEN_HPP
-#define HEADER_CREATE_SERVER_SCREEN_HPP
+
+#ifndef HEADER_MORE_OPTIONS_SERVER_SCREEN_HPP
+#define HEADER_MORE_OPTIONS_SERVER_SCREEN_HPP
 
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets.hpp"
 
-
 namespace GUIEngine { class Widget; class ListWidget; }
 
+
 /**
-  * \brief Handles the main menu
-  * \ingroup states_screens
-  */
-class CreateServerScreen :      public GUIEngine::Screen,
-                                public GUIEngine::ScreenSingleton<CreateServerScreen>
+* \brief Handles the main menu
+* \ingroup states_screens
+*/
+class MoreOptionsServerScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<MoreOptionsServerScreen>
 {
 private:
-    int m_prev_mode, m_prev_value;
+    friend class GUIEngine::ScreenSingleton<MoreOptionsServerScreen>;
 
     bool m_supports_ai;
 
-    friend class GUIEngine::ScreenSingleton<CreateServerScreen>;
+    MoreOptionsServerScreen();
 
-    CreateServerScreen();
+    GUIEngine::Widget* m_time_div_widget;
+    GUIEngine::Widget* m_nb_ia_div_widget;
+    GUIEngine::Widget* m_winning_div_widget;
+    GUIEngine::Widget* m_life_div_widget;
 
-    GUIEngine::TextBoxWidget * m_name_widget;
-    GUIEngine::SpinnerWidget * m_max_players_widget;
-    GUIEngine::SpinnerWidget* m_more_options_spinner;
+    GUIEngine::SpinnerWidget* m_time_widget;
+    GUIEngine::SpinnerWidget* m_nb_ia_widget;
+    GUIEngine::SpinnerWidget* m_winning_value_spinner;
+    GUIEngine::SpinnerWidget* m_life_value_spinner;
 
-    GUIEngine::LabelWidget * m_more_options_text;
-    GUIEngine::LabelWidget * m_info_widget;
-
-    GUIEngine::RibbonWidget * m_game_mode_widget;
-    GUIEngine::RibbonWidget * m_options_widget;
-    GUIEngine::ButtonWidget* m_more_options_widget;
-    GUIEngine::IconButtonWidget * m_create_widget;
-    GUIEngine::IconButtonWidget * m_cancel_widget;
-    GUIEngine::IconButtonWidget * m_back_widget;
-
-    void createServer();
-    void updateMoreOption(int game_mode);
+    GUIEngine::IconButtonWidget* m_back_widget;
 
 public:
-
     virtual void onUpdate(float delta) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
@@ -67,9 +59,9 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void beforeAddingWidget() OVERRIDE;
 
-    /** \brief implement callback from parent class GUIEngine::Screen */
+    ///** \brief implement callback from parent class GUIEngine::Screen */
     virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
-                               const int playerID) OVERRIDE;
+        const int playerID) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
@@ -77,6 +69,6 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void tearDown() OVERRIDE;
 
-};   // class CreateServerScreen
+};   // class MoreOptionsServerScreen
 
 #endif

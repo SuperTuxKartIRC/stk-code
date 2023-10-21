@@ -99,22 +99,22 @@ void NetworkTeamsSetupScreen::eventCallback(Widget* widget, const std::string& n
     else if (name == "team_1")
     {
         if (m_kart_view_info.size() == 1)
-            changeTeam(0, KART_TEAM_1, KART_TEAM_COLOR_RED);
+            changeTeam(0, KART_TEAM_RED, KART_TEAM_COLOR_RED);
     }
     else if (name == "team_2")
     {
         if (m_kart_view_info.size() == 1)
-            changeTeam(0, KART_TEAM_2, KART_TEAM_COLOR_BLUE);
+            changeTeam(0, KART_TEAM_BLUE, KART_TEAM_COLOR_BLUE);
     }
     else if (name == "team_3")
     {
         if (m_kart_view_info.size() == 1)
-            changeTeam(0, KART_TEAM_3, KART_TEAM_COLOR_GREEN);
+            changeTeam(0, KART_TEAM_GREEN, KART_TEAM_COLOR_GREEN);
     }
     else if (name == "team_4")
     {
         if (m_kart_view_info.size() == 1)
-            changeTeam(0, KART_TEAM_4, KART_TEAM_COLOR_ORANGE);
+            changeTeam(0, KART_TEAM_ORANGE, KART_TEAM_COLOR_ORANGE);
     }
 }   // eventCallback
 
@@ -164,8 +164,8 @@ void NetworkTeamsSetupScreen::beforeAddingWidget()
         KartViewInfo info;
 
         int single_team = UserConfigParams::m_default_team_teams;
-        info.teams = (nb_players == 1 ? (KartTeams)single_team :
-            (i & 1 ? KART_TEAM_1 : KART_TEAM_2)); // TODO : NEED MODIFICATIONS 
+        info.teams = (nb_players == 1 ? (KartTeam)single_team :
+            (i & 1 ? KART_TEAM_RED : KART_TEAM_BLUE)); // TODO : Besoins de modification // William Lussier 
         //info.teams = teams;
 
         //addModel requires loading the RenderInfo first
@@ -214,7 +214,7 @@ void NetworkTeamsSetupScreen::beforeAddingWidget()
         info.view = kart_view;
         info.confirmed = false;
         m_kart_view_info.push_back(info);
-        RaceManager::get()->setKartTeams(i, info.teams, info.teamColor);
+        RaceManager::get()->setKartTeam(i, info.teams, info.teamColor);
     }
 
     // Update layout
@@ -261,7 +261,7 @@ void NetworkTeamsSetupScreen::tearDown()
     Screen::tearDown();
 }   // tearDown
 
-void NetworkTeamsSetupScreen::changeTeam(int player_id, KartTeams teams, KartTeamsColor teamColor)
+void NetworkTeamsSetupScreen::changeTeam(int player_id, KartTeam teams, KartTeamsColor teamColor)
 {
     if (teams == KART_TEAM_NONE)
         return;
@@ -283,10 +283,11 @@ void NetworkTeamsSetupScreen::changeTeam(int player_id, KartTeams teams, KartTea
 
     if (m_kart_view_info.size() == 1)
     {
-        ServerConfig::m_kart_teams_choosing = (int)teams;
+        // TODO : Besoins de changements // William Lussier 
+        //ServerConfig::m_kart_teams_choosing = (int)teams;
     }
 
-    RaceManager::get()->setKartTeams(player_id, teams, teamColor);
+    RaceManager::get()->setKartTeam(player_id, teams, teamColor);
     m_kart_view_info[player_id].teams = teams;
     updateKartViewsLayout();
 }
@@ -490,7 +491,7 @@ void NetworkTeamsSetupScreen::updateKartViewsLayout()
     for (int i = 0; i < nb_players; i++)
     {
         const KartViewInfo& view_info = m_kart_view_info[i];
-        const KartTeams  teams = view_info.teams;
+        const KartTeam  teams = view_info.teams;
 
         // Compute the position
         const int cur_row = cur_kart_per_team[teams] / nb_columns;
@@ -540,35 +541,35 @@ const float NetworkTeamsSetupScreen::getHueColor(KartTeamsColor teamColor)
 
 void NetworkTeamsSetupScreen::changeTeamByDirection(int player_id, int direction)
 {
-    KartTeams teams = m_kart_view_info[player_id].teams;
+    KartTeam teams = m_kart_view_info[player_id].teams;
     KartTeamsColor teamColor;
 
     // Adjust the team based on the direction
     if (direction == -1) // PA_MENU_LEFT
     {
-        teams = static_cast<KartTeams>((static_cast<int>(teams) - 1) % 4);
+        teams = static_cast<KartTeam>((static_cast<int>(teams) - 1) % 4);
         if (teams < 0)
-            teams = KART_TEAM_4;
+            teams = KART_TEAM_ORANGE;
     }
     else if (direction == 1) // PA_MENU_RIGHT
     {
-        teams = static_cast<KartTeams>((static_cast<int>(teams) + 1) % 4);
+        teams = static_cast<KartTeam>((static_cast<int>(teams) + 1) % 4);
         if (teams == KART_TEAM_NONE)
-            teams = KART_TEAM_1;
+            teams = KART_TEAM_RED;
     }
 
     switch (teams)
     {
-    case KART_TEAM_1:
+    case KART_TEAM_RED:
         teamColor = m_team1Color;
         break;
-    case KART_TEAM_2:
+    case KART_TEAM_BLUE:
         teamColor = m_team2Color;
         break;
-    case KART_TEAM_3:
+    case KART_TEAM_GREEN:
         teamColor = m_team3Color;
         break;
-    case KART_TEAM_4:
+    case KART_TEAM_ORANGE:
         teamColor = m_team4Color;
         break;
     default:

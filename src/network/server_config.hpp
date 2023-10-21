@@ -112,6 +112,22 @@ namespace ServerConfig
         "Difficulty in server, 0 is beginner, 1 is intermediate, 2 is expert "
         "and 3 is supertux (the most difficult)."));
 
+    SERVER_CFG_PREFIX IntServerConfigParam m_server_game_duration
+        SERVER_CFG_DEFAULT(IntServerConfigParam(0, "server-game-duration",
+            "Duration of the game. If the time is 0, the time (timer) is desactivate"));
+
+    SERVER_CFG_PREFIX IntServerConfigParam m_server_game_point
+        SERVER_CFG_DEFAULT(IntServerConfigParam(5, "server-game-point",
+            "The number of points to win the game"));
+
+    SERVER_CFG_PREFIX IntServerConfigParam m_server_game_life
+        SERVER_CFG_DEFAULT(IntServerConfigParam(5, "server-game-life",
+            "The number of life"));
+
+    SERVER_CFG_PREFIX IntServerConfigParam m_server_game_nb_ia
+        SERVER_CFG_DEFAULT(IntServerConfigParam(0, "server-game-nb-ia",
+            "The number of ia"));
+
     SERVER_CFG_PREFIX IntServerConfigParam m_gp_track_count
         SERVER_CFG_DEFAULT(IntServerConfigParam(3, "gp-track-count",
         "Number of grand prix tracks per game (If grand prix enabled)."));

@@ -40,11 +40,11 @@ class NetworkTeamsSetupScreen : public GUIEngine::Screen,
         GUIEngine::ModelViewWidget* view;
         bool                        confirmed;
         bool                        support_colorization;
-        KartTeams                   teams;
+        KartTeam                   teams;
         KartTeamsColor              teamColor;
 
         KartViewInfo() : view(), confirmed(false), support_colorization(false),
-            teams(KART_TEAM_N) {}
+            teams(KART_TEAM_NONE) {}
     };
 
     AlignedArray<KartViewInfo>  m_kart_view_info;
@@ -84,7 +84,7 @@ private:
     bool areAllKartsConfirmed() const;
     int getNumConfirmedKarts();
     void updateKartViewsLayout();
-    void changeTeam(int player_id, KartTeams teams, KartTeamsColor teamsColor);
+    void changeTeam(int player_id, KartTeam teams, KartTeamsColor teamsColor);
     void prepareGame();
     const float getHueColor(KartTeamsColor teamsColor);
     void NetworkTeamsSetupScreen::changeTeamByDirection(int player_id, int direction);
