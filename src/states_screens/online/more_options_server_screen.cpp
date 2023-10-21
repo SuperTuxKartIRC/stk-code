@@ -79,6 +79,11 @@ void MoreOptionsServerScreen::loadedFromFile()
     assert(m_life_value_spinner != NULL);
     m_back_widget = getWidget<IconButtonWidget>("back");
     assert(m_back_widget != NULL);
+
+    m_nb_ia_widget->setValue(ServerConfig::m_server_game_nb_ia);
+    m_time_widget->setValue(ServerConfig::m_server_game_duration);
+    m_life_value_spinner->setValue(ServerConfig::m_server_game_life);
+    m_winning_value_spinner->setValue(ServerConfig::m_server_game_point);
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
@@ -110,15 +115,17 @@ void MoreOptionsServerScreen::init()
     //m_life_div_widget->setCollapsed(false, this);
 
     if (ServerConfig::m_server_mode == 9 || ServerConfig::m_server_mode == 10 || ServerConfig::m_server_mode == 11 || ServerConfig::m_server_mode == 12) {
-        m_time_div_widget->setCollapsed(true, this);
-        m_nb_ia_div_widget->setCollapsed(true, this);
+        m_time_div_widget->setVisible(false);
+        m_nb_ia_div_widget->setVisible(false);
     }
 
-    if (ServerConfig::m_server_mode == 9 || ServerConfig::m_server_mode == 10 || ServerConfig::m_server_mode == 11) {
-        m_winning_div_widget->setCollapsed(true, this);
+    if (!(ServerConfig::m_server_mode == 9 || ServerConfig::m_server_mode == 10 || ServerConfig::m_server_mode == 11)) {
+        m_winning_div_widget->setVisible(false);
+
     }
-    else if (ServerConfig::m_server_mode == 12) {
-        m_life_div_widget->setCollapsed(true, this);
+    if (!(ServerConfig::m_server_mode == 12)) {
+        m_life_div_widget->setVisible(false);
+        m_life_value_spinner->setVisible(false);
     }
 
 }   // init
