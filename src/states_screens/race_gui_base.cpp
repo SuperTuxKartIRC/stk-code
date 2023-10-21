@@ -1377,3 +1377,36 @@ void RaceGUIBase::removeReferee()
     }
 }   // removeReferee
 
+video::SColor RaceGUIBase::rgbaColorKartTeamsColor(KartTeamsColor teamColor)
+{
+    return teamColor == KART_TEAM_COLOR_BLUE      ? video::SColor(255, 0, 0, 255)     :
+           teamColor == KART_TEAM_COLOR_RED       ? video::SColor(255, 255, 0, 0)     :
+           teamColor == KART_TEAM_COLOR_GREEN     ? video::SColor(255, 0, 255, 0)     :
+           teamColor == KART_TEAM_COLOR_YELLOW    ? video::SColor(255, 255, 255, 0)   :
+           teamColor == KART_TEAM_COLOR_ORANGE    ? video::SColor(255, 255, 165, 0)   :
+           teamColor == KART_TEAM_COLOR_PURPLE    ? video::SColor(255, 128, 0, 128)   :
+           teamColor == KART_TEAM_COLOR_PINK      ? video::SColor(255, 255, 192, 203) :
+           teamColor == KART_TEAM_COLOR_TURQUOISE ? video::SColor(255, 0, 206, 209)   :
+           teamColor == KART_TEAM_COLOR_DARK_BLUE ? video::SColor(255, 0, 0, 139)     :
+           teamColor == KART_TEAM_COLOR_CYAN      ? video::SColor(255, 0, 255, 255)   :
+           teamColor == KART_TEAM_COLOR_DEFAULT   ? video::SColor(255, 255, 182, 193) :
+                                                    video::SColor(255, 255, 182, 193);
+
+} // rgbaColorKartTeamsColor
+
+std::string RaceGUIBase::getKartTeamsColorName(KartTeamsColor teamColorName)
+{
+    return teamColorName == KART_TEAM_COLOR_BLUE ? "blue" :
+           teamColorName == KART_TEAM_COLOR_RED ? "red" :
+           teamColorName == KART_TEAM_COLOR_GREEN ? "green" :
+           teamColorName == KART_TEAM_COLOR_YELLOW ? "yellow" :
+           teamColorName == KART_TEAM_COLOR_ORANGE ? "orange" :
+           teamColorName == KART_TEAM_COLOR_PURPLE ? "purple" :
+           teamColorName == KART_TEAM_COLOR_PINK ? "pink" :
+           teamColorName == KART_TEAM_COLOR_TURQUOISE ? "turquoise" :
+           teamColorName == KART_TEAM_COLOR_DARK_BLUE ? "dark_blue" :
+           teamColorName == KART_TEAM_COLOR_CYAN ? "cyan" :
+           teamColorName == KART_TEAM_COLOR_DEFAULT ? "pinky" :
+           "pinky";
+
+}

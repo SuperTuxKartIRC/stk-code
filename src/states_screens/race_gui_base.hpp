@@ -274,6 +274,9 @@ public:
     void recreateGUI();
     virtual void initSize();
 
+    // RGBA color for KartTeamsColor
+    video::SColor rgbaColorKartTeamsColor(KartTeamsColor teamColor);
+    std::string getKartTeamsColorName(KartTeamsColor teamColorName);
 };   // RaceGUIBase
 
 #endif

@@ -53,6 +53,8 @@ using namespace irr;
 #include "modes/linear_world.hpp"
 #include "modes/world.hpp"
 #include "modes/soccer_world.hpp"
+#include "modes/team_arena_battle.hpp"
+#include "modes/team_arena_battle_life.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/race_gui_multitouch.hpp"
@@ -575,6 +577,8 @@ void RaceGUI::drawGlobalMiniMap()
     World* world = World::getWorld();
     CaptureTheFlag *ctf_world = dynamic_cast<CaptureTheFlag*>(World::getWorld());
     SoccerWorld *soccer_world = dynamic_cast<SoccerWorld*>(World::getWorld());
+    TeamArenaBattle* team_arena_world = dynamic_cast<TeamArenaBattle*>(World::getWorld());
+    TeamArenaBattlelife* team_arena_life_world = dynamic_cast<TeamArenaBattlelife*>(World::getWorld());
 
     if (ctf_world)
     {
@@ -681,6 +685,7 @@ void RaceGUI::drawGlobalMiniMap()
                                  lower_y   -(int)(draw_at.getY()-marker_half_size));
 
         bool has_teams = (ctf_world || soccer_world);
+        bool has_teams_4 = team_arena_world || team_arena_life_world;
         
         // Highlight the player icons with some background image.
         if ((has_teams || is_local) && m_icons_frame != NULL)
@@ -700,6 +705,23 @@ void RaceGUI::drawGlobalMiniMap()
                     color = video::SColor(255, 0, 0, 200);
                 }
             }
+            else if (has_teams_4) {
+                KartTeam team = world->getKartTeam(kart->getWorldKartId());
+                KartTeamsColor kartColor;
+
+                // TODO : Besoins de modification. Aller chercher le KartTeamsColor par rapport au KartTeam // William Lussier 2023-10-21 14h40
+                if (team == KART_TEAM_RED)
+                    kartColor = KART_TEAM_COLOR_RED;
+                else if (team == KART_TEAM_BLUE)
+                    kartColor = KART_TEAM_COLOR_BLUE;
+                else if (team == KART_TEAM_GREEN)
+                    kartColor = KART_TEAM_COLOR_GREEN;
+                else if (team == KART_TEAM_ORANGE)
+                    kartColor = KART_TEAM_COLOR_ORANGE;
+
+                color = rgbaColorKartTeamsColor(kartColor);
+            }
+
                                   
             video::SColor colors[4] = {color, color, color, color};
 
@@ -1268,6 +1290,8 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
     SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
     FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
+    TeamArenaBattle* team_arena_battle = dynamic_cast<TeamArenaBattle*>(World::getWorld());
+    TeamArenaBattlelife* team_arena_battle_life = dynamic_cast<TeamArenaBattlelife*>(World::getWorld());
 
     static video::SColor color = video::SColor(255, 255, 255, 255);
     int hit_capture_limit =
@@ -1276,6 +1300,7 @@ void RaceGUI::drawLap(const AbstractKart* kart,
         ? RaceManager::get()->getHitCaptureLimit() : -1;
     int score_limit = sw && !RaceManager::get()->hasTimeTarget() ?
         RaceManager::get()->getMaxGoal() : ctf ? hit_capture_limit : -1;
+    int number_life = RaceManager::get()->getLifeTarget();
     if (!ctf && ffa && hit_capture_limit != -1)
     {
         int icon_width = irr_driver->getActualScreenSize().Height/19;
@@ -1343,6 +1368,102 @@ void RaceGUI::drawLap(const AbstractKart* kart,
             text = StringUtils::toWString(score_limit);
             font->draw(text, pos, video::SColor(255, 255, 255, 255));
         }
+        font->setBlackBorder(false);
+        return;
+    }
+    // TODO : Besoins de modifications. Affichages des points pour 4 équipes // William Lussier 2023-10-21 14h44
+    if (team_arena_battle || team_arena_battle_life) {
+        int team1_score = team_arena_battle->getTeamScore(0);
+        int team2_score = team_arena_battle->getTeamScore(1);
+        int team3_score = team_arena_battle->getTeamScore(2);
+        int team4_score = team_arena_battle->getTeamScore(3);
+
+        gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
+        font->setBlackBorder(true);
+        font->setScale(1.0f);
+        core::dimension2du d;
+
+
+        core::stringw text;
+        //if (team_arena_battle->getTeamsNum(KART_TEAM_1) > 0) {
+
+        //}
+
+        pos -= core::position2di(130, 0);;
+
+        text = StringUtils::toWString(team1_score);
+        font->draw(text, pos, video::SColor(255, 255, 0, 0), false, false, NULL, true /* ignore RTL */);
+        d = font->getDimension(text.c_str());
+        pos += core::position2di(d.Width, 0);
+
+        //if (team_arena_battle->getTeamsNum(KART_TEAM_2) > 0) {
+
+        //}
+
+        text = L"-";
+        font->draw(text, pos, video::SColor(255, 255, 255, 255));
+        d = font->getDimension(text.c_str());
+        pos += core::position2di(d.Width, 0);
+
+        text = StringUtils::toWString(team2_score);
+        font->draw(text, pos, video::SColor(255, 0, 128, 255), false, false, NULL, true /* ignore RTL */);
+        d = font->getDimension(text.c_str());
+        pos += core::position2di(d.Width, 0);
+
+        //if (team_arena_battle->getTeamsNum(KART_TEAM_3) > 0) {
+
+        //}
+
+        text = L"-";
+        font->draw(text, pos, video::SColor(255, 255, 255, 255));
+        d = font->getDimension(text.c_str());
+        pos += core::position2di(d.Width, 0);
+
+        text = StringUtils::toWString(team3_score);
+        font->draw(text, pos, video::SColor(255, 0, 225, 0), false, false, NULL, true /* ignore RTL */);
+        d = font->getDimension(text.c_str());
+        pos += core::position2di(d.Width, 0);
+
+        //if (team_arena_battle->getTeamsNum(KART_TEAM_4) > 0) {
+
+        //}
+
+        text = L"-";
+        font->draw(text, pos, video::SColor(255, 255, 255, 255));
+        d = font->getDimension(text.c_str());
+        pos += core::position2di(d.Width, 0);
+
+        text = StringUtils::toWString(team4_score);
+        font->draw(text, pos, video::SColor(255, 225, 128, 0), false, false, NULL, true /* ignore RTL */);
+        d = font->getDimension(text.c_str());
+        pos += core::position2di(d.Width, 0);
+
+        text = L"  ";
+        font->draw(text, pos, video::SColor(255, 255, 255, 255));
+        d = font->getDimension(text.c_str());
+        pos += core::position2di(d.Width, 0);
+
+        if (team_arena_battle)
+            text = StringUtils::toWString(hit_capture_limit);
+        else if (team_arena_battle_life)
+            text = StringUtils::toWString(number_life);
+        font->draw(text, pos, video::SColor(255, 225, 225, 255), false, false, NULL, true /* ignore RTL */);
+        d = font->getDimension(text.c_str());
+        pos += core::position2di(d.Width, 0);
+
+
+        int icon_width = irr_driver->getActualScreenSize().Height / 19;
+        core::rect<s32> indicator_pos(viewport.LowerRightCorner.X - (icon_width + 10),
+            pos.UpperLeftCorner.Y,
+            viewport.LowerRightCorner.X - 10,
+            pos.UpperLeftCorner.Y + icon_width);
+        core::rect<s32> source_rect(core::position2d<s32>(0, 0),
+            m_champion->getSize());
+        if(team_arena_battle)
+            draw2DImage(m_champion, indicator_pos, source_rect,NULL, NULL, true);
+        else if (team_arena_battle_life)
+            draw2DImage(m_heart_icon, indicator_pos, source_rect, NULL, NULL, true);
+
         font->setBlackBorder(false);
         return;
     }
