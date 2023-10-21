@@ -1636,13 +1636,12 @@ std::shared_ptr<AbstractKart> World::createKartWithTeam
 
     // Notice: In blender, please set 1,3,5,7... for blue starting position;
     // 2,4,6,8... for red.
-    if (team == KART_TEAM_BLUE)
-    {
-        pos_index = 1 + 2 * cur_blue;
+    if (getNumTeams() >= 3 || has4Team() == true) {
+        pos_index = index +1;
     }
-    else
-    {
-        pos_index = 2 + 2 * cur_red;
+    else {
+        if (team == KART_TEAM_BLUE) pos_index = 1 + 2 * cur_blue;
+        else pos_index = 2 + 2 * cur_red;
     }
 
     btTransform init_pos = getStartTransform(pos_index - 1);
