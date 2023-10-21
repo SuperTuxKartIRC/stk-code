@@ -5,6 +5,7 @@
 #include "modes/capture_the_flag.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/soccer_world.hpp"
+//#include "modes/team_arena_battle.hpp"
 #include "network/event.hpp"
 #include "network/game_setup.hpp"
 #include "network/network_config.hpp"
@@ -61,6 +62,7 @@ bool GameEventsProtocol::notifyEvent(Event* event)
     uint8_t type = data.getUInt8();
     CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
     FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
+    //TeamArenaBattle* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
     SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
     LinearWorld* lw = dynamic_cast<LinearWorld*>(World::getWorld());
     switch (type)
@@ -85,7 +87,9 @@ bool GameEventsProtocol::notifyEvent(Event* event)
     {
         if (!ffa)
             throw std::invalid_argument("No free-for-all world");
-        ffa->setKartScoreFromServer(data);
+        else if(ffa)
+            ffa->setKartScoreFromServer(data);
+        //else if (tab)
         break;
     }
     case GE_CTF_SCORED:

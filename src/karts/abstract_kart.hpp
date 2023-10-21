@@ -71,7 +71,7 @@ private:
     float m_kart_highest_point;
     /** The position of all four wheels in the 3d model */
     const Vec3* m_wheel_graphics_position;
-
+    KartTeam m_kart_team;
     /** Index of kart in world. */
     unsigned int m_world_kart_id;
 
@@ -200,6 +200,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the highest point of the kart (coordinate on up axis) */
     float getHighestPoint() const { return m_kart_highest_point;  }
+    // ------------------------------------------------------------------------
+    /** Returns the kart teams of the kart */
+    KartTeam getKartTeam() const { return m_kart_team; }
     // ------------------------------------------------------------------------
     /** Called after the kart comes to rest. It can be used to e.g. compute
      *  differences between graphical and physical chassis. Note that

@@ -375,12 +375,12 @@ void TeamArenaBattle::setWinningTeams()
         World::setWinningTeam(indices);
 }
 
-const void TeamArenaBattle::setPlayerTeams(KartTeams team) const
+const void TeamArenaBattle::setPlayerTeams(KartTeam team) const
 {
     for (int i = 0; i < getNumKarts(); i++)
     {
         AbstractKart* kart = getKartAtPosition(i);
-        KartTeams kartTeam = kart->getKartTeam();
+        KartTeam kartTeam = kart->getKartTeam();
         //m_players_teams[kart->getKartTeam()];
 
 

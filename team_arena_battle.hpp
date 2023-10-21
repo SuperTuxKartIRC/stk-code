@@ -105,7 +105,7 @@ public:
     // ------------------------------------------------------------------------
     virtual void updateGraphics(float dt) OVERRIDE;
     // ------------------------------------------------------------------------
-    virtual bool hasTeams() const OVERRIDE { return true; }
+    virtual bool hasTeam() const OVERRIDE { return true; }
     // ------------------------------------------------------------------------
     virtual bool isRaceOver() OVERRIDE;
     // ------------------------------------------------------------------------
@@ -121,14 +121,14 @@ public:
     // ------------------------------------------------------------------------
     virtual video::SColor getColor(unsigned int kart_id) const;
     // ------------------------------------------------------------------------
-    const std::vector<AbstractKart*>& getPlayerTeams(KartTeams team) const
+    const std::vector<AbstractKart*>& getPlayerTeams(KartTeam team) const
     { // TODO: Mettre cette méthode dans world.cpp // La logique d'équipe dois se trouver dans world.cpp
       // William Lussier 2023-10-08 11h53
         return m_players_teams[team];
     }
     // TODO: Mettre cette méthode dans world.cpp // La logique d'équipe dois se trouver dans world.cpp // William Lussier 2023-10-09 11h08
     // ------------------------------------------------------------------------
-    const void setPlayerTeams(KartTeams team) const;
+    const void setPlayerTeams(KartTeam team) const;
     // ------------------------------------------------------------------------
     //virtual unsigned int getRescuePositionIndex(AbstractKart* kart) OVERRIDE;
     // ------------------------------------------------------------------------
@@ -147,7 +147,7 @@ public:
         return false;
     }
     // ------------------------------------------------------------------------
-    int getTeamScore(KartTeams team) const { return m_teams[(int)team].m_scoresTeams; }
+    int getTeamScore(KartTeam team) const { return m_teams[(int)team].m_scoresTeams; }
     // ------------------------------------------------------------------------
     int getTeamScore(int team) const { return m_teams[team].m_scoresTeams; }
     // ------------------------------------------------------------------------
