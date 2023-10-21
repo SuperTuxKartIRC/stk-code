@@ -24,6 +24,7 @@
 #include <irrString.h>
 #include <vector2d.h>
 #include <rect.h>
+#include "network/remote_kart_info.hpp"
 #include <dimension2d.h>
 #include <SColor.h>
 namespace irr
