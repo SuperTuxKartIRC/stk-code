@@ -30,6 +30,7 @@
 #include "states_screens/state_manager.hpp"
 #include "states_screens/online/networking_lobby.hpp"
 #include "states_screens/online/tracks_screen.hpp"
+#include "states_screens/online/teams_screen.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -171,7 +172,7 @@ void NetworkKartSelectionScreen::allPlayersDone()
         {
             TracksScreen::getInstance()->setNetworkTracks();
             TracksScreen::getInstance()->push();
-            //NetworkTeamsSetupScreen::getInstance()->push();
+            NetworkTeamsSetupScreen::getInstance()->push();
         }
         else
         {
