@@ -31,6 +31,7 @@ void TeamArenaBattle::init()
     m_count_down_reached_zero = false;
     m_use_highscores = false;
     m_players_teams.resize(4);
+    m_teams.resize(4);
 }   // init
 
 // ----------------------------------------------------------------------------
