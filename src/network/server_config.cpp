@@ -294,6 +294,20 @@ core::stringw getModeName(unsigned id)
             return _("Free-For-All");
         case 8:
             return _("Capture The Flag");
+        case 9:
+            return _("Team Points");
+        case 10:
+            return _("Player with most points");
+        case 11:
+            return _("All Player Points");
+        case 12:
+            return _("Last team standing");
+        case 13:
+            return _("Tag zombie");
+        case 14:
+            return _("Monster Arena Battle");
+        case 15:
+            return _("Murder Mystery");
         default:
             return L"";
     }

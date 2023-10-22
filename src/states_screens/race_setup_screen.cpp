@@ -116,27 +116,32 @@ void RaceSetupScreen::init()
         w2->addItem(name3, IDENT_FTL, RaceManager::getIconOf(RaceManager::MINOR_MODE_FOLLOW_LEADER), false);
     }
 
-    irr::core::stringw name4 = irr::core::stringw(_("Battle")) + L"\n";
+    irr::core::stringw name4 = irr::core::stringw(
+        RaceManager::getNameOf(RaceManager::MINOR_MODE_FREE_FOR_ALL)) + L"\n";
     //FIXME: avoid duplicating descriptions from the help menu!
     name4 += _("Hit others with weapons until they lose all their lives.");
     w2->addItem( name4, IDENT_STRIKES, RaceManager::getIconOf(RaceManager::MINOR_MODE_FREE_FOR_ALL));
 
-    irr::core::stringw name8 = irr::core::stringw(_("Battle")) + L"\n";
+    irr::core::stringw name8 = irr::core::stringw(
+        RaceManager::getNameOf(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE)) + L"\n";
     //FIXME: avoid duplicating descriptions from the help menu!
     name8 += _("Hit other players' teams with weapons to score points.");
     w2->addItem(name8, IDENT_TEAM_L, RaceManager::getIconOf(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE));
 
-    irr::core::stringw name9 = irr::core::stringw(_("Battle")) + L"\n";
+    irr::core::stringw name9 = irr::core::stringw(
+        RaceManager::getNameOf(RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE)) + L"\n";
     //FIXME: avoid duplicating descriptions from the help menu!
     name9 += _("Surviving tags. Tags must kill (or touch) all other people.");
     w2->addItem(name9, IDENT_TAG_Z, RaceManager::getIconOf(RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE));
 
-    irr::core::stringw name10 = irr::core::stringw(_("Battle")) + L"\n";
+    irr::core::stringw name10 = irr::core::stringw(
+        RaceManager::getNameOf(RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA)) + L"\n";
     //FIXME: avoid duplicating descriptions from the help menu!
     name10 += _("Surviving monsters. Monsters must kill all other people.");
     w2->addItem(name10, IDENT_MONSTER, RaceManager::getIconOf(RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA));
 
-    irr::core::stringw name11 = irr::core::stringw(_("Battle")) + L"\n";
+    irr::core::stringw name11 = irr::core::stringw(
+        RaceManager::getNameOf(RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA)) + L"\n";
     //FIXME: avoid duplicating descriptions from the help menu!
     name11 += _("Surviving the killer. The sheriff must kill the killer.");
     w2->addItem(name11, IDENT_MURDER_MYSTERY, RaceManager::getIconOf(RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA));

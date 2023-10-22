@@ -1319,6 +1319,13 @@ const core::stringw RaceManager::getNameOf(const MinorRaceModeType mode)
         case MINOR_MODE_FREE_FOR_ALL:   return _("Free-For-All");
         //I18N: Game mode
         case MINOR_MODE_CAPTURE_THE_FLAG: return _("Capture The Flag");
+        case MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM: return _("Team Points");
+        case MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER: return _("Player with most points");
+        case MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER: return _("All Player Points");
+        case MINOR_MODE_TEAM_ARENA_BATTLE_LIFE: return _("Last team standing");
+        case MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE: return _("Tag zombie");
+        case MINOR_MODE_MONSTER_ATTACK_ARENA: return _("Monster Arena Battle");
+        case MINOR_MODE_MURDER_MYSTERY_ARENA: return _("Murder Mystery");
         //I18N: Game mode
         case MINOR_MODE_EASTER_EGG:     return _("Egg Hunt");
         //I18N: Game mode
