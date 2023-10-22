@@ -515,7 +515,7 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam          m_game_mode
         PARAM_DEFAULT(IntUserConfigParam(0, "game_mode",
             &m_race_setup_group,
-            "Game mode. 0=standard, 1=time trial, 2=follow the leader, 3=3 strikes, 4=easter egg hunt, 5=soccer, 6=ghost replay, 7=teams arena, 8=tag arena, 9=monster arena, 10=murder mystery"));
+            "Game mode. 0=standard, 1=time trial, 2=follow the leader, 3=3 strikes, 4=easter egg hunt, 5=soccer, 6=ghost replay, 7=teams points arena, 8=teams player points arena, 9=teams all player points arena, 10=last team standing, 11=tag arena, 12=monster arena, 13=murder mystery"));
     PARAM_PREFIX StringUserConfigParam m_default_kart
         PARAM_DEFAULT(StringUserConfigParam("tux", "kart",
             "Kart to select by default (the last used kart)"));

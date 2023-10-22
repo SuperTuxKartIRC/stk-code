@@ -5660,7 +5660,7 @@ void ServerLobby::saveInitialItems(std::shared_ptr<NetworkItemManager> nim)
 //-----------------------------------------------------------------------------
 bool ServerLobby::supportsAI()
 {
-    return getGameMode() == 3 || getGameMode() == 4;
+    return getGameMode() == 3 || getGameMode() == 4; // TODO : Besoins de modification // William Lussier 2033-10-22
 }   // supportsAI
 
 //-----------------------------------------------------------------------------
