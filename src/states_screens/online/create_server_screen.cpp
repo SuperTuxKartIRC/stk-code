@@ -244,6 +244,13 @@ void CreateServerScreen::updateMoreOption(int game_mode)
             m_more_options_spinner->addLabel(_("Free-For-All"));
             //I18N: In the create server screen for battle server
             m_more_options_spinner->addLabel(_("Capture The Flag"));
+            m_more_options_spinner->addLabel(_("Team Points"));
+            m_more_options_spinner->addLabel(_("Player with most points"));
+            m_more_options_spinner->addLabel(_("All Player Points"));
+            m_more_options_spinner->addLabel(_("Last team standing"));
+            m_more_options_spinner->addLabel(_("Tag zombie"));
+            m_more_options_spinner->addLabel(_("Monster Arena Battle"));
+            m_more_options_spinner->addLabel(_("Murder Mystery"));
             m_more_options_spinner->setValue(m_prev_value);
             break;
         }
@@ -405,8 +412,22 @@ void CreateServerScreen::createServer()
         {
             if (esi == 0)
                 ServerConfig::m_server_mode = 7;
-            else
+            else if (esi == 1)
                 ServerConfig::m_server_mode = 8;
+            else if (esi == 2)
+                ServerConfig::m_server_mode = 9;
+            else if (esi == 3)
+                ServerConfig::m_server_mode = 10;
+            else if (esi == 4)
+                ServerConfig::m_server_mode = 11;
+            else if (esi == 5)
+                ServerConfig::m_server_mode = 12;
+            else if (esi == 6)
+                ServerConfig::m_server_mode = 13;
+            else if (esi == 7)
+                ServerConfig::m_server_mode = 14;
+            else if (esi == 8)
+                ServerConfig::m_server_mode = 15;
         }
         else
         {

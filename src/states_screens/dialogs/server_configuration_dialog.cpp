@@ -107,8 +107,22 @@ GUIEngine::EventPropagation
                     int v = m_more_options_spinner->getValue();
                     if (v == 0)
                         change.addUInt8(7).addUInt8(0);
-                    else
+                    else if (v == 1)
                         change.addUInt8(8).addUInt8(0);
+                    else if (v == 2)
+                        change.addUInt8(9).addUInt8(0);
+                    else if (v == 3)
+                        change.addUInt8(10).addUInt8(0);
+                    else if (v == 4)
+                        change.addUInt8(11).addUInt8(0);
+                    else if (v == 5)
+                        change.addUInt8(12).addUInt8(0);
+                    else if (v == 6)
+                        change.addUInt8(13).addUInt8(0);
+                    else if (v == 7)
+                        change.addUInt8(14).addUInt8(0);
+                    else if (v == 8)
+                        change.addUInt8(15).addUInt8(0);
                     break;
                 }
                 case 3:
@@ -160,6 +174,13 @@ void ServerConfigurationDialog::updateMoreOption(int game_mode)
             m_more_options_spinner->clearLabels();
             m_more_options_spinner->addLabel(_("Free-For-All"));
             m_more_options_spinner->addLabel(_("Capture The Flag"));
+            m_more_options_spinner->addLabel(_("Team Points"));
+            m_more_options_spinner->addLabel(_("Player with most points"));
+            m_more_options_spinner->addLabel(_("All Player Points"));
+            m_more_options_spinner->addLabel(_("Last team standing"));
+            m_more_options_spinner->addLabel(_("Tag zombie"));
+            m_more_options_spinner->addLabel(_("Monster Arena Battle"));
+            m_more_options_spinner->addLabel(_("Murder Mystery"));
             m_more_options_spinner->setValue(m_prev_value);
             break;
         }
