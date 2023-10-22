@@ -354,7 +354,7 @@ void loadServerLobbyFromConfig()
         m_player_reports_expired_days.revertToDefaults();
     if (m_server_difficulty > RaceManager::DIFFICULTY_LAST)
         m_server_difficulty = RaceManager::DIFFICULTY_LAST;
-    if (m_server_mode > 8)
+    if (m_server_mode > 15)
         m_server_mode = 3;
 
     if (m_official_karts_threshold > 1.0f)

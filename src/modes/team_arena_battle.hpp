@@ -176,14 +176,14 @@ public:
         {
             progress.first = (uint32_t)m_time;
         }
-        if (m_scores[0] > m_scores[1]) // m_red_scores > m_blue_scores
+        if (m_teams[0].m_scoresTeams > m_teams[1].m_scoresTeams) // m_red_scores > m_blue_scores
         {
-            progress.second = (uint32_t)((float)m_scores[0] /
+            progress.second = (uint32_t)((float)m_teams[0].m_scoresTeams /
                 (float)RaceManager::get()->getHitCaptureLimit() * 100.0f);
         }
         else
         {
-            progress.second = (uint32_t)((float)m_scores[1] /
+            progress.second = (uint32_t)((float)m_teams[1].m_scoresTeams /
                 (float)RaceManager::get()->getHitCaptureLimit() * 100.0f);
         }
         return progress;
