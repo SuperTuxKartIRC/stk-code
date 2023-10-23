@@ -1603,13 +1603,26 @@ std::shared_ptr<AbstractKart> World::createKartWithTeam
     int pos_index = 0;
     int position  = index + 1;
     KartTeam team = KART_TEAM_BLUE;
+    RaceManager::MinorRaceModeType mode = RaceManager::get()->getMinorMode();
 
     if (kart_type == RaceManager::KT_AI)
     { // TODO : TEAM Modification
-        if (index < m_red_ai) 
-            team = KART_TEAM_RED;
-        else
-            team = KART_TEAM_BLUE;
+        if (mode == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG || mode == RaceManager::MINOR_MODE_SOCCER) {
+            if (index < m_red_ai) team = KART_TEAM_RED;
+            else team = KART_TEAM_BLUE;
+        }
+        else {
+            if (index < m_red_ai) 
+                team = KART_TEAM_RED;
+            else if (index < m_red_ai + m_blue_ai)
+                team = KART_TEAM_BLUE;
+            else if (index < m_red_ai + m_blue_ai + m_green_ai)
+                team = KART_TEAM_GREEN;
+            else
+                team = KART_TEAM_ORANGE;
+            //teamColor = RaceManager::get()->getTeamColor(team);
+            //m_kart_teams_color_map[index] = teamColor;
+        }
         m_kart_team_map[index] = team;
     }
     else if (NetworkConfig::get()->isNetworking())
@@ -1649,7 +1662,9 @@ std::shared_ptr<AbstractKart> World::createKartWithTeam
 
     std::shared_ptr<GE::GERenderInfo> ri = std::make_shared<GE::GERenderInfo>();
     ri = (team == KART_TEAM_BLUE ? std::make_shared<GE::GERenderInfo>(0.66f) :
-        std::make_shared<GE::GERenderInfo>(1.0f));
+          team == KART_TEAM_RED ? std::make_shared<GE::GERenderInfo>(1.0f) :
+          team == KART_TEAM_GREEN ? std::make_shared<GE::GERenderInfo>(0.45f) :
+          std::make_shared<GE::GERenderInfo>(0.12f));
 
     std::shared_ptr<AbstractKart> new_kart;
     if (RewindManager::get()->isEnabled())

@@ -239,6 +239,7 @@ void RaceManager::setKartTeam(unsigned int player_id, KartTeam team, KartTeamsCo
     assert(player_id < m_player_karts.size());
 
     m_player_karts[player_id].setKartTeam(team); // TODO : Besoins de modification // William Lussier 2023-10-21 10h51
+    m_player_karts[player_id].setKartColorTeam(teamColor);
 }   // setKartTeam
 
 //---------------------------------------------------------------------------------------------
