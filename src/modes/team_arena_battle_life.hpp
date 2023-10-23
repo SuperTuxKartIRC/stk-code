@@ -62,6 +62,7 @@ private:
     {
         int  m_scoresTeams;
         int  m_inlife_player;
+        int  m_totalLifes;
     };
 
     /** This vector contains an 'BattleInfo' struct for every kart in the race.*/
@@ -131,6 +132,8 @@ public:
     int getTeamScore(KartTeam team) const { return m_teams[(int)team].m_scoresTeams; }
     // ------------------------------------------------------------------------
     int getTeamScore(int team) const { return m_teams[team].m_scoresTeams; }
+    // ------------------------------------------------------------------------
+    void setWinningTeams();
     // ------------------------------------------------------------------------
     void resetKartForSwatterHit(int kart_id, int at_world_ticks)
     {

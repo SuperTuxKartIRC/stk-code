@@ -95,6 +95,10 @@ bool GameEventsProtocol::notifyEvent(Event* event)
             throw std::invalid_argument("No team-arena-battle world");
         else if (tab)
             tab->setKartScoreFromServer(data);
+        else if (!tabl)
+            throw std::invalid_argument("No team-arena-battle life world");
+        else if (tabl)
+            tabl->setKartScoreFromServer(data);
         break;
     }
     case GE_CTF_SCORED:

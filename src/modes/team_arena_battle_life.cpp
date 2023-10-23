@@ -1,5 +1,8 @@
-#include "karts/abstract_kart.hpp"
 #include "team_arena_battle_life.hpp"
+
+#include "graphics/camera.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/kart_model.hpp"
 #include "tracks/track.hpp"
 #include <utils/string_utils.hpp>
 #include "network/network_config.hpp"
@@ -40,6 +43,7 @@ void TeamArenaBattlelife::init()
     for (unsigned int i = 0; i < 4; i++)
     {
         m_teams[i].m_inlife_player = getTeamNum((KartTeam)i);
+        m_teams[i].m_totalLifes = getTeamNum((KartTeam)i) * RaceManager::get()->getLifeTarget();
     }
 }   // init
 
@@ -177,26 +181,6 @@ bool TeamArenaBattlelife::kartHit(int kart_id, int hitter)
     if (life < 1) {
         m_teams[(int)getKartTeam(kart_id)].m_inlife_player--;
         m_nb_player_inlife--;
-        eliminateKart(kart_id, /*notify_of_elimination*/ true);
-        m_karts[kart_id]->finishedRace(WorldStatus::getTime());
-
-        // Find a camera of the kart with the most lives ("leader"), and
-        // attach all cameras for this kart to the leader.
-        // TODO : Ne fonctione pas !!! // William Lussier 2023-10-07 13h43
-        int max_lives = 0;
-        AbstractKart* leader = NULL;
-        for (unsigned int i = 0; i < getNumKarts(); i++)
-        {
-            AbstractKart* const kart = getKart(i);
-            if (kart->isEliminated() || kart->hasFinishedRace() ||
-                kart->getWorldKartId() == (unsigned)kart_id) continue;
-            if (m_kart_info[i].m_lifes > max_lives)
-            {
-                leader = kart;
-                max_lives = m_kart_info[i].m_lifes;
-            }
-        }
-
     }
     return true;
 }   // kartHit
@@ -214,36 +198,27 @@ void TeamArenaBattlelife::handleScoreInServer(int kart_id, int hitter)
         new_life = --m_kart_info[kart_id].m_lifes;
 
         m_teams[(int)getKartTeam(kart_id)].m_scoresTeams--;
+        m_teams[(int)getKartTeam(kart_id)].m_totalLifes--;
     }
     else if (getKartTeam(kart_id)!= getKartTeam(hitter)) {
         new_score = ++m_kart_info[hitter].m_scores;
         new_life = --m_kart_info[kart_id].m_lifes;
 
         m_teams[(int)getKartTeam(hitter)].m_scoresTeams++;
+        m_teams[(int)getKartTeam(kart_id)].m_totalLifes--;
     }
     
 
-    // TODO : Besoins de modification. Pas besoins de créer deux variable p2 ?? // William Lussier 2023-10-07 11h37
     if (NetworkConfig::get()->isNetworking() &&
         NetworkConfig::get()->isServer())
     {
-        //NetworkString p(PROTOCOL_GAME_EVENTS);
-        //p.setSynchronous(true);
-        //p.addUInt8(GameEventsProtocol::GE_BATTLE_KART_LIFE);
-        //if (kart_id == hitter || hitter == -1)
-        //    p.addUInt8((uint8_t)kart_id).addUInt16((int16_t)new_life);
-        //else
-        //    p.addUInt8((uint8_t)hitter).addUInt16((int16_t)new_life);
-        //STKHost::get()->sendPacketToAllPeers(&p, true);
-
-
         NetworkString p2(PROTOCOL_GAME_EVENTS);
         p2.setSynchronous(true);
         p2.addUInt8(GameEventsProtocol::GE_BATTLE_KART_SCORE);
         if (kart_id == hitter || hitter == -1)
-            p2.addUInt8((uint8_t)kart_id).addUInt16((int16_t)new_score);
+            p2.addUInt8((uint8_t)kart_id).addUInt16((uint16_t)new_score);
         else
-            p2.addUInt8((uint8_t)hitter).addUInt16((int16_t)new_score);
+            p2.addUInt8((uint8_t)hitter).addUInt16((uint16_t)new_score);
         STKHost::get()->sendPacketToAllPeers(&p2, true);
     }
 }   // handleScoreInServer
@@ -323,8 +298,6 @@ bool TeamArenaBattlelife::isRaceOver()
 
     const int hit_capture_limit = RaceManager::get()->getHitCaptureLimit();
 
-    if (m_count_down_reached_zero && RaceManager::get()->hasTimeTarget())
-        return true;
     int teamDeath = 0;
 
     for (int i = 0; i < 4; i++) // TODO : Changer le chiffre 4 par la nombre d'équipe qui sont présentement dans le mode de jeu
@@ -332,15 +305,44 @@ bool TeamArenaBattlelife::isRaceOver()
         if (m_teams[i].m_inlife_player == 0) {
             teamDeath++;
         }
+        if (teamDeath > getNumTeams()) {
+            if (m_teams[i].m_inlife_player != 0) {
+                // Set the winning team
+                World::setWinningTeam(i);
+                return true;
+            }
+        }
     }
 
-    if (teamDeath > getNumTeams() || (m_count_down_reached_zero && RaceManager::get()->hasTimeTarget())) {
+    if(m_count_down_reached_zero && RaceManager::get()->hasTimeTarget()) {
+        TeamArenaBattlelife::setWinningTeams();
         return true;
     }
     else {
         return false;
     }
 }   // isRaceOver
+
+void TeamArenaBattlelife::setWinningTeams()
+{
+    // Find the highest life score
+    int maxScoreLife = 0;
+    for (const auto& team : m_teams) {
+        if (team.m_totalLifes > maxScoreLife) {
+            maxScoreLife = team.m_totalLifes;
+        }
+    }
+
+    // Find the indices of the occurrences of the largest value
+    std::vector<int> indices;
+    for (int i = 0; i < m_teams.size(); ++i) {
+        if (m_teams[i].m_totalLifes == maxScoreLife) {
+            indices.push_back(i);
+        }
+    }
+    if (indices.size() > 0)
+        World::setWinningTeam(indices);
+}
 
 /** Returns the internal identifier for this race. */
 const std::string& TeamArenaBattlelife::getIdent() const

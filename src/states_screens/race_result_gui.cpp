@@ -1210,6 +1210,8 @@ void RaceResultGUI::unload()
             break;
         }   // switch
 
+        RaceManager::MinorRaceModeType mode = RaceManager::get()->getMinorMode();
+
         // Second phase: update X and Y positions for the various animations
         // =================================================================
         float v = 0.9f*UserConfigParams::m_width / m_time_single_scroll;
@@ -1221,10 +1223,10 @@ void RaceResultGUI::unload()
         {
             displayCTFResults();
         }
-        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM       ||
-                 RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER     ||
-                 RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER ||
-                 RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE)
+        else if (mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM       ||
+                 mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER     ||
+                 mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER ||
+                 mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE)
         {
             displayTeamsArenaResults();
         }
@@ -1563,7 +1565,7 @@ void RaceResultGUI::unload()
         for (const auto& teamData : teamsData) {
             displayTeamPlayers(teamData.team, teamData.x, teamData.y + rect.Height);
         }
-    }
+    } // displayTeamsArenaResults
 
 
     void RaceResultGUI::displayTeamPlayers(KartTeam teams, int x, int y) {
