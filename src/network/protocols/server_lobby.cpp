@@ -908,6 +908,46 @@ void ServerLobby::changeTeam(Event* event)
 }   // changeTeam
 
 //-----------------------------------------------------------------------------
+void ServerLobby::changePlusTeam(Event* event)
+{
+    if (!RaceManager::get()->teamPlusEnabled()) // !ServerConfig::m_team_choosing ||
+        return;
+    if (!checkDataSize(event, 1)) return;
+    NetworkString& data = event->data();
+    uint8_t local_id = data.getUInt8();
+    uint8_t team = data.getUInt8();
+    auto& player = event->getPeer()->getPlayerProfiles().at(local_id);
+    auto teams = STKHost::get()->getAllPlayersTeamPlusInfo();
+    // At most 7 players on each team (for live join)
+    if (team == KART_TEAM_RED)
+    {
+        if (std::get<0>(teams) >= 7)
+            return;
+        player->setTeam(KART_TEAM_RED);
+    }
+    else if (team == KART_TEAM_BLUE)
+    {
+        if (std::get<1>(teams) >= 7)
+            return;
+        player->setTeam(KART_TEAM_BLUE);
+    }
+    else if (team == KART_TEAM_GREEN)
+    {
+        if (std::get<2>(teams) >= 7)
+            return;
+        player->setTeam(KART_TEAM_GREEN);
+    }
+    else if (team == KART_TEAM_ORANGE)
+    {
+        if (std::get<3>(teams) >= 7)
+            return;
+        player->setTeam(KART_TEAM_ORANGE);
+    }
+    updatePlayerList();
+}   // change4Team
+
+
+//-----------------------------------------------------------------------------
 void ServerLobby::kickHost(Event* event)
 {
     if (m_server_owner.lock() != event->getPeerSP())
@@ -941,6 +981,7 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
         case LE_VOTE: handlePlayerVote(event);                    break;
         case LE_KICK_HOST: kickHost(event);                       break;
         case LE_CHANGE_TEAM: changeTeam(event);                   break;
+        case LE_CHANGE_TEAM_PLUS: changePlusTeam(event);          break;
         case LE_REQUEST_BEGIN: startSelection(event);             break;
         case LE_CHAT: handleChat(event);                          break;
         case LE_CONFIG_SERVER: handleServerConfiguration(event);  break;
@@ -1673,6 +1714,8 @@ void ServerLobby::asynchronousUpdate()
                 false/*live_join*/);
             m_game_setup->setHitCaptureTime(m_battle_hit_capture_limit,
                 m_battle_time_limit);
+            m_game_setup->setNbAiTeam(m_battle_nb_ia,
+                m_battle_nb_team);
             uint16_t flag_return_time = (uint16_t)stk_config->time2Ticks(
                 ServerConfig::m_flag_return_timeout);
             RaceManager::get()->setFlagReturnTicks(flag_return_time);
@@ -1714,7 +1757,7 @@ void ServerLobby::encodePlayers(BareNetworkString* bns,
             .addUInt8(player->getHandicap())
             .addUInt8(player->getLocalPlayerId())
             .addUInt8(
-            RaceManager::get()->teamEnabled() ? player->getTeam() : KART_TEAM_NONE)
+            (RaceManager::get()->teamEnabled() || RaceManager::get()->teamPlusEnabled()) ? player->getTeam() : KART_TEAM_NONE)
             .encodeString(player->getCountryCode());
         bns->encodeString(player->getKartName());
     }
@@ -1733,7 +1776,18 @@ NetworkString* ServerLobby::getLoadWorldMessage(
     load_world_message->addUInt8(live_join ? 1 : 0);
     encodePlayers(load_world_message, players);
     load_world_message->addUInt32(m_item_seed);
-    if (RaceManager::get()->isBattleMode())
+    if (RaceManager::get()->teamPlusEnabled()) {
+        // TODO : Besoins de modification . Prendre en compte le nombre d'ia et d'équipe // William Lussier 2023-10-25 9h39
+        load_world_message->addUInt32(m_battle_hit_capture_limit)
+            .addFloat(m_battle_time_limit).addUInt8(m_battle_nb_ia).addUInt8(m_battle_nb_team);
+        uint16_t flag_return_time = (uint16_t)stk_config->time2Ticks(
+            ServerConfig::m_flag_return_timeout);
+        load_world_message->addUInt16(flag_return_time);
+        uint16_t flag_deactivated_time = (uint16_t)stk_config->time2Ticks(
+            ServerConfig::m_flag_deactivated_time);
+        load_world_message->addUInt16(flag_deactivated_time);
+    }
+    else if (RaceManager::get()->isBattleMode())
     {
         load_world_message->addUInt32(m_battle_hit_capture_limit)
             .addFloat(m_battle_time_limit);
@@ -1932,7 +1986,7 @@ std::vector<std::shared_ptr<NetworkPlayerProfile> >
  */
 int ServerLobby::getReservedId(std::shared_ptr<NetworkPlayerProfile>& p,
                                unsigned local_id) const
-{ // TODO : TEAM Modification
+{ // TODO : Besoins de modification : TEAM Modification // William Lussier 2023-10-26 11h19
     const bool is_ffa =
         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL;
     int red_count = 0;
@@ -1970,7 +2024,11 @@ int ServerLobby::getReservedId(std::shared_ptr<NetworkPlayerProfile>& p,
                 if ((p->getTeam() == KART_TEAM_RED &&
                     rki.getKartTeam() == KART_TEAM_RED) ||
                     (p->getTeam() == KART_TEAM_BLUE &&
-                    rki.getKartTeam() == KART_TEAM_BLUE))
+                    rki.getKartTeam() == KART_TEAM_BLUE) ||
+                    (p->getTeam() == KART_TEAM_RED &&
+                    rki.getKartTeam() == KART_TEAM_GREEN) ||
+                    (p->getTeam() == KART_TEAM_RED &&
+                    rki.getKartTeam() == KART_TEAM_ORANGE))
                 {
                     rki.copyFrom(p, local_id);
                     return i;
@@ -2485,9 +2543,9 @@ void ServerLobby::startSelection(const Event *event)
         }
     }
 
-
+    // TODO : Besoins de modification : TEAM Modification // William Lussier 2023-10-26 11h19
     if (!ServerConfig::m_owner_less && ServerConfig::m_team_choosing &&
-        RaceManager::get()->teamEnabled())
+        RaceManager::get()->teamEnabled() || RaceManager::get()->teamPlusEnabled())
     {
         auto red_blue = STKHost::get()->getAllPlayersTeamInfo();
         if ((red_blue.first == 0 || red_blue.second == 0) &&
@@ -3792,7 +3850,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
             handicap, (uint8_t)i, KART_TEAM_NONE,
             country_code);
         if (ServerConfig::m_team_choosing)
-        { // TODO : TEAM Modification
+        { // TODO : Besoins de modification : TEAM Modification // William Lussier 2023-10-26 11h19
             KartTeam cur_team = KART_TEAM_NONE;
             if (red_blue.first > red_blue.second)
             {
@@ -4084,7 +4142,7 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
         pl->addUInt8(boolean_combine);
         pl->addUInt8(profile->getHandicap());
         if (ServerConfig::m_team_choosing &&
-            RaceManager::get()->teamEnabled())
+            RaceManager::get()->teamEnabled() || RaceManager::get()->teamPlusEnabled())
             pl->addUInt8(profile->getTeam());
         else
             pl->addUInt8(KART_TEAM_NONE);
@@ -4467,14 +4525,41 @@ bool ServerLobby::handleAllVotes(PeerVote* winner_vote,
 void ServerLobby::getHitCaptureLimit()
 {
     int hit_capture_limit = std::numeric_limits<int>::max();
+    int nb_ia = 0;
+    int nb_team = 0;
     float time_limit = 0.0f;
-    if (RaceManager::get()->getMinorMode() ==
-        RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
+    RaceManager::MinorRaceModeType mode = RaceManager::get()->getMinorMode();
+    if (mode == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
     {
         if (ServerConfig::m_capture_limit > 0)
             hit_capture_limit = ServerConfig::m_capture_limit;
         if (ServerConfig::m_time_limit_ctf > 0)
             time_limit = (float)ServerConfig::m_time_limit_ctf;
+    }
+    else if (mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER     || 
+             mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM       ||
+             mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER || 
+             mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE)
+    {
+        if (mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE) {
+            if (ServerConfig::m_server_game_duration > 0) {
+                hit_capture_limit = ServerConfig::m_server_game_duration;
+            }
+            if (ServerConfig::m_server_game_life > 0) {
+                hit_capture_limit = ServerConfig::m_server_game_life;
+            }
+            else
+                hit_capture_limit = 3;
+        }
+        else if (ServerConfig::m_server_game_duration > 0) {
+            hit_capture_limit = ServerConfig::m_server_game_duration;
+        }
+        if (ServerConfig::m_server_game_point > 0)
+            hit_capture_limit = ServerConfig::m_server_game_point;
+        if (ServerConfig::m_server_game_nb_ai > 0)
+            nb_ia = ServerConfig::m_server_game_nb_ai;
+        if (ServerConfig::m_server_game_nb_team > 0)
+            nb_team = ServerConfig::m_server_game_nb_team;
     }
     else
     {
@@ -4485,6 +4570,8 @@ void ServerLobby::getHitCaptureLimit()
     }
     m_battle_hit_capture_limit = hit_capture_limit;
     m_battle_time_limit = time_limit;
+    m_battle_nb_ia = nb_ia;
+    m_battle_nb_team = nb_team;
 }   // getHitCaptureLimit
 
 // ----------------------------------------------------------------------------
@@ -5133,6 +5220,8 @@ void ServerLobby::handleServerConfiguration(Event* event)
         Log::warn("ServerLobby", "Grand prix is used for new mode.");
         return;
     }
+
+    // TODO : Besoins de modifications pour prendre en compte des autres options en ligne (nb team, nb ia, etc) // William Lussier 2023-10-25 20h21
 
     RaceManager::get()->setMinorMode(modes.first);
     RaceManager::get()->setMajorMode(modes.second);

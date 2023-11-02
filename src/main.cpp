@@ -580,6 +580,8 @@ void cmdLineHelp()
     "       --soccer-goals     Use goals limit mode in network soccer game.\n"
     "       --capture-limit    Specify capture limit for CTF.\n"
     "       --time-limit       Specify time limit for current game mode.\n"
+    "       --nb-team-battle   Specify number of team in team battle mode.\n"
+    "       --nb-ai-battle     Specify number of ai in team battle mode.\n"
     "       --reverse          Play track in reverse (if allowed)\n"
     "  -f,  --fullscreen       Use fullscreen display.\n"
     "  -w,  --windowed         Use windowed display (default).\n"
@@ -1556,6 +1558,16 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
     }
 
     if (CommandLine::has("--capture-limit", &n))
+    {
+        RaceManager::get()->setHitCaptureTime(n, 0.0f);
+    }
+
+    if (CommandLine::has("--nb-team-battle", &n))
+    {
+        RaceManager::get()->setHitCaptureTime(n, 0.0f);
+    }
+    
+    if (CommandLine::has("--nb-ai-battle", &n))
     {
         RaceManager::get()->setHitCaptureTime(n, 0.0f);
     }

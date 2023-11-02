@@ -29,7 +29,8 @@
 #include "network/stk_host.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
-
+#include "karts/kart_model.hpp"
+#include <ge_render_info.hpp>
 #include <algorithm>
 #include <utility>
 
@@ -38,11 +39,6 @@
 class TeamArenaBattle : public WorldWithRank {
 
 private:
-
-    
-    int m_team1_scores =0, m_team2_scores = 0, m_team3_scores = 0, m_team4_scores = 0;
-    std::string m_team1_color = "", m_team2_color = "", m_team3_color = "", m_team4_color = "";
-
     std::map<int, int> m_swatter_reset_kart_ticks;
     bool m_count_down_reached_zero = false;
 
@@ -54,35 +50,21 @@ private:
     {
         int  m_lives;
         int  m_scores;
+        bool getScore = false;
     };
 
     struct TeamsInfo
     {
         int  m_scoresTeams;
+        int  m_totalPlayerGetScore;
+        int  m_totalPlayer;
     };
 
     std::vector<BattleInfo> m_kart_info;
-public:
-    struct PlayerData
-    {
-        /** World ID of kart which scores. */
-        unsigned int  m_id;
-        /** Kart ident which scores. */
-        std::string   m_kart;
-        /** Player name which scores. */
-        core::stringw m_player;
-        /** Country code of player. */
-        std::string m_country_code;
-        /** Handicap of player. */
-        HandicapLevel m_handicap_level;
-    };   // ScorerData
 protected:
-    std::vector<int> m_scores;
     std::vector<TeamsInfo> m_teams;
-    std::vector<std::vector<PlayerData>> m_players_teams2;
-    std::vector<std::vector<AbstractKart*>> m_players_teams;
-    std::vector<AbstractKart> m_players;
-    //std::vector<int> m_teamNbPlayers;
+    int hit_capture_limit = RaceManager::get()->getHitCaptureLimit();
+    //const unsigned int m_num_team = getNumTeams();
     void handleScoreInServer(int kart_id, int hitter);
 public:
     // ------------------------------------------------------------------------
@@ -123,35 +105,25 @@ public:
     // ------------------------------------------------------------------------
     virtual video::SColor getColor(unsigned int kart_id) const;
     // ------------------------------------------------------------------------
-    const std::vector<AbstractKart*>& getPlayerTeams(KartTeam team) const
-    { // TODO: Mettre cette méthode dans world.cpp // La logique d'équipe dois se trouver dans world.cpp
-      // William Lussier 2023-10-08 11h53
-        return m_players_teams[team];
-    }
-    // TODO: Mettre cette méthode dans world.cpp // La logique d'équipe dois se trouver dans world.cpp // William Lussier 2023-10-09 11h08
-    // ------------------------------------------------------------------------
-    const void setPlayerTeams(KartTeam team) const;
-    // ------------------------------------------------------------------------
-    //virtual unsigned int getRescuePositionIndex(AbstractKart* kart) OVERRIDE;
-    // ------------------------------------------------------------------------
     virtual void setKartScoreFromServer(NetworkString& ns);
     // ------------------------------------------------------------------------
     virtual void setScoreFromServer(int kart_id, int new_kart_score, int team_scored, int new_team_score);
     // ------------------------------------------------------------------------
-    int getKartScore(int kart_id) const { return m_scores.at(kart_id); }
+    int getKartScore(int kart_id) const { return m_kart_info.at(kart_id).m_scores; }
+    // ------------------------------------------------------------------------
     int getTeamsKartScore(int kart_id);
-
-    // ------------------------------------------------------------------------
-    bool getKartFFAResult(int kart_id) const;
-    // ------------------------------------------------------------------------
-    bool getKartCTFResult(unsigned int kart_id) const
-    {
-        return false;
-    }
     // ------------------------------------------------------------------------
     int getTeamScore(KartTeam team) const { return m_teams[(int)team].m_scoresTeams; }
     // ------------------------------------------------------------------------
-    int getTeamScore(int team) const { return m_teams[team].m_scoresTeams; }
+    int getTeamScore(int team) const 
+    { 
+        if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER || 
+            RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER) {
+            return m_teams[team].m_totalPlayerGetScore;
+        }
+        else 
+            return m_teams[team].m_scoresTeams; 
+    }
     // ------------------------------------------------------------------------
     void setWinningTeams();
     // ------------------------------------------------------------------------
@@ -159,6 +131,8 @@ public:
     {
         m_swatter_reset_kart_ticks[kart_id] = at_world_ticks;
     }
+    // ------------------------------------------------------------------------
+
     // ------------------------------------------------------------------------
     virtual void addReservedKart(int kart_id) OVERRIDE
     {
@@ -192,8 +166,38 @@ public:
     virtual void saveCompleteState(BareNetworkString* bns, STKPeer* peer) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void restoreCompleteState(const BareNetworkString& b) OVERRIDE;
-    
+    float rgbToHue(int r, int g, int b) {
+        float hue = 0.0f;
+
+        // Convert RGB values to the range [0, 1]
+        float r_normalized = r / 255.0f;
+        float g_normalized = g / 255.0f;
+        float b_normalized = b / 255.0f;
+
+        float cmax = std::max(r_normalized, std::max(g_normalized, b_normalized));
+        float cmin = std::min(r_normalized, std::min(g_normalized, b_normalized));
+        float delta = cmax - cmin;
+
+        // Calculate the hue value
+        if (delta != 0) {
+            if (cmax == r_normalized) {
+                hue = fmod((g_normalized - b_normalized) / delta, 6.0f);
+            }
+            else if (cmax == g_normalized) {
+                hue = (b_normalized - r_normalized) / delta + 2.0f;
+            }
+            else {
+                hue = (r_normalized - g_normalized) / delta + 4.0f;
+            }
+        }
+
+        hue *= 60.0f; // Convert hue to degrees
+
+        if (hue < 0) {
+            hue += 360.0f;
+        }
+
+        return hue;
+    }
 };
-
-
 #endif // TEAM_ARENA_BATTLE_HPP

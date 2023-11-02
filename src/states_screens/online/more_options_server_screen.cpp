@@ -62,25 +62,29 @@ void MoreOptionsServerScreen::loadedFromFile()
 
     m_time_div_widget = getWidget<Widget>("time-div");
     assert(m_time_widget != NULL);
-    m_nb_ia_div_widget = getWidget<Widget>("nb-ia-div");
+    m_nb_ia_div_widget = getWidget<Widget>("nb-ai-div");
     assert(m_nb_ia_div_widget != NULL);
     m_winning_div_widget = getWidget<Widget>("winning-div");
     assert(m_winning_div_widget != NULL);
     m_life_div_widget = getWidget<Widget>("number-life-div");
     assert(m_life_div_widget != NULL);
+    m_team_div_widget = getWidget<Widget>("nb-team-div");
+    assert(m_team_div_widget != NULL);
 
     m_time_widget = getWidget<SpinnerWidget>("time-value-spinner");
     assert(m_time_widget != NULL);
-    m_nb_ia_widget = getWidget<SpinnerWidget>("nb-ia-value-spinner");
-    assert(m_nb_ia_widget != NULL);
+    m_nb_ai_widget = getWidget<SpinnerWidget>("nb-ai-value-spinner");
+    assert(m_nb_ai_widget != NULL);
     m_winning_value_spinner = getWidget<SpinnerWidget>("winning-value-spinner");
     assert(m_winning_value_spinner != NULL);
     m_life_value_spinner = getWidget<SpinnerWidget>("life-value-spinner");
     assert(m_life_value_spinner != NULL);
+    m_nb_team_value_spinner = getWidget<SpinnerWidget>("nb-team-value-spinner");
+    assert(m_nb_team_value_spinner != NULL);
     m_back_widget = getWidget<IconButtonWidget>("back");
     assert(m_back_widget != NULL);
 
-    m_nb_ia_widget->setValue(ServerConfig::m_server_game_nb_ia);
+    m_nb_ai_widget->setValue(ServerConfig::m_server_game_nb_ai);
     m_time_widget->setValue(ServerConfig::m_server_game_duration);
     m_life_value_spinner->setValue(ServerConfig::m_server_game_life);
     m_winning_value_spinner->setValue(ServerConfig::m_server_game_point);
@@ -96,7 +100,7 @@ void MoreOptionsServerScreen::init()
         m_supports_ai = !UserConfigParams::m_wan_server_gp;
 
     if (!m_supports_ai) {
-        m_nb_ia_widget->setCollapsed(false);
+        m_nb_ai_widget->setCollapsed(false);
     }
 
 
@@ -107,25 +111,34 @@ void MoreOptionsServerScreen::init()
     //m_point_value_label->setVisible(false);
     //m_point_value_label->setActive(false);
 
+    //m_time_div_widget->setCollapsed(true, this);
+    //m_nb_ia_div_widget->setCollapsed(true, this);
+    //m_winning_div_widget->setCollapsed(true, this);
+    //m_life_div_widget->setCollapsed(true, this);
 
-
-    //m_time_div_widget->setCollapsed(false, this);
-    //m_nb_ia_div_widget->setCollapsed(false, this);
-    //m_winning_div_widget->setCollapsed(false, this);
-    //m_life_div_widget->setCollapsed(false, this);
+    //m_time_div_widget->setVisible(false);
+    //m_nb_ia_div_widget->setVisible(false);
+    //m_winning_div_widget->setVisible(false);
+    //m_life_div_widget->setVisible(false);
 
     if (ServerConfig::m_server_mode == 9 || ServerConfig::m_server_mode == 10 || ServerConfig::m_server_mode == 11 || ServerConfig::m_server_mode == 12) {
-        m_time_div_widget->setVisible(false);
-        m_nb_ia_div_widget->setVisible(false);
+        //m_time_div_widget->setVisible(false);
+        //m_nb_ia_div_widget->setVisible(false);
+
+        //m_time_div_widget->setVisible(true);
+        //m_nb_ia_div_widget->setVisible(true);
+        //m_winning_div_widget->setVisible(true);
+        //m_life_div_widget->setVisible(true);
+        m_nb_team_value_spinner->setMax(4);
     }
 
     if (!(ServerConfig::m_server_mode == 9 || ServerConfig::m_server_mode == 10 || ServerConfig::m_server_mode == 11)) {
-        m_winning_div_widget->setVisible(false);
+        //m_winning_div_widget->setVisible(false);
 
     }
     if (!(ServerConfig::m_server_mode == 12)) {
-        m_life_div_widget->setVisible(false);
-        m_life_value_spinner->setVisible(false);
+        //m_life_div_widget->setVisible(false);
+        //m_life_value_spinner->setVisible(false);
     }
 
 }   // init
@@ -143,9 +156,9 @@ void MoreOptionsServerScreen::eventCallback(Widget* widget, const std::string& n
     {
         ServerConfig::m_server_game_duration = m_time_widget->getValue();
     }
-    else if (name == m_nb_ia_widget->m_properties[PROP_ID])
+    else if (name == m_nb_ai_widget->m_properties[PROP_ID])
     {
-        ServerConfig::m_server_game_nb_ia = m_time_widget->getValue();
+        ServerConfig::m_server_game_nb_ai = m_time_widget->getValue();
     }
     else if (name == m_winning_value_spinner->m_properties[PROP_ID])
     {

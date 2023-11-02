@@ -72,7 +72,6 @@ class RemoteKartInfo
         int                 m_global_player_id;
         uint32_t            m_host_id;
         KartTeam            m_kart_team;
-        KartTeamsColor      m_kart_team_color;
         bool                m_network_player;
         HandicapLevel       m_handicap;
         float               m_default_kart_color;
@@ -111,8 +110,7 @@ public:
     void setHostId(uint32_t id)              { m_host_id = id;            }
     void setLocalPlayerId(int id)            { m_local_player_id = id;    }
     void setGlobalPlayerId(int id)           { m_global_player_id = id;   }
-    void setKartTeam(KartTeam team)          { m_kart_team = team;        }
-    void setKartColorTeam(KartTeamsColor color){ m_kart_team_color = color;}
+    void setKartTeam(KartTeam team)      { m_kart_team = team;      }
     void setNetworkPlayer(bool value)        { m_network_player = value;  }
     void setDefaultKartColor(float value) { m_default_kart_color = value; }
     void setHandicap(HandicapLevel value)    { m_handicap = value;        }

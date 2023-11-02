@@ -1,3 +1,4 @@
+//
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2023 SuperTuxKart-Team
 //
@@ -14,8 +15,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-#ifndef TEAM_ARENA_BATTLE_LIFE_HPP
-#define TEAM_ARENA_BATTLE_LIFE_HPP
+#ifndef TAG_ZOMBIE_ARENA_BATTLE_HPP
+#define TAG_ZOMBIE_ARENA_BATTLE_HPP
 
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
@@ -28,54 +29,69 @@
 #include "tracks/track.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "utils/string_utils.hpp"
-
-#include <algorithm>
 #include <utility>
+#include <ge_render_info.hpp>
+#include <algorithm>
 #include <string>
 
 
-class TeamArenaBattlelife : public WorldWithRank {
+class TagZombieArenaBattle : public WorldWithRank {
 
 private:
     std::map<int, int> m_swatter_reset_kart_ticks;
     bool m_count_down_reached_zero = false;
+    const int8_t PNBT = 0, ZNBT = 1;
 
     /** Profiling usage */
-    int m_total_rescue;
-    int m_total_hit;
+    int m_total_rescue = 0;
+    int m_total_hit = 0;
 
     struct BattleInfo
     {
-        int  m_lifes = RaceManager::get()->getLifeTarget();
+        int  m_lifes;
+        int8_t m_nb_player_converted;
+        double m_convertedTime;
+        bool  m_is_start_zombie;
+        int8_t m_zombie_id_convert;
     };
 
-    struct TeamsInfo
+    struct TeamInfo
     {
-        int  m_inlife_player;
-        int  m_total_life;
-        int  m_totalPlayer;
+        int  m_scoresTeams;
+        int8_t  m_inlife_player;
     };
 
-    /** This vector contains an 'BattleInfo' struct for every kart in the race.*/
-    std::vector<BattleInfo> m_kart_info;
-
-    // ------------------------------------------------------------------------
-    virtual video::SColor getColor(unsigned int kart_id) const;
 protected:
-    int m_nb_player_inlife;
-    std::vector<TeamsInfo> m_teams;
-    void handleScoreInServer(int kart_id, int hitter);
+    int8_t m_total_player = getNumKarts();
+    int8_t m_nb_not_zombie_player;
+    //int m_nb_tags_zombie = NetworkConfig::get()->isNetworking() ? 1 : RaceManager::get()->getNumberOfGreenAIKarts() >= RaceManager::get()->getNumPlayers() ? RaceManager::get()->getNumPlayers() : RaceManager::get()->getNumberOfGreenAIKarts();
+    int8_t m_nb_tags_zombie = NetworkConfig::get()->isNetworking() ? 1 : RaceManager::get()->getNumberOfGreenAIKarts();
+    float m_delay = (RaceManager::get()->getTimeTarget() > 60.f) ? 15.0f : 5.0f;
+
+    KartTeam m_tag_zombie_team = KART_TEAM_GREEN;
+    KartTeam m_player_team = KART_TEAM_RED;
+
+    std::vector<TeamInfo> m_team_info; // TeamList
+    std::vector<BattleInfo> m_kart_info; // KartList
+    std::vector<int8_t> m_tag_zombie_list_rand; // List of random zombie at start of the game
+
+    bool change = false;
+    int changewait = 0;
+    int idplayer;
+    
 public:
     // ------------------------------------------------------------------------
-    TeamArenaBattlelife();
+    TagZombieArenaBattle();
     // ------------------------------------------------------------------------
-    virtual ~TeamArenaBattlelife();
+    virtual ~TagZombieArenaBattle();
     // ------------------------------------------------------------------------
     virtual void init() OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void reset(bool restart = false) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void getKartsDisplayInfo(std::vector<RaceGUIBase::KartIconDisplayInfo>* info) OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual video::SColor getColor(unsigned int kart_id) const;
     // ------------------------------------------------------------------------
     virtual bool raceHasLaps() OVERRIDE { return false; }
     // ------------------------------------------------------------------------
@@ -87,8 +103,6 @@ public:
     // ------------------------------------------------------------------------
     virtual bool hasTeam() const OVERRIDE { return true; }
     // ------------------------------------------------------------------------
-    virtual bool has4Team() const OVERRIDE { return true; }
-    // ------------------------------------------------------------------------
     virtual bool isRaceOver() OVERRIDE;
     // ------------------------------------------------------------------------
     virtual bool kartHit(int kart_id, int hitter = -1) OVERRIDE;
@@ -98,51 +112,54 @@ public:
     virtual void countdownReachedZero() OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void terminateRace() OVERRIDE;
+
+private:
+    // ------------------------------------------------------------------------
+    virtual void initGameInfo();
+    // ------------------------------------------------------------------------
+    void handleScoreInServer(int kart_id, int hitter);
     // ------------------------------------------------------------------------
     void setKartLifeFromServer(NetworkString& ns);
     // ------------------------------------------------------------------------
-    int getKartLife(int kart_id) const { return m_kart_info.at(kart_id).m_lifes; }
-    // ------------------------------------------------------------------------
-    int getTeamsKartScore(int kart_id);
-    // ------------------------------------------------------------------------
-    int getTeamTotalLife(int team) const { return m_teams[(int)team].m_total_life; }
-    // ------------------------------------------------------------------------
-    int getTeamInlifePlayer(int team) const { return m_teams[(int)team].m_inlife_player; }
-    // ------------------------------------------------------------------------
     void setWinningTeams();
+    // ------------------------------------------------------------------------
+    virtual void setZombie(int kartId, int zombieId);
+    // ------------------------------------------------------------------------
+    virtual bool setZombieStart();
+    // ------------------------------------------------------------------------
+    void changeKart(int idKart);
+    // ------------------------------------------------------------------------
+    // Function to generate unique random numbers and store them in m_tag_zombie_list_rand
+    virtual void generateUniqueRandomNumbers();
     // ------------------------------------------------------------------------
     void resetKartForSwatterHit(int kart_id, int at_world_ticks)
     {
         m_swatter_reset_kart_ticks[kart_id] = at_world_ticks;
     }
     // ------------------------------------------------------------------------
-    virtual std::pair<uint32_t, uint32_t> getGameStartedProgress() const OVERRIDE
-    {
-        // TODO : Dois être modifier pour fonctionner avec les 4 équipes (pas juste avec l'équipe 1 et 2)
-        std::pair<uint32_t, uint32_t> progress(
-            std::numeric_limits<uint32_t>::max(),
-            std::numeric_limits<uint32_t>::max());
-        if (RaceManager::get()->hasTimeTarget())
-        {
-            progress.first = (uint32_t)m_time;
-        }
-        if (m_teams[0].m_total_life > m_teams[1].m_total_life) // m_red_scores > m_blue_scores
-        {
-            progress.second = (uint32_t)((float)m_teams[0].m_total_life /
-                (float)RaceManager::get()->getHitCaptureLimit() * 100.0f);
-        }
-        else
-        {
-            progress.second = (uint32_t)((float)m_teams[1].m_total_life /
-                (float)RaceManager::get()->getHitCaptureLimit() * 100.0f);
-        }
-        return progress;
-    }
-    // ------------------------------------------------------------------------
     virtual void saveCompleteState(BareNetworkString* bns, STKPeer* peer) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void restoreCompleteState(const BareNetworkString& b) OVERRIDE;
+
+public :
+    // ------------------------------------------------------------------------
+    int getKartNbConvertedPlayer(int kart_id) const { return m_kart_info.at(kart_id).m_nb_player_converted; }
+    // ------------------------------------------------------------------------
+    int getKartConvertedTime(int kart_id) const { return m_kart_info.at(kart_id).m_convertedTime; }
+    // ------------------------------------------------------------------------
+    int getTeamInlifePlayer(int team) const { return m_team_info[(int)team].m_inlife_player; }
+    // ------------------------------------------------------------------------
+    void setKartsInfoFromServer(NetworkString& ns);
+
+    // Function set() / get() the none zombie and the zombie team with the KartTeam
+    // ------------------------------------------------------------------------
+    void setTagZombieTeam(KartTeam team) { m_tag_zombie_team = team; };
+    // ------------------------------------------------------------------------
+    KartTeam getTagZombieTeam() const { return m_tag_zombie_team; }
+    // ------------------------------------------------------------------------
+    void setTagPlayerTeam(KartTeam team) { m_player_team = team; };
+    // ------------------------------------------------------------------------
+    KartTeam getTagPlayerTeam() const { return m_player_team; }
 };
 
-
-#endif // TEAM_ARENA_BATTLE_LIFE_HPP
+#endif // TAG_ARENA_BATTLE_HPP

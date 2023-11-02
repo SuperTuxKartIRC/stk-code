@@ -307,9 +307,6 @@ private:
     /** Pointer to the kart object belonging to this kart model. */
     AbstractKart* m_kart;
 
-    /** For our engine to get the desired hue for colorization. */
-    std::shared_ptr<GE::GERenderInfo> m_render_info;
-
     /** True if this kart model can be colorization in red / blue (now only
      *  used in soccer mode). */
     bool m_support_colorization;
@@ -339,6 +336,9 @@ private:
         node->setRotation(rotation);
         node->setScale(scale);
     }
+protected:
+    /** For our engine to get the desired hue for colorization. */
+    std::shared_ptr<GE::GERenderInfo> m_render_info;
 
 public:
                   KartModel(bool is_master);
@@ -456,5 +456,9 @@ public:
     // ------------------------------------------------------------------------
     const KartProperties* getKartProperties() const
                                                   { return m_kart_properties; }
+    // ------------------------------------------------------------------------
+
+
+
 };   // KartModel
 #endif

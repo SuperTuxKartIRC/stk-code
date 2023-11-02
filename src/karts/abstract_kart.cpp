@@ -32,6 +32,7 @@
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
+
 /** Creates a kart.
  *  \param ident The identifier of the kart.
  *  \param world_kart_id  The world index of this kart.
@@ -183,6 +184,19 @@ void AbstractKart::changeKart(const std::string& new_ident,
                               HandicapLevel handicap,
                               std::shared_ptr<GE::GERenderInfo> ri,
                               const KartData& kart_data)
+{
+    // Reset previous kart (including delete old animation above)
+    reset();
+    // Remove kart body
+    Physics::get()->removeKart(this);
+    loadKartProperties(new_ident, handicap, ri, kart_data);
+}   // changeKart
+
+// ----------------------------------------------------------------------------
+void AbstractKart::changeKartMore(const std::string& new_ident,
+    HandicapLevel handicap,
+    std::shared_ptr<GE::GERenderInfo> ri,
+    const KartData& kart_data)
 {
     // Reset previous kart (including delete old animation above)
     reset();

@@ -2534,6 +2534,11 @@ msgstr "Nombre de points pour gagné"
 
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
+msgid "Number of tags"
+msgstr "Nombre de tags"
+
+#. I18N: ./data/gui/screens/track_info.stkgui
+#. I18N: In the track info screen
 msgid "Deactivate"
 msgstr "Désactivé"
 
@@ -3964,6 +3969,16 @@ msgstr "Limite de temps"
 #: src/states_screens/track_info_screen.cpp:377
 msgid "Goals limit"
 msgstr "Limites des objectifs"
+
+#. I18N: In the create server screen for team server
+#: src/network/protocols/client_lobby.cpp:770
+msgid "Nb team:"
+msgstr "Nb équipe:"
+
+#. I18N: In the create server screen for team server
+#: src/network/protocols/client_lobby.cpp:770
+msgid "Nb AI:"
+msgstr "Nb IA:"
 
 #. I18N: In the networking lobby
 #: src/network/protocols/client_lobby.cpp:774
@@ -6379,6 +6394,10 @@ msgstr "Pas de bonus - seuls tes talents de conduite comptent !"
 #: src/states_screens/race_setup_screen.cpp:109
 msgid "Keep up with the leader kart but don't overtake it!"
 msgstr "Talonne le meneur, mais sans le dépasser !"
+
+#: src/states_screens/race_setup_screen.cpp:115
+msgid "Team arena battle."
+msgstr "Arène bataille équipe"
 
 #: src/states_screens/race_setup_screen.cpp:115
 msgid "Hit other players' teams with weapons to score points."

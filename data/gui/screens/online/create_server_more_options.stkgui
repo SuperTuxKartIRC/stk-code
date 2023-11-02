@@ -14,9 +14,14 @@
 
             <spacer height="1%" width="20"/>
 
-            <div width="100%" height="fit" layout="horizontal-row" id="nb-ia-div">
-                <label id="nb-ia-value-text" proportion="1" text_align="left" I18N="In the server creation screen" text="Max. number of IA players"/>
-                <spinner id="nb-ia-value-spinner" proportion="1" min_value="0" max_value="30"/>/>
+            <div width="100%" height="fit" layout="horizontal-row" id="nb-ai-div">
+                <label id="nb-ai-value-text" proportion="1" text_align="left" I18N="In the server creation screen" text="Max. number of AI players"/>
+                <spinner id="nb-ai-value-spinner" proportion="1" min_value="0" max_value="30"/>/>
+            </div>
+
+       	    <div width="100%" height="fit" layout="horizontal-row" id="nb-team-div">
+                <label id="nb-ia-value-text" proportion="1" text_align="left" I18N="In the server creation screen" text="Max. number of team"/>
+                <spinner id="nb-team-value-spinner" proportion="1" min_value="0" max_value="30"/>/>
             </div>
 
             <spacer height="1%" width="20"/>
@@ -47,6 +52,14 @@
                             I18N="Difficulty"  text="orange"/>
             </ribbon>
             </div>
+
+    	    <div width="5%" height="fit" layout="horizontal-row">
+                <icon-button id="powerup" icon_align="right" icon="gui/icons/gift.png"/>
+		<icon-button id="nitro" icon_align="right" icon="gui/icons/nitro.png"/>
+		<icon-button id="banana" icon_align="right" icon="gui/icons/banana.png"/>
+		<icon-button id="powerup-selection" icon_align="right" icon="gui/icons/powerups_selection.png"/>
+		<icon-button id="special-option" icon_align="right" icon="gui/icons/heart.png"/>
+            </div>  
 
         </box>
         <spacer width="10" height="2%"/>

@@ -751,7 +751,11 @@ void NetworkingLobby::updatePlayerPings()
         {
             m_player_list->renameItem(id, name_with_ping, p.second.m_icon_id);
             // Don't show chosen team color for spectator
-            if (p.second.isSpectator())
+            if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE)
+            {
+                //color nothing
+            }
+            else if (p.second.isSpectator())
                 m_player_list->markItemRed(id, false/*red*/);
             else if (p.second.m_kart_team == KART_TEAM_RED)
                 m_player_list->markItemRed(id);
@@ -959,7 +963,11 @@ void NetworkingLobby::updatePlayers()
         m_player_list->addItem(internal_name, player_name,
             player.m_icon_id);
         // Don't show chosen team color for spectator
-        if (player.isSpectator())
+        if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE)
+        {
+            //color nothing
+        }
+        else if (player.isSpectator())
             m_player_list->markItemRed(i, false/*red*/);
         else if (cur_team == KART_TEAM_RED)
             m_player_list->markItemRed(i);

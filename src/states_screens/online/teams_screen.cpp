@@ -33,13 +33,15 @@
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "network/network_config.hpp"
+#include "network/network_string.hpp"
+#include "network/protocols/lobby_protocol.hpp"
+#include "network/stk_host.hpp"
 #include "states_screens/arenas_screen.hpp"
 #include "states_screens/online/tracks_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
-#include "network/network_config.hpp"
-#include "network/stk_host.hpp"
 #include <IrrlichtDevice.h>
 #include <network/protocol.hpp>
 #include "network/server_config.hpp"
@@ -286,6 +288,12 @@ void NetworkTeamsSetupScreen::changeTeam(int player_id, KartTeam teams, KartTeam
         // TODO : Besoins de changements // William Lussier 
         //ServerConfig::m_kart_teams_choosing = (int)teams;
     }
+
+    NetworkString change_team(PROTOCOL_LOBBY_ROOM);
+    change_team.addUInt8(LobbyProtocol::LE_CHANGE_TEAM_PLUS)
+        .addUInt8(player_id).addUInt8((int)teams);
+    STKHost::get()->sendToServer(&change_team, true/*reliable*/);
+
 
     RaceManager::get()->setKartTeam(player_id, teams, teamColor);
     m_kart_view_info[player_id].teams = teams;

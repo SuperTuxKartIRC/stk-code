@@ -1,5 +1,7 @@
-#include "karts/abstract_kart.hpp"
 #include "team_arena_battle.hpp"
+
+#include "audio/music_manager.hpp"
+#include "karts/abstract_kart.hpp"
 #include "tracks/track.hpp"
 #include <utils/string_utils.hpp>
 #include "network/network_config.hpp"
@@ -9,14 +11,9 @@
 TeamArenaBattle::TeamArenaBattle()
 {
     if (RaceManager::get()->hasTimeTarget())
-    {
-        WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN,
-            RaceManager::get()->getTimeTarget());
-    }
+        WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN, RaceManager::get()->getTimeTarget());
     else
-    {
         WorldStatus::setClockMode(CLOCK_CHRONO);
-    }
 }
 
 TeamArenaBattle::~TeamArenaBattle()
@@ -30,8 +27,10 @@ void TeamArenaBattle::init()
     m_display_rank = false;
     m_count_down_reached_zero = false;
     m_use_highscores = false;
-    m_players_teams.resize(4);
     m_teams.resize(4);
+    m_kart_info.resize(getNumKarts());
+    for (unsigned int i = 0; i < 4; i++)
+        m_teams[i].m_totalPlayer = getTeamNum((KartTeam)i);
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -40,19 +39,15 @@ void TeamArenaBattle::reset(bool restart)
     WorldWithRank::reset(restart);
     m_count_down_reached_zero = false;
     if (RaceManager::get()->hasTimeTarget())
-    {
-        WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN,
-            RaceManager::get()->getTimeTarget());
-    }
+        WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN, RaceManager::get()->getTimeTarget());
     else
-    {
         WorldStatus::setClockMode(CLOCK_CHRONO);
-    }
     m_teams.clear();
     m_teams.resize(4);
-    m_scores.clear();
-    m_scores.resize(m_karts.size(), 0);
-    m_players_teams.resize(4);
+    m_kart_info.clear();
+    m_kart_info.resize(getNumKarts());
+    for (unsigned int i = 0; i < 4; i++)
+        m_teams[i].m_totalPlayer = getTeamNum((KartTeam)i);
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -60,7 +55,7 @@ void TeamArenaBattle::reset(bool restart)
  */
 void TeamArenaBattle::countdownReachedZero()
 {
-    // Prevent negative time in network soccer when finishing
+    // Prevent negative time in network team arena battle when finishing
     m_time_ticks = 0;
     m_time = 0.0f;
     m_count_down_reached_zero = true;
@@ -76,19 +71,7 @@ void TeamArenaBattle::terminateRace()
     }   // i<kart_amount
     WorldWithRank::terminateRace();
 }   // terminateRace
-// ----------------------------------------------------------------------------
-bool TeamArenaBattle::getKartFFAResult(int kart_id) const
-{
-    // the kart(s) which has the top score wins
-    int maxIndex = 0; // Initialize the index of the maximum score to 0
-    for (int i = 1; i < m_teams.size(); ++i) {
-        if (m_teams[i].m_scoresTeams > m_teams[maxIndex].m_scoresTeams) {
-            maxIndex = i; // Update maxIndex if a higher score is found
-        }
-    }
-    int a = getKartTeam(kart_id);
-    return (a == maxIndex);
-}   // getKartFFAResult
+
 // ----------------------------------------------------------------------------
 /** Returns the data to display in the race gui.
  */
@@ -109,7 +92,7 @@ void TeamArenaBattle::getKartsDisplayInfo(
             rank_info.m_color = video::SColor(255, 0, 255, 0);
         else if (getKartTeam(i) == KART_TEAM_ORANGE)
             rank_info.m_color = video::SColor(255, 255, 165, 0);
-        rank_info.m_text = getKart(i)->getController()->getName(); // A corriger plus tard 
+        rank_info.m_text = getKart(i)->getController()->getName();
         if (RaceManager::get()->getKartGlobalPlayerId(i) > -1)
         {
             const core::stringw& flag = StringUtils::getCountryFlag(
@@ -121,7 +104,7 @@ void TeamArenaBattle::getKartsDisplayInfo(
             }
         }
         rank_info.m_text += core::stringw(L" (") +
-            StringUtils::toWString(m_scores[i]) + L")";
+            StringUtils::toWString(m_kart_info[i].m_scores) + L")";
     }
 }   // getKartsDisplayInfo
 
@@ -159,60 +142,71 @@ void TeamArenaBattle::handleScoreInServer(int kart_id, int hitter)
     int new_score = 0;
     int team;
     if (kart_id == hitter || hitter == -1) {
-        // banana
-        m_scores[kart_id]--;
+        m_kart_info[kart_id].m_scores--;
         team = (int)getKartTeam(kart_id);
         new_score = m_teams[team].m_scoresTeams--;
+        
+        if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER || 
+            RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER) {
+            if (m_kart_info[kart_id].getScore == true && m_kart_info[kart_id].m_scores < hit_capture_limit) {
+                m_kart_info[kart_id].getScore = false;
+                new_score = m_teams[team].m_totalPlayerGetScore--;
+            }
+        }
     }
-    
     else {
-        m_scores[hitter]++;
+        m_kart_info[hitter].m_scores++;
         team = (int)getKartTeam(hitter);
         new_score = m_teams[team].m_scoresTeams++;
+
+        if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER ||
+            RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER) {
+            if (m_kart_info[hitter].getScore == false && m_kart_info[hitter].m_scores >= hit_capture_limit) {
+                m_kart_info[hitter].getScore = true;
+                new_score = m_teams[team].m_totalPlayerGetScore++;
+            }
+        }
     }
+
 
     if (NetworkConfig::get()->isNetworking() &&
         NetworkConfig::get()->isServer())
     {
-        //NetworkString p(PROTOCOL_GAME_EVENTS);
-        //p.setSynchronous(true);
-        //p.addUInt8(GameEventsProtocol::GE_TEAM_ARENA_BATTLE_SCORED);
-        //if (kart_id == hitter || hitter == -1)
-        //    p.addUInt8((uint8_t)kart_id).addUInt16((int16_t)new_score);
-        //else
-        //    p.addUInt8((uint8_t)hitter).addUInt16((int16_t)new_score);
-        //STKHost::get()->sendPacketToAllPeers(&p, true);
-
         NetworkString p(PROTOCOL_GAME_EVENTS);
         p.setSynchronous(true);
-        p.addUInt8(GameEventsProtocol::GE_BATTLE_KART_SCORE);
+        p.addUInt8(GameEventsProtocol::GE_BATTLE_KART_SCORE_TEAM);
         if (kart_id == hitter || hitter == -1)
-            p.addUInt8((uint8_t)kart_id).addUInt16((int16_t)m_scores[kart_id]).addUInt8((uint8_t)team).addUInt8((uint8_t)new_score);
+            p.addUInt8((uint8_t)kart_id).addUInt16((int16_t)m_kart_info[kart_id].m_scores).addUInt8((int8_t)team).addUInt8((int8_t)new_score);
         else
-            p.addUInt8((uint8_t)hitter).addUInt16((int16_t)m_scores[hitter]).addUInt8((uint8_t)team).addUInt8((uint8_t)new_score);
+            p.addUInt8((uint8_t)hitter).addUInt16((int16_t)m_kart_info[hitter].m_scores).addUInt8((int8_t)team).addUInt8((int8_t)new_score);
         STKHost::get()->sendPacketToAllPeers(&p, true);
     }
 }   // handleScoreInServer
 
+// ----------------------------------------------------------------------------
 void TeamArenaBattle::setKartScoreFromServer(NetworkString& ns)
 {
     int kart_id = ns.getUInt8();
     int16_t score = ns.getUInt16();
-    m_scores.at(kart_id) = score;
+    m_kart_info.at(kart_id).m_scores = score;
 }   // setKartScoreFromServer
 
+// ----------------------------------------------------------------------------
 void TeamArenaBattle::setScoreFromServer(int kart_id, int new_kart_score, int team_scored, int new_team_score)
 {
-    m_scores.at(kart_id) = new_kart_score;
+    m_kart_info.at(kart_id).m_scores = new_kart_score;
     m_teams[team_scored].m_scoresTeams = new_team_score;
 }   // setKartScoreFromServer
 
-
+// ----------------------------------------------------------------------------
 int TeamArenaBattle::getTeamsKartScore(int kart_id)
 {
-    return m_teams[(int)getKartTeam(kart_id)].m_scoresTeams;
+    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER) {
+        return m_teams[(int)getKartTeam(kart_id)].m_totalPlayerGetScore;
+    }
+    else 
+        return m_teams[(int)getKartTeam(kart_id)].m_scoresTeams;
 }
-
 
 // ----------------------------------------------------------------------------
 void TeamArenaBattle::update(int ticks)
@@ -223,12 +217,12 @@ void TeamArenaBattle::update(int ticks)
         updateSectorForKarts();
 
     std::vector<std::pair<int, int> > ranks;
-    for (unsigned i = 0; i < m_scores.size(); i++)
+    for (unsigned i = 0; i < m_kart_info.size(); i++)
     {
         // For eliminated (disconnected or reserved player) make his score
         // int min so always last in rank
         int cur_score = getKart(i)->isEliminated() ?
-            std::numeric_limits<int>::min() : m_scores[i];
+            std::numeric_limits<int>::min() : m_kart_info[i].m_scores;
         ranks.emplace_back(i, cur_score);
     }
     std::sort(ranks.begin(), ranks.end(),
@@ -284,8 +278,6 @@ bool TeamArenaBattle::isRaceOver()
     //if (!getKartAtPosition(1))
     //    return false;
 
-    //const int top_id = getKartAtPosition(1)->getWorldKartId();
-    const int hit_capture_limit = RaceManager::get()->getHitCaptureLimit();
     
     if (m_count_down_reached_zero && RaceManager::get()->hasTimeTarget()) {
 
@@ -296,35 +288,47 @@ bool TeamArenaBattle::isRaceOver()
     else if (hit_capture_limit > 0) {
         for (int i = 0; i < 4; i++) // TODO : La valeur du 4 dois être changer par le nombre d'équipe // William Lussier 2023-10-09 8h37
         {
-            if (m_teams[i].m_scoresTeams >= hit_capture_limit) {
-                // Set the winning team
-                World::setWinningTeam(i);
-                return true;
+            if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM) {
+                if (m_teams[i].m_scoresTeams >= hit_capture_limit) {
+                    // Set the winning team
+                    World::setWinningTeam(i);
+                    return true;
+                }
+                else if (hit_capture_limit > 1 && m_teams[i].m_scoresTeams >= hit_capture_limit - 1) {
+                    if (!m_faster_music_active)
+                    {
+                        music_manager->switchToFastMusic();
+                        m_faster_music_active = true;
+                    }
+                }
             }
+            else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER) {
+                if (m_teams[i].m_totalPlayer > 0 && m_teams[i].m_totalPlayerGetScore == m_teams[i].m_totalPlayer) {
+                    // Set the winning team
+                    World::setWinningTeam(i);
+                    return true;
+                }
+                else if (m_teams[i].m_totalPlayer > 1 && m_teams[i].m_totalPlayerGetScore == m_teams[i].m_totalPlayer - 1) {
+                    if (!m_faster_music_active)
+                    {
+                        music_manager->switchToFastMusic();
+                        m_faster_music_active = true;
+                    }
+                }
+            }
+            else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER) {
+                if (m_teams[i].m_totalPlayer > 0 && m_teams[i].m_totalPlayerGetScore == 1) {
+                    // Set the winning team
+                    World::setWinningTeam(i);
+                    return true;
+                }
+            }
+            // TODO : dois aussi regarder si les joueurs encore en vie font partie de la même équipe
         }
     }
 
-    //else if(getCurrentNumKarts() == 1 || getCurrentNumPlayers() == 0) // TODO : dois aussi regarder si les joueurs encore en vie font partie de la même équipe
-    //    return true;
-
-    //return (m_count_down_reached_zero && RaceManager::get()->hasTimeTarget()) ||
-    //       (hit_capture_limit != 0 && m_scores[top_id] >= hit_capture_limit)  || 
-    //       (m_scoresTeams[0] > 4 || m_scoresTeams[1] > 4 || m_scoresTeams[2] > 4 || m_scoresTeams[3] > 4 );
-
     return false;
 }   // isRaceOver
-
-// ----------------------------------------------------------------------------
-//bool TeamArenaBattle::kartHit(int kart_id, int hitter)
-//{
-//    return true;
-//}   // kartHit
-
-//-----------------------------------------------------------------------------
-//unsigned int TeamArenaBattle::getRescuePositionIndex(AbstractKart* kart)
-//{
-//    return m_kart_position_map.at(kart->getWorldKartId());
-//}   // getRescuePositionIndex
 
 // ----------------------------------------------------------------------------
 /** Returns the internal identifier for this race. */
@@ -353,41 +357,32 @@ void TeamArenaBattle::restoreCompleteState(const BareNetworkString& b)
     for (unsigned i = 0; i < m_teams.size(); i++)
         m_teams[i].m_scoresTeams = b.getUInt32();
 }   // restoreCompleteState
-// ----------------------------------------------------------------------------
 
+// ----------------------------------------------------------------------------
 void TeamArenaBattle::setWinningTeams()
 {
     // Find the highest score
     int maxScore = 0;
     for (const auto& team : m_teams) {
-        if (team.m_scoresTeams > maxScore) {
-            maxScore = team.m_scoresTeams;
+        if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER) {
+            if (team.m_totalPlayerGetScore > maxScore) {
+                maxScore = team.m_totalPlayerGetScore;
+            }
+        }
+        else { // highest Team score
+            if (team.m_scoresTeams > maxScore) {
+                maxScore = team.m_scoresTeams;
+            }
         }
     }
 
     // Find the indices of the occurrences of the largest value
     std::vector<int> indices;
     for (int i = 0; i < m_teams.size(); ++i) {
-        if (m_teams[i].m_scoresTeams == maxScore) {
+        if (m_teams[i].m_scoresTeams == maxScore && maxScore > 0) {
             indices.push_back(i);
         }
     }
     if (indices.size() > 0)
         World::setWinningTeam(indices);
-}
-
-const void TeamArenaBattle::setPlayerTeams(KartTeam team) const
-{
-    for (int i = 0; i < getNumKarts(); i++)
-    {
-        AbstractKart* kart = getKartAtPosition(i);
-        KartTeam kartTeam = kart->getKartTeam();
-        //m_players_teams[kart->getKartTeam()];
-
-
-        if (m_players_teams.size() <= team) {
-            //m_players_teams.resize(kartTeam + 1);
-        }
-        //m_players_teams[kart->getKartTeam()].push_back(kart);
-    }
 }

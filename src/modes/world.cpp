@@ -296,6 +296,9 @@ void World::init()
 
     int numDifferentTeams = teamsGame.size();
     setNumTeams(numDifferentTeams);
+    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE) {
+        teamsGame.push_back(KART_TEAM_GREEN);
+    }
     setTeamsInGame(teamsGame);
 
     main_loop->renderGUI(7050);
@@ -1603,16 +1606,17 @@ std::shared_ptr<AbstractKart> World::createKartWithTeam
     int pos_index = 0;
     int position  = index + 1;
     KartTeam team = KART_TEAM_BLUE;
-    RaceManager::MinorRaceModeType mode = RaceManager::get()->getMinorMode();
+
+
 
     if (kart_type == RaceManager::KT_AI)
     { // TODO : TEAM Modification
-        if (mode == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG || mode == RaceManager::MINOR_MODE_SOCCER) {
-            if (index < m_red_ai) team = KART_TEAM_RED;
-            else team = KART_TEAM_BLUE;
+        if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE) {
+            team = KART_TEAM_RED;
+            m_kart_team_map[index] = team;
         }
-        else {
-            if (index < m_red_ai) 
+        else if (has4Team()) {
+            if (index < m_red_ai)
                 team = KART_TEAM_RED;
             else if (index < m_red_ai + m_blue_ai)
                 team = KART_TEAM_BLUE;
@@ -1620,24 +1624,49 @@ std::shared_ptr<AbstractKart> World::createKartWithTeam
                 team = KART_TEAM_GREEN;
             else
                 team = KART_TEAM_ORANGE;
+            m_kart_team_map[index] = team;
             //teamColor = RaceManager::get()->getTeamColor(team);
             //m_kart_teams_color_map[index] = teamColor;
+
         }
-        m_kart_team_map[index] = team;
+        else {
+            if (index < m_red_ai)
+                team = KART_TEAM_RED;
+            else
+                team = KART_TEAM_BLUE;
+            m_kart_team_map[index] = team;
+        }
+        
+
+        
     }
     else if (NetworkConfig::get()->isNetworking())
     {
-        m_kart_team_map[index] = RaceManager::get()->getKartInfo(index).getKartTeam();
-        team = RaceManager::get()->getKartInfo(index).getKartTeam();
+        if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE) {
+            team = KART_TEAM_RED;
+            m_kart_team_map[index] = team;
+        }
+        else {
+            m_kart_team_map[index] = RaceManager::get()->getKartInfo(index).getKartTeam();
+            team = RaceManager::get()->getKartInfo(index).getKartTeam();
+        }
+        
     }
     else
     {
-        int rm_id = index -
-            (RaceManager::get()->getNumberOfKarts() - RaceManager::get()->getNumPlayers());
+        if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE) {
+            team = KART_TEAM_RED;
+            m_kart_team_map[index] = team;
+        }
+        else {
+            int rm_id = index -
+                (RaceManager::get()->getNumberOfKarts() - RaceManager::get()->getNumPlayers());
 
-        assert(rm_id >= 0);
-        team = RaceManager::get()->getKartInfo(rm_id).getKartTeam();
-        m_kart_team_map[index] = team;
+            assert(rm_id >= 0);
+            team = RaceManager::get()->getKartInfo(rm_id).getKartTeam();
+            m_kart_team_map[index] = team;
+        }
+        
     }
 
     core::stringw online_name;
@@ -1649,7 +1678,7 @@ std::shared_ptr<AbstractKart> World::createKartWithTeam
 
     // Notice: In blender, please set 1,3,5,7... for blue starting position;
     // 2,4,6,8... for red.
-    if (getNumTeams() >= 3 || has4Team() == true) {
+    if (getNumTeams() >= 3 || has4Team() == true || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE) {
         pos_index = index +1;
     }
     else {
@@ -1661,10 +1690,10 @@ std::shared_ptr<AbstractKart> World::createKartWithTeam
     m_kart_position_map[index] = (unsigned)(pos_index - 1);
 
     std::shared_ptr<GE::GERenderInfo> ri = std::make_shared<GE::GERenderInfo>();
-    ri = (team == KART_TEAM_BLUE ? std::make_shared<GE::GERenderInfo>(0.66f) :
-          team == KART_TEAM_RED ? std::make_shared<GE::GERenderInfo>(1.0f) :
-          team == KART_TEAM_GREEN ? std::make_shared<GE::GERenderInfo>(0.45f) :
-          std::make_shared<GE::GERenderInfo>(0.12f));
+    ri = team == KART_TEAM_BLUE ? std::make_shared<GE::GERenderInfo>(0.66f) :
+    ri = team == KART_TEAM_RED ? std::make_shared<GE::GERenderInfo>(1.0f) :
+    ri = team == KART_TEAM_GREEN ? std::make_shared<GE::GERenderInfo>(0.33f) :
+        std::make_shared<GE::GERenderInfo>(0.065f);
 
     std::shared_ptr<AbstractKart> new_kart;
     if (RewindManager::get()->isEnabled())
@@ -1732,6 +1761,20 @@ KartTeam World::getKartTeam(unsigned int kart_id) const
     assert(n != m_kart_team_map.end());
     return n->second;
 }   // getKartTeam
+
+void World::changeKartTeam(unsigned int kart_id, const KartTeam& new_team) {
+    std::map<int, KartTeam>::iterator n =
+        m_kart_team_map.find(kart_id);
+
+    // Check if the kart with the specified ID is found
+    if (n != m_kart_team_map.end()) {
+        // Change the team of the kart
+        n->second = new_team;
+    }
+    else {
+        // Handle the case where the kart is not found
+    }
+}
 
 //-----------------------------------------------------------------------------
 void World::setAITeam()

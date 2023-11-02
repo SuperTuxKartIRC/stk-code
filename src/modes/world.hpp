@@ -441,6 +441,8 @@ public:
     }
     // ------------------------------------------------------------------------
     virtual bool isGoalPhase() const { return false; }
+
+    void changeKartTeam(unsigned int kart_id, const KartTeam& new_team);
 };   // World
 
 #endif

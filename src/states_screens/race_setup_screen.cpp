@@ -116,15 +116,16 @@ void RaceSetupScreen::init()
         w2->addItem(name3, IDENT_FTL, RaceManager::getIconOf(RaceManager::MINOR_MODE_FOLLOW_LEADER), false);
     }
 
-    irr::core::stringw name4 = irr::core::stringw("Battle") + L"\n";
+    irr::core::stringw name4 = irr::core::stringw(
+        RaceManager::getNameOf(RaceManager::MINOR_MODE_FREE_FOR_ALL)) + L"\n";
     //FIXME: avoid duplicating descriptions from the help menu!
     name4 += _("Hit others with weapons until they lose all their lives.");
     w2->addItem( name4, IDENT_STRIKES, RaceManager::getIconOf(RaceManager::MINOR_MODE_FREE_FOR_ALL));
 
-    irr::core::stringw name8 = irr::core::stringw("Teams Battle") + L"\n";
+    irr::core::stringw name8 = irr::core::stringw("Team arena battle") + L"\n";
     //FIXME: avoid duplicating descriptions from the help menu!
     name8 += _("Hit other players' teams with weapons to score points.");
-    w2->addItem(name8, IDENT_TEAM_PT, RaceManager::getIconOf(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM));
+    w2->addItem(name8, IDENT_TEAM_L, RaceManager::getIconOf(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE));
 
     irr::core::stringw name9 = irr::core::stringw(
         RaceManager::getNameOf(RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE)) + L"\n";

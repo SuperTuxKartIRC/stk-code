@@ -46,6 +46,7 @@
 #include "utils/stk_process.hpp"
 
 #include <IVideoDriver.h>
+#include <network/network_player_profile.hpp>
 
 //=============================================================================
 Physics* g_physics[PT_COUNT];
@@ -211,6 +212,9 @@ void Physics::update(int ticks)
     std::vector<CollisionPair>::iterator p;
     // Child process currently has no scripting engine
     bool is_child = STKProcess::getType() == PT_CHILD;
+    int kartid1 = 0;
+    int kartid2 = 0;
+
     for(p=m_all_collisions.begin(); p!=m_all_collisions.end(); ++p)
     {
         // Kart-kart collision
@@ -225,13 +229,25 @@ void Physics::update(int ticks)
             {
                 Scripting::ScriptEngine* script_engine =
                                                 Scripting::ScriptEngine::getInstance();
-                int kartid1 = p->getUserPointer(0)->getPointerKart()->getWorldKartId();
-                int kartid2 = p->getUserPointer(1)->getPointerKart()->getWorldKartId();
+                kartid1 = p->getUserPointer(0)->getPointerKart()->getWorldKartId();
+                kartid2 = p->getUserPointer(1)->getPointerKart()->getWorldKartId();
                 script_engine->runFunction(false, "void onKartKartCollision(int, int)",
                     [=](asIScriptContext* ctx) {
                         ctx->SetArgDWord(0, kartid1);
                         ctx->SetArgDWord(1, kartid2);
                     });
+            }
+            KartTeam test = p->getUserPointer(0)->getPointerKart()->getKartTeam();
+            KartTeam test3 = p->getUserPointer(1)->getPointerKart()->getKartTeam();
+
+            //RemoteKartInfo& rki = RaceManager::get()->getKartInfo(kartid1);
+           //RemoteKartInfo& rki2 = RaceManager::get()->getKartInfo(kartid2);
+            //int test2 = RaceManager::get()->getMinorMode();
+            if (
+                RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE)
+            {
+                World::getWorld()->kartHit(kartid1, kartid2);
+
             }
             continue;
         }  // if kart-kart collision

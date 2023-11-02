@@ -152,6 +152,8 @@ void LobbyProtocol::configRemoteKart(
         rki.setOnlineId(profile->getOnlineId());
         if (RaceManager::get()->teamEnabled())
             rki.setKartTeam(profile->getTeam());
+        else if (RaceManager::get()->teamPlusEnabled())
+            rki.setKartTeam(profile->getTeam());
         rki.setCountryCode(profile->getCountryCode());
         rki.setKartData(profile->getKartData());
         rki.setNetworkPlayerProfile(profile);
@@ -237,6 +239,10 @@ void LobbyProtocol::addLiveJoiningKart(int kart_id, const RemoteKartInfo& rki,
         std::make_shared<GE::GERenderInfo>(1.0f) :
         rki.getKartTeam() == KART_TEAM_BLUE ?
         std::make_shared<GE::GERenderInfo>(0.66f) :
+        rki.getKartTeam() == KART_TEAM_GREEN ?
+        std::make_shared<GE::GERenderInfo>(0.33f) :
+        rki.getKartTeam() == KART_TEAM_ORANGE ?
+        std::make_shared<GE::GERenderInfo>(0.065f) :
         std::make_shared<GE::GERenderInfo>(rki.getDefaultKartColor()),
         rki.getKartData());
     k->setLiveJoinKart(live_join_util_ticks);

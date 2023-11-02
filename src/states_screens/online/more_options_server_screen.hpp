@@ -42,11 +42,13 @@ private:
     GUIEngine::Widget* m_nb_ia_div_widget;
     GUIEngine::Widget* m_winning_div_widget;
     GUIEngine::Widget* m_life_div_widget;
+    GUIEngine::Widget* m_team_div_widget;
 
     GUIEngine::SpinnerWidget* m_time_widget;
-    GUIEngine::SpinnerWidget* m_nb_ia_widget;
+    GUIEngine::SpinnerWidget* m_nb_ai_widget;
     GUIEngine::SpinnerWidget* m_winning_value_spinner;
     GUIEngine::SpinnerWidget* m_life_value_spinner;
+    GUIEngine::SpinnerWidget* m_nb_team_value_spinner;
 
     GUIEngine::IconButtonWidget* m_back_widget;
 

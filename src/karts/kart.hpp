@@ -340,6 +340,10 @@ public:
                             HandicapLevel handicap,
                             std::shared_ptr<GE::GERenderInfo> ri,
                             const KartData& kart_data = KartData()) OVERRIDE;
+    virtual void changeKartMore(const std::string& new_ident,
+        HandicapLevel handicap,
+        std::shared_ptr<GE::GERenderInfo> ri,
+        const KartData& kart_data = KartData()) OVERRIDE;
 
     // ========================================================================================
     // SPEED and speed-boost related functions

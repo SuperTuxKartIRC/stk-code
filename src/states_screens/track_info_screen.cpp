@@ -131,8 +131,10 @@ void TrackInfoScreen::beforeAddingWidget()
 
     m_is_team_arena_battle = RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER
         || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM
-        || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE
-        || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER;
+        || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER
+        || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE;
+
+    m_is_tag_arena_battle = RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE;
 
     m_is_teams_mode = m_is_team_arena_battle;
 
@@ -142,7 +144,7 @@ void TrackInfoScreen::beforeAddingWidget()
     m_ai_blue_div->setCollapsed((!(RaceManager::get()->isSoccerMode()) && !m_is_teams_mode), this);
 
     // show 'Number of team 3 and 4 AI karts' if teams mode
-    m_ai_team3_div->setCollapsed((!m_is_teams_mode), this);
+    m_ai_team3_div->setCollapsed((!(m_is_teams_mode || m_is_tag_arena_battle)), this);
     m_ai_team4_div->setCollapsed((!m_is_teams_mode), this);
 
     m_number_life_div->setCollapsed((true), this);
@@ -210,6 +212,7 @@ void TrackInfoScreen::init()
     m_ai_team3_spinner->setVisible(false);
     m_ai_team3_label->setVisible(false);
     m_ai_team3_label->setActive(false);
+    m_ai_team3_label->setText(_("Number of Team3 AI karts"), false);
     m_ai_team4_spinner->setVisible(false);
     m_ai_team4_label->setVisible(false);
     m_ai_team4_label->setActive(false);
@@ -319,17 +322,40 @@ void TrackInfoScreen::init()
 
         m_point_value_spinner->setMin(0);
         m_target_value_spinner->setValue(UserConfigParams::m_team_arena_battle_time_limit);
-        m_ai_kart_spinner->setValue(UserConfigParams::m_team1_ai_num);
-        m_ai_blue_spinner->setValue(UserConfigParams::m_team2_ai_num);
-        m_ai_team3_spinner->setValue(UserConfigParams::m_team3_ai_num);
-        m_ai_team4_spinner->setValue(UserConfigParams::m_team4_ai_num);
-        if (m_target_type_spinner->getValue() == 1) {
+        if (m_target_type_spinner->getValue() == 3) {
             m_point_value_spinner->setValue(UserConfigParams::m_kart_lifes_arena);
         }
         else {
             m_point_value_spinner->setValue(UserConfigParams::m_win_points_condition_arena);
         }
         setTeamArenaBattleWidgets(has_AI);
+    }
+
+    if (m_is_tag_arena_battle)
+    {
+        m_target_value_spinner->setMin(1);
+        m_target_value_spinner->setVisible(true);
+        m_target_value_label->setVisible(true);
+        m_target_value_label->setText(_("Maximum time (min.)"), false);
+        m_target_value_spinner->setValue(UserConfigParams::m_team_arena_battle_time_limit);
+
+
+        m_ai_team3_label->setText(_("Number of tags"), false);
+
+        m_ai_team3_spinner->setMin(1);
+
+        int nbPlayers = m_track->getMaxArenaPlayers() - 1;
+        nbPlayers >= 1 ? m_ai_team3_spinner->setMax(nbPlayers) : m_ai_team3_spinner->setMax(1);
+        m_ai_team3_spinner->setValue(1);
+
+        m_ai_team3_spinner->setVisible(true);
+        m_ai_team3_label->setVisible(true);
+        m_ai_team3_spinner->setActive(true);
+        //m_ai_team3_label->setActive(true);
+        
+
+
+
     }
 
 
@@ -529,17 +555,13 @@ void TrackInfoScreen::setTeamArenaBattleWidgets(bool has_AI)
     m_target_value_label->setVisible(true);
     m_target_value_label->setText(_("Maximum time (min.)"), false);
     m_target_value_spinner->setValue(UserConfigParams::m_team_arena_battle_time_limit);
-    m_ai_kart_spinner->setValue(UserConfigParams::m_team1_ai_num);
-    m_ai_blue_spinner->setValue(UserConfigParams::m_team2_ai_num);
-    m_ai_team3_spinner->setValue(UserConfigParams::m_team3_ai_num);
-    m_ai_team4_spinner->setValue(UserConfigParams::m_team4_ai_num);
     m_point_value_spinner->setVisible(true);
     m_point_value_label->setVisible(true);
 
     m_target_type_spinner->clearLabels();
     m_target_type_spinner->addLabel(_("Team Points"));
-    //m_target_type_spinner->addLabel(_("Player with most points"));
-    //m_target_type_spinner->addLabel(_("All Player Points"));
+    m_target_type_spinner->addLabel(_("Player with most points"));
+    m_target_type_spinner->addLabel(_("All Player Points"));
     m_target_type_spinner->addLabel(_("Last team standing"));
     m_target_type_spinner->setValue(0);
 
@@ -563,11 +585,6 @@ void TrackInfoScreen::setTeamArenaBattleWidgets(bool has_AI)
 
         m_ai_kart_label->setText(_("Number of Team1 AI karts"), false);
         m_ai_blue_label->setText(_("Number of Team2 AI karts"), false);
-
-        m_ai_kart_spinner->setValue(UserConfigParams::m_team1_ai_num);
-        m_ai_blue_spinner->setValue(UserConfigParams::m_team2_ai_num);
-        m_ai_team3_spinner->setValue(UserConfigParams::m_team3_ai_num);
-        m_ai_team4_spinner->setValue(UserConfigParams::m_team4_ai_num);
 
         // Check if there's any local players in both team
         int num_team1_players = 0, num_team2_players = 0, num_team3_players = 0, num_team4_players = 0;
@@ -828,19 +845,36 @@ void TrackInfoScreen::onEnterPressedInternal()
             RaceManager::get()->setMaxGoal(selected_target_value);
     }
     if (m_is_team_arena_battle) {
-        if (m_target_type_spinner->getValue() == 1) {
-            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE);
-            RaceManager::get()->setLifeTarget(m_point_value_spinner->getValue());
+        if (m_target_type_spinner->getValue() == 0) {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM);
+            RaceManager::get()->setHitCaptureLimit(m_point_value_spinner->getValue());
         }
-        else {
+        else if (m_target_type_spinner->getValue() == 1) {
             RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER);
             RaceManager::get()->setHitCaptureLimit(m_point_value_spinner->getValue());
+        }
+        else if (m_target_type_spinner->getValue() == 2) {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER);
+            RaceManager::get()->setHitCaptureLimit(m_point_value_spinner->getValue());
+        }
+        else {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE);
+            RaceManager::get()->setLifeTarget(m_point_value_spinner->getValue());
         }
         RaceManager::get()->setTimeTarget(m_target_value_spinner->getValue() * 60);
         UserConfigParams::m_team1_ai_num = m_ai_kart_spinner->getValue();
         UserConfigParams::m_team2_ai_num = m_ai_blue_spinner->getValue();
         UserConfigParams::m_team3_ai_num = m_ai_team3_spinner->getValue();
         UserConfigParams::m_team4_ai_num = m_ai_team4_spinner->getValue();
+
+
+    }
+    if (m_is_team_arena_battle) {
+        RaceManager::get()->setTimeTarget(m_target_value_spinner->getValue() * 60);
+    }
+    if (m_is_tag_arena_battle) {
+        RaceManager::get()->setTimeTarget(m_target_value_spinner->getValue() * 60);
+        RaceManager::get()->setNumGreenAI(m_ai_team3_spinner->getValue());
 
 
     }
@@ -878,12 +912,6 @@ void TrackInfoScreen::onEnterPressedInternal()
 void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
     const int playerID)
 {
-    if (m_target_type_spinner->getValue() == 1) {
-        m_point_value_label->setText(_("Number of lifes"), false);
-    }
-    else {
-        m_point_value_label->setText(_("Number of points to win"), false);
-    }
     if (name == "buttons")
     {
         const std::string& button = getWidget<GUIEngine::RibbonWidget>("buttons")
@@ -917,18 +945,13 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
         }
         else if (m_is_team_arena_battle)
         {
-            if (m_target_type_spinner->getValue() == 1) {
+            if (m_target_type_spinner->getValue() == 3) {
                 m_point_value_spinner->setValue(UserConfigParams::m_kart_lifes_arena);
             }
             else {
                 m_point_value_spinner->setValue(UserConfigParams::m_win_points_condition_arena);
             }
             m_target_value_spinner->setValue(UserConfigParams::m_team_arena_battle_time_limit);
-
-            m_ai_kart_spinner->setValue(UserConfigParams::m_team1_ai_num);
-            m_ai_blue_spinner->setValue(UserConfigParams::m_team2_ai_num);
-            m_ai_team3_spinner->setValue(UserConfigParams::m_team3_ai_num);
-            m_ai_team4_spinner->setValue(UserConfigParams::m_team4_ai_num);
         }
     }
     else if (name == "target-value-spinner")
@@ -950,12 +973,22 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
         }
         else if (m_is_team_arena_battle)
         {
+            if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE)
+                UserConfigParams::m_team_arena_battle_life_time_limit = m_target_value_spinner->getValue();
+            else
+                UserConfigParams::m_team_arena_battle_time_limit = m_target_value_spinner->getValue();
 
-            UserConfigParams::m_team_arena_battle_time_limit = m_target_value_spinner->getValue();
             UserConfigParams::m_team1_ai_num = m_ai_kart_spinner->getValue();
             UserConfigParams::m_team2_ai_num = m_ai_blue_spinner->getValue();
             UserConfigParams::m_team3_ai_num = m_ai_team3_spinner->getValue();
             UserConfigParams::m_team4_ai_num = m_ai_team4_spinner->getValue();
+            setWidgetsValueZeroDeactivateText(m_target_value_spinner, m_target_value_label, "Maximum time (min.)", "Deactivate");
+        }
+        else if (m_is_tag_arena_battle)
+        {
+            
+                UserConfigParams::m_tag_arena_battle_time_limit = m_target_value_spinner->getValue();
+
             setWidgetsValueZeroDeactivateText(m_target_value_spinner, m_target_value_label, "Maximum time (min.)", "Deactivate");
         }
         else if (m_is_lap_trial)
@@ -974,12 +1007,14 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (name == "points-value-spinner")
     {
-        if (m_target_type_spinner->getValue() == 1) {
+        if (m_target_type_spinner->getValue() == 3) {
             UserConfigParams::m_kart_lifes_arena = m_point_value_spinner->getValue();
+            setWidgetsValueZeroDeactivateText(m_point_value_spinner, m_point_value_label, "Number of lifes", "Deactivate");
         }
         else {
             if (m_is_team_arena_battle) {
                 UserConfigParams::m_win_points_condition_arena = m_point_value_spinner->getValue();
+                setWidgetsValueZeroDeactivateText(m_point_value_spinner, m_point_value_label, "Number of points to win", "Deactivate");
             }
         }
 
@@ -1033,7 +1068,7 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
         else if (m_is_teams_mode) // Teams mode
             teamsSpinnerUpdate("team2");
     }
-    else if (name == "ai-team3-spinner" && m_is_teams_mode)
+    else if (name == "ai-team3-spinner" && (m_is_teams_mode || m_is_tag_arena_battle))
     {
         teamsSpinnerUpdate("team3");
     }
@@ -1109,32 +1144,37 @@ void TrackInfoScreen::teamsSpinnerUpdate(std::string team)
     const int max_arena_players = m_track->getMaxArenaPlayers();
     const int local_players = RaceManager::get()->getNumLocalPlayers();
     const int num_ai = max_arena_players - local_players;
+    if (m_is_tag_arena_battle) {
+        m_ai_team3_spinner->setValue(m_ai_team3_spinner->getValue());
+    }
+    else {
+        if (m_ai_kart_spinner->getValue() + m_ai_blue_spinner->getValue() +
+            m_ai_team3_spinner->getValue() + m_ai_team4_spinner->getValue() >= num_ai)
+        {
+            // Une mini modif pourrais être fait pour que si aucun autres IA peut être ajouter et que ex : 
+            // c'est bloquer a 5 AI pour l'équipe 1, si un IA supplémentaire tante d'être ajouter, le nombre d'IA sera a 0 
+            // 5->0 // 0->1 // 1->2
+            if (team == "team1")
+                m_ai_kart_spinner->setValue(num_ai - m_ai_blue_spinner->getValue() - m_ai_team3_spinner->getValue() - m_ai_team4_spinner->getValue());
+            else if (team == "team2")
+                m_ai_blue_spinner->setValue(num_ai - m_ai_kart_spinner->getValue() - m_ai_team3_spinner->getValue() - m_ai_team4_spinner->getValue());
+            else if (team == "team3")
+                m_ai_team3_spinner->setValue(num_ai - m_ai_blue_spinner->getValue() - m_ai_kart_spinner->getValue() - m_ai_team4_spinner->getValue());
+            else if (team == "team4")
+                m_ai_team4_spinner->setValue(num_ai - m_ai_blue_spinner->getValue() - m_ai_kart_spinner->getValue() - m_ai_team3_spinner->getValue());
+        }
 
+        unsigned num_team1 = 0, num_team2 = 0, num_team3 = 0, num_team4 = 0;
+        for (unsigned i = 0; i < RaceManager::get()->getNumLocalPlayers(); i++)
+        {
+            RaceManager::get()->getKartInfo(i).getKartTeam() == KART_TEAM_RED ? num_team1++ :
+                RaceManager::get()->getKartInfo(i).getKartTeam() == KART_TEAM_BLUE ? num_team2++ :
+                RaceManager::get()->getKartInfo(i).getKartTeam() == KART_TEAM_GREEN ? num_team3++ :
+                num_team4++;
+        }
+    }
     // Reduce the value of the other spinner if going over the max total num of AI
-    if (m_ai_kart_spinner->getValue() + m_ai_blue_spinner->getValue() +
-        m_ai_team3_spinner->getValue() + m_ai_team4_spinner->getValue() >= num_ai)
-    {
-        // Une mini modif pourrais être fait pour que si aucun autres IA peut être ajouter et que ex : 
-        // c'est bloquer a 5 AI pour l'équipe 1, si un IA supplémentaire tante d'être ajouter, le nombre d'IA sera a 0 
-        // 5->0 // 0->1 // 1->2
-        if (team == "team1")
-            m_ai_kart_spinner->setValue(num_ai - m_ai_blue_spinner->getValue() - m_ai_team3_spinner->getValue() - m_ai_team4_spinner->getValue());
-        else if (team == "team2")
-            m_ai_blue_spinner->setValue(num_ai - m_ai_kart_spinner->getValue() - m_ai_team3_spinner->getValue() - m_ai_team4_spinner->getValue());
-        else if (team == "team3")
-            m_ai_team3_spinner->setValue(num_ai - m_ai_blue_spinner->getValue() - m_ai_kart_spinner->getValue() - m_ai_team4_spinner->getValue());
-        else if (team == "team4")
-            m_ai_team4_spinner->setValue(num_ai - m_ai_blue_spinner->getValue() - m_ai_kart_spinner->getValue() - m_ai_team3_spinner->getValue());
-    }
-
-    unsigned num_team1 = 0, num_team2 = 0, num_team3 = 0, num_team4 = 0;
-    for (unsigned i = 0; i < RaceManager::get()->getNumLocalPlayers(); i++)
-    {
-        RaceManager::get()->getKartInfo(i).getKartTeam() == KART_TEAM_RED ? num_team1++ :
-            RaceManager::get()->getKartInfo(i).getKartTeam() == KART_TEAM_BLUE ? num_team2++ :
-            RaceManager::get()->getKartInfo(i).getKartTeam() == KART_TEAM_GREEN ? num_team3++ :
-            num_team4++;
-    }
+    
 
 
 

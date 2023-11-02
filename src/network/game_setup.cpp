@@ -202,12 +202,22 @@ void GameSetup::sortPlayersForGame(
         std::mt19937 g(rd());
         std::shuffle(players.begin(), players.end(), g);
     }
-    if (!RaceManager::get()->teamEnabled() ||
+    if (!RaceManager::get()->teamEnabled() || !RaceManager::get()->teamPlusEnabled() || 
         ServerConfig::m_team_choosing)
         return;
+
     for (unsigned i = 0; i < players.size(); i++)
     { // TODO : TEAM Modification
-        players[i]->setTeam((KartTeam)(i % 2));
+        if (RaceManager::get()->teamPlusEnabled()) {
+            if (ServerConfig::m_server_game_nb_team > 0) {
+                players[i]->setTeam((KartTeam)(i % ServerConfig::m_server_game_nb_team));
+            }
+            else
+                players[i]->setTeam((KartTeam)(i % 4));
+        }
+        else {
+            players[i]->setTeam((KartTeam)(i % 2));
+        }
     }
 }   // sortPlayersForGame
 

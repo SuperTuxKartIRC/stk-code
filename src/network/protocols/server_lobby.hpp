@@ -248,6 +248,10 @@ private:
 
     float m_battle_time_limit;
 
+    int m_battle_nb_ia;
+
+    int m_battle_nb_team;
+
     unsigned m_item_seed;
 
     uint32_t m_winner_peer_id;
@@ -270,6 +274,7 @@ private:
     void finishedLoadingLiveJoinClient(Event *event);
     void kickHost(Event* event);
     void changeTeam(Event* event);
+    void changePlusTeam(Event* event);
     void handleChat(Event* event);
     void unregisterServer(bool now,
         std::weak_ptr<ServerLobby> sl = std::weak_ptr<ServerLobby>());

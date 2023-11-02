@@ -476,6 +476,12 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam          m_team_arena_battle_time_limit
         PARAM_DEFAULT(IntUserConfigParam(3, "team-arena-battle-time-limit",
             &m_race_setup_group, "Time limit in team arena battle mode."));
+    PARAM_PREFIX IntUserConfigParam          m_tag_arena_battle_time_limit
+        PARAM_DEFAULT(IntUserConfigParam(3, "team-tag-battle-time-limit",
+            &m_race_setup_group, "Time limit in tag arena battle mode."));
+    PARAM_PREFIX IntUserConfigParam          m_team_arena_battle_life_time_limit
+        PARAM_DEFAULT(IntUserConfigParam(3, "team-arena-battle-life-time-limit",
+            &m_race_setup_group, "Time limit in team arena battle mode version with life."));
     PARAM_PREFIX IntUserConfigParam          m_num_goals
         PARAM_DEFAULT(IntUserConfigParam(3, "numgoals",
             &m_race_setup_group, "Default number of goals in soccer mode."));

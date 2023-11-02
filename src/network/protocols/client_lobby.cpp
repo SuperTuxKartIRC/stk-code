@@ -322,7 +322,21 @@ void ClientLobby::addAllPlayers(Event* event)
 
     uint32_t random_seed = data.getUInt32();
     ItemManager::updateRandomSeed(random_seed);
-    if (RaceManager::get()->isBattleMode())
+    if (RaceManager::get()->teamPlusEnabled())
+    {
+        int hit_capture_limit = data.getUInt32();
+        float time_limit = data.getFloat();
+        int nb_ai = data.getUInt8();
+        int nb_team = data.getUInt8();
+
+        m_game_setup->setHitCaptureTime(hit_capture_limit, time_limit);
+        m_game_setup->setNbAiTeam(nb_ai, nb_team); // TODO : Besoins de modif ??? // William Lussier 
+        uint16_t flag_return_timeout = data.getUInt16();
+        RaceManager::get()->setFlagReturnTicks(flag_return_timeout);
+        unsigned flag_deactivated_time = data.getUInt16();
+        RaceManager::get()->setFlagDeactivatedTicks(flag_deactivated_time);
+    }
+    else if (RaceManager::get()->isBattleMode())
     {
         int hit_capture_limit = data.getUInt32();
         float time_limit = data.getFloat();
@@ -755,6 +769,18 @@ void ClientLobby::handleServerInfo(Event* event)
     core::stringw mode_name = ServerConfig::getModeName(u_data);
     total_lines += _("Game mode: %s", mode_name);
     total_lines += L"\n";
+
+
+    // TODO : Besoins de modification pour aller chercher et envoyer le data // William Lussier 2023-10-25
+    //I18N: In the networking lobby
+    //core::stringw time = ServerConfig::getModeName(u_data);
+    //core::stringw nb_team = ServerConfig::getModeName(u_data);
+    //core::stringw nb_ai = ServerConfig::getModeName(u_data);
+    //total_lines += _("Time limit: %s", time);
+    //total_lines += _(", Nb team: %s", nb_team);
+    //total_lines += _(", Nb AI: %s", nb_ai);
+    //total_lines += L"\n";
+
 
     uint8_t extra_server_info = data.getUInt8();
     bool grand_prix_started = false;

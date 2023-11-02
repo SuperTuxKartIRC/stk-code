@@ -49,6 +49,7 @@
 #include "modes/soccer_world.hpp"
 #include "modes/team_arena_battle.hpp"
 #include "modes/team_arena_battle_life.hpp"
+#include "modes/tag_zombie_arena_battle.hpp"
 #include "modes/lap_trial.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/network_config.hpp"
@@ -239,7 +240,6 @@ void RaceManager::setKartTeam(unsigned int player_id, KartTeam team, KartTeamsCo
     assert(player_id < m_player_karts.size());
 
     m_player_karts[player_id].setKartTeam(team); // TODO : Besoins de modification // William Lussier 2023-10-21 10h51
-    m_player_karts[player_id].setKartColorTeam(teamColor);
 }   // setKartTeam
 
 //---------------------------------------------------------------------------------------------
@@ -694,7 +694,7 @@ void RaceManager::startNextRace()
         else if (m_minor_mode == MINOR_MODE_TEAM_ARENA_BATTLE_LIFE)
             World::setWorld(new TeamArenaBattlelife());
         else if (m_minor_mode == MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE)
-            World::setWorld(new FreeForAll());
+            World::setWorld(new TagZombieArenaBattle());
         else if (m_minor_mode == MINOR_MODE_MONSTER_ATTACK_ARENA)
             World::setWorld(new FreeForAll());
         else if (m_minor_mode == MINOR_MODE_MURDER_MYSTERY_ARENA)

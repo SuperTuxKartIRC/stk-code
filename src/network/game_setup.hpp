@@ -52,6 +52,10 @@ private:
 
     float m_battle_time_limit;
 
+    int m_nb_ai;
+
+    int m_nb_team;
+
     bool m_reverse;
 
     std::atomic_bool m_is_grand_prix;
@@ -141,6 +145,12 @@ public:
     {
         m_hit_capture_limit = hc;
         m_battle_time_limit = time;
+    }
+    // ------------------------------------------------------------------------
+    void setNbAiTeam(int ai, int team)
+    {
+        m_nb_ai = ai;
+        m_nb_team = team;
     }
     // ------------------------------------------------------------------------
     const std::string& getServerNameUtf8() const { return m_server_name_utf8; }

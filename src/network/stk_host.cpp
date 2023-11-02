@@ -1509,8 +1509,7 @@ void STKHost::initClientNetwork(ENetEvent& event, Network* new_network)
 // ----------------------------------------------------------------------------
 std::pair<int, int> STKHost::getAllPlayersTeamInfo() const
 {
-    int red_count = 0;
-    int blue_count = 0;
+    int red_count = 0, blue_count = 0;
     auto pp = getAllPlayerProfiles();
     for (auto& player : pp)
     {
@@ -1522,6 +1521,25 @@ std::pair<int, int> STKHost::getAllPlayersTeamInfo() const
     return std::make_pair(red_count, blue_count);
 
 }   // getAllPlayersTeamInfo
+
+// ------------------------------------------------------------------------
+std::tuple<int, int, int, int> STKHost::getAllPlayersTeamPlusInfo() const {
+    int red_count = 0, blue_count = 0;
+    int green_count = 0, orange_count = 0;
+    auto pp = getAllPlayerProfiles();
+    for (auto& player : pp)
+    {
+        if (player->getTeam() == KART_TEAM_RED)
+            red_count++;
+        else if (player->getTeam() == KART_TEAM_BLUE)
+            blue_count++;
+        else if (player->getTeam() == KART_TEAM_GREEN)
+            green_count++;
+        else if (player->getTeam() == KART_TEAM_ORANGE)
+            orange_count++;
+    }
+    return std::make_tuple(red_count, blue_count, green_count, orange_count);
+}  // getAllPlayersTeamPlusInfo
 
 // ----------------------------------------------------------------------------
 /** Get the players for starting a new game.

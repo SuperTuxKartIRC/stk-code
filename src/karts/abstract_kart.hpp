@@ -147,6 +147,10 @@ public:
                             HandicapLevel handicap,
                             std::shared_ptr<GE::GERenderInfo> ri,
                             const KartData& kart_data = KartData());
+    virtual void changeKartMore(const std::string& new_ident,
+        HandicapLevel handicap,
+        std::shared_ptr<GE::GERenderInfo> ri,
+        const KartData& kart_data = KartData());
     // ========================================================================
     // Access to the handicap.
     // ------------------------------------------------------------------------
@@ -203,6 +207,8 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the kart teams of the kart */
     KartTeam getKartTeam() const { return m_kart_team; }
+
+    void setKartTeam(KartTeam team) { m_kart_team = team; }
     // ------------------------------------------------------------------------
     /** Called after the kart comes to rest. It can be used to e.g. compute
      *  differences between graphical and physical chassis. Note that

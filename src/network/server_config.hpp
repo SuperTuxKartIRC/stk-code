@@ -124,9 +124,13 @@ namespace ServerConfig
         SERVER_CFG_DEFAULT(IntServerConfigParam(5, "server-game-life",
             "The number of life"));
 
-    SERVER_CFG_PREFIX IntServerConfigParam m_server_game_nb_ia
-        SERVER_CFG_DEFAULT(IntServerConfigParam(0, "server-game-nb-ia",
-            "The number of ia"));
+    SERVER_CFG_PREFIX IntServerConfigParam m_server_game_nb_ai
+        SERVER_CFG_DEFAULT(IntServerConfigParam(0, "server-game-nb-ai",
+            "The number of ai"));
+
+    SERVER_CFG_PREFIX IntServerConfigParam m_server_game_nb_team
+        SERVER_CFG_DEFAULT(IntServerConfigParam(2, "server-game-nb-team",
+            "The number of team"));
 
     SERVER_CFG_PREFIX IntServerConfigParam m_gp_track_count
         SERVER_CFG_DEFAULT(IntServerConfigParam(3, "gp-track-count",

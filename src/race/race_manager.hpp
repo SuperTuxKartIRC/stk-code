@@ -820,7 +820,7 @@ public:
         const int id = (int)m_minor_mode;
         // This uses the  numerical id of the mode, see the macros
         // LINEAR_RACE and BATTLE_ARENA above for exact meaning.
-        if ((id >= 2000 && id <= 2002) || (id >= 2004 && id <= 2007)) return true;
+        if ((id >= 2000 && id <= 2002) || (id >= 2004 && id <=2009)) return true;
         else            return false;
     }   // isBattleMode
 
@@ -1005,7 +1005,7 @@ public:
         return m_minor_mode == MINOR_MODE_SOCCER ||
             m_minor_mode == MINOR_MODE_CAPTURE_THE_FLAG;
     }
-    bool team4Enabled() const // TODO : changement team 
+    bool teamPlusEnabled() const // TODO : changement team 
     {
         return m_minor_mode == MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM ||
             MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER ||

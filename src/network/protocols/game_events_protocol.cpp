@@ -5,6 +5,7 @@
 #include "modes/capture_the_flag.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/soccer_world.hpp"
+#include "modes/tag_zombie_arena_battle.hpp"
 #include "modes/team_arena_battle.hpp"
 #include "modes/team_arena_battle_life.hpp"
 #include "network/event.hpp"
@@ -65,6 +66,7 @@ bool GameEventsProtocol::notifyEvent(Event* event)
     FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
     TeamArenaBattle* tab = dynamic_cast<TeamArenaBattle*>(World::getWorld());
     TeamArenaBattlelife* tabl = dynamic_cast<TeamArenaBattlelife*>(World::getWorld());
+    TagZombieArenaBattle* tagzab = dynamic_cast<TagZombieArenaBattle*>(World::getWorld());
     SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
     LinearWorld* lw = dynamic_cast<LinearWorld*>(World::getWorld());
     switch (type)
@@ -87,18 +89,28 @@ bool GameEventsProtocol::notifyEvent(Event* event)
     }
     case GE_BATTLE_KART_SCORE:
     {
-        if (!ffa)
-            throw std::invalid_argument("No free-for-all world");
-        else if(ffa)
+        if (!ffa && !tabl && !tagzab)
+            throw std::invalid_argument("No free-for-all world, team-arena-battle-life world or or tag-zombie-arena-battle world"); 
+        else if (ffa)
             ffa->setKartScoreFromServer(data);
-        else if (!tab)
-            throw std::invalid_argument("No team-arena-battle world");
-        else if (tab)
-            tab->setKartScoreFromServer(data);
-        else if (!tabl)
-            throw std::invalid_argument("No team-arena-battle life world");
         else if (tabl)
-            tabl->setKartScoreFromServer(data);
+            tabl->setKartLifeFromServer(data);
+        else if (tagzab)
+            tagzab->setKartsInfoFromServer(data);
+        break;
+    }
+    case GE_BATTLE_KART_SCORE_TEAM:
+    {
+        if (!tab)
+            throw std::invalid_argument("No team-arena-battle");
+
+        if (tab) {
+            int8_t kart_id = data.getUInt8();
+            int16_t new_kart_scores = data.getUInt16();
+            int team_scored = data.getUInt8();
+            int8_t new_team_scores = data.getUInt8();
+            tab->setScoreFromServer(kart_id, new_kart_scores, team_scored, new_team_scores);
+        }
         break;
     }
     case GE_CTF_SCORED:
