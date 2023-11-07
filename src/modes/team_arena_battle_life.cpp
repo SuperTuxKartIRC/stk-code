@@ -40,7 +40,7 @@ void TeamArenaBattlelife::init()
     {
         m_teams[i].m_inlife_player = getTeamNum((KartTeam)i);
         m_teams[i].m_total_life = getTeamNum((KartTeam)i) * RaceManager::get()->getLifeTarget();
-        m_teams[i].m_totalPlayer = getTeamNum((KartTeam)i);
+        m_teams[i].m_total_player = getTeamNum((KartTeam)i);
     }
 }   // init
 
@@ -64,7 +64,7 @@ void TeamArenaBattlelife::reset(bool restart)
     {
         m_teams[i].m_inlife_player = getTeamNum((KartTeam)i);
         m_teams[i].m_total_life = getTeamNum((KartTeam)i) * RaceManager::get()->getLifeTarget();
-        m_teams[i].m_totalPlayer = getTeamNum((KartTeam)i);
+        m_teams[i].m_total_player = getTeamNum((KartTeam)i);
     }
 }   // reset
 
@@ -281,7 +281,7 @@ bool TeamArenaBattlelife::isRaceOver()
 
     for (int i = 0; i < 4; i++) // TODO : Changer le chiffre 4 par la nombre d'équipe qui sont présentement dans le mode de jeu
     {
-        if (m_teams[i].m_totalPlayer >0 && m_teams[i].m_inlife_player == 0) {
+        if (m_teams[i].m_total_player >0 && m_teams[i].m_inlife_player == 0) {
             teamDeath++;
         }
         if (teamDeath >= getNumTeams() - 1) {

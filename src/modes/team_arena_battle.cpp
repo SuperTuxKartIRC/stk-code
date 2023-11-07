@@ -30,7 +30,7 @@ void TeamArenaBattle::init()
     m_teams.resize(4);
     m_kart_info.resize(getNumKarts());
     for (unsigned int i = 0; i < 4; i++)
-        m_teams[i].m_totalPlayer = getTeamNum((KartTeam)i);
+        m_teams[i].m_total_player = getTeamNum((KartTeam)i);
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -47,7 +47,7 @@ void TeamArenaBattle::reset(bool restart)
     m_kart_info.clear();
     m_kart_info.resize(getNumKarts());
     for (unsigned int i = 0; i < 4; i++)
-        m_teams[i].m_totalPlayer = getTeamNum((KartTeam)i);
+        m_teams[i].m_total_player = getTeamNum((KartTeam)i);
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -144,26 +144,26 @@ void TeamArenaBattle::handleScoreInServer(int kart_id, int hitter)
     if (kart_id == hitter || hitter == -1) {
         m_kart_info[kart_id].m_scores--;
         team = (int)getKartTeam(kart_id);
-        new_score = m_teams[team].m_scoresTeams--;
+        new_score = m_teams[team].m_scores_teams--;
         
         if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER || 
             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER) {
-            if (m_kart_info[kart_id].getScore == true && m_kart_info[kart_id].m_scores < hit_capture_limit) {
-                m_kart_info[kart_id].getScore = false;
-                new_score = m_teams[team].m_totalPlayerGetScore--;
+            if (m_kart_info[kart_id].get_score == true && m_kart_info[kart_id].m_scores < hit_capture_limit) {
+                m_kart_info[kart_id].get_score = false;
+                new_score = m_teams[team].m_total_player_get_score--;
             }
         }
     }
     else {
         m_kart_info[hitter].m_scores++;
         team = (int)getKartTeam(hitter);
-        new_score = m_teams[team].m_scoresTeams++;
+        new_score = m_teams[team].m_scores_teams++;
 
         if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER ||
             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER) {
-            if (m_kart_info[hitter].getScore == false && m_kart_info[hitter].m_scores >= hit_capture_limit) {
-                m_kart_info[hitter].getScore = true;
-                new_score = m_teams[team].m_totalPlayerGetScore++;
+            if (m_kart_info[hitter].get_score == false && m_kart_info[hitter].m_scores >= hit_capture_limit) {
+                m_kart_info[hitter].get_score = true;
+                new_score = m_teams[team].m_total_player_get_score++;
             }
         }
     }
@@ -195,17 +195,17 @@ void TeamArenaBattle::setKartScoreFromServer(NetworkString& ns)
 void TeamArenaBattle::setScoreFromServer(int kart_id, int new_kart_score, int team_scored, int new_team_score)
 {
     m_kart_info.at(kart_id).m_scores = new_kart_score;
-    m_teams[team_scored].m_scoresTeams = new_team_score;
+    m_teams[team_scored].m_scores_teams = new_team_score;
 }   // setKartScoreFromServer
 
 // ----------------------------------------------------------------------------
 int TeamArenaBattle::getTeamsKartScore(int kart_id)
 {
     if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER) {
-        return m_teams[(int)getKartTeam(kart_id)].m_totalPlayerGetScore;
+        return m_teams[(int)getKartTeam(kart_id)].m_total_player_get_score;
     }
     else 
-        return m_teams[(int)getKartTeam(kart_id)].m_scoresTeams;
+        return m_teams[(int)getKartTeam(kart_id)].m_scores_teams;
 }
 
 // ----------------------------------------------------------------------------
@@ -289,12 +289,12 @@ bool TeamArenaBattle::isRaceOver()
         for (int i = 0; i < 4; i++) // TODO : La valeur du 4 dois être changer par le nombre d'équipe // William Lussier 2023-10-09 8h37
         {
             if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM) {
-                if (m_teams[i].m_scoresTeams >= hit_capture_limit) {
+                if (m_teams[i].m_scores_teams >= hit_capture_limit) {
                     // Set the winning team
                     World::setWinningTeam(i);
                     return true;
                 }
-                else if (hit_capture_limit > 1 && m_teams[i].m_scoresTeams >= hit_capture_limit - 1) {
+                else if (hit_capture_limit > 1 && m_teams[i].m_scores_teams >= hit_capture_limit - 1) {
                     if (!m_faster_music_active)
                     {
                         music_manager->switchToFastMusic();
@@ -303,12 +303,12 @@ bool TeamArenaBattle::isRaceOver()
                 }
             }
             else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER) {
-                if (m_teams[i].m_totalPlayer > 0 && m_teams[i].m_totalPlayerGetScore == m_teams[i].m_totalPlayer) {
+                if (m_teams[i].m_total_player > 0 && m_teams[i].m_total_player_get_score == m_teams[i].m_total_player) {
                     // Set the winning team
                     World::setWinningTeam(i);
                     return true;
                 }
-                else if (m_teams[i].m_totalPlayer > 1 && m_teams[i].m_totalPlayerGetScore == m_teams[i].m_totalPlayer - 1) {
+                else if (m_teams[i].m_total_player > 1 && m_teams[i].m_total_player_get_score == m_teams[i].m_total_player - 1) {
                     if (!m_faster_music_active)
                     {
                         music_manager->switchToFastMusic();
@@ -317,7 +317,7 @@ bool TeamArenaBattle::isRaceOver()
                 }
             }
             else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER) {
-                if (m_teams[i].m_totalPlayer > 0 && m_teams[i].m_totalPlayerGetScore == 1) {
+                if (m_teams[i].m_total_player > 0 && m_teams[i].m_total_player_get_score == 1) {
                     // Set the winning team
                     World::setWinningTeam(i);
                     return true;
@@ -347,7 +347,7 @@ void TeamArenaBattle::saveCompleteState(BareNetworkString* bns, STKPeer* peer)
 {
     // TODO : Vérifier que ça fonctionne // William Lussier 2023-10-07 12h00
     for (unsigned i = 0; i < m_teams.size(); i++)
-        bns->addUInt32(m_teams[i].m_scoresTeams);
+        bns->addUInt32(m_teams[i].m_scores_teams);
 }   // saveCompleteState
 
 // ----------------------------------------------------------------------------
@@ -355,7 +355,7 @@ void TeamArenaBattle::restoreCompleteState(const BareNetworkString& b)
 {
     // TODO : Vérifier que ça fonctionne // William Lussier 2023-10-07 12h00
     for (unsigned i = 0; i < m_teams.size(); i++)
-        m_teams[i].m_scoresTeams = b.getUInt32();
+        m_teams[i].m_scores_teams = b.getUInt32();
 }   // restoreCompleteState
 
 // ----------------------------------------------------------------------------
@@ -365,13 +365,13 @@ void TeamArenaBattle::setWinningTeams()
     int maxScore = 0;
     for (const auto& team : m_teams) {
         if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER) {
-            if (team.m_totalPlayerGetScore > maxScore) {
-                maxScore = team.m_totalPlayerGetScore;
+            if (team.m_total_player_get_score > maxScore) {
+                maxScore = team.m_total_player_get_score;
             }
         }
         else { // highest Team score
-            if (team.m_scoresTeams > maxScore) {
-                maxScore = team.m_scoresTeams;
+            if (team.m_scores_teams > maxScore) {
+                maxScore = team.m_scores_teams;
             }
         }
     }
@@ -379,7 +379,7 @@ void TeamArenaBattle::setWinningTeams()
     // Find the indices of the occurrences of the largest value
     std::vector<int> indices;
     for (int i = 0; i < m_teams.size(); ++i) {
-        if (m_teams[i].m_scoresTeams == maxScore && maxScore > 0) {
+        if (m_teams[i].m_scores_teams == maxScore && maxScore > 0) {
             indices.push_back(i);
         }
     }

@@ -40,7 +40,8 @@ class TagZombieArenaBattle : public WorldWithRank {
 private:
     std::map<int, int> m_swatter_reset_kart_ticks;
     bool m_count_down_reached_zero = false;
-    const int8_t PNBT = 0, ZNBT = 1;
+    const int8_t PNBT = 0, ZNBT = 2;
+    irr::core::stringw m_winning_text;
 
     /** Profiling usage */
     int m_total_rescue = 0;
@@ -49,10 +50,11 @@ private:
     struct BattleInfo
     {
         int  m_lifes;
-        int8_t m_nb_player_converted;
-        double m_convertedTime;
+        int m_nb_player_converted; // int8_t
+        float m_convertedTime = -1;
         bool  m_is_start_zombie;
         int8_t m_zombie_id_convert;
+        int m_points_result;
     };
 
     struct TeamInfo
@@ -64,9 +66,8 @@ private:
 protected:
     int8_t m_total_player = getNumKarts();
     int8_t m_nb_not_zombie_player;
-    //int m_nb_tags_zombie = NetworkConfig::get()->isNetworking() ? 1 : RaceManager::get()->getNumberOfGreenAIKarts() >= RaceManager::get()->getNumPlayers() ? RaceManager::get()->getNumPlayers() : RaceManager::get()->getNumberOfGreenAIKarts();
     int8_t m_nb_tags_zombie = NetworkConfig::get()->isNetworking() ? 1 : RaceManager::get()->getNumberOfGreenAIKarts();
-    float m_delay = (RaceManager::get()->getTimeTarget() > 60.f) ? 15.0f : 5.0f;
+    float m_delay = 0;
 
     KartTeam m_tag_zombie_team = KART_TEAM_GREEN;
     KartTeam m_player_team = KART_TEAM_RED;
@@ -132,6 +133,8 @@ private:
     // Function to generate unique random numbers and store them in m_tag_zombie_list_rand
     virtual void generateUniqueRandomNumbers();
     // ------------------------------------------------------------------------
+    void calculatePoints();
+    // ------------------------------------------------------------------------
     void resetKartForSwatterHit(int kart_id, int at_world_ticks)
     {
         m_swatter_reset_kart_ticks[kart_id] = at_world_ticks;
@@ -147,6 +150,10 @@ public :
     // ------------------------------------------------------------------------
     int getKartConvertedTime(int kart_id) const { return m_kart_info.at(kart_id).m_convertedTime; }
     // ------------------------------------------------------------------------
+    int getKartConverteZombie(int kart_id) const { return m_kart_info.at(kart_id).m_zombie_id_convert; }
+    // ------------------------------------------------------------------------
+    int getKartPointsResult(int kart_id) const { return m_kart_info.at(kart_id).m_points_result; }
+    // ------------------------------------------------------------------------
     int getTeamInlifePlayer(int team) const { return m_team_info[(int)team].m_inlife_player; }
     // ------------------------------------------------------------------------
     void setKartsInfoFromServer(NetworkString& ns);
@@ -160,6 +167,10 @@ public :
     void setTagPlayerTeam(KartTeam team) { m_player_team = team; };
     // ------------------------------------------------------------------------
     KartTeam getTagPlayerTeam() const { return m_player_team; }
+    // ------------------------------------------------------------------------
+    void setWinningTeamsTexte(irr::core::stringw winningText) { m_winning_text = winningText; };
+    // ------------------------------------------------------------------------
+    irr::core::stringw getWinningTeamsTexte() { return m_winning_text; };
 };
 
 #endif // TAG_ARENA_BATTLE_HPP

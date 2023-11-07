@@ -1518,6 +1518,9 @@ void RaceResultGUI::unload()
 
     void RaceResultGUI::displayTeamsArenaResults() {
         World* world = (World*)World::getWorld();
+        TagZombieArenaBattle* tagzab = (TagZombieArenaBattle*)World::getWorld();
+        RaceManager::MinorRaceModeType mode = RaceManager::get()->getMinorMode();
+
         std::vector <int> winningTeams = world->getWinningTeam();
         std::vector<TeamData> teamsData;
         gui::IGUIFont* font = GUIEngine::getTitleFont();
@@ -1542,7 +1545,7 @@ void RaceResultGUI::unload()
         }
 
         // Affichage du texte en fonction du nombre d'équipes gagnantes
-        std::string winText;
+        std::string winText = "";
         core::stringw winTextw;
         KartTeamsColor teamsColor;
 
@@ -1555,7 +1558,11 @@ void RaceResultGUI::unload()
             irr::video::SColor color = RaceGUIBase::rgbaColorKartTeamsColor(teamsColor);
             std::string colorName = RaceGUIBase::getKartTeamsColorName(teamsColor);
 
-            winText = (colorName + " Wins!");
+            if (mode == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE) {
+                winTextw = tagzab->getWinningTeamsTexte();
+            }
+            else
+                winText = (colorName + " Wins!");
         }
         else if (winningTeams.size() > 1) {
             winText = "It's a draw between Teams ";
@@ -1579,10 +1586,12 @@ void RaceResultGUI::unload()
             // Ajouter un message personnalisé si aucune team gagne 
         }
 
-        winTextw = (winText.c_str());
+        if (!winText.empty()) {
+            winTextw = winText.c_str();
+        }
 
         core::rect<s32> pos(current_x, current_y, current_x, current_y);
-        font->draw(winText.c_str(), pos, video::SColor(255, 255, 255, 0), true, true);
+        font->draw(winTextw.c_str(), pos, video::SColor(255, 255, 255, 0), true, true);
         core::dimension2du rect = font->getDimension(winTextw.c_str());
 
         // Affichage des scores et des joueurs par équipe
@@ -1593,10 +1602,10 @@ void RaceResultGUI::unload()
 
 
     void RaceResultGUI::displayTeamPlayers(KartTeam teams, int x, int y) {
+        World* world = World::getWorld();
         TeamArenaBattle* tab = (TeamArenaBattle*)World::getWorld();
         TeamArenaBattlelife* tabl = (TeamArenaBattlelife*)World::getWorld();
         TagZombieArenaBattle* tagzab = (TagZombieArenaBattle*)World::getWorld();
-        World* world = World::getWorld();
 
         int score;
         RaceManager::MinorRaceModeType mode = RaceManager::get()->getMinorMode();
@@ -1663,6 +1672,7 @@ void RaceResultGUI::unload()
         for (unsigned int i = 0; i < num_karts; i++)
         {
             AbstractKart* kart;
+            AbstractKart* kartZombie; // The zombie that kill the player (survivant) // For his icon
             unsigned kart_id;
             KartTeam team;
             if (modeVal == 1) {
@@ -1678,11 +1688,13 @@ void RaceResultGUI::unload()
             else if (modeVal == 3) {
                 kart = tagzab->getKartAtPosition(i + 1);
                 kart_id = kart->getWorldKartId();
+                kartZombie = tagzab->getKartAtPosition(tagzab->getKartConverteZombie(kart_id));
                 team = tagzab->getKartTeam(kart_id);
             }
             if (team != teams)
                 continue;
-            result_text = kart->getController()->getName();
+            //result_text = "";
+            result_text = kart->getController()->getName(); //
             if (RaceManager::get()->getKartGlobalPlayerId(kart_id) > -1)
             {
                 const core::stringw& flag = StringUtils::getCountryFlag(
@@ -1694,22 +1706,40 @@ void RaceResultGUI::unload()
                 }
             }
             result_text.append("  ");
+            irr::u32 offset_x;
 
             if (modeVal == 1)
                 result_text.append(StringUtils::toWString(tab->getKartScore(kart_id)));
             else if (modeVal == 2)
                 result_text.append(StringUtils::toWString(tabl->getKartLife(kart_id)));
-            else if (modeVal == 3)
-                result_text.append(StringUtils::toWString(tagzab->getKartNbConvertedPlayer(kart_id)));
+            else if (modeVal == 3) {
+                if (tagzab->getKartNbConvertedPlayer(kart_id) > 0)
+                    result_text.append(StringUtils::toWString(tagzab->getKartNbConvertedPlayer(kart_id)));
+                if (tagzab->getKartConvertedTime(kart_id) > -1 && kartZombie != NULL) {
+                    result_text.append("   ");
+                    result_text.append(StringUtils::timeToString(tagzab->getKartConvertedTime(kart_id), 0).c_str());
+                    result_text.append("   ");
+                    if (tagzab->getKartConverteZombie(kart_id) != -1) {
+                        kart_icon = kartZombie->getKartProperties()->getIconMaterial()->getTexture();
+                        source_rect = core::recti(core::vector2di(0, 0), kart_icon->getSize());
+                        // TODO : Besoins de modification. l'icone n'est pas bien placer  
+                        irr::u32 offset_x = (irr::u32)(font->getDimension(result_text.c_str()).Width / 1.f); // 1.5f
+                        dest_rect = core::recti(x + offset_x + m_width_icon, y, x + offset_x, y + m_width_icon);
+                        draw2DImage(kart_icon, dest_rect, source_rect, NULL, NULL, true);
+                    }
+                }
+                if (tagzab->getKartPointsResult(kart_id) > 0) {
+                    result_text.append("   +");
+                    result_text.append(StringUtils::toWString(tagzab->getKartPointsResult(kart_id)).c_str());
+                }
+            }
 
             // y + team_icon_height
             font->draw(result_text, core::rect<s32>(x, y, x + 200, y + 30), kart->getController()->isLocalPlayerController() ? color : black_color, true, false);
             kart_icon = kart->getKartProperties()->getIconMaterial()->getTexture();
 
             source_rect = core::recti(core::vector2di(0, 0), kart_icon->getSize());
-            irr::u32 offset_x =
-                (irr::u32)(font->getDimension(result_text.c_str()).Width / 1.5f);
-            // TODO : Besoins de modification. l'icone n'est pas bien placer  
+            offset_x = (irr::u32)(font->getDimension(result_text.c_str()).Width / 1.5f);
             dest_rect = core::recti(x - m_width_icon, y,
                 x , y + m_width_icon);
             draw2DImage(kart_icon, dest_rect, source_rect, NULL, NULL, true);

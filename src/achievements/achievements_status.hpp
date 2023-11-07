@@ -135,8 +135,13 @@ public :
            MURDER_MYSTERY_STARTED = 66,
            MURDER_MYSTERY_FINISHED = 67,
 
+           // Tag zombie points 
+           TAG_ZOMBIE_ARENA_ALL_POINTS = 80,
+           TAG_ZOMBIE_ARENA_SURVIVOR_POINTS = 81,
+           TAG_ZOMBIE_ARENA_ZOMBIE_POINTS = 82,
 
-ACHIEVE_DATA_NUM = 68
+
+           ACHIEVE_DATA_NUM = 68
     };
 
 private:

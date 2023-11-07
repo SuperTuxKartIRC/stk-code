@@ -37,6 +37,7 @@
 #include "input/keyboard_device.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/controller/battle_ai.hpp"
+#include "karts/controller/battle_team_ai.hpp"
 #include "karts/ghost_kart.hpp"
 #include "karts/controller/end_controller.hpp"
 #include "karts/controller/local_player_controller.hpp"
@@ -90,6 +91,7 @@
 
 #include <IrrlichtDevice.h>
 #include <ISceneManager.h>
+#include "tag_zombie_arena_battle.hpp"
 
 World* World::m_world[PT_COUNT];
 
@@ -293,9 +295,6 @@ void World::init()
         }
     }
 
-
-    int numDifferentTeams = teamsGame.size();
-    setNumTeams(numDifferentTeams);
     if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE) {
         teamsGame.push_back(KART_TEAM_GREEN);
     }
@@ -1615,7 +1614,7 @@ std::shared_ptr<AbstractKart> World::createKartWithTeam
             team = KART_TEAM_RED;
             m_kart_team_map[index] = team;
         }
-        else if (has4Team()) {
+        else if (hasTeamPlus()) {
             if (index < m_red_ai)
                 team = KART_TEAM_RED;
             else if (index < m_red_ai + m_blue_ai)
@@ -1678,7 +1677,7 @@ std::shared_ptr<AbstractKart> World::createKartWithTeam
 
     // Notice: In blender, please set 1,3,5,7... for blue starting position;
     // 2,4,6,8... for red.
-    if (getNumTeams() >= 3 || has4Team() == true || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE) {
+    if (getNumTeams() >= 3 || hasTeamPlus() == true || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE) {
         pos_index = index +1;
     }
     else {
@@ -1888,6 +1887,14 @@ void World::updateAchievementDataEndRace()
             else if (RaceManager::get()->isEggHuntMode())
             {
                 PlayerManager::trackEvent(RaceManager::get()->getTrackName(), ACS::TR_EGG_HUNT_FINISHED);
+            }
+
+            else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE) {
+                if (RaceManager::get()->getNumPlayers() > 4) {
+                    TagZombieArenaBattle* tagzab = (TagZombieArenaBattle*)World::getWorld();
+                    PlayerManager::increaseAchievement(ACS::TAG_ZOMBIE_ARENA_ALL_POINTS, tagzab->getKartPointsResult(i));
+                    PlayerManager::increaseAchievement(getKartTeam(i) == KART_TEAM_RED ? ACS::TAG_ZOMBIE_ARENA_SURVIVOR_POINTS : ACS::TAG_ZOMBIE_ARENA_ZOMBIE_POINTS, tagzab->getKartPointsResult(i));
+                }
             }
 
             updateAchievementModeCounters(false /*start*/);

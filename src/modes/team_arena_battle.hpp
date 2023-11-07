@@ -47,25 +47,29 @@ private:
     int m_total_hit;
 
     struct BattleInfo
-    {
-        int  m_lives;
+    {   
         int  m_scores;
-        bool getScore = false;
+        bool get_score = false;
+        // For team_arena_battle_life
+        int  m_lives = RaceManager::get()->getLifeTarget();
     };
 
     struct TeamsInfo
     {
-        int  m_scoresTeams;
-        int  m_totalPlayerGetScore;
-        int  m_totalPlayer;
+        int  m_scores_teams;
+        int  m_total_player_get_score;
+        int  m_total_player;
+        // For team_arena_battle_life
+        int  m_inlife_player;
+        int  m_total_life;
     };
 
-    std::vector<BattleInfo> m_kart_info;
 protected:
+    std::vector<BattleInfo> m_kart_info;
     std::vector<TeamsInfo> m_teams;
+    int m_nb_player_inlife;
     int hit_capture_limit = RaceManager::get()->getHitCaptureLimit();
     //const unsigned int m_num_team = getNumTeams();
-    void handleScoreInServer(int kart_id, int hitter);
 public:
     // ------------------------------------------------------------------------
     TeamArenaBattle();
@@ -89,7 +93,7 @@ public:
     // ------------------------------------------------------------------------
     virtual bool hasTeam() const OVERRIDE { return true; }
     // ------------------------------------------------------------------------
-    virtual bool has4Team() const OVERRIDE { return true; }
+    virtual bool hasTeamPlus() const OVERRIDE { return true; }
     // ------------------------------------------------------------------------
     virtual bool isRaceOver() OVERRIDE;
     // ------------------------------------------------------------------------
@@ -105,6 +109,8 @@ public:
     // ------------------------------------------------------------------------
     virtual video::SColor getColor(unsigned int kart_id) const;
     // ------------------------------------------------------------------------
+    void handleScoreInServer(int kart_id, int hitter);
+    // ------------------------------------------------------------------------
     virtual void setKartScoreFromServer(NetworkString& ns);
     // ------------------------------------------------------------------------
     virtual void setScoreFromServer(int kart_id, int new_kart_score, int team_scored, int new_team_score);
@@ -113,16 +119,16 @@ public:
     // ------------------------------------------------------------------------
     int getTeamsKartScore(int kart_id);
     // ------------------------------------------------------------------------
-    int getTeamScore(KartTeam team) const { return m_teams[(int)team].m_scoresTeams; }
+    int getTeamScore(KartTeam team) const { return m_teams[(int)team].m_scores_teams; }
     // ------------------------------------------------------------------------
     int getTeamScore(int team) const 
     { 
         if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER || 
             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER) {
-            return m_teams[team].m_totalPlayerGetScore;
+            return m_teams[team].m_total_player_get_score;
         }
         else 
-            return m_teams[team].m_scoresTeams; 
+            return m_teams[team].m_scores_teams;
     }
     // ------------------------------------------------------------------------
     void setWinningTeams();
@@ -150,14 +156,14 @@ public:
         {
             progress.first = (uint32_t)m_time;
         }
-        if (m_teams[0].m_scoresTeams > m_teams[1].m_scoresTeams) // m_red_scores > m_blue_scores
+        if (m_teams[0].m_scores_teams > m_teams[1].m_scores_teams) // m_red_scores > m_blue_scores
         {
-            progress.second = (uint32_t)((float)m_teams[0].m_scoresTeams /
+            progress.second = (uint32_t)((float)m_teams[0].m_scores_teams /
                 (float)RaceManager::get()->getHitCaptureLimit() * 100.0f);
         }
         else
         {
-            progress.second = (uint32_t)((float)m_teams[1].m_scoresTeams /
+            progress.second = (uint32_t)((float)m_teams[1].m_scores_teams /
                 (float)RaceManager::get()->getHitCaptureLimit() * 100.0f);
         }
         return progress;

@@ -706,6 +706,10 @@ void RaceGUI::drawGlobalMiniMap()
                 {
                     color = video::SColor(255, 0, 0, 200);
                 }
+                else if (team == KART_TEAM_GREEN)
+                {
+                    color = video::SColor(255, 0, 255, 0);
+                }
             }
             else if (has_teams_plus) {
                 KartTeam team = world->getKartTeam(kart->getWorldKartId());

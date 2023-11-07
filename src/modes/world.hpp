@@ -125,8 +125,6 @@ protected:
     int              m_eliminated_players;
     /** Overall number of players. */
     int              m_num_players;
-    /** Overall number of teams. */
-    int              m_num_teams;
     /** Number of winning teams. */
     std::vector<int> m_winning_teams;
 
@@ -402,16 +400,14 @@ public:
     // ------------------------------------------------------------------------
     virtual bool hasTeam() const                              { return false; }
     // ------------------------------------------------------------------------
-    virtual bool has4Team() const { return false; }
+    virtual bool hasTeamPlus() const { return false; }
     // ------------------------------------------------------------------------
     /** Get the team of kart in world (including AIs) */
     KartTeam getKartTeam(unsigned int kart_id) const;
     // ------------------------------------------------------------------------
     int getTeamNum(KartTeam team) const;
     // ------------------------------------------------------------------------
-    int getNumTeams() const { return m_num_teams; }
-    // ------------------------------------------------------------------------
-    void setNumTeams(int numTeams) { m_num_teams = numTeams; }
+    int getNumTeams() const { return m_teamsInGame.size(); }
     // ------------------------------------------------------------------------
     KartTeam getTeamsInGame(int index) { return m_teamsInGame[index]; }
     // ------------------------------------------------------------------------

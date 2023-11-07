@@ -546,18 +546,26 @@ void ArenaAI::useItems(const float dt)
         }
 
     // Below powerups won't appear in arena, so skip them
-    case PowerupManager::POWERUP_ZIPPER:
+    case PowerupManager::POWERUP_ZIPPER: // Don't handle switch
+        m_controls->setFire(true);       // (use it no matter what) for now
         break;   // POWERUP_ZIPPER
 
-    case PowerupManager::POWERUP_PLUNGER:
+    case PowerupManager::POWERUP_PLUNGER:// Don't handle switch
+        m_controls->setFire(true);       // (use it no matter what) for now
         break;   // POWERUP_PLUNGER
+
 
     case PowerupManager::POWERUP_SWITCH: // Don't handle switch
         m_controls->setFire(true);       // (use it no matter what) for now
         break;   // POWERUP_SWITCH
 
-    case PowerupManager::POWERUP_PARACHUTE:
+    case PowerupManager::POWERUP_PARACHUTE:// Don't handle switch
+        m_controls->setFire(true);         // (use it no matter what) for now
         break;   // POWERUP_PARACHUTE
+
+    case PowerupManager::POWERUP_ANVIL:  // Don't handle switch
+        m_controls->setFire(true);       // (use it no matter what) for now
+        break;   // POWERUP_ANVIL
 
     case PowerupManager::POWERUP_RUBBERBALL:
         break;
