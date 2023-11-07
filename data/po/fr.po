@@ -6324,6 +6324,16 @@ msgstr "Les Rouges l’emportent"
 msgid "Blue Team Wins"
 msgstr "Les Bleus l’emportent"
 
+#: src/states_screens/race_result_gui.cpp:638
+#: src/states_screens/race_result_gui.cpp:1533
+msgid "The zombie team Wins!"
+msgstr "L'équipe des zombies l’emportent"
+
+#: src/states_screens/race_result_gui.cpp:638
+#: src/states_screens/race_result_gui.cpp:1533
+msgid "The survivor team Wins!"
+msgstr "L'équipe des survivants l’emportent"
+
 #: src/states_screens/race_result_gui.cpp:640
 #: src/states_screens/race_result_gui.cpp:1538
 msgid "It's a draw"

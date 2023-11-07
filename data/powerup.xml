@@ -247,6 +247,23 @@
               multi   =" 0       0     5     0       0        0       0     0     0     0"    />
     </weights>
   </battle-weight-list>
+  
+  <teamsarena-weight-list>
+    <weights num-karts="1">
+      <!--              bubble  cake  bowl  zipper  plunger  switch swattr rubber para  anvil -->
+      <weight single  ="50      100   250   5       30       30     120    0      10    10"
+              multi   ="2       0     30    0       4        0      10     0      0     1"    />
+    </weights>
+  </teamsarena-weight-list>
+  
+  <tagzombie-weight-list>
+    <weights num-karts="1">
+      <!--              bubble  cake  bowl  zipper  plunger  switch swattr rubber para  anvil -->
+      <weight single  ="40      12    240   10      30       40     120    0      20    10"
+              multi   ="0       0     20    0       5        0      0      0      0     0"    />
+    </weights>
+  </tagzombie-weight-list>
+  
 
   <soccer-weight-list>
     <weights num-karts="1">
