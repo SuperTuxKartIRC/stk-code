@@ -29,8 +29,7 @@
 #include "network/stk_host.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
-#include "karts/kart_model.hpp"
-#include <ge_render_info.hpp>
+
 #include <algorithm>
 #include <utility>
 
@@ -47,25 +46,29 @@ private:
     int m_total_hit;
 
     struct BattleInfo
-    {
-        int  m_lives;
+    {   
         int  m_scores;
-        bool getScore = false;
+        bool get_score = false;
+        // For team_arena_battle_life
+        int  m_lives = RaceManager::get()->getLifeTarget();
     };
 
     struct TeamsInfo
     {
-        int  m_scoresTeams;
-        int  m_totalPlayerGetScore;
-        int  m_totalPlayer;
+        int  m_scores_teams;
+        int  m_total_player_get_score;
+        int  m_total_player;
+        // For team_arena_battle_life
+        int  m_inlife_player;
+        int  m_total_life;
     };
 
-    std::vector<BattleInfo> m_kart_info;
 protected:
+    std::vector<BattleInfo> m_kart_info;
     std::vector<TeamsInfo> m_teams;
+    int m_nb_player_inlife;
     int hit_capture_limit = RaceManager::get()->getHitCaptureLimit();
     //const unsigned int m_num_team = getNumTeams();
-    void handleScoreInServer(int kart_id, int hitter);
 public:
     // ------------------------------------------------------------------------
     TeamArenaBattle();
@@ -89,7 +92,7 @@ public:
     // ------------------------------------------------------------------------
     virtual bool hasTeam() const OVERRIDE { return true; }
     // ------------------------------------------------------------------------
-    virtual bool has4Team() const OVERRIDE { return true; }
+    virtual bool has4eamPlus() const OVERRIDE { return true; }
     // ------------------------------------------------------------------------
     virtual bool isRaceOver() OVERRIDE;
     // ------------------------------------------------------------------------
@@ -105,6 +108,8 @@ public:
     // ------------------------------------------------------------------------
     virtual video::SColor getColor(unsigned int kart_id) const;
     // ------------------------------------------------------------------------
+    void handleScoreInServer(int kart_id, int hitter);
+    // ------------------------------------------------------------------------
     virtual void setKartScoreFromServer(NetworkString& ns);
     // ------------------------------------------------------------------------
     virtual void setScoreFromServer(int kart_id, int new_kart_score, int team_scored, int new_team_score);
@@ -113,16 +118,16 @@ public:
     // ------------------------------------------------------------------------
     int getTeamsKartScore(int kart_id);
     // ------------------------------------------------------------------------
-    int getTeamScore(KartTeam team) const { return m_teams[(int)team].m_scoresTeams; }
+    int getTeamScore(KartTeam team) const { return m_teams[(int)team].m_scores_teams; }
     // ------------------------------------------------------------------------
     int getTeamScore(int team) const 
     { 
         if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER || 
             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER) {
-            return m_teams[team].m_totalPlayerGetScore;
+            return m_teams[team].m_total_player_get_score;
         }
         else 
-            return m_teams[team].m_scoresTeams; 
+            return m_teams[team].m_scores_teams;
     }
     // ------------------------------------------------------------------------
     void setWinningTeams();
@@ -131,8 +136,6 @@ public:
     {
         m_swatter_reset_kart_ticks[kart_id] = at_world_ticks;
     }
-    // ------------------------------------------------------------------------
-
     // ------------------------------------------------------------------------
     virtual void addReservedKart(int kart_id) OVERRIDE
     {
@@ -150,14 +153,14 @@ public:
         {
             progress.first = (uint32_t)m_time;
         }
-        if (m_teams[0].m_scoresTeams > m_teams[1].m_scoresTeams) // m_red_scores > m_blue_scores
+        if (m_teams[0].m_scores_teams > m_teams[1].m_scores_teams) // m_red_scores > m_blue_scores
         {
-            progress.second = (uint32_t)((float)m_teams[0].m_scoresTeams /
+            progress.second = (uint32_t)((float)m_teams[0].m_scores_teams /
                 (float)RaceManager::get()->getHitCaptureLimit() * 100.0f);
         }
         else
         {
-            progress.second = (uint32_t)((float)m_teams[1].m_scoresTeams /
+            progress.second = (uint32_t)((float)m_teams[1].m_scores_teams /
                 (float)RaceManager::get()->getHitCaptureLimit() * 100.0f);
         }
         return progress;
@@ -166,38 +169,6 @@ public:
     virtual void saveCompleteState(BareNetworkString* bns, STKPeer* peer) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void restoreCompleteState(const BareNetworkString& b) OVERRIDE;
-    float rgbToHue(int r, int g, int b) {
-        float hue = 0.0f;
-
-        // Convert RGB values to the range [0, 1]
-        float r_normalized = r / 255.0f;
-        float g_normalized = g / 255.0f;
-        float b_normalized = b / 255.0f;
-
-        float cmax = std::max(r_normalized, std::max(g_normalized, b_normalized));
-        float cmin = std::min(r_normalized, std::min(g_normalized, b_normalized));
-        float delta = cmax - cmin;
-
-        // Calculate the hue value
-        if (delta != 0) {
-            if (cmax == r_normalized) {
-                hue = fmod((g_normalized - b_normalized) / delta, 6.0f);
-            }
-            else if (cmax == g_normalized) {
-                hue = (b_normalized - r_normalized) / delta + 2.0f;
-            }
-            else {
-                hue = (r_normalized - g_normalized) / delta + 4.0f;
-            }
-        }
-
-        hue *= 60.0f; // Convert hue to degrees
-
-        if (hue < 0) {
-            hue += 360.0f;
-        }
-
-        return hue;
-    }
+    
 };
 #endif // TEAM_ARENA_BATTLE_HPP

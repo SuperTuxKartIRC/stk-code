@@ -296,9 +296,6 @@ void World::init()
 
     int numDifferentTeams = teamsGame.size();
     setNumTeams(numDifferentTeams);
-    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE) {
-        teamsGame.push_back(KART_TEAM_GREEN);
-    }
     setTeamsInGame(teamsGame);
 
     main_loop->renderGUI(7050);
@@ -1611,11 +1608,7 @@ std::shared_ptr<AbstractKart> World::createKartWithTeam
 
     if (kart_type == RaceManager::KT_AI)
     { // TODO : TEAM Modification
-        if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE) {
-            team = KART_TEAM_RED;
-            m_kart_team_map[index] = team;
-        }
-        else if (has4Team()) {
+        if (has4eamPlus()) {
             if (index < m_red_ai)
                 team = KART_TEAM_RED;
             else if (index < m_red_ai + m_blue_ai)
@@ -1628,6 +1621,13 @@ std::shared_ptr<AbstractKart> World::createKartWithTeam
             //teamColor = RaceManager::get()->getTeamColor(team);
             //m_kart_teams_color_map[index] = teamColor;
 
+        }
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE){
+            if (index % 2 == 0)
+                team = KART_TEAM_RED;
+            else
+                team = KART_TEAM_BLUE;
+            m_kart_team_map[index] = team;
         }
         else {
             if (index < m_red_ai)
@@ -1643,7 +1643,10 @@ std::shared_ptr<AbstractKart> World::createKartWithTeam
     else if (NetworkConfig::get()->isNetworking())
     {
         if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE) {
-            team = KART_TEAM_RED;
+            if (index % 2 == 0)
+                team = KART_TEAM_RED;
+            else
+                team = KART_TEAM_BLUE;
             m_kart_team_map[index] = team;
         }
         else {
@@ -1655,7 +1658,10 @@ std::shared_ptr<AbstractKart> World::createKartWithTeam
     else
     {
         if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE) {
-            team = KART_TEAM_RED;
+            if (index % 2 == 0)
+                team = KART_TEAM_RED;
+            else
+                team = KART_TEAM_BLUE;
             m_kart_team_map[index] = team;
         }
         else {
@@ -1678,7 +1684,7 @@ std::shared_ptr<AbstractKart> World::createKartWithTeam
 
     // Notice: In blender, please set 1,3,5,7... for blue starting position;
     // 2,4,6,8... for red.
-    if (getNumTeams() >= 3 || has4Team() == true || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE) {
+    if (getNumTeams() >= 3 || has4eamPlus() == true) {
         pos_index = index +1;
     }
     else {
@@ -1761,20 +1767,6 @@ KartTeam World::getKartTeam(unsigned int kart_id) const
     assert(n != m_kart_team_map.end());
     return n->second;
 }   // getKartTeam
-
-void World::changeKartTeam(unsigned int kart_id, const KartTeam& new_team) {
-    std::map<int, KartTeam>::iterator n =
-        m_kart_team_map.find(kart_id);
-
-    // Check if the kart with the specified ID is found
-    if (n != m_kart_team_map.end()) {
-        // Change the team of the kart
-        n->second = new_team;
-    }
-    else {
-        // Handle the case where the kart is not found
-    }
-}
 
 //-----------------------------------------------------------------------------
 void World::setAITeam()

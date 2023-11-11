@@ -53,7 +53,7 @@ private:
     {
         int  m_inlife_player;
         int  m_total_life;
-        int  m_totalPlayer;
+        int  m_total_player;
     };
 
     /** This vector contains an 'BattleInfo' struct for every kart in the race.*/
@@ -87,7 +87,7 @@ public:
     // ------------------------------------------------------------------------
     virtual bool hasTeam() const OVERRIDE { return true; }
     // ------------------------------------------------------------------------
-    virtual bool has4Team() const OVERRIDE { return true; }
+    virtual bool has4eamPlus() const OVERRIDE { return true; }
     // ------------------------------------------------------------------------
     virtual bool isRaceOver() OVERRIDE;
     // ------------------------------------------------------------------------

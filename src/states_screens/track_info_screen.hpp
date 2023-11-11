@@ -55,8 +55,6 @@ class TrackInfoScreen : public GUIEngine::Screen,
 
     bool m_is_team_arena_battle;
 
-    bool m_is_tag_arena_battle;
-
     bool m_is_teams_mode;
 
     bool m_is_arena_mode;

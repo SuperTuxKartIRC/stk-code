@@ -402,7 +402,7 @@ public:
     // ------------------------------------------------------------------------
     virtual bool hasTeam() const                              { return false; }
     // ------------------------------------------------------------------------
-    virtual bool has4Team() const { return false; }
+    virtual bool has4eamPlus() const { return false; }
     // ------------------------------------------------------------------------
     /** Get the team of kart in world (including AIs) */
     KartTeam getKartTeam(unsigned int kart_id) const;
@@ -441,8 +441,6 @@ public:
     }
     // ------------------------------------------------------------------------
     virtual bool isGoalPhase() const { return false; }
-
-    void changeKartTeam(unsigned int kart_id, const KartTeam& new_team);
 };   // World
 
 #endif

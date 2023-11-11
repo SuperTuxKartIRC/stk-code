@@ -5221,8 +5221,6 @@ void ServerLobby::handleServerConfiguration(Event* event)
         return;
     }
 
-    // TODO : Besoins de modifications pour prendre en compte des autres options en ligne (nb team, nb ia, etc) // William Lussier 2023-10-25 20h21
-
     RaceManager::get()->setMinorMode(modes.first);
     RaceManager::get()->setMajorMode(modes.second);
     RaceManager::get()->setDifficulty(RaceManager::Difficulty(new_difficulty));

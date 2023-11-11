@@ -40,9 +40,6 @@ void TagZombieArenaBattle::reset(bool restart)
     else
         WorldStatus::setClockMode(CLOCK_CHRONO);
 
-    for (size_t i = 0; i < m_total_player; i++)
-        changeKartTeam(i, m_player_team); // Update the team for the kart
-
     initGameInfo();
 
 }   // reset
@@ -295,7 +292,6 @@ void TagZombieArenaBattle::restoreCompleteState(const BareNetworkString& b)
 // ----------------------------------------------------------------------------
 void TagZombieArenaBattle::setZombie(int kartId, int zombieId)
 {
-    changeKartTeam(kartId, m_tag_zombie_team); // Update the team for the kart
     m_nb_not_zombie_player--;
     m_kart_info[kartId].m_convertedTime = (double)getTime();
     m_kart_info[kartId].m_zombie_id_convert = zombieId;

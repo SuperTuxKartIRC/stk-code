@@ -50,7 +50,6 @@
 #include "modes/capture_the_flag.hpp"
 #include "modes/overworld.hpp"
 #include "modes/soccer_world.hpp"
-#include <modes/tag_zombie_arena_battle.hpp>
 #include <modes/team_arena_battle.hpp>
 #include <modes/team_arena_battle_life.hpp>
 #include "network/network_config.hpp"
@@ -1225,8 +1224,7 @@ void RaceResultGUI::unload()
         else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM       ||
                  RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER     ||
                  RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER ||
-                 RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE ||
-                 RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE)
+                 RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE)
         {
             displayTeamsArenaResults();
         }
@@ -1595,7 +1593,6 @@ void RaceResultGUI::unload()
     void RaceResultGUI::displayTeamPlayers(KartTeam teams, int x, int y) {
         TeamArenaBattle* tab = (TeamArenaBattle*)World::getWorld();
         TeamArenaBattlelife* tabl = (TeamArenaBattlelife*)World::getWorld();
-        TagZombieArenaBattle* tagzab = (TagZombieArenaBattle*)World::getWorld();
         World* world = World::getWorld();
 
         int score;
@@ -1610,10 +1607,6 @@ void RaceResultGUI::unload()
         else if (mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE) {
             modeVal = 2;
             score = tabl->getTeamTotalLife(teams);
-        }
-        else if (mode == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE) {
-            modeVal = 3;
-            score = tagzab->getTeamInlifePlayer(teams);
         }
 
         //video::SColor red_color = video::SColor(255, 255, 0, 0);
@@ -1675,11 +1668,6 @@ void RaceResultGUI::unload()
                 kart_id = kart->getWorldKartId();
                 team = tabl->getKartTeam(kart_id);
             }
-            else if (modeVal == 3) {
-                kart = tagzab->getKartAtPosition(i + 1);
-                kart_id = kart->getWorldKartId();
-                team = tagzab->getKartTeam(kart_id);
-            }
             if (team != teams)
                 continue;
             result_text = kart->getController()->getName();
@@ -1699,8 +1687,6 @@ void RaceResultGUI::unload()
                 result_text.append(StringUtils::toWString(tab->getKartScore(kart_id)));
             else if (modeVal == 2)
                 result_text.append(StringUtils::toWString(tabl->getKartLife(kart_id)));
-            else if (modeVal == 3)
-                result_text.append(StringUtils::toWString(tagzab->getKartNbConvertedPlayer(kart_id)));
 
             // y + team_icon_height
             font->draw(result_text, core::rect<s32>(x, y, x + 200, y + 30), kart->getController()->isLocalPlayerController() ? color : black_color, true, false);

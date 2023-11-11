@@ -348,8 +348,6 @@ Item* ItemManager::placeItem(ItemState::ItemType type, const Vec3& xyz,
     // Make sure this subroutine is not used otherwise (since networking
     // needs to be aware of items added to the track, so this would need
     // to be added).
-
-
     assert(World::getWorld()->getPhase() == WorldStatus::SETUP_PHASE ||
            ProfileWorld::isProfileMode()                               );
     ItemState::ItemType mesh_type = type;
@@ -357,12 +355,6 @@ Item* ItemManager::placeItem(ItemState::ItemType type, const Vec3& xyz,
     Item* item = new Item(type, xyz, normal, m_item_mesh[mesh_type],
                           m_item_lowres_mesh[mesh_type], m_icon[mesh_type],
                           /*prev_owner*/NULL);
-
-    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE)
-    {
-        removeTextures();
-        return item;
-    }
 
     insertItem(item);
     if (m_switch_ticks >= 0)

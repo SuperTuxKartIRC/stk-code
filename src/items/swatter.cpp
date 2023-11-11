@@ -404,32 +404,28 @@ void Swatter::squashThingsAround()
 
     if (success)
     {
-
         World::getWorld()->kartHit(m_closest_kart->getWorldKartId(),
             m_kart->getWorldKartId());
 
         CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
-
-            if (ctf)
+        if (ctf)
+        {
+            int reset_ticks = (ctf->getTicksSinceStart() / 10) * 10 + 80;
+            ctf->resetKartForSwatterHit(m_closest_kart->getWorldKartId(),
+                reset_ticks);
+        }
+        // Handle achievement if the swatter is used by the current player
+        if (m_kart->getController()->canGetAchievements())
+        {
+            PlayerManager::addKartHit(m_closest_kart->getWorldKartId());
+            PlayerManager::increaseAchievement(AchievementsStatus::SWATTER_HIT, 1);
+            PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS, 1);
+            if (RaceManager::get()->isLinearRaceMode())
             {
-                int reset_ticks = (ctf->getTicksSinceStart() / 10) * 10 + 80;
-                ctf->resetKartForSwatterHit(m_closest_kart->getWorldKartId(),
-                    reset_ticks);
+                PlayerManager::increaseAchievement(AchievementsStatus::SWATTER_HIT_1RACE, 1);
+                PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS_1RACE, 1);
             }
-            // Handle achievement if the swatter is used by the current player
-
-            if (m_kart && m_kart->getController()->canGetAchievements())
-            {
-                PlayerManager::addKartHit(m_closest_kart->getWorldKartId());
-                PlayerManager::increaseAchievement(AchievementsStatus::SWATTER_HIT, 1);
-                PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS, 1);
-                if (RaceManager::get()->isLinearRaceMode())
-                {
-                    PlayerManager::increaseAchievement(AchievementsStatus::SWATTER_HIT_1RACE, 1);
-                    PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS_1RACE, 1);
-                }
-            }
-
+        }
     }
 
     if (!GUIEngine::isNoGraphics() && has_created_explosion_animation &&

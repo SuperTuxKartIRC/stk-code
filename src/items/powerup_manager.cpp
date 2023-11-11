@@ -146,11 +146,12 @@ void PowerupManager::loadPowerupsModels()
         }
     }
     
-    loadWeights(root, "race-weight-list"    );
-    loadWeights(root, "ftl-weight-list"     );
-    loadWeights(root, "battle-weight-list"  );
-    loadWeights(root, "soccer-weight-list"  );
-    loadWeights(root, "tutorial-weight-list");
+    loadWeights(root, "race-weight-list"        );
+    loadWeights(root, "ftl-weight-list"         );
+    loadWeights(root, "battle-weight-list"      );
+    loadWeights(root, "teamsarena-weight-list"  );
+    loadWeights(root, "soccer-weight-list"      );
+    loadWeights(root, "tutorial-weight-list"    );
 
     delete root;
 
@@ -530,10 +531,10 @@ void PowerupManager::computeWeightsForRace(int num_karts)
     case RaceManager::MINOR_MODE_3_STRIKES:                           class_name = "battle";   break;
     case RaceManager::MINOR_MODE_FREE_FOR_ALL:                        class_name = "battle";   break;
     case RaceManager::MINOR_MODE_CAPTURE_THE_FLAG:                    class_name = "battle";   break;
-    case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM:       class_name = "battle";   break;
-    case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER:     class_name = "battle";   break;
-    case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER: class_name = "battle";   break;
-    case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE:              class_name = "battle";   break;
+    case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM:       class_name = "teamsarena";   break;
+    case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER:     class_name = "teamsarena";   break;
+    case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER: class_name = "teamsarena";   break;
+    case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE:              class_name = "teamsarena";   break;
     case RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE:             class_name = "battle";   break;
     case RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA:                class_name = "battle";   break;
     case RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA:                class_name = "battle";   break;
