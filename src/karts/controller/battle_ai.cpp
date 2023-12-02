@@ -105,7 +105,7 @@ void BattleAI::findClosestKart(bool consider_difficulty, bool find_sta)
         }
         
 
-        if (RaceManager::get()->getMinorMode() == RaceManager::MinorRaceModeType::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE) {
+        if (RaceManager::get()->isTagzArenaBattleMode()) {
             if (m_world->getKartTeam(m_kart->getWorldKartId()) == KART_TEAM_RED && m_world->getKartTeam(kart->getWorldKartId()) == KART_TEAM_GREEN)
                 continue; // TODO : Besoins de modification // William Lussier 
         } // the player skip the zombie kart

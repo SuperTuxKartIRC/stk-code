@@ -15,7 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/online/network_kart_selection.hpp"
+#include "states_screens/online/network_teams_selection.hpp"
 
 #include "config/user_config.hpp"
 #include "guiengine/widgets/progress_bar_widget.hpp"
@@ -30,21 +30,21 @@
 #include "states_screens/state_manager.hpp"
 #include "states_screens/online/networking_lobby.hpp"
 #include "states_screens/online/tracks_screen.hpp"
-#include "states_screens/online/teams_screen.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+#include <states_screens/teams_setup_screen.hpp>
 
 using namespace GUIEngine;
 
 // ----------------------------------------------------------------------------
-void NetworkKartSelectionScreen::beforeAddingWidget()
+void NetworkTeamsSelectionScreen::beforeAddingWidget()
 {
     m_multiplayer = NetworkConfig::get()->getNetworkPlayers().size() != 1;
     KartSelectionScreen::beforeAddingWidget();
 }   // beforeAddingWidget
 
 // ----------------------------------------------------------------------------
-void NetworkKartSelectionScreen::init()
+void NetworkTeamsSelectionScreen::init()
 {
     assert(!NetworkConfig::get()->isAddingNetworkPlayers());
     m_all_players_done = false;
@@ -67,7 +67,7 @@ void NetworkKartSelectionScreen::init()
         joinPlayer(std::get<0>(p), std::get<1>(p));
         if (std::get<2>(p) == HANDICAP_MEDIUM)
         {
-            m_kart_widgets.get(m_kart_widgets.size() -1)
+            m_kart_widgets.get(m_kart_widgets.size() - 1)
                 ->enableHandicapForNetwork();
         }
         w->updateItemDisplay();
@@ -84,7 +84,7 @@ void NetworkKartSelectionScreen::init()
 /** Called once per frame. Updates the timer display.
  *  \param dt Time step size.
  */
-void NetworkKartSelectionScreen::onUpdate(float dt)
+void NetworkTeamsSelectionScreen::onUpdate(float dt)
 {
     if (StkTime::getMonoTimeMs() > m_exit_timeout)
     {
@@ -96,12 +96,12 @@ void NetworkKartSelectionScreen::onUpdate(float dt)
         return;
     }
 
-    KartSelectionScreen::onUpdate(dt);
+    NetworkTeamsSelectionScreen::onUpdate(dt);
     updateProgressBarText();
 }   // onUpdate
 
 // ----------------------------------------------------------------------------
-void NetworkKartSelectionScreen::allPlayersDone()
+void NetworkTeamsSelectionScreen::allPlayersDone()
 {
     m_all_players_done = true;
     input_manager->setMasterPlayerOnly(true);
@@ -164,27 +164,17 @@ void NetworkKartSelectionScreen::allPlayersDone()
     input_manager->getDeviceManager()->setAssignMode(ASSIGN);
     auto cl = LobbyProtocol::get<ClientLobby>();
     if (!m_live_join && cl && cl->serverEnabledTrackVoting())
-    { // TODO : Besoins de modification
-        if ((RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM ||
-            RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER ||
-            RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER ||
-            RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE) && 
-            RaceManager::get()->getTeamsSelectionEnabled())
-        {
-            TracksScreen::getInstance()->setNetworkTracks();
-            TracksScreen::getInstance()->push();
-            NetworkTeamsSetupScreen::getInstance()->push();
-        }
-        else
-        {
-            TracksScreen::getInstance()->setNetworkTracks();
-            TracksScreen::getInstance()->push();
-        }
+    {
+        //TracksScreen::getInstance()->setNetworkTracks();
+        //TracksScreen::getInstance()->push();
+
+
+        //TeamsSetupScreen::getInstance->set
     }
 }   // allPlayersDone
 
 // ----------------------------------------------------------------------------
-bool NetworkKartSelectionScreen::onEscapePressed()
+bool NetworkTeamsSelectionScreen::onEscapePressed()
 {
     if (!m_live_join)
     {
@@ -214,7 +204,7 @@ bool NetworkKartSelectionScreen::onEscapePressed()
 }   // onEscapePressed
 
 // ----------------------------------------------------------------------------
-void NetworkKartSelectionScreen::updateProgressBarText()
+void NetworkTeamsSelectionScreen::updateProgressBarText()
 {
     if (m_live_join)
         return;
@@ -235,12 +225,12 @@ void NetworkKartSelectionScreen::updateProgressBarText()
 }   // updateProgressBarText
 
 // ----------------------------------------------------------------------------
-bool NetworkKartSelectionScreen::isIgnored(const std::string& ident) const
-{
-    // Online addon kart use tux for hitbox in server so we can allow any
-    // addon kart graphically, if live join is disabled
-    if (NetworkConfig::get()->useTuxHitboxAddon() &&
-        ident.find("addon_") != std::string::npos)
-        return false;
-    return m_available_karts.find(ident) == m_available_karts.end();
-}   // isIgnored
+//bool NetworkTeamsSelectionScreen::isIgnored(const std::string& ident) const
+//{
+//    // Online addon kart use tux for hitbox in server so we can allow any
+//    // addon kart graphically, if live join is disabled
+//    if (NetworkConfig::get()->useTuxHitboxAddon() &&
+//        ident.find("addon_") != std::string::npos)
+//        return false;
+//    return m_available_karts.find(ident) == m_available_karts.end();
+//}   // isIgnored

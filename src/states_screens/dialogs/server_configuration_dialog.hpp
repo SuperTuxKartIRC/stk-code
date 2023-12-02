@@ -44,6 +44,7 @@ private:
     GUIEngine::RibbonWidget* m_game_mode_widget;
     GUIEngine::RibbonWidget* m_options_widget;
     GUIEngine::IconButtonWidget* m_ok_widget;
+    GUIEngine::IconButtonWidget* m_more_options_page_widget;
     GUIEngine::IconButtonWidget* m_cancel_widget;
 
     void updateMoreOption(int game_mode);
@@ -113,13 +114,13 @@ public:
                 m_prev_value = 6;
                 break;
             }
-            case RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA:
+            case RaceManager::MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE:
             {
                 m_prev_mode = 2;
                 m_prev_value = 7;
                 break;
             }
-            case RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA:
+            case RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE:
             {
                 m_prev_mode = 2;
                 m_prev_value = 8;

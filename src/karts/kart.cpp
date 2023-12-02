@@ -260,41 +260,6 @@ void Kart::changeKart(const std::string& new_ident,
 }   // changeKart
 
 // ----------------------------------------------------------------------------
-void Kart::changeKartMore(const std::string& new_ident,
-    HandicapLevel handicap,
-    std::shared_ptr<GE::GERenderInfo> ri,
-    const KartData& kart_data)
-{
-    AbstractKart::changeKartMore(new_ident, handicap, ri, kart_data);
-    m_kart_model->setKart(this);
-
-    scene::ISceneNode* old_node = m_node;
-    loadData(m_type, UserConfigParams::m_animated_characters);
-    initSound();
-    m_wheel_box = NULL;
-
-    if (LocalPlayerController* lpc =
-        dynamic_cast<LocalPlayerController*>(getController()))
-        lpc->initParticleEmitter();
-
-    if (old_node)
-        old_node->remove();
-
-    // Reset 1 more time (add back the body)
-    reset();
-
-    for (int i = 0; i < m_vehicle->getNumWheels(); i++)
-    {
-        btWheelInfo& wi = m_vehicle->getWheelInfo(i);
-        wi.m_raycastInfo.m_suspensionLength = m_default_suspension_force /
-            m_vehicle->getNumWheels();
-    }
-    m_graphical_y_offset = -m_default_suspension_force /
-        m_vehicle->getNumWheels() + m_kart_model->getLowestPoint();
-    m_kart_model->setDefaultSuspension();
-    startEngineSFX();
-}   // changeKart
-// ----------------------------------------------------------------------------
 /** The destructor frees the memory of this kart, but note that the actual kart
  *  model is still stored in the kart_properties (m_kart_model variable), so
  *  it is not reloaded).
@@ -532,6 +497,12 @@ void Kart::setSlowdown(unsigned int category, float max_speed_fraction,
                        int fade_in_time)
 {
     m_max_speed->setSlowdown(category, max_speed_fraction,  fade_in_time);
+}   // setSlowdown
+
+void Kart::setSlowdown(unsigned int category, float max_speed_fraction,
+    int fade_in_time, int duration)
+{
+    m_max_speed->setSlowdown(category, max_speed_fraction, fade_in_time, duration);
 }   // setSlowdown
 
 // -----------------------------------------------------------------------------
@@ -1138,18 +1109,15 @@ void Kart::setRaceResult()
     }
     else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE)
     {
-        //FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
-        //m_race_result = ffa->getKartFFAResult(getWorldKartId());
+       
     }
-    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA)
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE)
     {
-        //FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
-        //m_race_result = ffa->getKartFFAResult(getWorldKartId());
+
     }
-    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA)
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE)
     {
-        //FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
-        //m_race_result = ffa->getKartFFAResult(getWorldKartId());
+
     }
     else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
     {

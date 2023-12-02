@@ -30,6 +30,7 @@
 #include "karts/rescue_animation.hpp"
 #include "karts/controller/local_player_controller.hpp"
 #include "modes/soccer_world.hpp"
+#include "modes/tag_zombie_arena_battle.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
 #include "karts/explosion_animation.hpp"
@@ -214,7 +215,6 @@ void Physics::update(int ticks)
     bool is_child = STKProcess::getType() == PT_CHILD;
     int kartid1 = 0;
     int kartid2 = 0;
-
     for(p=m_all_collisions.begin(); p!=m_all_collisions.end(); ++p)
     {
         // Kart-kart collision
@@ -227,8 +227,7 @@ void Physics::update(int ticks)
                               p->getContactPointCS(1)                );
             if (!is_child)
             {
-                Scripting::ScriptEngine* script_engine =
-                                                Scripting::ScriptEngine::getInstance();
+                Scripting::ScriptEngine* script_engine = Scripting::ScriptEngine::getInstance();
                 kartid1 = p->getUserPointer(0)->getPointerKart()->getWorldKartId();
                 kartid2 = p->getUserPointer(1)->getPointerKart()->getWorldKartId();
                 script_engine->runFunction(false, "void onKartKartCollision(int, int)",
@@ -237,17 +236,21 @@ void Physics::update(int ticks)
                         ctx->SetArgDWord(1, kartid2);
                     });
             }
-            KartTeam test = p->getUserPointer(0)->getPointerKart()->getKartTeam();
-            KartTeam test3 = p->getUserPointer(1)->getPointerKart()->getKartTeam();
 
-            //RemoteKartInfo& rki = RaceManager::get()->getKartInfo(kartid1);
-           //RemoteKartInfo& rki2 = RaceManager::get()->getKartInfo(kartid2);
-            //int test2 = RaceManager::get()->getMinorMode();
-            if (
-                RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE)
+            if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE)
             {
-                World::getWorld()->kartHit(kartid1, kartid2);
+                kartid1 = p->getUserPointer(0)->getPointerKart()->getWorldKartId();
+                kartid2 = p->getUserPointer(1)->getPointerKart()->getWorldKartId();
+                AbstractKart* kart1 = p->getUserPointer(0)->getPointerKart();
+                AbstractKart* kart2 = p->getUserPointer(1)->getPointerKart();
 
+                TagZombieArenaBattle* tagzab = (TagZombieArenaBattle*)World::getWorld();
+                if (World::getWorld()->getKartTeam(kartid1) == tagzab->getTagZombieTeam() && !kart2->isShielded()) {
+                    World::getWorld()->kartHit(kartid2, kartid1);
+                } // kartid1 is zombie 
+                else if (World::getWorld()->getKartTeam(kartid2) == tagzab->getTagZombieTeam() && !kart1->isShielded()) {
+                    World::getWorld()->kartHit(kartid1, kartid2);
+                } // kartid2 is zombie
             }
             continue;
         }  // if kart-kart collision

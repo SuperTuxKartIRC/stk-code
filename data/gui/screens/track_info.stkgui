@@ -127,6 +127,15 @@
                         <spacer width="3%"/>
                         <label id="record-race-text" proportion="3" I18N="In the track info screen" text="Record the race for ghost replay" text_align="left" align="center"/>
                     </div>
+
+	            <div width="5%" height="fit" layout="horizontal-row">
+                         <icon-button id="powerup" icon_align="right" icon="gui/icons/gift.png"/>
+		         <icon-button id="nitro" icon_align="right" icon="gui/icons/nitro.png"/>
+		         <icon-button id="banana" icon_align="right" icon="gui/icons/banana.png"/>
+		         <icon-button id="powerup-selection" icon_align="right" icon="gui/icons/powerups_selection.png"/>
+		         <icon-button id="special-option" icon_align="right" icon="gui/icons/heart.png"/>
+                    </div>  
+			
                 </box><!-- Race options box -->
                 
                 <spacer width="1" height="2%"/>

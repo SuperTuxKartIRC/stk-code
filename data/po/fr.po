@@ -73,7 +73,7 @@ msgstr "Joue à chaque piste officielle au moins une fois."
 
 #. I18N: ./data/achievements.xml
 msgid "Strike!"
-msgstr "Strike !"
+msgstr "Stri !"
 
 #. I18N: ./data/achievements.xml
 msgid "Hit 10 karts with a bowling-ball."
@@ -3836,6 +3836,16 @@ msgstr "%s a capturé le drapeau bleu !"
 msgid "%s captured the red flag!"
 msgstr "%s a capturé le drapeau rouge !"
 
+#: src/modes/tag_zombie_arena_battle.cpp:450
+#, c-format
+msgid "%s has been tansformed in zombie by %s!"
+msgstr "%s a été transformé en zombie par %s!"
+
+#: src/modes/tag_zombie_arena_battle.cpp:450
+#, c-format
+msgid "%s has been tansformed in zombie!"
+msgstr "%s a été transformé en zombie !"
+
 #: src/modes/easter_egg_hunt.cpp:222
 #, c-format
 msgid "Eggs: %d / %d"
@@ -4137,6 +4147,16 @@ msgstr "Mêlée générale"
 #: src/states_screens/online/create_server_screen.cpp:239
 msgid "Capture The Flag"
 msgstr "Capture le drapeau"
+
+#: src/states_screens/race_manager.cpp:1333
+#: src/race/race_manager.cpp:1290 src/states_screens/track_info_screen.cpp:337
+msgid "Tag zombie survivor (powerful)"
+msgstr "Tag zombie survivant puissant"
+
+#: src/states_screens/race_manager.cpp:1335
+#: src/race/race_manager.cpp:1290 src/states_screens/track_info_screen.cpp:251
+msgid "Tag zombie last survivor"
+msgstr "Tag zombie dernier survivant"
 
 #: src/online/online_player_profile.cpp:455
 #, c-format
@@ -6409,21 +6429,22 @@ msgstr "Talonne le meneur, mais sans le dépasser !"
 msgid "Team arena battle."
 msgstr "Arène bataille équipe"
 
+
 #: src/states_screens/race_setup_screen.cpp:115
 msgid "Hit other players' teams with weapons to score points."
 msgstr "Tire sur les membres des autres équipes pour faire des points"
 
 #: src/states_screens/race_setup_screen.cpp:115
-msgid "Surviving tags. Tags must kill (or touch) all other people."
-msgstr "Survivre aux tags. Les tags doivent tuer (ou toucher) toutes les autres personnes."
+msgid "Surviving zombies. Zombies must kill (or touch) all other people (survivor)."
+msgstr "Survivre aux zombie. Les zombies doivent tuer (ou toucher) toutes les autres personnes (survivants)."
 
 #: src/states_screens/race_setup_screen.cpp:115
-msgid "Surviving monsters. Monsters must kill all other people."
-msgstr "Survivre aux monstres. Les monstres doivent tuer tous les autres personnes."
+msgid "Surviving zombies. The powerful survivor(s) must survive the zombies."
+msgstr "Survivre aux zombie. Le ou les survivants puissants doivent survivent aux zombies."
 
 #: src/states_screens/race_setup_screen.cpp:115
-msgid "Surviving the killer. The sheriff must kill the killer."
-msgstr "Survivre au tueur. Le shérif doit tuer le tueur."
+msgid "Surviving zombies. The last survivor wins the game."
+msgstr "Survivre aux zombie. Le dernier survivants gagne la partie."
 
 #: src/states_screens/race_setup_screen.cpp:120
 msgid "Push the ball into the opposite cage to score goals."

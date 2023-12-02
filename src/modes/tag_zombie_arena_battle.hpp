@@ -42,32 +42,49 @@ private:
     bool m_count_down_reached_zero = false;
     const int8_t PNBT = 0, ZNBT = 2;
     irr::core::stringw m_winning_text;
+    enum ClassesTypes {
+        VITESSE,
+        FORCE,
+        DEFENSE,
+        DEFORCE,
+        CONTROLE,
+        SPEED_CONTROLLER,
+        JACK_OF_ALL_TRADE,
+    };
 
     /** Profiling usage */
     int m_total_rescue = 0;
     int m_total_hit = 0;
 
+    struct PowerInfo {
+        int powerType;
+        int weight;
+    };
+
     struct BattleInfo
     {
         int  m_lifes;
         int m_nb_player_converted; // int8_t
-        float m_convertedTime = -1;
+        float m_converted_time = -1;
         bool  m_is_start_zombie;
         int8_t m_zombie_id_convert;
         int m_points_result;
+        int m_nb_rescues;
+        ClassesTypes m_type;
     };
 
     struct TeamInfo
     {
-        int  m_scoresTeams;
+        int  m_scores_teams;
         int8_t  m_inlife_player;
     };
 
 protected:
     int8_t m_total_player = getNumKarts();
     int8_t m_nb_not_zombie_player;
-    int8_t m_nb_tags_zombie = NetworkConfig::get()->isNetworking() ? 1 : RaceManager::get()->getNumberOfGreenAIKarts();
+    int8_t m_nb_tags_zombie = NetworkConfig::get()->isNetworking() ? RaceManager::get()->getTagTarget() : RaceManager::get()->getNumberOfGreenAIKarts();
     float m_delay = 0;
+    float m_delayItem = 15;
 
     KartTeam m_tag_zombie_team = KART_TEAM_GREEN;
     KartTeam m_player_team = KART_TEAM_RED;
@@ -75,10 +92,11 @@ protected:
     std::vector<TeamInfo> m_team_info; // TeamList
     std::vector<BattleInfo> m_kart_info; // KartList
     std::vector<int8_t> m_tag_zombie_list_rand; // List of random zombie at start of the game
+    std::map<ClassesTypes, std::vector<PowerInfo>> m_class_power_map;
 
-    bool change = false;
-    int changewait = 0;
-    int idplayer;
+    bool m_convert_player = false;
+    int m_id_player_converted;
+    int m_iPower;
     
 public:
     // ------------------------------------------------------------------------
@@ -126,6 +144,8 @@ private:
     // ------------------------------------------------------------------------
     virtual void setZombie(int kartId, int zombieId);
     // ------------------------------------------------------------------------
+    void TagZombieArenaBattle::setSurvivor(int kartId);
+    // ------------------------------------------------------------------------
     virtual bool setZombieStart();
     // ------------------------------------------------------------------------
     void changeKart(int idKart);
@@ -144,15 +164,19 @@ private:
     // ------------------------------------------------------------------------
     virtual void restoreCompleteState(const BareNetworkString& b) OVERRIDE;
 
-public :
+public:
     // ------------------------------------------------------------------------
     int getKartNbConvertedPlayer(int kart_id) const { return m_kart_info.at(kart_id).m_nb_player_converted; }
     // ------------------------------------------------------------------------
-    int getKartConvertedTime(int kart_id) const { return m_kart_info.at(kart_id).m_convertedTime; }
+    int getKartConvertedTime(int kart_id) const { return m_kart_info.at(kart_id).m_converted_time; }
     // ------------------------------------------------------------------------
     int getKartConverteZombie(int kart_id) const { return m_kart_info.at(kart_id).m_zombie_id_convert; }
     // ------------------------------------------------------------------------
     int getKartPointsResult(int kart_id) const { return m_kart_info.at(kart_id).m_points_result; }
+    // ------------------------------------------------------------------------
+    int getKartNbRescues(int kart_id) const { return m_kart_info.at(kart_id).m_nb_rescues; }
+    // ------------------------------------------------------------------------
+    void setKartNbRescuues(int kart_id) { m_kart_info.at(kart_id).m_nb_rescues++; }
     // ------------------------------------------------------------------------
     int getTeamInlifePlayer(int team) const { return m_team_info[(int)team].m_inlife_player; }
     // ------------------------------------------------------------------------
@@ -171,6 +195,20 @@ public :
     void setWinningTeamsTexte(irr::core::stringw winningText) { m_winning_text = winningText; };
     // ------------------------------------------------------------------------
     irr::core::stringw getWinningTeamsTexte() { return m_winning_text; };
+    // ------------------------------------------------------------------------
+    virtual void setZombieTexte(irr::core::stringw winningText, int kartId, int zombieId);
+
+
+    int getRandomPowerForClass(ClassesTypes classType);
+    void distributePower(int8_t powerIndex, int* collectible_type, int* amount);
+    ClassesTypes getRandomClassType();
+    void initializeClassPowerMap();
+
+    // overriding World methods
+    virtual void getDefaultCollectibles(int* collectible_type, int* amount) OVERRIDE;
+    virtual bool haveBonusBoxes() OVERRIDE;
+    virtual bool timerPower() OVERRIDE;
+    virtual void getItem(int* collectible_type, int* amount) OVERRIDE;
 };
 
 #endif // TAG_ARENA_BATTLE_HPP

@@ -89,28 +89,16 @@ bool GameEventsProtocol::notifyEvent(Event* event)
     }
     case GE_BATTLE_KART_SCORE:
     {
-        if (!ffa && !tabl && !tagzab)
-            throw std::invalid_argument("No free-for-all world, team-arena-battle-life world or or tag-zombie-arena-battle world"); 
+        if (!ffa && !tab && !tabl && !tagzab)
+            throw std::invalid_argument("No free-for-all world, team-arena-battle world or tag-zombie-arena-battle world"); 
         else if (ffa)
             ffa->setKartScoreFromServer(data);
+        else if (tab)
+            tab->setKartScoreFromServer(data);
         else if (tabl)
             tabl->setKartLifeFromServer(data);
         else if (tagzab)
             tagzab->setKartsInfoFromServer(data);
-        break;
-    }
-    case GE_BATTLE_KART_SCORE_TEAM:
-    {
-        if (!tab)
-            throw std::invalid_argument("No team-arena-battle");
-
-        if (tab) {
-            int8_t kart_id = data.getUInt8();
-            int16_t new_kart_scores = data.getUInt16();
-            int team_scored = data.getUInt8();
-            int8_t new_team_scores = data.getUInt8();
-            tab->setScoreFromServer(kart_id, new_kart_scores, team_scored, new_team_scores);
-        }
         break;
     }
     case GE_CTF_SCORED:

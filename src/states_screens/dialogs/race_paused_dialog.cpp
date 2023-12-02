@@ -457,6 +457,20 @@ void RacePausedDialog::beforeAddingWidgets()
             getWidget("team_space")->m_properties[GUIEngine::PROP_WIDTH] = "1%";
             getWidget("team")->setText(StringUtils::utf32ToWide({0x1f7e6}));
         }
+        else if (m_target_team == KART_TEAM_GREEN)
+        {
+            getWidget("team")->setVisible(true);
+            getWidget("team")->m_properties[GUIEngine::PROP_WIDTH] = "7%";
+            getWidget("team_space")->m_properties[GUIEngine::PROP_WIDTH] = "1%";
+            getWidget("team")->setText(StringUtils::utf32ToWide({ 0x1F7E9 }));
+        }
+        else if (m_target_team == KART_TEAM_ORANGE)
+        {
+            getWidget("team")->setVisible(true);
+            getWidget("team")->m_properties[GUIEngine::PROP_WIDTH] = "7%";
+            getWidget("team_space")->m_properties[GUIEngine::PROP_WIDTH] = "1%";
+            getWidget("team")->setText(StringUtils::utf32ToWide({ 0x1F7E7 }));
+        }
         else
         {
             getWidget("team")->m_properties[GUIEngine::PROP_WIDTH] = "0%";

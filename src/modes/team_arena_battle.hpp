@@ -80,6 +80,8 @@ public:
     // ------------------------------------------------------------------------
     virtual void reset(bool restart = false) OVERRIDE;
     // ------------------------------------------------------------------------
+    void initGameInfo();
+    // ------------------------------------------------------------------------
     virtual void getKartsDisplayInfo(
     std::vector<RaceGUIBase::KartIconDisplayInfo>* info) OVERRIDE;
     // ------------------------------------------------------------------------
@@ -112,8 +114,6 @@ public:
     void handleScoreInServer(int kart_id, int hitter);
     // ------------------------------------------------------------------------
     virtual void setKartScoreFromServer(NetworkString& ns);
-    // ------------------------------------------------------------------------
-    virtual void setScoreFromServer(int kart_id, int new_kart_score, int team_scored, int new_team_score);
     // ------------------------------------------------------------------------
     int getKartScore(int kart_id) const { return m_kart_info.at(kart_id).m_scores; }
     // ------------------------------------------------------------------------

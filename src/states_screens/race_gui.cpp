@@ -713,21 +713,7 @@ void RaceGUI::drawGlobalMiniMap()
             }
             else if (has_teams_plus) {
                 KartTeam team = world->getKartTeam(kart->getWorldKartId());
-                KartTeamsColor kartColor;
-
-                // TODO : Besoins de modification. Aller chercher le KartTeamsColor par rapport au KartTeam // William Lussier 2023-10-21 14h40
-                if (team == KART_TEAM_RED)
-                    kartColor = KART_TEAM_COLOR_RED;
-                else if (team == KART_TEAM_BLUE)
-                    kartColor = KART_TEAM_COLOR_BLUE;
-                else if (team == KART_TEAM_GREEN)
-                    kartColor = KART_TEAM_COLOR_GREEN;
-                else if (team == KART_TEAM_ORANGE)
-                    kartColor = KART_TEAM_COLOR_ORANGE;
-                else
-                    kartColor = KART_TEAM_COLOR_DEFAULT;
-
-                color = rgbaColorKartTeamsColor(kartColor);
+                color = rgbaColorKartTeamsColor(team);
             }
 
                                   
@@ -1406,7 +1392,7 @@ void RaceGUI::drawLap(const AbstractKart* kart,
 
 
         uint8_t nbTeam = world->getNumTeams();
-
+        KartTeam team;
         int icon_width = irr_driver->getActualScreenSize().Height / 19;
         core::rect<s32> indicator_pos(viewport.LowerRightCorner.X - (icon_width + 10),
             pos.UpperLeftCorner.Y,
@@ -1419,45 +1405,43 @@ void RaceGUI::drawLap(const AbstractKart* kart,
 
         for (uint8_t i = 0; i < nbTeam; i++)
         {
-            // TODO : Besoins de modification // William Lussier 2023-10-13
-            auto teamsColor = i == KART_TEAM_RED ? KART_TEAM_COLOR_RED :
-                              i == KART_TEAM_BLUE ? KART_TEAM_COLOR_BLUE :
-                              i == KART_TEAM_GREEN ? KART_TEAM_COLOR_GREEN :
-                              KART_TEAM_COLOR_ORANGE;
+            team = world->getTeamsInGame(i);
+            
+            if (team >= 0) {
+                team_score = modeVal == 1 ? tab->getTeamScore(team) : modeVal == 2 ? tabl->getTeamInlifePlayer((int)team) : modeVal == 3 ? tagzab->getTeamInlifePlayer((int)team) : 0;
 
-            if (world->getTeamsInGame((KartTeam)i) >= 0) {
-                team_score = modeVal == 1 ? tab->getTeamScore(i) : modeVal == 2 ? tabl->getTeamInlifePlayer(i) : modeVal == 3 ? tagzab->getTeamInlifePlayer(i) : 0;
-
-                if (i != 0) {
+                if (i != 0 && nbTeam > 1) {
                     text = L"-";
                     font->draw(text, pos, video::SColor(255, 255, 255, 255));
                     d = font->getDimension(text.c_str());
                     pos += core::position2di(d.Width, 0);
                 }
                 text = StringUtils::toWString(team_score);
-                font->draw(text, pos, rgbaColorKartTeamsColor(teamsColor), false, false, NULL, true /* ignore RTL */);
+                font->draw(text, pos, rgbaColorKartTeamsColor(team), false, false, NULL, true /* ignore RTL */);
                 d = font->getDimension(text.c_str());
                 pos += core::position2di(d.Width, 0);
             }
         }
         
-        text = L"  ";
-        font->draw(text, pos, video::SColor(255, 255, 255, 255));
-        d = font->getDimension(text.c_str());
-        pos += core::position2di(d.Width, 0);
+        if (hit_capture_limit != -1 && number_life != -1) {
+            text = L"  ";
+            font->draw(text, pos, video::SColor(255, 255, 255, 255));
+            d = font->getDimension(text.c_str());
+            pos += core::position2di(d.Width, 0);
 
-        text = modeVal == 1 ? StringUtils::toWString(hit_capture_limit) : modeVal == 2 ? StringUtils::toWString(number_life) : "-1";
+            text = modeVal == 1 ? StringUtils::toWString(hit_capture_limit) : modeVal == 2 ? StringUtils::toWString(number_life) : "-1";
 
-        font->draw(text, pos, video::SColor(255, 225, 225, 255), false, false, NULL, true /* ignore RTL */);
-        d = font->getDimension(text.c_str());
-        pos += core::position2di(d.Width, 0);
+            font->draw(text, pos, video::SColor(255, 225, 225, 255), false, false, NULL, true /* ignore RTL */);
+            d = font->getDimension(text.c_str());
+            pos += core::position2di(d.Width, 0);
 
-        modeVal == 2 ? draw2DImage(m_heart_icon, indicator_pos, source_rect, NULL, NULL, true) : draw2DImage(m_champion, indicator_pos, source_rect, NULL, NULL, true);
+            modeVal == 2 ? draw2DImage(m_heart_icon, indicator_pos, source_rect, NULL, NULL, true) : draw2DImage(m_champion, indicator_pos, source_rect, NULL, NULL, true);
 
-        //if(tab)
-        //    draw2DImage(m_champion, indicator_pos, source_rect,NULL, NULL, true);
-        //else if (tabl)
-        //    draw2DImage(m_heart_icon, indicator_pos, source_rect, NULL, NULL, true);
+            //if(tab)
+            //    draw2DImage(m_champion, indicator_pos, source_rect,NULL, NULL, true);
+            //else if (tabl)
+            //    draw2DImage(m_heart_icon, indicator_pos, source_rect, NULL, NULL, true);
+        }
 
         font->setBlackBorder(false);
         return;

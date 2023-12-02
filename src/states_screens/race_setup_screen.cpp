@@ -46,8 +46,8 @@ const int CONFIG_CODE_GHOST           = 6;
 const int CONFIG_CODE_LAP_TRIAL       = 7;
 const int CONFIG_CODE_TEAM_ARENA      = 8;
 const int CONFIG_CODE_TAG_Z_ARENA     = 9;
-const int CONFIG_CODE_MONSTER_ARENA   = 10;
-const int CONFIG_CODE_MURDER_MYSTERY  = 11;
+const int CONFIG_CODE_TAG_Z_S_ARENA   = 10;
+const int CONFIG_CODE_TAG_Z_LS_ARENA  = 11;
 const int CONFIG_CODE_TEAM_ARENA_LIFE = 12;
 
 using namespace GUIEngine;
@@ -130,20 +130,8 @@ void RaceSetupScreen::init()
     irr::core::stringw name9 = irr::core::stringw(
         RaceManager::getNameOf(RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE)) + L"\n";
     //FIXME: avoid duplicating descriptions from the help menu!
-    name9 += _("Surviving tags. Tags must kill (or touch) all other people.");
+    name9 += _("Surviving zombies. Zombies must kill (or touch) all other people (survivor).");
     w2->addItem(name9, IDENT_TAG_Z, RaceManager::getIconOf(RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE));
-
-    irr::core::stringw name10 = irr::core::stringw(
-        RaceManager::getNameOf(RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA)) + L"\n";
-    //FIXME: avoid duplicating descriptions from the help menu!
-    name10 += _("Surviving monsters. Monsters must kill all other people.");
-    w2->addItem(name10, IDENT_MONSTER, RaceManager::getIconOf(RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA));
-
-    irr::core::stringw name11 = irr::core::stringw(
-        RaceManager::getNameOf(RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA)) + L"\n";
-    //FIXME: avoid duplicating descriptions from the help menu!
-    name11 += _("Surviving the killer. The sheriff must kill the killer.");
-    w2->addItem(name11, IDENT_MURDER_MYSTERY, RaceManager::getIconOf(RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA));
 
     irr::core::stringw name5 = irr::core::stringw(
         RaceManager::getNameOf(RaceManager::MINOR_MODE_SOCCER)) + L"\n";
@@ -202,17 +190,11 @@ void RaceSetupScreen::init()
     case CONFIG_CODE_LAP_TRIAL:
         w2->setSelection(IDENT_LAP_TRIAL, PLAYER_ID_GAME_MASTER, true);
         break;
-    case CONFIG_CODE_TEAM_ARENA: // TODO : Besoins de modification // William Lussier 2023-10-21 11h10
+    case CONFIG_CODE_TEAM_ARENA:
         w2->setSelection(IDENT_TEAM_PT, PLAYER_ID_GAME_MASTER, true);
         break;
     case CONFIG_CODE_TAG_Z_ARENA:
         w2->setSelection(IDENT_TAG_Z, PLAYER_ID_GAME_MASTER, true);
-        break;
-    case CONFIG_CODE_MONSTER_ARENA:
-        w2->setSelection(IDENT_MONSTER, PLAYER_ID_GAME_MASTER, true);
-        break;
-    case CONFIG_CODE_MURDER_MYSTERY:
-        w2->setSelection(IDENT_MURDER_MYSTERY, PLAYER_ID_GAME_MASTER, true);
         break;
     case CONFIG_CODE_TEAM_ARENA_LIFE:
         w2->setSelection(IDENT_TEAM_L, PLAYER_ID_GAME_MASTER, true);
@@ -336,16 +318,16 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name,
             UserConfigParams::m_game_mode = CONFIG_CODE_TAG_Z_ARENA;
             ArenasScreen::getInstance()->push();
         }
-        else if (selectedMode == IDENT_MONSTER)
+        else if (selectedMode == IDENT_TAG_Z_S)
         {
-            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA);
-            UserConfigParams::m_game_mode = CONFIG_CODE_MONSTER_ARENA;
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE);
+            UserConfigParams::m_game_mode = CONFIG_CODE_TAG_Z_S_ARENA;
             ArenasScreen::getInstance()->push();
         }
-        else if (selectedMode == IDENT_MURDER_MYSTERY)
+        else if (selectedMode == IDENT_TAG_Z_LS)
         {
-            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA);
-            UserConfigParams::m_game_mode = CONFIG_CODE_MURDER_MYSTERY;
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE);
+            UserConfigParams::m_game_mode = CONFIG_CODE_TAG_Z_LS_ARENA;
             ArenasScreen::getInstance()->push();
         }
         else if (selectedMode == "locked")

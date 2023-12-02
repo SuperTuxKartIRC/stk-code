@@ -40,16 +40,12 @@
                 <spinner id="more-options-spinner" proportion="1" wrap_around="true"/>
             </div>
 
-           <div x="0" y="0" width="20%" height="8%" align="left" layout="horizontal-row">
-                 <icon-button id="powerup" icon_align="right" icon="gui/icons/gift.png"/>
-	         <icon-button id="nitro" icon_align="right" icon="gui/icons/nitro.png"/>
-		 <icon-button id="banana" icon_align="right" icon="gui/icons/banana.png"/>
-            </div>
-
             <buttonbar id="options" x="0" y="0" width="30%" height="15%" align="center">
 
                 <icon-button id="cancel" width="64" height="64" icon="gui/icons/red_x.png"
                              I18N="In the server configuration screen" text="Cancel" label_location="bottom"/>
+                <icon-button id="more-options-page" width="64" height="64" icon="gui/icons/heart.png"
+                             I18N="In the server configuration screen" text="Options" label_location="bottom"/>
                 <icon-button id="ok" width="64" height="64" icon="gui/icons/green_check.png"
                              I18N="In the server configuration screen" text="OK" label_location="bottom"/>
             </buttonbar>

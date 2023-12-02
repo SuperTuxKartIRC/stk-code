@@ -27,10 +27,7 @@ void TeamArenaBattle::init()
     m_display_rank = false;
     m_count_down_reached_zero = false;
     m_use_highscores = false;
-    m_teams.resize(4);
-    m_kart_info.resize(getNumKarts());
-    for (unsigned int i = 0; i < 4; i++)
-        m_teams[i].m_total_player = getTeamNum((KartTeam)i);
+    initGameInfo();
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -42,13 +39,19 @@ void TeamArenaBattle::reset(bool restart)
         WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN, RaceManager::get()->getTimeTarget());
     else
         WorldStatus::setClockMode(CLOCK_CHRONO);
+    initGameInfo();
+}   // reset
+
+// ----------------------------------------------------------------------------
+void TeamArenaBattle::initGameInfo()
+{
     m_teams.clear();
     m_teams.resize(4);
     m_kart_info.clear();
     m_kart_info.resize(getNumKarts());
     for (unsigned int i = 0; i < 4; i++)
         m_teams[i].m_total_player = getTeamNum((KartTeam)i);
-}   // reset
+}
 
 // ----------------------------------------------------------------------------
 /** Called when the match time ends.
@@ -139,31 +142,30 @@ bool TeamArenaBattle::kartHit(int kart_id, int hitter)
  */
 void TeamArenaBattle::handleScoreInServer(int kart_id, int hitter)
 {
-    int new_score = 0;
     int team;
     if (kart_id == hitter || hitter == -1) {
         m_kart_info[kart_id].m_scores--;
         team = (int)getKartTeam(kart_id);
-        new_score = m_teams[team].m_scores_teams--;
+        m_teams[team].m_scores_teams--;
         
         if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER || 
             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER) {
             if (m_kart_info[kart_id].get_score == true && m_kart_info[kart_id].m_scores < hit_capture_limit) {
                 m_kart_info[kart_id].get_score = false;
-                new_score = m_teams[team].m_total_player_get_score--;
+                m_teams[team].m_total_player_get_score--;
             }
         }
     }
     else {
         m_kart_info[hitter].m_scores++;
         team = (int)getKartTeam(hitter);
-        new_score = m_teams[team].m_scores_teams++;
+        m_teams[team].m_scores_teams++;
 
         if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER ||
             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER) {
             if (m_kart_info[hitter].get_score == false && m_kart_info[hitter].m_scores >= hit_capture_limit) {
                 m_kart_info[hitter].get_score = true;
-                new_score = m_teams[team].m_total_player_get_score++;
+                m_teams[team].m_total_player_get_score++;
             }
         }
     }
@@ -174,11 +176,8 @@ void TeamArenaBattle::handleScoreInServer(int kart_id, int hitter)
     {
         NetworkString p(PROTOCOL_GAME_EVENTS);
         p.setSynchronous(true);
-        p.addUInt8(GameEventsProtocol::GE_BATTLE_KART_SCORE_TEAM);
-        if (kart_id == hitter || hitter == -1)
-            p.addUInt8((uint8_t)kart_id).addUInt16((int16_t)m_kart_info[kart_id].m_scores).addUInt8((int8_t)team).addUInt8((int8_t)new_score);
-        else
-            p.addUInt8((uint8_t)hitter).addUInt16((int16_t)m_kart_info[hitter].m_scores).addUInt8((int8_t)team).addUInt8((int8_t)new_score);
+        p.addUInt8(GameEventsProtocol::GE_BATTLE_KART_SCORE);
+        p.addUInt8((uint8_t)kart_id).addUInt8((uint8_t)hitter);
         STKHost::get()->sendPacketToAllPeers(&p, true);
     }
 }   // handleScoreInServer
@@ -186,16 +185,9 @@ void TeamArenaBattle::handleScoreInServer(int kart_id, int hitter)
 // ----------------------------------------------------------------------------
 void TeamArenaBattle::setKartScoreFromServer(NetworkString& ns)
 {
-    int kart_id = ns.getUInt8();
-    int16_t score = ns.getUInt16();
-    m_kart_info.at(kart_id).m_scores = score;
-}   // setKartScoreFromServer
-
-// ----------------------------------------------------------------------------
-void TeamArenaBattle::setScoreFromServer(int kart_id, int new_kart_score, int team_scored, int new_team_score)
-{
-    m_kart_info.at(kart_id).m_scores = new_kart_score;
-    m_teams[team_scored].m_scores_teams = new_team_score;
+    uint8_t kart_id = ns.getUInt8();
+    uint8_t hitter = ns.getUInt8();
+    handleScoreInServer(kart_id, hitter);
 }   // setKartScoreFromServer
 
 // ----------------------------------------------------------------------------

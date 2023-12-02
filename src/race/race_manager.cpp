@@ -134,6 +134,7 @@ RaceManager::RaceManager()
     m_coin_target        = 0;
     m_started_from_overworld = false;
     m_have_kart_last_position_on_overworld = false;
+    m_teams_selection   = false;
     m_num_local_players = 0;
     m_hit_capture_limit = 0;
     m_flag_return_ticks = stk_config->time2Ticks(20.0f);
@@ -141,6 +142,9 @@ RaceManager::RaceManager()
     m_skipped_tracks_in_gp = 0;
     m_gp_time_target = 0.0f;
     m_gp_total_laps = 0;
+    m_bonusBoxes = true;
+    m_nitro = true;
+    m_banana = true;
     setMaxGoal(0);
     setTimeTarget(0.0f);
     setReverseTrack(false);
@@ -229,17 +233,6 @@ void RaceManager::setKartTeam(unsigned int player_id, KartTeam team)
     assert(player_id < m_player_karts.size());
 
     m_player_karts[player_id].setKartTeam(team);
-}   // setKartTeam
-
-//---------------------------------------------------------------------------------------------
-/** Sets additional information for a player to indicate which team it
- *  belongs to.
-*/
-void RaceManager::setKartTeam(unsigned int player_id, KartTeam team, KartTeamsColor teamColor)
-{
-    assert(player_id < m_player_karts.size());
-
-    m_player_karts[player_id].setKartTeam(team); // TODO : Besoins de modification // William Lussier 2023-10-21 10h51
 }   // setKartTeam
 
 //---------------------------------------------------------------------------------------------
@@ -695,10 +688,10 @@ void RaceManager::startNextRace()
             World::setWorld(new TeamArenaBattlelife());
         else if (m_minor_mode == MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE)
             World::setWorld(new TagZombieArenaBattle());
-        else if (m_minor_mode == MINOR_MODE_MONSTER_ATTACK_ARENA)
-            World::setWorld(new FreeForAll());
-        else if (m_minor_mode == MINOR_MODE_MURDER_MYSTERY_ARENA)
-            World::setWorld(new FreeForAll());
+        else if (m_minor_mode == MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE)
+            World::setWorld(new TagZombieArenaBattle());
+        else if (m_minor_mode == MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE)
+            World::setWorld(new TagZombieArenaBattle());
     }
     else if(m_minor_mode==MINOR_MODE_SOCCER)
         World::setWorld(new SoccerWorld());
@@ -1307,26 +1300,33 @@ const core::stringw RaceManager::getNameOf(const MinorRaceModeType mode)
     switch (mode)
     {
         //I18N: Game mode
-        case MINOR_MODE_NORMAL_RACE:    return _("Normal Race");
-        //I18N: Game mode
-        case MINOR_MODE_TIME_TRIAL:     return _("Time Trial");
-        //I18N: Game mode
-        case MINOR_MODE_FOLLOW_LEADER:  return _("Follow the Leader");
-        //I18N: Game mode
-        case MINOR_MODE_LAP_TRIAL:      return _("Lap Trial");
-        //I18N: Game mode
-        case MINOR_MODE_3_STRIKES:      return _("3 Strikes Battle");
-        //I18N: Game mode
-        case MINOR_MODE_FREE_FOR_ALL:   return _("Free-For-All");
+        case MINOR_MODE_NORMAL_RACE:      return _("Normal Race");
+        //I18N: Game mode                 
+        case MINOR_MODE_TIME_TRIAL:       return _("Time Trial");
+        //I18N: Game mode                 
+        case MINOR_MODE_FOLLOW_LEADER:    return _("Follow the Leader");
+        //I18N: Game mode                 
+        case MINOR_MODE_LAP_TRIAL:        return _("Lap Trial");
+        //I18N: Game mode                 
+        case MINOR_MODE_3_STRIKES:        return _("3 Strikes Battle");
+        //I18N: Game mode                 
+        case MINOR_MODE_FREE_FOR_ALL:     return _("Free-For-All");
         //I18N: Game mode
         case MINOR_MODE_CAPTURE_THE_FLAG: return _("Capture The Flag");
-        case MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM: return _("Team Points");
-        case MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER: return _("Player with most points");
+        //I18N: Game mode
+        case MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM:       return _("Team Points");
+        //I18N: Game mode
+        case MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER:     return _("Player with most points");
+        //I18N: Game mode
         case MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER: return _("All Player Points");
-        case MINOR_MODE_TEAM_ARENA_BATTLE_LIFE: return _("Last team standing");
+        //I18N: Game mode
+        case MINOR_MODE_TEAM_ARENA_BATTLE_LIFE:  return _("Last team standing");
+        //I18N: Game mode
         case MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE: return _("Tag zombie");
-        case MINOR_MODE_MONSTER_ATTACK_ARENA: return _("Monster Arena Battle");
-        case MINOR_MODE_MURDER_MYSTERY_ARENA: return _("Murder Mystery");
+        //I18N: Game mode
+        case MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE:      return _("Tag zombie survivor");
+        //I18N: Game mode
+        case MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE: return _("Tag zombie all survivor");
         //I18N: Game mode
         case MINOR_MODE_EASTER_EGG:     return _("Egg Hunt");
         //I18N: Game mode
@@ -1345,6 +1345,7 @@ core::stringw RaceManager::getDifficultyName(Difficulty diff) const
         case RaceManager::DIFFICULTY_MEDIUM: return _("Intermediate"); break;
         case RaceManager::DIFFICULTY_HARD:   return _("Expert");   break;
         case RaceManager::DIFFICULTY_BEST:   return _("SuperTux");   break;
+        case RaceManager::DIFFICULTY_COUNT:  return _("SuperTux");   break; // TODO : NEED TO BE DELETED 
         default:  assert(false);
     }
     return "";

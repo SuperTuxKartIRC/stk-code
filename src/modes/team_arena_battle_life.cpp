@@ -47,6 +47,7 @@ void TeamArenaBattlelife::init()
 // ----------------------------------------------------------------------------
 void TeamArenaBattlelife::reset(bool restart)
 {
+    //int life = RaceManager::get()->getLifeTarget() == NULL : 1 ? 5;
     WorldWithRank::reset(restart);
     m_count_down_reached_zero = false;
     if (RaceManager::get()->hasTimeTarget()) {
@@ -63,8 +64,16 @@ void TeamArenaBattlelife::reset(bool restart)
     for (unsigned int i = 0; i < 4; i++)
     {
         m_teams[i].m_inlife_player = getTeamNum((KartTeam)i);
-        m_teams[i].m_total_life = getTeamNum((KartTeam)i) * RaceManager::get()->getLifeTarget();
+        m_teams[i].m_total_life = getTeamNum((KartTeam)i) * (RaceManager::get()->getLifeTarget());
         m_teams[i].m_total_player = getTeamNum((KartTeam)i);
+    }
+
+    if (NetworkConfig::get()->isNetworking())
+        RaceManager::get()->setHitCaptureLimit(3);
+
+    for (unsigned int i = 0; i < kart_amount; i++) {
+        if (NetworkConfig::get()->isNetworking())
+            m_kart_info[i].m_lifes = 3;
     }
 }   // reset
 

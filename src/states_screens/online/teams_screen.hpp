@@ -41,7 +41,6 @@ class NetworkTeamsSetupScreen : public GUIEngine::Screen,
         bool                        confirmed;
         bool                        support_colorization;
         KartTeam                   teams;
-        KartTeamsColor              teamColor;
 
         KartViewInfo() : view(), confirmed(false), support_colorization(false),
             teams(KART_TEAM_NONE) {}
@@ -84,17 +83,12 @@ private:
     bool areAllKartsConfirmed() const;
     int getNumConfirmedKarts();
     void updateKartViewsLayout();
-    void changeTeam(int player_id, KartTeam teams, KartTeamsColor teamsColor);
+    void changeTeam(int player_id, KartTeam teams);
     void prepareGame();
-    const float getHueColor(KartTeamsColor teamsColor);
+    const float getHueColor(KartTeam teamsColor);
     void NetworkTeamsSetupScreen::changeTeamByDirection(int player_id, int direction);
     void NetworkTeamsSetupScreen::changeTeamColor(int player_id, int direction);
     int m_teamSelection = 1;
-
-    KartTeamsColor m_team1Color = KART_TEAM_COLOR_RED;
-    KartTeamsColor m_team2Color = KART_TEAM_COLOR_BLUE;
-    KartTeamsColor m_team3Color = KART_TEAM_COLOR_GREEN;
-    KartTeamsColor m_team4Color = KART_TEAM_COLOR_ORANGE;
 };
 
 #endif // HEADER_NETWORK_TEAMS_SETUP_SCREEN_HPP

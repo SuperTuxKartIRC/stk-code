@@ -51,8 +51,8 @@ static const std::string IDENT_TEAM_PP("BATTLE_TEAM_POINT_PLAYER");
 static const std::string IDENT_TEAM_APP("BATTLE_TEAM_ALL_POINTS_PLAYER");
 static const std::string IDENT_TEAM_L("BATTLE_TEAM_LIFE");
 static const std::string IDENT_TAG_Z("BATTLE_TAG_ZOMBIE");
-static const std::string IDENT_MONSTER("BATTLE_MONSTER");
-static const std::string IDENT_MURDER_MYSTERY("BATTLE_MURDER_MYSTERY");
+static const std::string IDENT_TAG_Z_S("BATTLE_TAG_ZOMBIE_SURVIVOR");
+static const std::string IDENT_TAG_Z_LS("BATTLE_TAG_ZOMBIE_LAST_SURVIVOR");
 static const std::string IDENT_EASTER("EASTER_EGG_HUNT");
 static const std::string IDENT_SOCCER("SOCCER");
 static const std::string IDENT_GHOST("GHOST");
@@ -130,8 +130,8 @@ public:
         MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER = BATTLE_ARENA(6),
         MINOR_MODE_TEAM_ARENA_BATTLE_LIFE = BATTLE_ARENA(7),
         MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE = BATTLE_ARENA(8),
-        MINOR_MODE_MONSTER_ATTACK_ARENA = BATTLE_ARENA(9),
-        MINOR_MODE_MURDER_MYSTERY_ARENA = BATTLE_ARENA(10),
+        MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE = BATTLE_ARENA(9),
+        MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE = BATTLE_ARENA(10),
 
         MINOR_MODE_EASTER_EGG = EASTER_EGG(0),
 
@@ -158,22 +158,22 @@ public:
     {
         switch (mode)
         {
-        case MINOR_MODE_NORMAL_RACE:                       return IDENT_STD;
-        case MINOR_MODE_TIME_TRIAL:                        return IDENT_TTRIAL;
-        case MINOR_MODE_FOLLOW_LEADER:                     return IDENT_FTL;
-        case MINOR_MODE_LAP_TRIAL:                         return IDENT_LAP_TRIAL;
-        case MINOR_MODE_3_STRIKES:                         return IDENT_STRIKES;
-        case MINOR_MODE_FREE_FOR_ALL:                      return IDENT_FFA;
-        case MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM:     return IDENT_TEAM_PT;
-        case MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER:   return IDENT_TEAM_PP;
-        case MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER:return IDENT_TEAM_APP;
-        case MINOR_MODE_TEAM_ARENA_BATTLE_LIFE:            return IDENT_TEAM_L;
-        case MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE:           return IDENT_TAG_Z;
-        case MINOR_MODE_MONSTER_ATTACK_ARENA:              return IDENT_MONSTER;
-        case MINOR_MODE_MURDER_MYSTERY_ARENA:              return IDENT_MURDER_MYSTERY;
-        case MINOR_MODE_CAPTURE_THE_FLAG:                  return IDENT_CTF;
-        case MINOR_MODE_EASTER_EGG:                        return IDENT_EASTER;
-        case MINOR_MODE_SOCCER:                            return IDENT_SOCCER;
+        case MINOR_MODE_NORMAL_RACE:                            return IDENT_STD;
+        case MINOR_MODE_TIME_TRIAL:                             return IDENT_TTRIAL;
+        case MINOR_MODE_FOLLOW_LEADER:                          return IDENT_FTL;
+        case MINOR_MODE_LAP_TRIAL:                              return IDENT_LAP_TRIAL;
+        case MINOR_MODE_3_STRIKES:                              return IDENT_STRIKES;
+        case MINOR_MODE_FREE_FOR_ALL:                           return IDENT_FFA;
+        case MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM:          return IDENT_TEAM_PT;
+        case MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER:        return IDENT_TEAM_PP;
+        case MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER:    return IDENT_TEAM_APP;
+        case MINOR_MODE_TEAM_ARENA_BATTLE_LIFE:                 return IDENT_TEAM_L;
+        case MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE:                return IDENT_TAG_Z;
+        case MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE:       return IDENT_TAG_Z_S;
+        case MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE:  return IDENT_TAG_Z_LS;
+        case MINOR_MODE_CAPTURE_THE_FLAG:                       return IDENT_CTF;
+        case MINOR_MODE_EASTER_EGG:                             return IDENT_EASTER;
+        case MINOR_MODE_SOCCER:                                 return IDENT_SOCCER;
         default: assert(false);
             return IDENT_STD;  // stop compiler warning
         }
@@ -187,22 +187,22 @@ public:
     {
         switch (mode)
         {
-        case MINOR_MODE_NORMAL_RACE:                         return "/gui/icons/mode_normal.png";
-        case MINOR_MODE_TIME_TRIAL:                          return "/gui/icons/mode_tt.png";
-        case MINOR_MODE_FOLLOW_LEADER:                       return "/gui/icons/mode_ftl.png";
-        case MINOR_MODE_LAP_TRIAL:                           return "/gui/icons/mode_laptrial.png";
-        case MINOR_MODE_3_STRIKES:                           return "/gui/icons/mode_3strikes.png";
-        case MINOR_MODE_FREE_FOR_ALL:                        return "/gui/icons/mode_weapons.png";
-        case MINOR_MODE_CAPTURE_THE_FLAG:                    return "/gui/icons/mode_weapons.png";
-        case MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM:       return "/gui/icons/mode_team_arena.png";
-        case MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER:     return "/gui/icons/mode_team_arena.png";
-        case MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER: return "/gui/icons/mode_team_arena.png";
-        case MINOR_MODE_TEAM_ARENA_BATTLE_LIFE:              return "/gui/icons/mode_team_arena.png";
-        case MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE:             return "/gui/icons/mode_tag_arena.png";
-        case MINOR_MODE_MONSTER_ATTACK_ARENA:                return "/gui/icons/mode_monster_arena.png";
-        case MINOR_MODE_MURDER_MYSTERY_ARENA:                return "/gui/icons/mode_murder_mystery.png";
-        case MINOR_MODE_EASTER_EGG:                          return "/gui/icons/mode_easter.png";
-        case MINOR_MODE_SOCCER:                              return "/gui/icons/mode_soccer.png";
+        case MINOR_MODE_NORMAL_RACE:                           return "/gui/icons/mode_normal.png";
+        case MINOR_MODE_TIME_TRIAL:                            return "/gui/icons/mode_tt.png";
+        case MINOR_MODE_FOLLOW_LEADER:                         return "/gui/icons/mode_ftl.png";
+        case MINOR_MODE_LAP_TRIAL:                             return "/gui/icons/mode_laptrial.png";
+        case MINOR_MODE_3_STRIKES:                             return "/gui/icons/mode_3strikes.png";
+        case MINOR_MODE_FREE_FOR_ALL:                          return "/gui/icons/mode_weapons.png";
+        case MINOR_MODE_CAPTURE_THE_FLAG:                      return "/gui/icons/mode_weapons.png";
+        case MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM:         return "/gui/icons/mode_team_arena.png";
+        case MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER:       return "/gui/icons/mode_team_arena.png";
+        case MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER:   return "/gui/icons/mode_team_arena.png";
+        case MINOR_MODE_TEAM_ARENA_BATTLE_LIFE:                return "/gui/icons/mode_team_arena.png";
+        case MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE:               return "/gui/icons/mode_tag_arena.png";
+        case MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE:      return "/gui/icons/mode_tag_arena.png";
+        case MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE: return "/gui/icons/mode_tag_arena.png";
+        case MINOR_MODE_EASTER_EGG:                            return "/gui/icons/mode_easter.png";
+        case MINOR_MODE_SOCCER:                                return "/gui/icons/mode_soccer.png";
         default: assert(false); return NULL;
         }
     }   // getIconOf
@@ -227,8 +227,8 @@ public:
         case MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER:     return false;
         case MINOR_MODE_TEAM_ARENA_BATTLE_LIFE:                  return false;
         case MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE:                 return false;
-        case MINOR_MODE_MONSTER_ATTACK_ARENA:                    return false;
-        case MINOR_MODE_MURDER_MYSTERY_ARENA:                    return false;
+        case MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE:        return false;
+        case MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE:   return false;
         case MINOR_MODE_EASTER_EGG:                              return false;
         case MINOR_MODE_SOCCER:                                  return true;
         default: assert(false);                                  return false;
@@ -255,8 +255,8 @@ public:
         else if (name == IDENT_TEAM_APP)         return MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER;
         else if (name == IDENT_TEAM_L)           return MINOR_MODE_TEAM_ARENA_BATTLE_LIFE;
         else if (name == IDENT_TAG_Z)            return MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE;
-        else if (name == IDENT_MONSTER)          return MINOR_MODE_MONSTER_ATTACK_ARENA;
-        else if (name == IDENT_MURDER_MYSTERY)   return MINOR_MODE_MURDER_MYSTERY_ARENA;
+        else if (name == IDENT_TAG_Z_S)          return MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE;
+        else if (name == IDENT_TAG_Z_LS)         return MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE;
         else if (name == IDENT_EASTER)           return MINOR_MODE_EASTER_EGG;
         else if (name == IDENT_SOCCER)           return MINOR_MODE_SOCCER;
 
@@ -394,9 +394,13 @@ private:
     int                              m_coin_target;
     float                            m_time_target;
     int                              m_life_target;
+    int                              m_tag_target;
+    int                              m_minor_mode_target=0;
     int                              m_goal_target;
     int                              m_hit_capture_limit;
     int                              m_skipped_tracks_in_gp;
+    int                              m_nb_teams;
+    bool                             m_teams_selection;
     /** Time target for GP, used in Lap Trial mode */
     float                            m_gp_time_target;
     /** Total laps from every track, used in Lap Trial mode */
@@ -421,6 +425,11 @@ private:
     bool m_has_ghost_karts;
 
     bool m_watching_replay;
+
+    bool m_bonusBoxes;
+    bool m_nitro;
+    bool m_banana;
+
 public:
     // ----------------------------------------------------------------------------------------
     static RaceManager* get();
@@ -442,10 +451,6 @@ public:
     /** Sets additional information for a player to indicate which team it belong to
     */
     void setKartTeam(unsigned int player_id, KartTeam team);
-
-    /** Sets additional information for a player to indicate which team it belong to
-    */
-    void RaceManager::setKartTeam(unsigned int player_id, KartTeam team, KartTeamsColor teamColor);
 
     /** Sets the handicap for a player.
      */
@@ -580,6 +585,16 @@ public:
     {
         m_life_target = life;
     }   // setTimeTarget
+
+    void setTagTarget(int tag)
+    {
+        m_tag_target = tag;
+    }   // setTimeTarget
+     // ----------------------------------------------------------------------------------------
+    void setMinorMode(int minormode)
+    {
+        m_minor_mode_target = minormode;
+    }   // setTimeTarget
     // ----------------------------------------------------------------------------------------
     RemoteKartInfo& getKartInfo(unsigned int n)
     {
@@ -634,22 +649,22 @@ public:
     {
         switch (m_minor_mode)
         {
-        case MINOR_MODE_NORMAL_RACE:                         return "normal";
-        case MINOR_MODE_TIME_TRIAL:                          return "time-trial";
-        case MINOR_MODE_FOLLOW_LEADER:                       return "follow-the-leader";
-        case MINOR_MODE_3_STRIKES:                           return "battle";
-        case MINOR_MODE_FREE_FOR_ALL:                        return "ffa";
-        case MINOR_MODE_CAPTURE_THE_FLAG:                    return "ctf";
-        case MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM:       return "team-arena-points-team";
-        case MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER:     return "team-arena-points-player";
-        case MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER: return "team-arena-all-points-player";
-        case MINOR_MODE_TEAM_ARENA_BATTLE_LIFE:              return "team-arena-life";
-        case MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE:             return "tag-zombie-arena";
-        case MINOR_MODE_MONSTER_ATTACK_ARENA:                return "monster";
-        case MINOR_MODE_MURDER_MYSTERY_ARENA:                return "murder-mystery";
-        case MINOR_MODE_EASTER_EGG:                          return "egg-hunt";
-        case MINOR_MODE_SOCCER:                              return "soccer";
-        default: assert(false);                              return "";
+        case MINOR_MODE_NORMAL_RACE:                            return "normal";
+        case MINOR_MODE_TIME_TRIAL:                             return "time-trial";
+        case MINOR_MODE_FOLLOW_LEADER:                          return "follow-the-leader";
+        case MINOR_MODE_3_STRIKES:                              return "battle";
+        case MINOR_MODE_FREE_FOR_ALL:                           return "ffa";
+        case MINOR_MODE_CAPTURE_THE_FLAG:                       return "ctf";
+        case MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM:          return "team-arena-points-team";
+        case MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER:        return "team-arena-points-player";
+        case MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER:    return "team-arena-all-points-player";
+        case MINOR_MODE_TEAM_ARENA_BATTLE_LIFE:                 return "team-arena-life";
+        case MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE:                return "tag-zombie-arena";
+        case MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE:       return "tag-zombie-survivor-arena";
+        case MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE:  return "tag-zombie-last-survivor-arena";
+        case MINOR_MODE_EASTER_EGG:                             return "egg-hunt";
+        case MINOR_MODE_SOCCER:                                 return "soccer";
+        default: assert(false);                                 return "";
         }
     }
     // ----------------------------------------------------------------------------------------
@@ -777,7 +792,11 @@ public:
     // ----------------------------------------------------------------------------------------
     float getTimeTarget() const { return m_time_target; }
     // ----------------------------------------------------------------------------------------
+    int getMinorModeTarget() const { return m_minor_mode_target; }
+    // ----------------------------------------------------------------------------------------
     float getLifeTarget() const { return m_life_target; }
+    // ----------------------------------------------------------------------------------------
+    float getTagTarget() const { return m_tag_target; }
     // ----------------------------------------------------------------------------------------
     int getTrackNumber() const { return m_track_number; }
     // ----------------------------------------------------------------------------------------
@@ -820,7 +839,7 @@ public:
         const int id = (int)m_minor_mode;
         // This uses the  numerical id of the mode, see the macros
         // LINEAR_RACE and BATTLE_ARENA above for exact meaning.
-        if ((id >= 2000 && id <= 2002) || (id >= 2004 && id <=2009)) return true;
+        if ((id >= 2000 && id <= 2002) || (id >= 2004 && id <=2010)) return true;
         else            return false;
     }   // isBattleMode
 
@@ -842,7 +861,29 @@ public:
         const int id = (int)m_minor_mode;
         // This uses the  numerical id of the mode, see the macros
         // LINEAR_RACE and TEAM_BATTLE_ARENA above for exact meaning.
-        if (id == 2004) return true;
+        if (id >= 2004 && id <= 2007) return true;
+        else            return false;
+    }   // isSoccerMode
+
+    // ----------------------------------------------------------------------------------------
+    /** \brief Returns true if the current mode is a team arena battle life mode. */
+    bool isTabLifeMode() const
+    {
+        const int id = (int)m_minor_mode;
+        // This uses the  numerical id of the mode, see the macros
+        // LINEAR_RACE and TEAM_BATTLE_ARENA above for exact meaning.
+        if (id == 2007) return true;
+        else            return false;
+    }   // isSoccerMode
+
+    // ----------------------------------------------------------------------------------------
+    /** \brief Returns true if the current mode is a tag zombie arena battle mode. */
+    bool isTagzArenaBattleMode() const
+    {
+        const int id = (int)m_minor_mode;
+        // This uses the  numerical id of the mode, see the macros
+        // LINEAR_RACE and TAG_ZOMBIE_BATTLE_ARENA above for exact meaning.
+        if (id >= 2008 && id <= 20010) return true;
         else            return false;
     }   // isSoccerMode
 
@@ -854,7 +895,10 @@ public:
 
     // ----------------------------------------------------------------------------------------
     bool isCTFMode() const { return m_minor_mode == MINOR_MODE_CAPTURE_THE_FLAG; }
-
+    // ----------------------------------------------------------------------------------------
+    bool isTABLifeMode() const { return m_minor_mode == MINOR_MODE_TEAM_ARENA_BATTLE_LIFE; }
+    // ----------------------------------------------------------------------------------------
+    bool isTagZombieABMode() const { return m_minor_mode == MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE; }
     // ----------------------------------------------------------------------------------------
     bool isEggHuntMode() const { return m_minor_mode == MINOR_MODE_EASTER_EGG; }
 
@@ -1013,6 +1057,26 @@ public:
             MINOR_MODE_TEAM_ARENA_BATTLE_LIFE;
     }
     // ----------------------------------------------------------------------------------------
+    bool getNbTeams() const
+    {
+        return m_nb_teams;
+    }
+    // ----------------------------------------------------------------------------------------
+    void setNbTeams(bool nbTeams)
+    {
+        m_nb_teams = nbTeams;
+    }
+    // ----------------------------------------------------------------------------------------
+    bool getTeamsSelectionEnabled() const
+    {
+        return m_teams_selection;
+    }
+    // ----------------------------------------------------------------------------------------
+    void setTeamsSelectionEnabled(bool activated)
+    {
+        m_teams_selection = activated;
+    }
+    // ----------------------------------------------------------------------------------------
     void setFlagReturnTicks(unsigned ticks) { m_flag_return_ticks = ticks; }
     // ----------------------------------------------------------------------------------------
     unsigned getFlagReturnTicks() const { return m_flag_return_ticks; }
@@ -1048,10 +1112,30 @@ public:
             m_minor_mode == MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER ||
             m_minor_mode == MINOR_MODE_TEAM_ARENA_BATTLE_LIFE ||
             m_minor_mode == MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE ||
-            m_minor_mode == MINOR_MODE_MONSTER_ATTACK_ARENA ||
-            m_minor_mode == MINOR_MODE_MURDER_MYSTERY_ARENA ||
+            m_minor_mode == MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE ||
+            m_minor_mode == MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE ||
             m_minor_mode == MINOR_MODE_FREE_FOR_ALL;
     }
+
+    // ------------------------------------------------------------------------
+    /** Called to determine whether this race mode uses bonus boxes. */
+    bool haveBonusBoxes() const { return m_bonusBoxes; }
+    // ------------------------------------------------------------------------
+    /** Called to determine whether this race mode uses bonus boxes. */
+    void setBonusBoxes(bool bonusBoxes) { m_bonusBoxes = bonusBoxes; }
+    // ------------------------------------------------------------------------
+    /** Called to determine whether this race mode uses bottle of nitro. */
+    bool haveBottleNitro() const { return m_nitro; }
+    // ------------------------------------------------------------------------
+    /** Called to set whether this race mode uses bottle of nitro. */
+    void setBottleNitro(bool nitro) { m_nitro = nitro; }
+    // ------------------------------------------------------------------------
+    /** Called to determine whether this race mode uses banana. */
+    bool haveBananna() const { return m_banana; }
+    // ------------------------------------------------------------------------
+    /** Called to determine whether this race mode uses banana. */
+    void setBananna(bool banana) { m_banana = banana; }
+
 };   // RaceManager
 
 #endif

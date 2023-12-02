@@ -1255,13 +1255,13 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         case 11:
         {
             ServerConfig::m_server_mode = 14;
-            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA);
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE);
             break;
         }
         case 12:
         {
             ServerConfig::m_server_mode = 15;
-            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA);
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE);
             break;
         }
         default:

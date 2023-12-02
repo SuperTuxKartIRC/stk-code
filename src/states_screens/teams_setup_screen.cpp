@@ -95,23 +95,27 @@ void TeamsSetupScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (name == "team_1")
     {
-        if (m_kart_view_info.size() == 1)
-            changeTeam(0, KART_TEAM_RED, KART_TEAM_COLOR_RED);
+        if (m_kart_view_info.size() == 1) {
+            changeTeam(0, KART_TEAM_RED);
+        }
     }
     else if (name == "team_2")
     {
-        if (m_kart_view_info.size() == 1)
-            changeTeam(0, KART_TEAM_BLUE, KART_TEAM_COLOR_BLUE);
+        if (m_kart_view_info.size() == 1) {
+            changeTeam(0, KART_TEAM_BLUE);
+        }
     }
     else if (name == "team_3")
     {
-        if (m_kart_view_info.size() == 1)
-            changeTeam(0, KART_TEAM_GREEN, KART_TEAM_COLOR_GREEN);
+        if (m_kart_view_info.size() == 1) {
+            changeTeam(0, KART_TEAM_GREEN);
+        }
     }
     else if (name == "team_4")
     {
-        if (m_kart_view_info.size() == 1)
-            changeTeam(0, KART_TEAM_ORANGE, KART_TEAM_COLOR_ORANGE);
+        if (m_kart_view_info.size() == 1) {
+            changeTeam(0, KART_TEAM_ORANGE);
+        }
     }
 }   // eventCallback
 
@@ -151,21 +155,15 @@ void TeamsSetupScreen::beforeAddingWidget()
         // Record info about it for further update
         KartViewInfo info;
 
-        int single_team = KART_TEAM_BLUE;//UserConfigParams::m_default_team_teams;
-        int team_color = KART_TEAM_COLOR_BLUE;//UserConfigParams::m_default_team_color;
-        //info.teams = (nb_players == 0) ? (KartTeams)single_team :
-        //             (nb_players == 1) ? (KartTeams)single_team :
-        //             (nb_players == 2 && i == 3) ? KART_TEAM_2 :
-        //             KART_TEAM_2; // TODO : Besoins de modification 
+        int single_team = UserConfigParams::m_default_team_teams;
         info.teams = (KartTeam)single_team;
-        info.teamColor = (KartTeamsColor)team_color;
 
         //addModel requires loading the RenderInfo first
         info.support_colorization = kart_model.supportColorization();
         if (info.support_colorization)
         {
             kart_view->getModelViewRenderInfo()->setHue
-            (getHueColor(info.teamColor));
+            (getHueColor(info.teams));
         }
 
         core::matrix4 model_location;
@@ -206,7 +204,7 @@ void TeamsSetupScreen::beforeAddingWidget()
         info.view = kart_view;
         info.confirmed = false;
         m_kart_view_info.push_back(info);
-        RaceManager::get()->setKartTeam(i, info.teams, info.teamColor);
+        RaceManager::get()->setKartTeam(i, info.teams);
     }
 
     // Update layout
@@ -253,7 +251,7 @@ void TeamsSetupScreen::tearDown()
     Screen::tearDown();
 }   // tearDown
 
-void TeamsSetupScreen::changeTeam(int player_id, KartTeam teams, KartTeamsColor teamColor)
+void TeamsSetupScreen::changeTeam(int player_id, KartTeam teams)
 {
     if (teams == KART_TEAM_NONE)
         return;
@@ -265,7 +263,7 @@ void TeamsSetupScreen::changeTeam(int player_id, KartTeam teams, KartTeamsColor 
     if (m_kart_view_info[player_id].support_colorization)
     {
         m_kart_view_info[player_id].view->getModelViewRenderInfo()
-            ->setHue(getHueColor(teamColor));
+            ->setHue(getHueColor(teams));
     }
 
     for (unsigned int i = 0; i < m_kart_view_info.size(); i++)
@@ -279,7 +277,7 @@ void TeamsSetupScreen::changeTeam(int player_id, KartTeam teams, KartTeamsColor 
         //UserConfigParams::m_default_team_color = (int)teamColor;
     }
 
-    RaceManager::get()->setKartTeam(player_id, teams,teamColor);
+    RaceManager::get()->setKartTeam(player_id, teams);
     m_kart_view_info[player_id].teams = teams;
     updateKartViewsLayout();
 }
@@ -518,26 +516,25 @@ void TeamsSetupScreen::prepareGame()
     input_manager->setMasterPlayerOnly(true);
 }   // prepareGame
 
-const float TeamsSetupScreen::getHueColor(KartTeamsColor teamColor)
+const float TeamsSetupScreen::getHueColor(KartTeam teamColor)
 {
-    return teamColor == KART_TEAM_COLOR_RED ? 0.01f :
-        teamColor == KART_TEAM_COLOR_BLUE ? 0.6f :
-        teamColor == KART_TEAM_COLOR_GREEN ? 0.33f :
-        teamColor == KART_TEAM_COLOR_PURPLE ? 0.75f :
-        teamColor == KART_TEAM_COLOR_PINK ? 0.95f :
-        teamColor == KART_TEAM_COLOR_ORANGE ? 0.065f :
-        teamColor == KART_TEAM_COLOR_YELLOW ? 0.16f :
-        teamColor == KART_TEAM_COLOR_TURQUOISE ? 0.45f :
-        teamColor == KART_TEAM_COLOR_DARK_BLUE ? 0.66f :
-        teamColor == KART_TEAM_COLOR_CYAN ? 0.5f :
-        teamColor == KART_TEAM_COLOR_DEFAULT ? 0.99f :
+    return teamColor == KART_TEAM_RED ? 0.01f :
+           teamColor == KART_TEAM_BLUE ? 0.6f :
+           teamColor == KART_TEAM_GREEN ? 0.33f :
+           teamColor == KART_TEAM_ORANGE ? 0.065f :
+           //teamColor == KART_TEAM_PURPLE ? 0.75f :
+           //teamColor == KART_TEAM_PINK ? 0.95f :
+           //teamColor == KART_TEAM_YELLOW ? 0.16f :
+           //teamColor == KART_TEAM_TURQUOISE ? 0.45f :
+           //teamColor == KART_TEAM_DARK_BLUE ? 0.66f :
+           //teamColor == KART_TEAM_CYAN ? 0.5f :
+           //teamColor == KART_TEAM_DEFAULT ? 0.99f :
         0.99f;
 }
 
 void TeamsSetupScreen::changeTeamByDirection(int player_id, int direction)
 {
     KartTeam teams = m_kart_view_info[player_id].teams;
-    KartTeamsColor teamColor;
 
     // Adjust the team based on the direction
     if (direction == -1) // PA_MENU_LEFT
@@ -553,26 +550,8 @@ void TeamsSetupScreen::changeTeamByDirection(int player_id, int direction)
             teams = KART_TEAM_RED;
     }
 
-    switch (teams)
-    {
-    case KART_TEAM_RED:
-        teamColor = m_team1Color;
-        break;
-    case KART_TEAM_BLUE:
-        teamColor = m_team2Color;
-        break;
-    case KART_TEAM_GREEN:
-        teamColor = m_team3Color;
-        break;
-    case KART_TEAM_ORANGE:
-        teamColor = m_team4Color;
-        break;
-    default:
-        teamColor = KART_TEAM_COLOR_DEFAULT;
-        break;
-    }
-
-    changeTeam(player_id, teams, teamColor);
+    UserConfigParams::m_default_team_teams = (int)teams;
+    changeTeam(player_id, teams);
 }
 
 void TeamsSetupScreen::changeTeamColor(int player_id, int direction)

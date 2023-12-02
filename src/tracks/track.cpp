@@ -2689,7 +2689,20 @@ void Track::itemCommand(const XMLNode *node)
 
     // Some modes (e.g. time trial) don't have any bonus boxes
     if(type==Item::ITEM_BONUS_BOX &&
-       !World::getWorld()->haveBonusBoxes())
+       (!World::getWorld()->haveBonusBoxes() ||
+       !RaceManager::get()->haveBonusBoxes()))
+        return;
+
+    // Some item can be deactivate like bottle of nitro
+    if (type == Item::ITEM_NITRO_SMALL || type == Item::ITEM_NITRO_BIG &&
+        (!World::getWorld()->haveBottleNitro() ||
+        !RaceManager::get()->haveBottleNitro()))
+        return;
+
+    // Some item can be deactivate like bananna
+    if (type == Item::ITEM_BANANA &&
+        (!World::getWorld()->haveBananna() ||
+        !RaceManager::get()->haveBananna()))
         return;
 
     // Only do easter eggs in easter egg mode.

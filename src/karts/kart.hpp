@@ -309,7 +309,10 @@ public:
     virtual void   startEngineSFX   () OVERRIDE;
     virtual void  collectedItem(ItemState *item) OVERRIDE;
     virtual float getStartupBoostFromStartTicks(int ticks) const OVERRIDE;
-    virtual float getStartupBoost() const OVERRIDE  { return m_startup_boost; }
+    virtual float getStartupBoost() const OVERRIDE  { return m_startup_boost;
+
+    }
+
     virtual void setStartupBoost(float val) OVERRIDE { m_startup_boost = val; }
     virtual const Material *getMaterial() const OVERRIDE;
     virtual const Material *getLastMaterial() const OVERRIDE;
@@ -340,10 +343,7 @@ public:
                             HandicapLevel handicap,
                             std::shared_ptr<GE::GERenderInfo> ri,
                             const KartData& kart_data = KartData()) OVERRIDE;
-    virtual void changeKartMore(const std::string& new_ident,
-        HandicapLevel handicap,
-        std::shared_ptr<GE::GERenderInfo> ri,
-        const KartData& kart_data = KartData()) OVERRIDE;
+    virtual void setKartTeam(KartTeam team) OVERRIDE { AbstractKart::setKartTeam(team); };
 
     // ========================================================================================
     // SPEED and speed-boost related functions
@@ -358,8 +358,9 @@ public:
                                     float speed_boost, float engine_force, 
                                     int duration, int fade_out_time) OVERRIDE;
     // ----------------------------------------------------------------------------------------
-    virtual void   setSlowdown(unsigned int category, float max_speed_fraction,
-                               int fade_in_time) OVERRIDE;
+    virtual void   setSlowdown(unsigned int category, float max_speed_fraction, int fade_in_time) OVERRIDE;
+    // ----------------------------------------------------------------------------------------
+    virtual void setSlowdown(unsigned int category, float max_speed_fraction, int fade_in_time, int duration) OVERRIDE;
     // ----------------------------------------------------------------------------------------
     virtual int   getSpeedIncreaseTicksLeft(unsigned int category) const OVERRIDE;
     // ----------------------------------------------------------------------------------------

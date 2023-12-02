@@ -253,10 +253,10 @@ std::pair<RaceManager::MinorRaceModeType, RaceManager::MajorRaceModeType>
             return { RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE,
                 RaceManager::MAJOR_MODE_SINGLE };
         case 14:
-            return { RaceManager::MINOR_MODE_MONSTER_ATTACK_ARENA,
+            return { RaceManager::MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE,
                 RaceManager::MAJOR_MODE_SINGLE };
         case 15:
-            return { RaceManager::MINOR_MODE_MURDER_MYSTERY_ARENA,
+            return { RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE,
                 RaceManager::MAJOR_MODE_SINGLE };
         default:
             break;
@@ -409,6 +409,9 @@ void loadServerLobbyFromConfig()
     const bool is_gp =
         RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX;
     const bool is_battle = RaceManager::get()->isBattleMode();
+    const bool is_team_arena_battle = RaceManager::get()->isTeamArenaBattleMode();
+    const bool is_tag_zombie = RaceManager::get()->isTagZombieABMode();
+    const bool is_tabl = RaceManager::get()->isTABLifeMode();
 
     std::shared_ptr<LobbyProtocol> server_lobby;
     server_lobby = STKHost::create();
@@ -424,17 +427,32 @@ void loadServerLobbyFromConfig()
     }
     else if (is_battle)
     {
-        if (m_hit_limit <= 0 && m_time_limit_ffa <= 0)
-        {
-            Log::warn("main", "Reset invalid hit and time limit settings");
-            m_hit_limit.revertToDefaults();
-            m_time_limit_ffa.revertToDefaults();
+        if (is_team_arena_battle)
+        { // À vérifier et modifier // William Lussier 2023-11-24 16h31
+            if (is_tabl)
+            {
+                server_lobby->getGameSetup()->setSoccerGoalTarget(m_soccer_goal_target);
+            }
+            else 
+                server_lobby->getGameSetup()->setSoccerGoalTarget(m_soccer_goal_target);
         }
-        if (m_capture_limit <= 0 && m_time_limit_ctf <= 0)
-        {
-            Log::warn("main", "Reset invalid Capture and time limit settings");
-            m_capture_limit.revertToDefaults();
-            m_time_limit_ctf.revertToDefaults();
+        else if (is_tag_zombie)
+        { // À vérifier et modifier // William Lussier 2023-11-24 16h31
+            server_lobby->getGameSetup()->setSoccerGoalTarget(m_soccer_goal_target);
+        }
+        else {
+            if (m_hit_limit <= 0 && m_time_limit_ffa <= 0)
+            {
+                Log::warn("main", "Reset invalid hit and time limit settings");
+                m_hit_limit.revertToDefaults();
+                m_time_limit_ffa.revertToDefaults();
+            }
+            if (m_capture_limit <= 0 && m_time_limit_ctf <= 0)
+            {
+                Log::warn("main", "Reset invalid Capture and time limit settings");
+                m_capture_limit.revertToDefaults();
+                m_time_limit_ctf.revertToDefaults();
+            }
         }
     }
 

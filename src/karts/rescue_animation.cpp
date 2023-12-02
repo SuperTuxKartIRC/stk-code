@@ -24,6 +24,7 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/follow_the_leader.hpp"
+#include "modes/tag_zombie_arena_battle.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "network/network_string.hpp"
 #include "mini_glm.hpp"
@@ -32,6 +33,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <modes/tag_zombie_arena_battle.hpp>
 
 RescueAnimation* RescueAnimation::create(AbstractKart* kart,
                                          bool is_auto_rescue)
@@ -80,6 +82,14 @@ RescueAnimation::RescueAnimation(AbstractKart* kart, bool is_auto_rescue)
         !is_auto_rescue)
     {
         World::getWorld()->kartHit(m_kart->getWorldKartId());
+        if (RaceManager::get()->isTagzArenaBattleMode()) {
+            TagZombieArenaBattle* tzab = dynamic_cast<TagZombieArenaBattle*> (World::getWorld());
+            tzab->setKartNbRescuues(m_kart->getWorldKartId());
+            int nbRescues = tzab->getKartNbRescues(m_kart->getWorldKartId());
+            if (m_kart->getKartTeam() != KART_TEAM_GREEN) {
+                m_kart->setSlowdown(1, nbRescues > 5 ? 0.4f : 0.5f, 0, 900 + (nbRescues * 50));
+            }
+        }
         if (UserConfigParams::m_arena_ai_stats)
         {
             ThreeStrikesBattle* tsb = dynamic_cast<ThreeStrikesBattle*>

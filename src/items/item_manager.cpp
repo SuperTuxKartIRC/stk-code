@@ -358,12 +358,6 @@ Item* ItemManager::placeItem(ItemState::ItemType type, const Vec3& xyz,
                           m_item_lowres_mesh[mesh_type], m_icon[mesh_type],
                           /*prev_owner*/NULL);
 
-    //if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE)
-    //{
-    //    removeTextures();
-    //    return item;
-    //}
-
     insertItem(item);
     if (m_switch_ticks >= 0)
     {

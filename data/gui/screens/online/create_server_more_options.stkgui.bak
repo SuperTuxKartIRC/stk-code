@@ -35,20 +35,6 @@
                 <label id="life-value-text" proportion="1" text_align="left" I18N="In the server creation screen" text="Number of life"/>
                 <spinner id="life-value-spinner" proportion="1" min_value="0" max_value="30"/>
             </div>
-	    <div width="100%" height="fit" layout="horizontal-row" id="number-tag-div">
-                <label id="tag-value-text" proportion="1" text_align="left" I18N="In the server creation screen" text="Number of tag"/>
-                <spinner id="tag-value-spinner" proportion="1" min_value="0" max_value="30"/>
-            </div>
-
-		    <div width="100%" height="fit" layout="horizontal-row" id="teams-selection-div" >
-                        <div proportion="1" height="fit" layout="horizontal-row">
-                            <div width="100%" height="fit" text-align="center" layout="vertical-row" >
-                                <checkbox id="teams-selection-checkbox" align="center"/>
-                            </div>
-                        </div>
-                        <spacer width="3%"/>
-                        <label id="teams-selections-text" proportion="3" I18N="In the track info screen" text="Teams selection" text_align="left" align="center"/>
-                    </div>
 
             <spacer height="2%" width="20"/>
 

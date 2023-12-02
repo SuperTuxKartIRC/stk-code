@@ -147,10 +147,6 @@ public:
                             HandicapLevel handicap,
                             std::shared_ptr<GE::GERenderInfo> ri,
                             const KartData& kart_data = KartData());
-    virtual void changeKartMore(const std::string& new_ident,
-        HandicapLevel handicap,
-        std::shared_ptr<GE::GERenderInfo> ri,
-        const KartData& kart_data = KartData());
     // ========================================================================
     // Access to the handicap.
     // ------------------------------------------------------------------------
@@ -207,8 +203,8 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the kart teams of the kart */
     KartTeam getKartTeam() const { return m_kart_team; }
-
-    void setKartTeam(KartTeam team) { m_kart_team = team; }
+    // ------------------------------------------------------------------------
+    virtual void setKartTeam(KartTeam team) { m_kart_team = team; }
     // ------------------------------------------------------------------------
     /** Called after the kart comes to rest. It can be used to e.g. compute
      *  differences between graphical and physical chassis. Note that
@@ -367,6 +363,9 @@ public:
      *  \param fade_in_time How long till maximum speed is capped. */
     virtual void setSlowdown(unsigned int category, float max_speed_fraction,
                              int fade_in_time) = 0;
+    // ------------------------------------------------------------------------
+    virtual void setSlowdown(unsigned int category, float max_speed_fraction,
+        int fade_in_time, int duration) = 0;
     // ------------------------------------------------------------------------
     /** Returns the remaining collected energy. */
     virtual float getEnergy() const = 0;

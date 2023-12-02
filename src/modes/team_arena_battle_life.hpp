@@ -44,6 +44,7 @@ private:
     int m_total_rescue;
     int m_total_hit;
 
+    int life = RaceManager::get()->getLifeTarget();
     struct BattleInfo
     {
         int  m_lifes = RaceManager::get()->getLifeTarget();

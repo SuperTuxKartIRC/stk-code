@@ -94,6 +94,9 @@ void RaceResultGUI::init()
 
     m_timer = 0;
 
+    m_player_icon = irr_driver->getTexture(FileManager::GUI_ICON, "player.png");
+    m_zombie_icon = irr_driver->getTexture(FileManager::GUI_ICON, "zombie.png");
+
     getWidget("operations")->setActive(false);
     getWidget("left")->setVisible(false);
     getWidget("middle")->setVisible(false);
@@ -1222,11 +1225,7 @@ void RaceResultGUI::unload()
         {
             displayCTFResults();
         }
-        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM       ||
-                 RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER     ||
-                 RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER ||
-                 RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE ||
-                 RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE)
+        else if (RaceManager::get()->isTeamArenaBattleMode() || RaceManager::get()->isTagzArenaBattleMode())
         {
             displayTeamsArenaResults();
         }
@@ -1547,18 +1546,12 @@ void RaceResultGUI::unload()
         // Affichage du texte en fonction du nombre d'équipes gagnantes
         std::string winText = "";
         core::stringw winTextw;
-        KartTeamsColor teamsColor;
 
         if (winningTeams.size() == 1) {
-            // TODO : Besoins de modification // William Lussier 2023-10-13
-            teamsColor = winningTeams[0] == 0 ? KART_TEAM_COLOR_RED :
-                         winningTeams[0] == 1 ? KART_TEAM_COLOR_BLUE :
-                         winningTeams[0] == 2 ? KART_TEAM_COLOR_GREEN :
-                         KART_TEAM_COLOR_ORANGE;
-            irr::video::SColor color = RaceGUIBase::rgbaColorKartTeamsColor(teamsColor);
-            std::string colorName = RaceGUIBase::getKartTeamsColorName(teamsColor);
+            //irr::video::SColor color = RaceGUIBase::rgbaColorKartTeamsColor((KartTeam)winningTeams[0]);
+            std::string colorName = RaceGUIBase::getKartTeamsColorName((KartTeam)winningTeams[0]);
 
-            if (mode == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE) {
+            if (RaceManager::get()->isTagzArenaBattleMode()) {
                 winTextw = tagzab->getWinningTeamsTexte();
             }
             else
@@ -1567,13 +1560,8 @@ void RaceResultGUI::unload()
         else if (winningTeams.size() > 1) {
             winText = "It's a draw between Teams ";
             for (size_t i = 0; i < winningTeams.size(); ++i) {
-                // TODO : Besoins de modification // William Lussier 2023-10-13
-                teamsColor = winningTeams[i] == 0 ? KART_TEAM_COLOR_RED :
-                             winningTeams[i] == 1 ? KART_TEAM_COLOR_BLUE :
-                             winningTeams[i] == 2 ? KART_TEAM_COLOR_GREEN :
-                             KART_TEAM_COLOR_ORANGE;
-                irr::video::SColor color = RaceGUIBase::rgbaColorKartTeamsColor(teamsColor);
-                std::string colorName = RaceGUIBase::getKartTeamsColorName(teamsColor);
+                //irr::video::SColor color = RaceGUIBase::rgbaColorKartTeamsColor((KartTeam)winningTeams[i]);
+                std::string colorName = RaceGUIBase::getKartTeamsColorName((KartTeam)winningTeams[i]);
 
                 winText += (colorName);
                 if (i < winningTeams.size() - 1) {
@@ -1620,15 +1608,10 @@ void RaceResultGUI::unload()
             modeVal = 2;
             score = tabl->getTeamTotalLife(teams);
         }
-        else if (mode == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE) {
+        else if (RaceManager::get()->isTagzArenaBattleMode()) {
             modeVal = 3;
             score = tagzab->getTeamInlifePlayer(teams);
         }
-
-        //video::SColor red_color = video::SColor(255, 255, 0, 0);
-        //video::SColor blue_color = video::SColor(255, 51, 153, 255);
-        //video::SColor orange_color = video::SColor(255, 255, 128, 0);
-        //video::SColor green_color = video::SColor(255, 0, 255, 0);
 
         video::SColor white_color = video::SColor(255, 255, 255, 255);
         video::SColor black_color = video::SColor(255, 0, 0, 0);
@@ -1638,13 +1621,8 @@ void RaceResultGUI::unload()
         irr::video::ITexture* kart_icon;
         gui::IGUIFont* font = GUIEngine::getSmallFont();
 
-        // TODO : Besoins de modification // William Lussier 2023-10-13
-        auto teamsColor = teams == KART_TEAM_RED ? KART_TEAM_COLOR_RED :
-            teams == KART_TEAM_BLUE ? KART_TEAM_COLOR_BLUE :
-            teams == KART_TEAM_GREEN ? KART_TEAM_COLOR_GREEN :
-            KART_TEAM_COLOR_ORANGE;
-        auto color = RaceGUIBase::rgbaColorKartTeamsColor(teamsColor);
-        auto colorName = RaceGUIBase::getKartTeamsColorName(teamsColor);
+        auto color = RaceGUIBase::rgbaColorKartTeamsColor(teams);
+        auto colorName = RaceGUIBase::getKartTeamsColorName(teams);
 
         irr::video::ITexture* team_icon = irr_driver->getTexture(FileManager::GUI_ICON,
             colorName + "_flag.png");
@@ -1721,6 +1699,8 @@ void RaceResultGUI::unload()
                     result_text.append("   ");
                     if (tagzab->getKartConverteZombie(kart_id) != -1) {
                         kart_icon = kartZombie->getKartProperties()->getIconMaterial()->getTexture();
+                        if (kart_icon == NULL)
+                            kart_icon = m_zombie_icon;
                         source_rect = core::recti(core::vector2di(0, 0), kart_icon->getSize());
                         // TODO : Besoins de modification. l'icone n'est pas bien placer  
                         irr::u32 offset_x = (irr::u32)(font->getDimension(result_text.c_str()).Width / 1.f); // 1.5f
@@ -1737,11 +1717,13 @@ void RaceResultGUI::unload()
             // y + team_icon_height
             font->draw(result_text, core::rect<s32>(x, y, x + 200, y + 30), kart->getController()->isLocalPlayerController() ? color : black_color, true, false);
             kart_icon = kart->getKartProperties()->getIconMaterial()->getTexture();
-
+            if (kart_icon == NULL) {
+                if (team == tagzab->getTagPlayerTeam()) kart_icon = m_player_icon;
+                else if (team == tagzab->getTagZombieTeam()) kart_icon = m_zombie_icon;
+            }
             source_rect = core::recti(core::vector2di(0, 0), kart_icon->getSize());
             offset_x = (irr::u32)(font->getDimension(result_text.c_str()).Width / 1.5f);
-            dest_rect = core::recti(x - m_width_icon, y,
-                x , y + m_width_icon);
+            dest_rect = core::recti(x - m_width_icon, y, x, y + m_width_icon);
             draw2DImage(kart_icon, dest_rect, source_rect, NULL, NULL, true);
             y += 30;
         }

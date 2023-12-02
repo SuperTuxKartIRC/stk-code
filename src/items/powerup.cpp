@@ -114,6 +114,18 @@ void Powerup::update(int ticks)
 {
     // Remove any sound ticks that should have played
     const int remove_ticks = World::getWorld()->getTicksSinceStart() - 1000;
+
+    // TODO : À vérifier // William Lussier 2023-11-23 16h05
+    if (!RaceManager::get()->haveBonusBoxes() && World::getWorld()->timerPower())
+    {
+        m_type = PowerupManager::POWERUP_NOTHING;
+        m_number = 0;
+
+        int type, number;
+        World::getWorld()->getItem(&type, &number);
+        set((PowerupManager::PowerupType)type, number);
+    }
+
     for (auto it = m_played_sound_ticks.begin();
          it != m_played_sound_ticks.end();)
     {
@@ -335,42 +347,85 @@ void Powerup::use()
         }
         else // if the kart is looking forward, use the bubblegum as a shield
         {
+            if(RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE) // A modifier pour baisser le temps du shield Thierry.B 20/11/2023 
+            {
 
-            if(!m_kart->isShielded()) //if the previous shield had been used up.
-            {
-                if (m_kart->getIdent() == "nolok")
+                if (!m_kart->isShielded()) //if the previous shield had been used up.
                 {
-                    m_kart->getAttachment()
-                          ->set(Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD,
+                    if (m_kart->getIdent() == "nolok")
+                    {
+                        m_kart->getAttachment()
+                            ->set(Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD,
                                 stk_config->
-                                  time2Ticks(kp->getBubblegumShieldDuration()));
+                                time2Ticks(kp->getBubblegumShieldDuration() - 5));
+                    }
+                    else
+                    {
+                        m_kart->getAttachment()
+                            ->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
+                                stk_config->
+                                time2Ticks(kp->getBubblegumShieldDuration() - 5));
+                    }
                 }
-                else
+                else // using a bubble gum while still having a shield
                 {
-                    m_kart->getAttachment()
-                          ->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
+                    if (m_kart->getIdent() == "nolok")
+                    {
+                        m_kart->getAttachment()
+                            ->set(Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD,
                                 stk_config->
-                                  time2Ticks(kp->getBubblegumShieldDuration()));
+                                time2Ticks(kp->getBubblegumShieldDuration() - 5));
+                    }
+                    else
+                    {
+                        m_kart->getAttachment()
+                            ->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
+                                stk_config->
+                                time2Ticks(kp->getBubblegumShieldDuration() - 5
+                                    + m_kart->getShieldTime()));
+                    }
                 }
+
             }
-            else // using a bubble gum while still having a shield
+            else
             {
-                if (m_kart->getIdent() == "nolok")
+                if (!m_kart->isShielded()) //if the previous shield had been used up.
                 {
-                    m_kart->getAttachment()
-                          ->set(Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD,
+                    if (m_kart->getIdent() == "nolok")
+                    {
+                        m_kart->getAttachment()
+                            ->set(Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD,
                                 stk_config->
-                                 time2Ticks(kp->getBubblegumShieldDuration()));
+                                time2Ticks(kp->getBubblegumShieldDuration()));
+                    }
+                    else
+                    {
+                        m_kart->getAttachment()
+                            ->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
+                                stk_config->
+                                time2Ticks(kp->getBubblegumShieldDuration()));
+                    }
                 }
-                else
+                else // using a bubble gum while still having a shield
                 {
-                    m_kart->getAttachment()
-                          ->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
+                    if (m_kart->getIdent() == "nolok")
+                    {
+                        m_kart->getAttachment()
+                            ->set(Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD,
+                                stk_config->
+                                time2Ticks(kp->getBubblegumShieldDuration()));
+                    }
+                    else
+                    {
+                        m_kart->getAttachment()
+                            ->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
                                 stk_config->
                                 time2Ticks(kp->getBubblegumShieldDuration()
-                                           + m_kart->getShieldTime()       ) );
+                                    + m_kart->getShieldTime()));
+                    }
                 }
             }
+
 
             if (!has_played_sound)
             {

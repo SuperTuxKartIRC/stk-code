@@ -84,11 +84,13 @@ void AbstractKart::reset()
 }   // reset
 
 // ----------------------------------------------------------------------------
-void AbstractKart::loadKartProperties(const std::string& new_ident,
+void AbstractKart::loadKartProperties(const std::string& new_ident_n,
                                       HandicapLevel handicap,
                                       std::shared_ptr<GE::GERenderInfo> ri,
                                       const KartData& kart_data)
 {
+    const std::string new_ident = new_ident_n; // TODO : Besoins de changement. Cette ligne n'est pas supposer exister ... William Lussier 2023-11-11 14h07
+
     m_kart_properties.reset(new KartProperties());
     KartProperties* tmp_kp = NULL;
     const KartProperties* kp = kart_properties_manager->getKart(new_ident);
@@ -184,19 +186,6 @@ void AbstractKart::changeKart(const std::string& new_ident,
                               HandicapLevel handicap,
                               std::shared_ptr<GE::GERenderInfo> ri,
                               const KartData& kart_data)
-{
-    // Reset previous kart (including delete old animation above)
-    reset();
-    // Remove kart body
-    Physics::get()->removeKart(this);
-    loadKartProperties(new_ident, handicap, ri, kart_data);
-}   // changeKart
-
-// ----------------------------------------------------------------------------
-void AbstractKart::changeKartMore(const std::string& new_ident,
-    HandicapLevel handicap,
-    std::shared_ptr<GE::GERenderInfo> ri,
-    const KartData& kart_data)
 {
     // Reset previous kart (including delete old animation above)
     reset();
