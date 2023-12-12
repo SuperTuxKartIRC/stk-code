@@ -509,13 +509,14 @@ int ReplayRecorder::enumToCode (PowerupManager::PowerupType type)
         (type == PowerupManager::POWERUP_NOTHING)    ? 0 :
         (type == PowerupManager::POWERUP_BUBBLEGUM)  ? 1 :
         (type == PowerupManager::POWERUP_CAKE)       ? 2 :
-        (type == PowerupManager::POWERUP_BOWLING)    ? 3 :
-        (type == PowerupManager::POWERUP_ZIPPER)     ? 4 :
-        (type == PowerupManager::POWERUP_PLUNGER)    ? 5 :
-        (type == PowerupManager::POWERUP_SWITCH)     ? 6 :
-        (type == PowerupManager::POWERUP_SWATTER)    ? 7 :
-        (type == PowerupManager::POWERUP_RUBBERBALL) ? 8 :
-        (type == PowerupManager::POWERUP_PARACHUTE)  ? 9 :
+        (type == PowerupManager::POWERUP_BARREL)     ? 3 :
+        (type == PowerupManager::POWERUP_BOWLING)    ? 4 :
+        (type == PowerupManager::POWERUP_ZIPPER)     ? 5 :
+        (type == PowerupManager::POWERUP_PLUNGER)    ? 6 :
+        (type == PowerupManager::POWERUP_SWITCH)     ? 7 :
+        (type == PowerupManager::POWERUP_SWATTER)    ? 8 :
+        (type == PowerupManager::POWERUP_RUBBERBALL) ? 9 :
+        (type == PowerupManager::POWERUP_PARACHUTE)  ? 10 :
                                                       -1 ;
 
     return code;
@@ -543,13 +544,14 @@ PowerupManager::PowerupType ReplayRecorder::codeToEnumItem (int code)
         (code == 0) ? PowerupManager::POWERUP_NOTHING    :
         (code == 1) ? PowerupManager::POWERUP_BUBBLEGUM  :
         (code == 2) ? PowerupManager::POWERUP_CAKE       :
-        (code == 3) ? PowerupManager::POWERUP_BOWLING    :
-        (code == 4) ? PowerupManager::POWERUP_ZIPPER     :
-        (code == 5) ? PowerupManager::POWERUP_PLUNGER    :
-        (code == 6) ? PowerupManager::POWERUP_SWITCH     :
-        (code == 7) ? PowerupManager::POWERUP_SWATTER    :
-        (code == 8) ? PowerupManager::POWERUP_RUBBERBALL :
-        (code == 9) ? PowerupManager::POWERUP_PARACHUTE  :
+        (code == 3) ? PowerupManager::POWERUP_BARREL :
+        (code == 4) ? PowerupManager::POWERUP_BOWLING    :
+        (code == 5) ? PowerupManager::POWERUP_ZIPPER     :
+        (code == 6) ? PowerupManager::POWERUP_PLUNGER    :
+        (code == 7) ? PowerupManager::POWERUP_SWITCH     :
+        (code == 8) ? PowerupManager::POWERUP_SWATTER    :
+        (code == 9) ? PowerupManager::POWERUP_RUBBERBALL :
+        (code == 10) ? PowerupManager::POWERUP_PARACHUTE  :
                       PowerupManager::POWERUP_NOTHING ;
 
     return type;

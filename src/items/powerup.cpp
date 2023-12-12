@@ -203,6 +203,7 @@ void Powerup::set(PowerupManager::PowerupType type, int n)
         case PowerupManager::POWERUP_NOTHING:
         case PowerupManager::POWERUP_CAKE:
         case PowerupManager::POWERUP_PLUNGER:
+        case PowerupManager::POWERUP_BARREL:
         default :
             m_sound_use = SFXManager::get()->createSoundSource("shoot");
             break ;
@@ -444,6 +445,49 @@ void Powerup::use()
 
         }   // end of PowerupManager::POWERUP_BUBBLEGUM
         break;
+
+        case PowerupManager::POWERUP_BARREL: //TODO: barrel what the barrel do 
+            // use the barrel the traditional way, if the kart is looking back
+            if (m_kart->getControls().getLookBack())
+            {
+                Item* new_item = im->dropNewItem(Item::ITEM_BARREL, m_kart);
+
+                // E.g. ground not found in raycast.
+                if (!new_item) return;
+                if (!has_played_sound)
+                {
+                    Powerup::adjustSound();
+                    m_sound_use->play();
+                }
+            }
+            else // if the kart is looking forward, use the barrel as a projectile
+            {
+                if (stk_config->m_shield_restrict_weapons)
+                    m_kart->setShieldTime(0.0f); // make weapon usage destroy the shield
+                if (!has_played_sound)
+                {
+                    Powerup::adjustSound();
+                    m_sound_use->play();
+                }
+                ProjectileManager::get()->newProjectile(m_kart, m_type);
+
+                if (!has_played_sound)
+                {
+                    if (m_sound_use != NULL)
+                    {
+                        m_sound_use->deleteSFX();
+                        m_sound_use = NULL;
+                    }
+                    //Extraordinary. Usually sounds are set in Powerup::set()
+                    m_sound_use = SFXManager::get()->createSoundSource("inflate");
+                    //In this case this is a workaround, since the bubblegum and barrel item has two different sounds.
+
+                    Powerup::adjustSound();
+                    m_sound_use->play();
+                }
+
+            }   // end of PowerupManager::POWERUP_BARREL
+            break;
 
     case PowerupManager::POWERUP_ANVIL:
         //Attach an anvil(twice as good as the one given

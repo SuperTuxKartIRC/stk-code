@@ -88,6 +88,8 @@ private:
     /** Height of the digit font. */
     int              m_font_height;
 
+    float m_elapsedTime = 0;
+
     /** Icon textures (stored as variables to not look up
         their location on every frame) */
     irr::video::ITexture *m_red_team;
@@ -131,6 +133,11 @@ private:
                                 const core::vector2df &offset,
                                 float min_ratio, int meter_width,
                                 int meter_height, float dt);
+    void drawPowerTime          (const AbstractKart *kart,
+                                const core::vector2df &offset,
+                                float min_ratio, int meter_width,
+                                int meter_height, float dt);
+
 
     /* Helper functions for drawing meters */
 

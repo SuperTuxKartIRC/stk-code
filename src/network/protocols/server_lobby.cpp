@@ -1784,7 +1784,7 @@ NetworkString* ServerLobby::getLoadWorldMessage(
     if (RaceManager::get()->teamPlusEnabled()) {
         // TODO : Besoins de modification . Prendre en compte le nombre d'ia et d'équipe et la vie // William Lussier 2023-10-25 9h39
         load_world_message->addUInt32(m_battle_hit_capture_limit).addFloat(m_battle_time_limit)
-            .addUInt32(m_battle_number_life).addUInt8(m_battle_nb_ia).addUInt8(m_battle_nb_team);
+            .addUInt32(m_battle_number_life).addUInt8(m_battle_nb_ia).addUInt8(m_battle_nb_team).addUInt8(m_teams_selection);
         uint16_t flag_return_time = (uint16_t)stk_config->time2Ticks(
             ServerConfig::m_flag_return_timeout);
         load_world_message->addUInt16(flag_return_time);
@@ -4559,7 +4559,7 @@ void ServerLobby::getHitCaptureLimit()
         }
         else if (ServerConfig::m_server_game_duration > 0) {
             if (ServerConfig::m_server_game_duration > 60) {
-                time_limit = ServerConfig::m_server_game_duration/60;
+                time_limit = ServerConfig::m_server_game_duration;
             }
             else {
                 time_limit = ServerConfig::m_server_game_duration;
@@ -5362,13 +5362,14 @@ void ServerLobby::handleServerOptionConfiguration(Event* event)
     
 
     // TODO : Besoins de modifications pour prendre en compte des autres options en ligne (nb team, nb ia, etc) // William Lussier 2023-10-25 20h21
-    int  mode = data.getUInt8();
-    int  new_time_target = data.getUInt8();
+    int mode = data.getUInt8();
+    int new_time_target = data.getUInt8();
     int new_life_target = 0;
     int new_point_target = 0;
-    int  new_nb_ai = data.getUInt8();
+    int new_nb_ai = data.getUInt8();
     int new_nb_team = 0;
     int new_nb_tag = 0;
+    bool new_is_team_selection = false;
 
     if (new_game_mode == 13) {//tag zombie
         new_nb_tag= data.getUInt8();
@@ -5434,7 +5435,8 @@ void ServerLobby::handleServerOptionConfiguration(Event* event)
          m_battle_hit_capture_limit.load() != new_point_target ||
          m_battle_nb_ia.load() != new_nb_ai || // TODO : Besoins de modification. Utiliser la variable du nb d'IA qui existe déja // William Lussier 2023-10-26 15h28
          m_battle_nb_team.load() != new_nb_team ||
-         m_battle_nb_tag.load()!= new_nb_tag))
+         m_battle_nb_tag.load()!= new_nb_tag || 
+         m_teams_selection.load() != new_is_team_selection))
     {
         Log::info("ServerLobby", "Updating server info with new "
             "time target: %d, number or life: %d to stk-addons.", new_time_target,
@@ -5450,7 +5452,8 @@ void ServerLobby::handleServerOptionConfiguration(Event* event)
         request->addParameter("new-point-target", new_point_target);
         request->addParameter("new-nb-ai", new_nb_ai);
         request->addParameter("new-nb-team", new_nb_team);
-        request->addParameter("new-nb-tag", new_nb_tag);
+        request->addParameter("new_nb_tag", new_nb_tag);
+        request->addParameter("new_is_team_selection", new_is_team_selection);
         request->queue();
     }
     m_battle_time_limit.store(new_time_target);
@@ -5459,6 +5462,7 @@ void ServerLobby::handleServerOptionConfiguration(Event* event)
     m_battle_nb_ia.store(new_nb_ai);
     m_battle_nb_team.store(new_nb_team);
     m_battle_nb_tag.store(new_nb_tag);
+    m_teams_selection.store(new_nb_tag);
     updateTracksForMode();
 
     NetworkString* server_info = getNetworkString();
@@ -5615,59 +5619,74 @@ void ServerLobby::addLiveJoinPlaceholder(
     if (mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM ||
         mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER ||
         mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER ||
-        mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE)
-    {
-        // TODO : Besoins de modification 
-        // Team-Arena-Battle, reserve at most 7 players on each team
-        int red_count = 0;
-        int blue_count = 0;
-        int green_count = 0;
-        int orange_count = 0;
-        for (unsigned i = 0; i < players.size(); i++)
-        {
-            if (players[i]->getTeam() == KART_TEAM_RED) red_count++;
-            else if (players[i]->getTeam() == KART_TEAM_BLUE) blue_count++;
-            else if (players[i]->getTeam() == KART_TEAM_GREEN) green_count++;
-            else orange_count++;
-        }
-        red_count = red_count >= 7 ? 0 : 7 - red_count;
-        blue_count = blue_count >= 7 ? 0 : 7 - blue_count;
-        green_count = green_count >= 7 ? 0 : 7 - green_count;
-        orange_count = orange_count >= 7 ? 0 : 7 - orange_count;
-        for (int i = 0; i < red_count; i++)
-            players.push_back(NetworkPlayerProfile::getReservedProfile(KART_TEAM_RED));
-        for (int i = 0; i < blue_count; i++)
-            players.push_back(NetworkPlayerProfile::getReservedProfile(KART_TEAM_BLUE));
-        for (int i = 0; i < green_count; i++)
-            players.push_back(NetworkPlayerProfile::getReservedProfile(KART_TEAM_GREEN));
-        for (int i = 0; i < orange_count; i++)
-            players.push_back(NetworkPlayerProfile::getReservedProfile(KART_TEAM_ORANGE));
+        mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE ||
+        mode == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE ||
+        mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE ||
+        mode == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE || mode == RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE || mode == RaceManager::MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE) {
+
     }
-    else
-    {
-        // CTF or soccer, reserve at most 7 players on each team
-        int red_count = 0;
-        int blue_count = 0;
-        for (unsigned i = 0; i < players.size(); i++)
+    else {
+
+        if (mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM ||
+            mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER ||
+            mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER ||
+            mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE)
         {
-            if (players[i]->getTeam() == KART_TEAM_RED)
-                red_count++;
-            else
-                blue_count++;
+            // TODO : Besoins de modification 
+            // Team-Arena-Battle, reserve at most 7 players on each team
+            int red_count = 0;
+            int blue_count = 0;
+            int green_count = 0;
+            int orange_count = 0;
+            for (unsigned i = 0; i < players.size(); i++)
+            {
+                if (players[i]->getTeam() == KART_TEAM_RED) red_count++;
+                else if (players[i]->getTeam() == KART_TEAM_BLUE) blue_count++;
+                else if (players[i]->getTeam() == KART_TEAM_GREEN) green_count++;
+                else orange_count++;
+            }
+            red_count = red_count >= 7 ? 0 : 7 - red_count;
+            blue_count = blue_count >= 7 ? 0 : 7 - blue_count;
+            green_count = green_count >= 7 ? 0 : 7 - green_count;
+            orange_count = orange_count >= 7 ? 0 : 7 - orange_count;
+            for (int i = 0; i < red_count; i++)
+                players.push_back(NetworkPlayerProfile::getReservedProfile(KART_TEAM_RED));
+            for (int i = 0; i < blue_count; i++)
+                players.push_back(NetworkPlayerProfile::getReservedProfile(KART_TEAM_BLUE));
+            for (int i = 0; i < green_count; i++)
+                players.push_back(NetworkPlayerProfile::getReservedProfile(KART_TEAM_GREEN));
+            for (int i = 0; i < orange_count; i++)
+                players.push_back(NetworkPlayerProfile::getReservedProfile(KART_TEAM_ORANGE));
         }
-        red_count = red_count >= 7 ? 0 : 7 - red_count;
-        blue_count = blue_count >= 7 ? 0 : 7 - blue_count;
-        for (int i = 0; i < red_count; i++)
+        else
         {
-            players.push_back(
-                NetworkPlayerProfile::getReservedProfile(KART_TEAM_RED));
+            // CTF or soccer, reserve at most 7 players on each team
+            int red_count = 0;
+            int blue_count = 0;
+            for (unsigned i = 0; i < players.size(); i++)
+            {
+                if (players[i]->getTeam() == KART_TEAM_RED)
+                    red_count++;
+                else
+                    blue_count++;
+            }
+            red_count = red_count >= 7 ? 0 : 7 - red_count;
+            blue_count = blue_count >= 7 ? 0 : 7 - blue_count;
+            for (int i = 0; i < red_count; i++)
+            {
+                players.push_back(
+                    NetworkPlayerProfile::getReservedProfile(KART_TEAM_RED));
+            }
+            for (int i = 0; i < blue_count; i++)
+            {
+                players.push_back(
+                    NetworkPlayerProfile::getReservedProfile(KART_TEAM_BLUE));
+            }
+
         }
-        for (int i = 0; i < blue_count; i++)
-        {
-            players.push_back(
-                NetworkPlayerProfile::getReservedProfile(KART_TEAM_BLUE));
-        }
+
     }
+
 }   // addLiveJoinPlaceholder
 
 //-----------------------------------------------------------------------------

@@ -125,7 +125,11 @@ void KartWithStats::collectedItem(ItemState *item_state)
     case Item::ITEM_BUBBLEGUM:
         m_bubblegum_count++;
         break;
-    default        : break;
+    case Item::ITEM_BARREL:
+        m_barrel_count++;
+        break;
+    default        
+    : break;
     }   // switch TYPE
 
 }   // collectedItem

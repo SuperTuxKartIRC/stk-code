@@ -36,6 +36,7 @@
 #include "utils/string_utils.hpp"
 
 #include <typeinfo>
+#include "barrel.hpp"
 
 //=============================================================================================
 ProjectileManager* g_projectile_manager[PT_COUNT];
@@ -194,6 +195,9 @@ std::shared_ptr<Flyable>
         case PowerupManager::POWERUP_CAKE:
             f = std::make_shared<Cake>(kart);
             break;
+        case PowerupManager::POWERUP_BARREL:
+            f = std::make_shared<Barrel>(kart);
+            break;
         case PowerupManager::POWERUP_RUBBERBALL:
             f = std::make_shared<RubberBall>(kart);
             break;
@@ -296,6 +300,11 @@ std::string ProjectileManager::getUniqueIdentity(AbstractKart* kart,
         case PowerupManager::POWERUP_CAKE:
         {
             uid.addUInt8(RN_CAKE);
+            break;
+        }
+        case PowerupManager::POWERUP_BARREL:
+        {
+            uid.addUInt8(RN_BARREL);
             break;
         }
         case PowerupManager::POWERUP_RUBBERBALL:

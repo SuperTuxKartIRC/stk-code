@@ -593,6 +593,15 @@ namespace UserConfigParams
         PARAM_DEFAULT(BoolUserConfigParam(false, "bananna-tag-zombie-arena-arena",
             &m_race_setup_group, "Deactivate bananna in tag zombie arena mode."));
 
+    PARAM_PREFIX BoolUserConfigParam          m_bonus_box_team_arena
+        PARAM_DEFAULT(BoolUserConfigParam(false, "bonux-box-team-arena",
+            &m_race_setup_group, "Deactivate bonus box in team arena mode."));
+    PARAM_PREFIX BoolUserConfigParam          m_bottle_nitro_team_arena
+        PARAM_DEFAULT(BoolUserConfigParam(false, "bottle-nitro-team-arena",
+            &m_race_setup_group, "Deactivate bottle of nitro in team arena mode."));
+    PARAM_PREFIX BoolUserConfigParam          m_bananna_team_arena
+        PARAM_DEFAULT(BoolUserConfigParam(false, "bananna-team-arena-arena",
+            &m_race_setup_group, "Deactivate bananna in team arena mode."));
 
     PARAM_PREFIX BoolUserConfigParam          m_karts_powerup_gui
         PARAM_DEFAULT(BoolUserConfigParam(false, "karts-powerup-gui",
@@ -1014,7 +1023,7 @@ namespace UserConfigParams
         PARAM_DEFAULT(BoolUserConfigParam(true, "ipv6-lan",
             &m_network_group, "Enable IPv6 LAN server discovery."));
     PARAM_PREFIX IntUserConfigParam m_max_players
-        PARAM_DEFAULT(IntUserConfigParam(8, "max-players",
+        PARAM_DEFAULT(IntUserConfigParam(35, "max-players",
             &m_network_group, "Maximum number of players on the server "
             "(for gui server creation."));
     PARAM_PREFIX IntUserConfigParam m_timer_sync_difference_tolerance

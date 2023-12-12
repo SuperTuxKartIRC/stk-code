@@ -322,7 +322,7 @@ void ClientLobby::addAllPlayers(Event* event)
 
     uint32_t random_seed = data.getUInt32();
     ItemManager::updateRandomSeed(random_seed);
-    if (RaceManager::get()->isTeamArenaBattleMode() || RaceManager::get()->isTagZombieABMode())
+    if (RaceManager::get()->isTeamArenaBattleMode() || RaceManager::get()->isTagzArenaBattleMode())
     {
         int hit_capture_limit = data.getUInt32(); // 2 A
         float time_limit = data.getFloat(); // 1

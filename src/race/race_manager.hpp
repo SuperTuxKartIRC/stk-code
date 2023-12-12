@@ -883,7 +883,7 @@ public:
         const int id = (int)m_minor_mode;
         // This uses the  numerical id of the mode, see the macros
         // LINEAR_RACE and TAG_ZOMBIE_BATTLE_ARENA above for exact meaning.
-        if (id >= 2008 && id <= 20010) return true;
+        if (id >= 2008 && id <= 2010) return true;
         else            return false;
     }   // isSoccerMode
 
@@ -897,8 +897,6 @@ public:
     bool isCTFMode() const { return m_minor_mode == MINOR_MODE_CAPTURE_THE_FLAG; }
     // ----------------------------------------------------------------------------------------
     bool isTABLifeMode() const { return m_minor_mode == MINOR_MODE_TEAM_ARENA_BATTLE_LIFE; }
-    // ----------------------------------------------------------------------------------------
-    bool isTagZombieABMode() const { return m_minor_mode == MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE; }
     // ----------------------------------------------------------------------------------------
     bool isEggHuntMode() const { return m_minor_mode == MINOR_MODE_EASTER_EGG; }
 

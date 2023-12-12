@@ -101,7 +101,7 @@ void GameSetup::loadWorld()
         else
         {
             RaceManager::get()->setHitCaptureTime(m_hit_capture_limit,
-                m_battle_time_limit * 60.0f);
+                m_battle_time_limit);
         }
         RaceManager::get()->startSingleRace(m_tracks.back(), -1,
             false/*from_overworld*/);

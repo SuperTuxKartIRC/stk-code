@@ -74,6 +74,7 @@ void ItemManager::loadDefaultItemMeshes()
     std::map<ItemState::ItemType, std::string> item_names;
     item_names[ItemState::ITEM_BANANA     ] = "banana";
     item_names[ItemState::ITEM_BONUS_BOX  ] = "bonus-box";
+    item_names[ItemState::ITEM_BARREL     ] = "barrel";
     item_names[ItemState::ITEM_BUBBLEGUM  ] = "bubblegum";
     item_names[ItemState::ITEM_NITRO_BIG  ] = "nitro-big";
     item_names[ItemState::ITEM_NITRO_SMALL] = "nitro-small";
@@ -119,7 +120,7 @@ void ItemManager::loadDefaultItemMeshes()
             m_item_lowres_mesh[i]->grab();
         }
         std::string icon = "icon-" + item_names[(ItemState::ItemType)i] + ".png";
-        if (preloadIcon(icon))
+        if (preloadIcon(icon) || icon == "icon-barrel.png") //TODO: barrel enlever le || mais ne fontionne pas avec le barrel
             m_icon[i] = icon;
     }   // for i
     delete root;
@@ -463,6 +464,11 @@ void ItemManager::reset()
             deleteItem( *i );
             i++;
         }
+        //if ((*i)->canBeUsedUp() || (*i)->getType() == ItemState::ITEM_BARREL) //TODO: barrel
+        //{
+        //    deleteItem(*i);
+        //    i++;
+        //}
         else
         {
             (*i)->reset();

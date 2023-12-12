@@ -82,8 +82,8 @@ void ServerConfigurationMoreOptionsDialog::beforeAddingWidgets()
 	if (ServerConfig::m_server_game_duration < 0) {
 		m_time_widget_value_spinner->setValue(0);
 	}
-	else if(ServerConfig::m_server_game_duration !=0 && ServerConfig::m_server_game_duration>59) {
-		m_time_widget_value_spinner->setValue(ServerConfig::m_server_game_duration/60);
+	else if (ServerConfig::m_server_game_duration != 0 && ServerConfig::m_server_game_duration > 59) {
+		m_time_widget_value_spinner->setValue(ServerConfig::m_server_game_duration / 60);
 	}
 	else {
 		m_time_widget_value_spinner->setValue(ServerConfig::m_server_game_duration / 60);
@@ -93,53 +93,98 @@ void ServerConfigurationMoreOptionsDialog::beforeAddingWidgets()
 	m_tag_value_spinner->setValue(ServerConfig::m_server_game_nb_tag);
 
 
-    m_time_div_widget->setCollapsed(true);
-    m_nb_ai_div_widget->setCollapsed(true);
-    m_winning_div_widget->setCollapsed(true);
-    m_life_div_widget->setCollapsed(true);
-    m_team_div_widget->setCollapsed(true);
+	m_time_div_widget->setCollapsed(true);
+	m_nb_ai_div_widget->setCollapsed(true);
+	m_winning_div_widget->setCollapsed(true);
+	m_life_div_widget->setCollapsed(true);
+	m_team_div_widget->setCollapsed(true);
 	m_tag_div_widget->setCollapsed(true);
 	m_teams_selection_div_widget->setCollapsed(true);
 
-    // La this dans le setCollapsed() est important
-    //m_time_div_widget->setCollapsed(true, this);
-    //m_nb_ai_div_widget->setCollapsed(true, this);
-    //m_winning_div_widget->setCollapsed(true, this);
-    //m_life_div_widget->setCollapsed(true, this);
-    //m_team_div_widget->setCollapsed(true, this);
+	// La this dans le setCollapsed() est important
+	//m_time_div_widget->setCollapsed(true, this);
+	//m_nb_ai_div_widget->setCollapsed(true, this);
+	//m_winning_div_widget->setCollapsed(true, this);
+	//m_life_div_widget->setCollapsed(true, this);
+	//m_team_div_widget->setCollapsed(true, this);
 
-    switch (RaceManager::get()->getMinorMode())
-    {
-        case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM:
-        case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER:
-        case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER:
-		case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE:
-        {
-            m_time_div_widget->setCollapsed(false);
-            //m_nb_ai_div_widget->setCollapsed(false);
-			m_team_div_widget->setCollapsed(false);
-			m_teams_selection_div_widget->setCollapsed(false);
+	//m_life_value_spinner->setVisible(false);
+	//m_life_value_label->setVisible(false);
+	//m_life_value_label->setActive(false);
+	//m_winning_value_spinner->setVisible(false);
+	//m_point_value_label->setVisible(false);
+	//m_point_value_label->setActive(false);
 
-			if(RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE)
-				m_life_div_widget->setCollapsed(false);
-			else
-				m_winning_div_widget->setCollapsed(false);
-            break;
-        }
-        case RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE:
-        {
-            m_time_div_widget->setCollapsed(false);
-            //m_nb_ai_div_widget->setCollapsed(false);
-			m_tag_div_widget->setCollapsed(false);
-            break;
-        }
-        default:
-        {
-            break;
-        }
-    }
-}   // beforeAddingWidgets
+	switch (RaceManager::get()->getMinorMode())
+	{
+	case RaceManager::MINOR_MODE_NORMAL_RACE:
+	{
+		m_time_div_widget->setCollapsed(false);
+		break;
+	}
+	case RaceManager::MINOR_MODE_TIME_TRIAL:
+	{
+		m_time_div_widget->setCollapsed(false);
+		break;
+	}
+	case RaceManager::MINOR_MODE_FREE_FOR_ALL:
+	{
+		m_time_div_widget->setCollapsed(false);
+		break;
+	}
+	case RaceManager::MINOR_MODE_CAPTURE_THE_FLAG:
+	{
+		m_time_div_widget->setCollapsed(false);
+		break;
+	}
+	case RaceManager::MINOR_MODE_SOCCER:
+	{
+		m_time_div_widget->setCollapsed(false);
+		break;
+	}
+	case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM:
+	case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER:
+	case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER:
+	{
+		m_time_div_widget->setCollapsed(false);
+		m_nb_ai_div_widget->setCollapsed(false);
+		m_winning_div_widget->setCollapsed(false);
+		m_nb_team_value_spinner->setCollapsed(false);
+		break;
+	}
+	case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE:
+	{
+		m_time_div_widget->setCollapsed(false);
+		m_nb_ai_div_widget->setCollapsed(false);
+		m_team_div_widget->setCollapsed(false);
+		m_life_div_widget->setCollapsed(false);
+		break;
+	}
+	case RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE:
+	{
+		m_time_div_widget->setCollapsed(false);
+		m_nb_ai_div_widget->setCollapsed(false);
+		m_tag_div_widget->setCollapsed(false);
+		break;
+	}
+	case RaceManager::MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE:
+	{
+		m_time_div_widget->setCollapsed(false);
+		m_nb_ai_div_widget->setCollapsed(false);
+		break;
+	}
+	case RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE:
+	{
 
+		break;
+	}
+	default:
+	{
+
+		break;
+	}
+	}
+}
 // ----------------------------------------------------------------------------
 void ServerConfigurationMoreOptionsDialog::init()
 {

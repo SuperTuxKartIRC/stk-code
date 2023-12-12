@@ -165,7 +165,7 @@
        gp-lose: Plays when a player fails a grand prix.
        unlock: Plays when a kart, track, or other content is unlocked.
        -->
-  <music title="main_theme.music"
+  <music title="main_theme_2.music"
          default="kart_grand_prix.music"
          race-win="race_win_theme.music"
          race-neutral="race_summary.music"
@@ -236,9 +236,9 @@
   <powerup collect-mode="new" no-explosive-items-timeout="15.0"/>
   <!-- time: How long a switch is being effective.
        items for each item list the index of the item it is switched with.
-             Order: giftbox, banana, big-nitro, small-nitro, bubble-gum, nolok-bubble-gum,
-                    easter egg-->
-  <switch time="5"  items="1 0 4 4 2 2 6"/>
+             Order: giftbox, banana, barrel, big-nitro, small-nitro, bubble-gum, nolok-bubble-gum,
+                    easter egg--> 
+  <switch time="5"  items="1 0 3 5 5 3 3 6"/>
 
   <!-- Bubblegum
        disappear-counter: How often bubblegum gets driven over before it disappears.

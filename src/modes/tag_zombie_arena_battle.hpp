@@ -46,10 +46,10 @@ private:
         VITESSE,
         FORCE,
         DEFENSE,
-        DEFORCE,
         CONTROLE,
-        SPEED_CONTROLLER,
         JACK_OF_ALL_TRADE,
+        FUNNY,
+        POWERFULL_SURVIROR, // Special class for the second zombie mod
     };
 
     /** Profiling usage */
@@ -71,6 +71,7 @@ private:
         int m_points_result;
         int m_nb_rescues;
         ClassesTypes m_type;
+        int m_power_cooldown;
     };
 
     struct TeamInfo
@@ -82,9 +83,9 @@ private:
 protected:
     int8_t m_total_player = getNumKarts();
     int8_t m_nb_not_zombie_player;
-    int8_t m_nb_tags_zombie = NetworkConfig::get()->isNetworking() ? RaceManager::get()->getTagTarget() : RaceManager::get()->getNumberOfGreenAIKarts();
+    UINT8 m_nb_tags_zombie = NetworkConfig::get()->isNetworking() ? RaceManager::get()->getTagTarget() : RaceManager::get()->getNumberOfGreenAIKarts();
     float m_delay = 0;
-    float m_delayItem = 15;
+    float m_delayItem = 30;
 
     KartTeam m_tag_zombie_team = KART_TEAM_GREEN;
     KartTeam m_player_team = KART_TEAM_RED;
@@ -144,7 +145,7 @@ private:
     // ------------------------------------------------------------------------
     virtual void setZombie(int kartId, int zombieId);
     // ------------------------------------------------------------------------
-    void TagZombieArenaBattle::setSurvivor(int kartId);
+    void setSurvivor(int kartId);
     // ------------------------------------------------------------------------
     virtual bool setZombieStart();
     // ------------------------------------------------------------------------

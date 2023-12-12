@@ -249,7 +249,7 @@ private:
 
     std::atomic<int> m_battle_nb_team;
 
-    bool m_teams_selection;
+    std::atomic<bool> m_teams_selection;
 
     std::atomic<int> m_battle_nb_tag;
 

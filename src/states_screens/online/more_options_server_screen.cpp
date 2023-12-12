@@ -129,12 +129,12 @@ void MoreOptionsServerScreen::beforeAddingWidget()
     m_team_div_widget->setCollapsed(true, this);
     m_tag_div_widget->setCollapsed(true, this);
     m_teams_selection_div_widget->setCollapsed(true, this);
-
+    m_time_div_widget->setCollapsed(false, this);
     // Dois setter les valeurs des spinner avec les variable de configurations 
     // Au minimum pour team_arena (correspond au 4 mode de jeux bataille en équipe) + tag_zombie
     // Si possible une variable différente pour team_arena_life (pour le temps)
     if ((ServerConfig::m_server_mode == 9 || ServerConfig::m_server_mode == 10 || ServerConfig::m_server_mode == 11 || ServerConfig::m_server_mode == 12)) {
-        m_time_div_widget->setCollapsed(false, this);
+      
         //m_nb_ai_div_widget->setCollapsed(false, this);
         m_team_div_widget->setCollapsed(false, this);
         m_teams_selection_div_widget->setCollapsed(false, this);
@@ -162,7 +162,7 @@ void MoreOptionsServerScreen::eventCallback(Widget* widget, const std::string& n
         if (m_time_widget_value_spinner->getValue()>59) {
             m_time_widget_value_spinner->setValue(0);
         }
-        RaceManager::get()->setTimeTarget(m_time_widget_value_spinner->getValue());
+        RaceManager::get()->setTimeTarget(m_time_widget_value_spinner->getValue()*60);
         ServerConfig::m_server_game_duration = m_time_widget_value_spinner->getValue()*60;
     }
     else if (name == m_winning_value_spinner->m_properties[PROP_ID])

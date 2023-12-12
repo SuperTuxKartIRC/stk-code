@@ -132,12 +132,17 @@ public:
                       POWERUP_FIRST,
                       POWERUP_BUBBLEGUM = POWERUP_FIRST,
                       POWERUP_CAKE,
-                      POWERUP_BOWLING, POWERUP_ZIPPER, POWERUP_PLUNGER,
-                      POWERUP_SWITCH, POWERUP_SWATTER, POWERUP_RUBBERBALL,
+                      POWERUP_BARREL,
+                      POWERUP_BOWLING, 
+                      POWERUP_ZIPPER,
+                      POWERUP_PLUNGER,
+                      POWERUP_SWITCH, 
+                      POWERUP_SWATTER,
+                      POWERUP_RUBBERBALL,
                       POWERUP_PARACHUTE,
                       POWERUP_ANVIL,      //powerup.cpp assumes these two come last
                       POWERUP_LAST=POWERUP_ANVIL,
-                      POWERUP_MAX
+                      POWERUP_MAX, 
     };
 
 private:

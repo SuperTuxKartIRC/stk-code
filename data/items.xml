@@ -2,6 +2,7 @@
 <items>
   <bonus-box   model="gift-box.spm"        lowmodel="gift-box-low.spm"        glow="31 202 253"/>
   <banana      model="banana.spm"          lowmodel="banana-low.spm"          glow="197 152 37"/>
+  <barrel      model="barrel.spm"          lowmodel="barrel.spm"              glow="243 140 234"/>
   <nitro-big   model="nitrotank-big.spm"   lowmodel="nitrotank-big-low.spm"   glow="0 70 158"/>
   <nitro-small model="nitrotank-small.spm" lowmodel="nitrotank-small-low.spm" glow="0 70 158"/>
   <!-- While a bubble gum technically 

@@ -410,7 +410,7 @@ void loadServerLobbyFromConfig()
         RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX;
     const bool is_battle = RaceManager::get()->isBattleMode();
     const bool is_team_arena_battle = RaceManager::get()->isTeamArenaBattleMode();
-    const bool is_tag_zombie = RaceManager::get()->isTagZombieABMode();
+    const bool is_tag_zombie = RaceManager::get()->isTagzArenaBattleMode();
     const bool is_tabl = RaceManager::get()->isTABLifeMode();
 
     std::shared_ptr<LobbyProtocol> server_lobby;

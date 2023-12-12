@@ -1186,6 +1186,10 @@ void Kart::collectedItem(ItemState *item_state)
         // Play appropriate custom character sound
         playCustomSFX(SFXManager::CUSTOM_GOO);
         break;
+
+    case Item::ITEM_BARREL:
+        m_attachment->hitBarrel(item_state); //TODO: barrel Explosion au lieu de la banane hit
+        break;
     default        : break;
     }   // switch TYPE
 

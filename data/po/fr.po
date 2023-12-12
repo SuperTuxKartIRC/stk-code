@@ -73,7 +73,7 @@ msgstr "Joue à chaque piste officielle au moins une fois."
 
 #. I18N: ./data/achievements.xml
 msgid "Strike!"
-msgstr "Stri !"
+msgstr "Strik !"
 
 #. I18N: ./data/achievements.xml
 msgid "Hit 10 karts with a bowling-ball."
