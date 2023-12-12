@@ -1,0 +1,32 @@
+Here's a list of things to do or fix 
+
+Bug:
+	- The second sub-mode of the zombie tag game (tag-zombie survivor powerful) doesn't work (the game ends far too early with the isRaceOver() method).
+	- When gifts, banners, nitro are disabled, it doesn't always work. 
+	- Very recent bug: rechargeable powers no longer work as they should. They go to infinity, which is not normal. 
+	- The code for the victory counters in the Team-Arena game modes (in world.cpp) depending on the team chosen is commented on, as the code is causing problems. 
+	- Victory screen information seems to be mixed up (inaccurate). 
+	- Some powers, such as the parachute and the anvil, handle the team condition (not touching a member of your team) incorrectly.
+	- When you choose your team online with the selection screen, the kart is always in tux (we never managed to display the right kart).
+
+Improvement:
+	- When hit (Barril on the ground), the kart should explode instead of receiving a hitBanana() effect.
+	- When a game is over, the victory animation is not played (only the defeat animation is permanently played).
+	- Ensure that our game modes have acceptable default values for online mode (e.g. nb the tag = 1, nb life =3, etc.).
+	- Improve the third sub-game mode of the battle-arena-team (player with the most points) (points player) to make it better and more fun to play.
+	- In the overpowered survivor game mode, survivors should have lots of items at once, like 10-15 zippers, or 10-15 anvils, etc...
+	- When a kart becomes a zombie, its kart should turn green. This works locally (a kart is recreated and the old one deleted), but online it sometimes causes problems (the player is disconnected and reconnected very quickly). 
+	- Better icons ???
+
+Additional features 
+	- New powers such as tenis ball, baseball, voleyball and oil puddle.
+	- Addition of the urn object. This item appears when a player is transformed into a zombie (when the survivor dies). The urn contains a reward. 
+	- Added a mini surprise event system for our game mode. Like reducing the recharge time of player powers temporarily for 20s, or disabling the mini-map temporarily for 15s, or etc...
+	- Power selection menu (which power will be available in the gift or in the banana)
+	- Added a fog system or a darkening system (darkness with little light) to give a better atmosphere to the zombie game mode.
+	- Addition of achievements linked to our game modes or linked to the deactivation of gifts, nitro, banners, etc.
+
+Important 
+	- Create an installable (doesn't work after all) for (at most) December 17 in the afternoon.
+
+Oops wrong repo
