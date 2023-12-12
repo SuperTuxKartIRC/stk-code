@@ -1,0 +1,30 @@
+Voici une liste de chose a faire ou a corriger 
+
+Bug:
+	- Le deuximème sous mode de jeu de tag zombie (tag-zombie survivant puissant) ne fonctionne pas (la partie se termine beaucoup trop tôt méthode isRaceOver())
+	- Lorsque les cadeaux, bannnes, nitro sont désactivé, ça ne fonctionne pas toujours 
+	- Bug très récent : les pouvoir rechargable ne fonctionne plus comme il le faut. Donne juste de zipper a l'infini ce qui n'est pas normal 
+	- Le code pour les compteurs de victoire des modes de jeux Team-Arena (dans world.cpp) selon l'équipe choisit est en commentaire car le code cause problème 
+	- Les informations dans l'écran de victoire semble être mélanger (inexacte) 
+	- Certain pouvoir comme le parachute et l'enclume gère mal la condition d'équipe (ne pas toucher un membre de son équipe)
+	- Lorsqu'on choisit notre équipe en ligne avec l'écran de sélection, le kart est toujours tux (on a jamais réussit a faire afficher le bon kart)
+
+Amélioration:
+	- Lorsque toucher (le Barril qui se trouve au sol), le kart devrait exploser et non recevoir un effet de hitBanana()
+	- Lorsqu'une partie est terminer, l'animation de victoire n'est pas jouer (seulement l'animation de défaite est jouer en tout temps)
+	- S'assurer que nos mode de jeux ailles des valeurs par défaut acceptable pour le mode en ligne (ex: nb the tag = 1, nb de vie =3, etc...)
+	- Amélioration du troisième sous mode de jeu de team-arena-battle (joueur avec le plus de points) (points player) pour le rendre meilleur et plus le fun a jouer
+	- Dans le mode de jeux surviant surpuissant, les survivant devrait avoir beaucoup d'item a la fois genre 10-15 zipper, ou 10-15 enclume, etc ...
+	- Lorsqu'un kart devient zombie, sont kart devrait devenir vert. Ça fonctionne en local (un kart a recréer et l'ancien est supprimer) mais en ligne ça cause parfois problème (le joueur est déconnecter et reconnecter très rapidement) 
+	- Meilleur icones ???
+
+Ajout supplémentaire 
+	- Ajout de pouvoir supplémentaire comme le balle de tenis, la balle de baseball, le ballon de voleyball ou la flaque de glue (d'huile)
+	- Ajout de l'item d'urne. Cette item aparait lorsqu'un joueur se fait transformer en zombie (lorsque le survivant meur). L'urne contient une récompense 
+	- Ajout d'un mini système d'évènment surprise pour notre mode de jeu. Comme réduction du temps de recharge des pouvoirs des joueur temporairement pendants 20s, ou désactivation de la mini-map temporairement pendants 15s, ou etc ...
+	- Menu de sélection des pouvoirs (quel pouvoir sera disponible dans le cadeau ou dans la bananne)
+	- Ajout d'un système de brouillard ou d'un système d'assombrisement (obscurité avec peux de lumière) pour donner une meilleur ambiance au mode de jeu zombie
+	- Ajout de succès en rapport a nos mode de jeux ou en rapport a la désactivation des cadeaux, nitro, banannes
+
+Important 
+	- Créer un instalable (ne fonctionne pas finalement) d'ici (au maximum) le 17 décembre en après midi 
