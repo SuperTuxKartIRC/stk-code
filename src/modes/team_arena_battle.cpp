@@ -177,7 +177,7 @@ void TeamArenaBattle::handleScoreInServer(int kart_id, int hitter)
         NetworkString p(PROTOCOL_GAME_EVENTS);
         p.setSynchronous(true);
         p.addUInt8(GameEventsProtocol::GE_BATTLE_KART_SCORE);
-        p.addUInt8((uint8_t)kart_id).addUInt8((int8_t)hitter);
+        p.addUInt8((uint8_t)kart_id).addUInt8((uint8_t)hitter);
         STKHost::get()->sendPacketToAllPeers(&p, true);
     }
 }   // handleScoreInServer
@@ -186,7 +186,7 @@ void TeamArenaBattle::handleScoreInServer(int kart_id, int hitter)
 void TeamArenaBattle::setKartScoreFromServer(NetworkString& ns)
 {
     uint8_t kart_id = ns.getUInt8();
-    int8_t hitter = ns.getUInt8();
+    uint8_t hitter = ns.getUInt8();
     handleScoreInServer(kart_id, hitter);
 }   // setKartScoreFromServer
 

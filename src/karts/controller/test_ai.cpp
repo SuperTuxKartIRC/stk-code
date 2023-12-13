@@ -1050,7 +1050,7 @@ void SkiddingAI::evaluateItems(const ItemState *item, Vec3 kart_aim_direction,
 
     // If the item type is not handled here, ignore it
     Item::ItemType type = item->getType();
-    if( type!=Item::ITEM_BANANA && type != Item::ITEM_BARREL && type!=Item::ITEM_BUBBLEGUM && //TODO: barrel
+    if( type!=Item::ITEM_BANANA    && type!=Item::ITEM_BUBBLEGUM &&
         type!=Item::ITEM_BONUS_BOX &&
         type!=Item::ITEM_NITRO_BIG && type!=Item::ITEM_NITRO_SMALL  )
         return;
@@ -1061,7 +1061,6 @@ void SkiddingAI::evaluateItems(const ItemState *item, Vec3 kart_aim_direction,
         // Negative items: avoid them
         case Item::ITEM_BUBBLEGUM: // fallthrough
         case Item::ITEM_BANANA: avoid = true;  break;
-        case Item::ITEM_BARREL: avoid = true;  break; //TODO: barrel
 
         // Positive items: try to collect
         case Item::ITEM_NITRO_BIG:
@@ -1292,54 +1291,6 @@ void SkiddingAI::handleItems(const float dt)
                 m_controls->setLookBack(fire_backwards);
             break;
         }   // POWERUP_CAKE
-
-    case PowerupManager::POWERUP_BARREL:
-    {
-        // if the kart has a shield, do not break it by using a barrel.
-        if (m_kart->getShieldTime() > min_bubble_time)
-            break;
-        // Leave some time between shots
-        if (m_time_since_last_shot < 3.0f) break;
-
-        // Do not fire if the kart is driving too slow
-        bool kart_behind_is_slow =
-            (m_kart_behind && m_kart_behind->getSpeed() < m_kart->getSpeed());
-        bool kart_ahead_is_slow =
-            (m_kart_ahead && m_kart_ahead->getSpeed() < m_kart->getSpeed());
-        // Consider firing backwards if there is no kart ahead or it is
-        // slower. Also, if the kart behind is closer and not slower than
-        // this kart.
-        bool fire_backwards = !m_kart_ahead ||
-            (m_kart_behind &&
-                (m_distance_behind < m_distance_ahead ||
-                    kart_ahead_is_slow) &&
-                !kart_behind_is_slow
-                );
-
-        // Don't fire at a kart that is slower than us. Reason is that
-        // we can either save the cake for later since we will overtake
-        // the kart anyway, or that this might force the kart ahead to
-        // use its nitro/zipper (and then we will shoot since then the
-        // kart is faster).
-        if ((fire_backwards && kart_behind_is_slow) ||
-            (!fire_backwards && kart_ahead_is_slow))
-            break;
-
-        // Don't fire if the kart we are aiming at is invulnerable.
-        if ((fire_backwards && m_kart_behind && m_kart_behind->isInvulnerable()) ||
-            (!fire_backwards && m_kart_ahead && m_kart_ahead->isInvulnerable()))
-            return;
-
-        float distance = fire_backwards ? m_distance_behind
-            : m_distance_ahead;
-        // Since cakes can be fired all around, just use a sane distance
-        // with a bit of extra for backwards, as enemy will go towards barrel
-        m_controls->setFire((fire_backwards && distance < 25.0f) ||
-            (!fire_backwards && distance < 20.0f));
-        if (m_controls->getFire())
-            m_controls->setLookBack(fire_backwards);
-        break;
-    }   // POWERUP_BARREL
 
     case PowerupManager::POWERUP_BOWLING:
         {

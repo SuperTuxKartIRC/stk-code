@@ -63,7 +63,6 @@ public:
         ITEM_FIRST,
         ITEM_BONUS_BOX = ITEM_FIRST,
         ITEM_BANANA,
-        ITEM_BARREL,
         ITEM_NITRO_BIG,
         ITEM_NITRO_SMALL,
         ITEM_BUBBLEGUM,
@@ -244,7 +243,7 @@ public:
     /** Returns if this item is negative, i.e. a banana or bubblegum. */
     bool isNegativeItem() const
     {
-        return m_type == ITEM_BANANA || m_type == ITEM_BARREL || m_type == ITEM_BUBBLEGUM || //TODO: barrel
+        return m_type == ITEM_BANANA || m_type == ITEM_BUBBLEGUM ||
                m_type == ITEM_BUBBLEGUM_NOLOK;
     }
     // ------------------------------------------------------------------------

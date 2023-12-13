@@ -1666,7 +1666,7 @@ void RaceResultGUI::unload()
             else if (modeVal == 3) {
                 kart = tagzab->getKartAtPosition(i + 1);
                 kart_id = kart->getWorldKartId();
-                kartZombie = tagzab->getKartAtPosition(tagzab->getKartConverteZombie(kart_id)); // kart_id
+                kartZombie = tagzab->getKartConverteZombie(kart_id) != -1 ? World::getWorld()->getKart(tagzab->getKartConverteZombie(kart_id)) : NULL;
                 team = tagzab->getKartTeam(kart_id);
             }
             if (team != teams)

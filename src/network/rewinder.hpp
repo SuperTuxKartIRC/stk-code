@@ -34,11 +34,10 @@ enum RewinderName : char
     RN_RED_FLAG = 0x03,
     RN_BLUE_FLAG = 0x04,
     RN_CAKE = 0x05,
-    RN_BARREL = 0x06,
-    RN_BOWLING = 0x07,
-    RN_PLUNGER = 0x08,
-    RN_RUBBERBALL = 0x09,
-    RN_PHYSICAL_OBJ = 0x10
+    RN_BOWLING = 0x06,
+    RN_PLUNGER = 0x07,
+    RN_RUBBERBALL = 0x08,
+    RN_PHYSICAL_OBJ = 0x09
 };
 
 class Rewinder : public std::enable_shared_from_this<Rewinder>

@@ -45,7 +45,6 @@
 
 #include "irrMath.h"
 #include <IAnimatedMeshSceneNode.h>
-#include "barrel.hpp"
 
 /** Initialises the attachment each kart has.
  */
@@ -393,52 +392,6 @@ void Attachment::hitBanana(ItemState *item_state)
     }
 }   // hitBanana
 
-void Attachment::hitBarrel(ItemState* item_state)
-{
-    
-    //Bubble gum shield effect:
-    if (m_type == ATTACH_BUBBLEGUM_SHIELD ||
-        m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD)
-    {
-        m_ticks_left = 0;
-        return;
-    }
-
-    int leftover_ticks = 0;
-
-    bool add_a_new_item = true;
-
-    if (RaceManager::get()->isBattleMode())
-    {
-        World::getWorld()->kartHit(m_kart->getWorldKartId());
-        if (m_kart->getKartAnimation() == NULL)
-        {
-            ExplosionAnimation::create(m_kart, m_kart->getXYZ(), true);
-           // ExplosionAnimation::create(m_kart);
-        }
-
-        // Rumble!
-        Controller* controller = m_kart->getController();
-        if (controller && controller->isLocalPlayerController())
-        {
-            controller->rumble(0, 0.8f, 500);
-        }
-
-        return;
-    }
-
-    AttachmentType new_attachment = ATTACH_NOTHING;
-    const KartProperties* kp = m_kart->getKartProperties();
-    // Use this as a basic random number to make sync with server easier.
-    // Divide by 16 to increase probablity to have same time as server in
-    // case of a few physics frames different between client and server.
-    int ticks = World::getWorld()->getTicksSinceStart() / 16;
-
-    Track::getCurrentTrack()->handleExplosion(item_state->getXYZ(), NULL, true);
-
-}   // hitBarrel
-
-
 //-----------------------------------------------------------------------------
 /** Updates the attachments in case of a kart-kart collision. This must only
  *  be called for one of the karts in the collision, since it will update
@@ -607,7 +560,6 @@ void Attachment::update(int ticks)
         }
         break;
     }   // switch
-
 
     // Detach attachment if its time is up.
     if (m_ticks_left <= 0)

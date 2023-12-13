@@ -96,7 +96,7 @@ void BattleAI::findClosestKart(bool consider_difficulty, bool find_sta)
         if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM ||
             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER ||
             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE ||
-            RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE
+            RaceManager::get()->isTagzArenaBattleMode()
             ) {
             if (m_world->getKartTeam(kart->getWorldKartId()) == m_world->getKartTeam(m_kart->getWorldKartId()))
             {

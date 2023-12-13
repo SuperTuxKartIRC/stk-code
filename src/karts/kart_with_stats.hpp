@@ -58,9 +58,6 @@ private:
     /** How many bubblegums were taken */
     unsigned int m_bubblegum_count;
 
-    /** How many barrel were taken */
-    unsigned int m_barrel_count;
-
     /** How often the kart braked. */
     unsigned int m_brake_count;
 

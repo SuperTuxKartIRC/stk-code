@@ -206,7 +206,6 @@ namespace Scripting
             engine->RegisterEnumValue("PowerupType", "BOWLING", PowerupManager::PowerupType::POWERUP_BOWLING);
             engine->RegisterEnumValue("PowerupType", "BUBBLEGUM", PowerupManager::PowerupType::POWERUP_BUBBLEGUM);
             engine->RegisterEnumValue("PowerupType", "CAKE", PowerupManager::PowerupType::POWERUP_CAKE);
-            engine->RegisterEnumValue("PowerupType", "BARREL", PowerupManager::PowerupType::POWERUP_BARREL);
             engine->RegisterEnumValue("PowerupType", "PARACHUTE", PowerupManager::PowerupType::POWERUP_PARACHUTE);
             engine->RegisterEnumValue("PowerupType", "PLUNGER", PowerupManager::PowerupType::POWERUP_PLUNGER);
             engine->RegisterEnumValue("PowerupType", "RUBBERBALL", PowerupManager::PowerupType::POWERUP_RUBBERBALL);

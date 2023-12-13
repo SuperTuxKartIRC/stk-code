@@ -894,13 +894,8 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         if (minor_mode==RaceManager::MINOR_MODE_3_STRIKES                             ||
             minor_mode==RaceManager::MINOR_MODE_FREE_FOR_ALL                          ||
             minor_mode==RaceManager::MINOR_MODE_CAPTURE_THE_FLAG                      ||
-            minor_mode==RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM         ||
-            minor_mode==RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER       ||
-            minor_mode==RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER   ||
-            minor_mode==RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE                ||
-            minor_mode==RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE               ||
-            minor_mode==RaceManager::MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE      ||
-            minor_mode==RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE ||
+            RaceManager::get()->isTeamArenaBattleMode()                               ||
+            RaceManager::get()->isTagzArenaBattleMode()                               ||
             minor_mode==RaceManager::MINOR_MODE_EASTER_EGG                            ||
             minor_mode==RaceManager::MINOR_MODE_SOCCER)
         {

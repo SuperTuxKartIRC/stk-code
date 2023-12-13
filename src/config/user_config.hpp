@@ -546,63 +546,6 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam           m_team4_ai_num
         PARAM_DEFAULT(IntUserConfigParam(0, "team4-ai-num",
             &m_race_setup_group, "Number of Team4 AI karts."));
-
-    PARAM_PREFIX BoolUserConfigParam          m_bonus_box_race
-        PARAM_DEFAULT(BoolUserConfigParam(false, "bonux-box-race",
-            &m_race_setup_group, "Deactivate bonus box in race mode."));
-    PARAM_PREFIX BoolUserConfigParam          m_bottle_nitro_race
-        PARAM_DEFAULT(BoolUserConfigParam(false, "bottle-nitro-race",
-            &m_race_setup_group, "Deactivate bottle of nitro in race mode."));
-    PARAM_PREFIX BoolUserConfigParam          m_bananna_race
-        PARAM_DEFAULT(BoolUserConfigParam(false, "bananna-race",
-            &m_race_setup_group, "Deactivate bananna in race mode."));
-    PARAM_PREFIX BoolUserConfigParam          m_bonus_box_soccer
-        PARAM_DEFAULT(BoolUserConfigParam(false, "bonux-box-soccer",
-            &m_race_setup_group, "Deactivate bonus box in soccer mode."));
-    PARAM_PREFIX BoolUserConfigParam          m_bottle_nitro_soccer
-        PARAM_DEFAULT(BoolUserConfigParam(false, "bottle-nitro-soccer",
-            &m_race_setup_group, "Deactivate bottle of nitro in soccer mode."));
-    PARAM_PREFIX BoolUserConfigParam          m_bananna_soccer
-        PARAM_DEFAULT(BoolUserConfigParam(false, "bananna-soccer",
-            &m_race_setup_group, "Deactivate bananna in soccer mode."));
-    PARAM_PREFIX BoolUserConfigParam          m_bonus_box_battle_arena
-        PARAM_DEFAULT(BoolUserConfigParam(false, "bonux-box-battle-arena",
-            &m_race_setup_group, "Deactivate bonus box in battle arena mode."));
-    PARAM_PREFIX BoolUserConfigParam          m_bottle_nitro_battle_arena
-        PARAM_DEFAULT(BoolUserConfigParam(false, "bottle-nitro-battle-arena",
-            &m_race_setup_group, "Deactivate bottle of nitro in battle arena mode."));
-    PARAM_PREFIX BoolUserConfigParam          m_bananna_battle_arena
-        PARAM_DEFAULT(BoolUserConfigParam(false, "bananna-battle-arena",
-            &m_race_setup_group, "Deactivate bananna in battle arena mode."));
-    PARAM_PREFIX BoolUserConfigParam          m_bonus_box_teams_battle_arena
-        PARAM_DEFAULT(BoolUserConfigParam(false, "bonux-box-teams-battle-arena",
-            &m_race_setup_group, "Deactivate bonus box in teams battle arena mode."));
-    PARAM_PREFIX BoolUserConfigParam          m_bottle_nitro_teams_battle_arena
-        PARAM_DEFAULT(BoolUserConfigParam(false, "bottle-nitro-teams-battle-arena",
-            &m_race_setup_group, "Deactivate bottle of nitro in teams battle arena mode."));
-    PARAM_PREFIX BoolUserConfigParam          m_bananna_teams_battle_arena
-        PARAM_DEFAULT(BoolUserConfigParam(false, "bananna-teams-battle-arena",
-            &m_race_setup_group, "Deactivate bananna in teams battle arena mode."));
-    PARAM_PREFIX BoolUserConfigParam          m_bonus_box_tag_zombie_arena
-        PARAM_DEFAULT(BoolUserConfigParam(false, "bonux-box-tag-zombie-arena",
-            &m_race_setup_group, "Deactivate bonus box in tag zombie arena mode."));
-    PARAM_PREFIX BoolUserConfigParam          m_bottle_nitro_tag_zombie_arena
-        PARAM_DEFAULT(BoolUserConfigParam(false, "bottle-nitro-tag-zombie-arena",
-            &m_race_setup_group, "Deactivate bottle of nitro in tag zombie arena mode."));
-    PARAM_PREFIX BoolUserConfigParam          m_bananna_tag_zombie_arena
-        PARAM_DEFAULT(BoolUserConfigParam(false, "bananna-tag-zombie-arena-arena",
-            &m_race_setup_group, "Deactivate bananna in tag zombie arena mode."));
-
-    PARAM_PREFIX BoolUserConfigParam          m_bonus_box_team_arena
-        PARAM_DEFAULT(BoolUserConfigParam(false, "bonux-box-team-arena",
-            &m_race_setup_group, "Deactivate bonus box in team arena mode."));
-    PARAM_PREFIX BoolUserConfigParam          m_bottle_nitro_team_arena
-        PARAM_DEFAULT(BoolUserConfigParam(false, "bottle-nitro-team-arena",
-            &m_race_setup_group, "Deactivate bottle of nitro in team arena mode."));
-    PARAM_PREFIX BoolUserConfigParam          m_bananna_team_arena
-        PARAM_DEFAULT(BoolUserConfigParam(false, "bananna-team-arena-arena",
-            &m_race_setup_group, "Deactivate bananna in team arena mode."));
-
     PARAM_PREFIX BoolUserConfigParam          m_karts_powerup_gui
         PARAM_DEFAULT(BoolUserConfigParam(false, "karts-powerup-gui",
             &m_race_setup_group, "Show other karts' held powerups in race gui."));
@@ -1023,7 +966,7 @@ namespace UserConfigParams
         PARAM_DEFAULT(BoolUserConfigParam(true, "ipv6-lan",
             &m_network_group, "Enable IPv6 LAN server discovery."));
     PARAM_PREFIX IntUserConfigParam m_max_players
-        PARAM_DEFAULT(IntUserConfigParam(35, "max-players",
+        PARAM_DEFAULT(IntUserConfigParam(8, "max-players",
             &m_network_group, "Maximum number of players on the server "
             "(for gui server creation."));
     PARAM_PREFIX IntUserConfigParam m_timer_sync_difference_tolerance

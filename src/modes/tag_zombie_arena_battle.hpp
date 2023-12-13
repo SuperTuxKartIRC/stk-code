@@ -42,36 +42,20 @@ private:
     bool m_count_down_reached_zero = false;
     const int8_t PNBT = 0, ZNBT = 2;
     irr::core::stringw m_winning_text;
-    enum ClassesTypes {
-        VITESSE,
-        FORCE,
-        DEFENSE,
-        CONTROLE,
-        JACK_OF_ALL_TRADE,
-        FUNNY,
-        POWERFULL_SURVIROR, // Special class for the second zombie mod
-    };
 
     /** Profiling usage */
     int m_total_rescue = 0;
     int m_total_hit = 0;
 
-    struct PowerInfo {
-        int powerType;
-        int weight;
-    };
-
     struct BattleInfo
     {
         int  m_lifes;
-        int m_nb_player_converted; // int8_t
+        int m_nb_player_converted;
         float m_converted_time = -1;
         bool  m_is_start_zombie;
         int8_t m_zombie_id_convert;
-        int m_points_result;
+        int8_t m_points_result;
         int m_nb_rescues;
-        ClassesTypes m_type;
-        int m_power_cooldown;
     };
 
     struct TeamInfo
@@ -83,9 +67,8 @@ private:
 protected:
     int8_t m_total_player = getNumKarts();
     int8_t m_nb_not_zombie_player;
-    UINT8 m_nb_tags_zombie = NetworkConfig::get()->isNetworking() ? RaceManager::get()->getTagTarget() : RaceManager::get()->getNumberOfGreenAIKarts();
+    int8_t m_nb_tags_zombie = NetworkConfig::get()->isNetworking() ? 1 : RaceManager::get()->getNumberOfGreenAIKarts();
     float m_delay = 0;
-    float m_delayItem = 30;
 
     KartTeam m_tag_zombie_team = KART_TEAM_GREEN;
     KartTeam m_player_team = KART_TEAM_RED;
@@ -93,12 +76,11 @@ protected:
     std::vector<TeamInfo> m_team_info; // TeamList
     std::vector<BattleInfo> m_kart_info; // KartList
     std::vector<int8_t> m_tag_zombie_list_rand; // List of random zombie at start of the game
-    std::map<ClassesTypes, std::vector<PowerInfo>> m_class_power_map;
 
     bool m_convert_player = false;
     int m_id_player_converted;
-    int m_iPower;
-    
+    bool m_is_game_terminated = false;
+    bool m_has_count_points = false;
 public:
     // ------------------------------------------------------------------------
     TagZombieArenaBattle();
@@ -145,7 +127,7 @@ private:
     // ------------------------------------------------------------------------
     virtual void setZombie(int kartId, int zombieId);
     // ------------------------------------------------------------------------
-    void setSurvivor(int kartId);
+    void TagZombieArenaBattle::setSurvivor(int kartId);
     // ------------------------------------------------------------------------
     virtual bool setZombieStart();
     // ------------------------------------------------------------------------
@@ -155,6 +137,8 @@ private:
     virtual void generateUniqueRandomNumbers();
     // ------------------------------------------------------------------------
     void calculatePoints();
+    // ------------------------------------------------------------------------
+    void playMusic(BYTE numP, BYTE numS);
     // ------------------------------------------------------------------------
     void resetKartForSwatterHit(int kart_id, int at_world_ticks)
     {
@@ -198,18 +182,6 @@ public:
     irr::core::stringw getWinningTeamsTexte() { return m_winning_text; };
     // ------------------------------------------------------------------------
     virtual void setZombieTexte(irr::core::stringw winningText, int kartId, int zombieId);
-
-
-    int getRandomPowerForClass(ClassesTypes classType);
-    void distributePower(int8_t powerIndex, int* collectible_type, int* amount);
-    ClassesTypes getRandomClassType();
-    void initializeClassPowerMap();
-
-    // overriding World methods
-    virtual void getDefaultCollectibles(int* collectible_type, int* amount) OVERRIDE;
-    virtual bool haveBonusBoxes() OVERRIDE;
-    virtual bool timerPower() OVERRIDE;
-    virtual void getItem(int* collectible_type, int* amount) OVERRIDE;
 };
 
 #endif // TAG_ARENA_BATTLE_HPP

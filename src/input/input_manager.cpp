@@ -833,7 +833,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
 #endif
         }
         else if (RaceManager::get() &&
-            RaceManager::get()->isWatchingReplay() && !GUIEngine::ModalDialog::isADialogActive() && 
+            RaceManager::get()->isWatchingReplay() && !GUIEngine::ModalDialog::isADialogActive() &&
             StateManager::get()->getGameState() == GUIEngine::GAME)
         {
             // Get the first ghost kart

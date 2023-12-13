@@ -982,7 +982,7 @@ void SkiddingAI::evaluateItems(const ItemState *item, Vec3 kart_aim_direction,
 
     // If the item type is not handled here, ignore it
     Item::ItemType type = item->getType();
-    if( type!=Item::ITEM_BANANA && type != Item::ITEM_BARREL && type!=Item::ITEM_BUBBLEGUM &&
+    if( type!=Item::ITEM_BANANA    && type!=Item::ITEM_BUBBLEGUM &&
         type!=Item::ITEM_BONUS_BOX &&
         type!=Item::ITEM_NITRO_BIG && type!=Item::ITEM_NITRO_SMALL  )
         return;
@@ -993,7 +993,6 @@ void SkiddingAI::evaluateItems(const ItemState *item, Vec3 kart_aim_direction,
         // Negative items: avoid them
         case Item::ITEM_BUBBLEGUM: // fallthrough
         case Item::ITEM_BANANA: avoid = true;  break;
-        case Item::ITEM_BARREL: avoid = true;  break; //TODO: barrel hit
 
         // Positive items: try to collect
         case Item::ITEM_NITRO_BIG:
@@ -1200,15 +1199,6 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
             handleCake(item_skill);
             break;
         }   // POWERUP_CAKE
-    case PowerupManager::POWERUP_BARREL:
-    {
-        // if the kart has a shield, do not break it by using a cake.
-        if ((m_kart->getShieldTime() > min_bubble_time) && (stk_config->m_shield_restrict_weapons == true))
-            break;
-
-        handleCake(item_skill);
-        break;
-    }   // POWERUP_CAKE
           
     case PowerupManager::POWERUP_BOWLING:
         {
@@ -1316,7 +1306,6 @@ void SkiddingAI::handleBubblegum(int item_skill,
     projectile_types[0] = ProjectileManager::get()->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_BOWLING);
     projectile_types[1] = ProjectileManager::get()->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_PLUNGER);
     projectile_types[2] = ProjectileManager::get()->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_CAKE);
-    projectile_types[2] = ProjectileManager::get()->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_BARREL);
     projectile_types[3] = ProjectileManager::get()->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_RUBBERBALL);
    
     bool projectile_is_close = false;
@@ -1824,7 +1813,7 @@ void SkiddingAI::handleSwitch(int item_skill,
           }
        }
            
-       //Bad will store 2 for bananas, 3 for bubble gum, 3 for barrel
+       //Bad will store 2 for bananas, 3 for bubble gum
        for(int i=(int)items_to_avoid.size()-1; i>=0; i--)
        {
            if (items_to_avoid[i]->getType() == Item::ITEM_BUBBLEGUM)
@@ -1835,11 +1824,6 @@ void SkiddingAI::handleSwitch(int item_skill,
            else if ( items_to_avoid[i]->getType() == Item::ITEM_BANANA )
            {
               bad = 2;
-           }
-           else if (items_to_avoid[i]->getType() == Item::ITEM_BARREL) //TODO: barrel switch
-           {
-               bad = 3;
-               i = -1;
            }
        }
            

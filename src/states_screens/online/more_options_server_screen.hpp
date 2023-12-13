@@ -22,7 +22,7 @@
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets.hpp"
 
-namespace GUIEngine { class Widget; class ListWidget; class CheckBoxWidget;}
+namespace GUIEngine { class Widget; class ListWidget; }
 
 
 /**
@@ -39,20 +39,16 @@ private:
     MoreOptionsServerScreen();
 
     GUIEngine::Widget* m_time_div_widget;
-    GUIEngine::Widget* m_nb_ai_div_widget;
+    GUIEngine::Widget* m_nb_ia_div_widget;
     GUIEngine::Widget* m_winning_div_widget;
     GUIEngine::Widget* m_life_div_widget;
     GUIEngine::Widget* m_team_div_widget;
-    GUIEngine::Widget* m_tag_div_widget;
-    GUIEngine::Widget* m_teams_selection_div_widget;
 
-    GUIEngine::SpinnerWidget* m_time_widget_value_spinner;
-    GUIEngine::SpinnerWidget* m_nb_ai_widget_value_spinner;
+    GUIEngine::SpinnerWidget* m_time_widget;
+    GUIEngine::SpinnerWidget* m_nb_ai_widget;
     GUIEngine::SpinnerWidget* m_winning_value_spinner;
     GUIEngine::SpinnerWidget* m_life_value_spinner;
     GUIEngine::SpinnerWidget* m_nb_team_value_spinner;
-    GUIEngine::SpinnerWidget* m_tag_value_spinner;
-    GUIEngine::CheckBoxWidget* m_teams_selection_checkbox;
 
     GUIEngine::IconButtonWidget* m_back_widget;
 

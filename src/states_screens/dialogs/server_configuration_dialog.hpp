@@ -44,7 +44,6 @@ private:
     GUIEngine::RibbonWidget* m_game_mode_widget;
     GUIEngine::RibbonWidget* m_options_widget;
     GUIEngine::IconButtonWidget* m_ok_widget;
-    GUIEngine::IconButtonWidget* m_more_options_page_widget;
     GUIEngine::IconButtonWidget* m_cancel_widget;
 
     void updateMoreOption(int game_mode);

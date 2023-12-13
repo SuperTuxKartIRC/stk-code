@@ -409,9 +409,6 @@ void loadServerLobbyFromConfig()
     const bool is_gp =
         RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX;
     const bool is_battle = RaceManager::get()->isBattleMode();
-    const bool is_team_arena_battle = RaceManager::get()->isTeamArenaBattleMode();
-    const bool is_tag_zombie = RaceManager::get()->isTagzArenaBattleMode();
-    const bool is_tabl = RaceManager::get()->isTABLifeMode();
 
     std::shared_ptr<LobbyProtocol> server_lobby;
     server_lobby = STKHost::create();
@@ -427,32 +424,17 @@ void loadServerLobbyFromConfig()
     }
     else if (is_battle)
     {
-        if (is_team_arena_battle)
-        { // À vérifier et modifier // William Lussier 2023-11-24 16h31
-            if (is_tabl)
-            {
-                server_lobby->getGameSetup()->setSoccerGoalTarget(m_soccer_goal_target);
-            }
-            else 
-                server_lobby->getGameSetup()->setSoccerGoalTarget(m_soccer_goal_target);
+        if (m_hit_limit <= 0 && m_time_limit_ffa <= 0)
+        {
+            Log::warn("main", "Reset invalid hit and time limit settings");
+            m_hit_limit.revertToDefaults();
+            m_time_limit_ffa.revertToDefaults();
         }
-        else if (is_tag_zombie)
-        { // À vérifier et modifier // William Lussier 2023-11-24 16h31
-            server_lobby->getGameSetup()->setSoccerGoalTarget(m_soccer_goal_target);
-        }
-        else {
-            if (m_hit_limit <= 0 && m_time_limit_ffa <= 0)
-            {
-                Log::warn("main", "Reset invalid hit and time limit settings");
-                m_hit_limit.revertToDefaults();
-                m_time_limit_ffa.revertToDefaults();
-            }
-            if (m_capture_limit <= 0 && m_time_limit_ctf <= 0)
-            {
-                Log::warn("main", "Reset invalid Capture and time limit settings");
-                m_capture_limit.revertToDefaults();
-                m_time_limit_ctf.revertToDefaults();
-            }
+        if (m_capture_limit <= 0 && m_time_limit_ctf <= 0)
+        {
+            Log::warn("main", "Reset invalid Capture and time limit settings");
+            m_capture_limit.revertToDefaults();
+            m_time_limit_ctf.revertToDefaults();
         }
     }
 

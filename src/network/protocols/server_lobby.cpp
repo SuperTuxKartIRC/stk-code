@@ -716,10 +716,7 @@ void ServerLobby::setup()
 {
     LobbyProtocol::setup();
     m_battle_hit_capture_limit = 0;
-    m_battle_time_limit = 0;
-    m_battle_number_life = 0;
-    m_battle_nb_ia = 0;
-    m_battle_nb_team = 0;
+    m_battle_time_limit = 0.0f;
     m_item_seed = 0;
     m_winner_peer_id = 0;
     m_client_starting_time = 0;
@@ -978,26 +975,25 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
                   message_type);
         switch(message_type)
         {
-        case LE_CONNECTION_REQUESTED: connectionRequested(event);             break;
-        case LE_KART_SELECTION: kartSelectionRequested(event);                break;
-        case LE_CLIENT_LOADED_WORLD: finishedLoadingWorldClient(event);       break;
-        case LE_VOTE: handlePlayerVote(event);                                break;
-        case LE_KICK_HOST: kickHost(event);                                   break;
-        case LE_CHANGE_TEAM: changeTeam(event);                               break;
-        case LE_CHANGE_TEAM_PLUS: changePlusTeam(event);                      break;
-        case LE_REQUEST_BEGIN: startSelection(event);                         break;
-        case LE_CHAT: handleChat(event);                                      break;
-        case LE_CONFIG_SERVER: handleServerConfiguration(event);              break;
-        case LE_CONFIG_SERVER_OPTION: handleServerOptionConfiguration(event); break;
-        case LE_CHANGE_HANDICAP: changeHandicap(event);                       break;
-        case LE_CLIENT_BACK_LOBBY:                                            
-            clientSelectingAssetsWantsToBackLobby(event);                     break;
-        case LE_REPORT_PLAYER: writePlayerReport(event);                      break;
-        case LE_ASSETS_UPDATE:                                                
-            handleAssets(event->data(), event->getPeer());                    break;
-        case LE_COMMAND:                                                      
-            handleServerCommand(event, event->getPeerSP());                   break;
-        default:                                                              break;
+        case LE_CONNECTION_REQUESTED: connectionRequested(event); break;
+        case LE_KART_SELECTION: kartSelectionRequested(event);    break;
+        case LE_CLIENT_LOADED_WORLD: finishedLoadingWorldClient(event); break;
+        case LE_VOTE: handlePlayerVote(event);                    break;
+        case LE_KICK_HOST: kickHost(event);                       break;
+        case LE_CHANGE_TEAM: changeTeam(event);                   break;
+        case LE_CHANGE_TEAM_PLUS: changePlusTeam(event);          break;
+        case LE_REQUEST_BEGIN: startSelection(event);             break;
+        case LE_CHAT: handleChat(event);                          break;
+        case LE_CONFIG_SERVER: handleServerConfiguration(event);  break;
+        case LE_CHANGE_HANDICAP: changeHandicap(event);           break;
+        case LE_CLIENT_BACK_LOBBY:
+            clientSelectingAssetsWantsToBackLobby(event);         break;
+        case LE_REPORT_PLAYER: writePlayerReport(event);          break;
+        case LE_ASSETS_UPDATE:
+            handleAssets(event->data(), event->getPeer());        break;
+        case LE_COMMAND:
+            handleServerCommand(event, event->getPeerSP());       break;
+        default:                                                  break;
         }   // switch
     } // if (event->getType() == EVENT_TYPE_MESSAGE)
     else if (event->getType() == EVENT_TYPE_DISCONNECTED)
@@ -1718,7 +1714,6 @@ void ServerLobby::asynchronousUpdate()
                 false/*live_join*/);
             m_game_setup->setHitCaptureTime(m_battle_hit_capture_limit,
                 m_battle_time_limit);
-            m_game_setup->setLifeTime(m_battle_number_life, m_battle_time_limit); // TODO : Est-ce que c'est correct // William Lussier 2023-10-26 15h52
             m_game_setup->setNbAiTeam(m_battle_nb_ia,
                 m_battle_nb_team);
             uint16_t flag_return_time = (uint16_t)stk_config->time2Ticks(
@@ -1782,9 +1777,9 @@ NetworkString* ServerLobby::getLoadWorldMessage(
     encodePlayers(load_world_message, players);
     load_world_message->addUInt32(m_item_seed);
     if (RaceManager::get()->teamPlusEnabled()) {
-        // TODO : Besoins de modification . Prendre en compte le nombre d'ia et d'équipe et la vie // William Lussier 2023-10-25 9h39
-        load_world_message->addUInt32(m_battle_hit_capture_limit).addFloat(m_battle_time_limit)
-            .addUInt32(m_battle_number_life).addUInt8(m_battle_nb_ia).addUInt8(m_battle_nb_team).addUInt8(m_teams_selection);
+        // TODO : Besoins de modification . Prendre en compte le nombre d'ia et d'équipe // William Lussier 2023-10-25 9h39
+        load_world_message->addUInt32(m_battle_hit_capture_limit)
+            .addFloat(m_battle_time_limit).addUInt8(m_battle_nb_ia).addUInt8(m_battle_nb_team);
         uint16_t flag_return_time = (uint16_t)stk_config->time2Ticks(
             ServerConfig::m_flag_return_timeout);
         load_world_message->addUInt16(flag_return_time);
@@ -4319,13 +4314,8 @@ void ServerLobby::handlePlayerVote(Event* event)
         vote.m_num_laps = 0;
         vote.m_reverse = false;
     }
-    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM ||
-             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER ||
-             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER ||
-             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE ||
-             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE ||
-             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE ||
-             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE)
+    else if (RaceManager::get()->isTeamArenaBattleMode() ||
+             RaceManager::get()->isTeamArenaBattleMode())
     {
         vote.m_num_laps = 0;
     }
@@ -4533,7 +4523,6 @@ void ServerLobby::getHitCaptureLimit()
     int nb_ia = 0;
     int nb_team = 0;
     float time_limit = 0.0f;
-    int life = 0;
     RaceManager::MinorRaceModeType mode = RaceManager::get()->getMinorMode();
     if (mode == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
     {
@@ -4558,12 +4547,7 @@ void ServerLobby::getHitCaptureLimit()
                 hit_capture_limit = 3;
         }
         else if (ServerConfig::m_server_game_duration > 0) {
-            if (ServerConfig::m_server_game_duration > 60) {
-                time_limit = ServerConfig::m_server_game_duration;
-            }
-            else {
-                time_limit = ServerConfig::m_server_game_duration;
-            }
+            hit_capture_limit = ServerConfig::m_server_game_duration;
         }
         if (ServerConfig::m_server_game_point > 0)
             hit_capture_limit = ServerConfig::m_server_game_point;
@@ -4571,27 +4555,18 @@ void ServerLobby::getHitCaptureLimit()
             nb_ia = ServerConfig::m_server_game_nb_ai;
         if (ServerConfig::m_server_game_nb_team > 0)
             nb_team = ServerConfig::m_server_game_nb_team;
-        if (ServerConfig::m_server_game_life > 0)
-            life = ServerConfig::m_server_game_life;
     }
     else
     {
         if (ServerConfig::m_hit_limit > 0)
             hit_capture_limit = ServerConfig::m_hit_limit;
-        if (ServerConfig::m_server_game_duration > 0.0f)
-            time_limit = (float)ServerConfig::m_server_game_duration;
+        if (ServerConfig::m_time_limit_ffa > 0.0f)
+            time_limit = (float)ServerConfig::m_time_limit_ffa;
     }
     m_battle_hit_capture_limit = hit_capture_limit;
     m_battle_time_limit = time_limit;
-    m_battle_number_life = life;
     m_battle_nb_ia = nb_ia;
     m_battle_nb_team = nb_team;
-    m_game_setup->setHitCaptureTime(m_battle_hit_capture_limit,
-        m_battle_time_limit);
-    m_game_setup->setLifeTime(m_battle_number_life, m_battle_time_limit); // TODO : Est-ce que c'est correct // William Lussier 2023-10-26 15h52
-    m_game_setup->setNbAiTeam(m_battle_nb_ia,
-        m_battle_nb_team);
-
 }   // getHitCaptureLimit
 
 // ----------------------------------------------------------------------------
@@ -5309,172 +5284,6 @@ void ServerLobby::handleServerConfiguration(Event* event)
 }   // handleServerConfiguration
 
 //-----------------------------------------------------------------------------
-/*! \brief Called when the server owner request to change some game rules options 
- *   like time (duration of the game), number of life, number of team, etc ...
- *  \param event : Event providing the information.
- *
- *  Format of the data :
- *  Byte 0             1             2              3       4
- *       ----------------------------------------------------------------
- *  Size |     1       |     1       |       1      |   1   |    1    |
- *  Data | time-target | life-target | point target | nb-ai | nb-team |
- *       ----------------------------------------------------------------
- */
-void ServerLobby::handleServerOptionConfiguration(Event* event)
-{
-    if (m_state != WAITING_FOR_START_GAME)
-    {
-        Log::warn("ServerLobby",
-            "Received handleServerOptionConfiguration while being in state %d.",
-            m_state.load());
-        return;
-    }
-    if (!ServerConfig::m_server_configurable) // TODO : Ajouter une variable de config // William Lussier 2023-10-26 15h05
-    {
-        Log::warn("ServerLobby", "server-configurable is not enabled.");
-        return;
-    }
-    if (event->getPeerSP() != m_server_owner.lock())
-    {
-        Log::warn("ServerLobby",
-            "Client %d is not authorised to config server.",
-            event->getPeer()->getHostId());
-        return;
-    }
-    NetworkString& data = event->data();
-    int new_difficulty = data.getUInt8();
-    int new_game_mode = data.getUInt8();
-    if (new_difficulty==0&& new_game_mode==0) {
-
-    }
-    else {
-        auto modes = ServerConfig::getLocalGameMode(new_game_mode);
-        if (modes.second == RaceManager::MAJOR_MODE_GRAND_PRIX)
-        {
-            Log::warn("ServerLobby", "Grand prix is used for new mode.");
-            return;
-        }
-        RaceManager::get()->setMinorMode(modes.first);
-        RaceManager::get()->setMajorMode(modes.second);
-        RaceManager::get()->setDifficulty(RaceManager::Difficulty(new_difficulty));
-        m_game_setup->resetExtraServerInfo();
-    }
-    
-
-    // TODO : Besoins de modifications pour prendre en compte des autres options en ligne (nb team, nb ia, etc) // William Lussier 2023-10-25 20h21
-    int mode = data.getUInt8();
-    int new_time_target = data.getUInt8();
-    int new_life_target = 0;
-    int new_point_target = 0;
-    int new_nb_ai = data.getUInt8();
-    int new_nb_team = 0;
-    int new_nb_tag = 0;
-    bool new_is_team_selection = false;
-
-    if (new_game_mode == 13) {//tag zombie
-        new_nb_tag= data.getUInt8();
-    }
-    else if (new_game_mode == 12) {// team battle health
-        new_life_target = data.getUInt8();
-        new_nb_team = data.getUInt8();
-
-    }
-    else if (new_game_mode == 9 || new_game_mode == 10 || new_game_mode == 11) { //team battle
-        new_point_target = data.getUInt8();
-        new_nb_team = data.getUInt8();
-
-    }
-
-
-    // TODO : Besoins de modifications pour prendre en compte des autres options en ligne (nb team, nb ia, etc) // William Lussier 2023-10-25 20h21
-
-    auto peers = STKHost::get()->getPeers();
-    for (auto& peer : peers)
-    {
-        auto assets = peer->getClientAssets();
-        if (!peer->isValidated() || assets.second.empty())
-            continue;
-        std::set<std::string> tracks_erase;
-        for (const std::string& server_track : m_available_kts.second)
-        {
-            if (assets.second.find(server_track) == assets.second.end())
-            {
-                tracks_erase.insert(server_track);
-            }
-        }
-        if (tracks_erase.size() == m_available_kts.second.size())
-        {
-            NetworkString* message = getNetworkString(2);
-            message->setSynchronous(true);
-            message->addUInt8(LE_CONNECTION_REFUSED)
-                .addUInt8(RR_INCOMPATIBLE_DATA);
-            peer->cleanPlayerProfiles();
-            peer->sendPacket(message, true/*reliable*/);
-            peer->reset();
-            delete message;
-            Log::verbose("ServerLobby",
-                "Player has incompatible tracks for new game mode.");
-        }
-    }
-
-
-    RaceManager::get()->setTimeTarget(RaceManager::Difficulty(new_time_target * 60));
-    RaceManager::get()->setLifeTarget(RaceManager::Difficulty(new_life_target));
-
-    m_game_setup->resetExtraServerInfo();
-    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE)
-        RaceManager::get()->setLifeTarget(RaceManager::Difficulty(new_life_target));
-
-    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE)
-        RaceManager::get()->setTagTarget(RaceManager::Difficulty(new_nb_tag));
-
-
-    if (NetworkConfig::get()->isWAN() &&
-        (m_battle_time_limit.load() != new_time_target ||
-         m_battle_number_life.load() != new_life_target || 
-         m_battle_hit_capture_limit.load() != new_point_target ||
-         m_battle_nb_ia.load() != new_nb_ai || // TODO : Besoins de modification. Utiliser la variable du nb d'IA qui existe déja // William Lussier 2023-10-26 15h28
-         m_battle_nb_team.load() != new_nb_team ||
-         m_battle_nb_tag.load()!= new_nb_tag || 
-         m_teams_selection.load() != new_is_team_selection))
-    {
-        Log::info("ServerLobby", "Updating server info with new "
-            "time target: %d, number or life: %d to stk-addons.", new_time_target,
-            new_life_target);
-        int priority = Online::RequestManager::HTTP_MAX_PRIORITY;
-        auto request = std::make_shared<Online::XMLRequest>(priority);
-        NetworkConfig::get()->setServerDetails(request, "update-config");
-        const SocketAddress& addr = STKHost::get()->getPublicAddress();
-        request->addParameter("address", addr.getIP());
-        request->addParameter("port", addr.getPort());
-        request->addParameter("new-time-target", new_time_target);
-        request->addParameter("new-life-target", new_life_target);
-        request->addParameter("new-point-target", new_point_target);
-        request->addParameter("new-nb-ai", new_nb_ai);
-        request->addParameter("new-nb-team", new_nb_team);
-        request->addParameter("new_nb_tag", new_nb_tag);
-        request->addParameter("new_is_team_selection", new_is_team_selection);
-        request->queue();
-    }
-    m_battle_time_limit.store(new_time_target);
-    m_battle_number_life.store(new_life_target);
-    m_battle_hit_capture_limit.store(new_point_target);
-    m_battle_nb_ia.store(new_nb_ai);
-    m_battle_nb_team.store(new_nb_team);
-    m_battle_nb_tag.store(new_nb_tag);
-    m_teams_selection.store(new_nb_tag);
-    updateTracksForMode();
-
-    NetworkString* server_info = getNetworkString();
-    server_info->setSynchronous(true);
-    server_info->addUInt8(LE_SERVER_INFO);
-    m_game_setup->addServerInfo(server_info);
-    sendMessageToPeers(server_info);
-    delete server_info;
-    updatePlayerList();
-}   // handleServerOptionConfiguration
-
-//-----------------------------------------------------------------------------
 /*! \brief Called when a player want to change his handicap
  *  \param event : Event providing the information.
  *
@@ -5616,21 +5425,13 @@ void ServerLobby::addLiveJoinPlaceholder(
                 NetworkPlayerProfile::getReservedProfile(KART_TEAM_NONE));
         }
     }
-    if (mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM ||
-        mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER ||
-        mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER ||
-        mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE ||
-        mode == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE ||
-        mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE ||
-        mode == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE || mode == RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE || mode == RaceManager::MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE) {
+    if (RaceManager::get()->isTagzArenaBattleMode() || 
+        RaceManager::get()->isTeamArenaBattleMode()) {
 
     }
     else {
 
-        if (mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM ||
-            mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER ||
-            mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER ||
-            mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE)
+        if (RaceManager::get()->isTagzArenaBattleMode())
         {
             // TODO : Besoins de modification 
             // Team-Arena-Battle, reserve at most 7 players on each team
@@ -5686,7 +5487,6 @@ void ServerLobby::addLiveJoinPlaceholder(
         }
 
     }
-
 }   // addLiveJoinPlaceholder
 
 //-----------------------------------------------------------------------------

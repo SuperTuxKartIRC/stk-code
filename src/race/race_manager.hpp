@@ -394,13 +394,9 @@ private:
     int                              m_coin_target;
     float                            m_time_target;
     int                              m_life_target;
-    int                              m_tag_target;
-    int                              m_minor_mode_target=0;
     int                              m_goal_target;
     int                              m_hit_capture_limit;
     int                              m_skipped_tracks_in_gp;
-    int                              m_nb_teams;
-    bool                             m_teams_selection;
     /** Time target for GP, used in Lap Trial mode */
     float                            m_gp_time_target;
     /** Total laps from every track, used in Lap Trial mode */
@@ -425,11 +421,6 @@ private:
     bool m_has_ghost_karts;
 
     bool m_watching_replay;
-
-    bool m_bonusBoxes;
-    bool m_nitro;
-    bool m_banana;
-
 public:
     // ----------------------------------------------------------------------------------------
     static RaceManager* get();
@@ -584,16 +575,6 @@ public:
     void setLifeTarget(int life)
     {
         m_life_target = life;
-    }   // setTimeTarget
-
-    void setTagTarget(int tag)
-    {
-        m_tag_target = tag;
-    }   // setTimeTarget
-     // ----------------------------------------------------------------------------------------
-    void setMinorMode(int minormode)
-    {
-        m_minor_mode_target = minormode;
     }   // setTimeTarget
     // ----------------------------------------------------------------------------------------
     RemoteKartInfo& getKartInfo(unsigned int n)
@@ -792,11 +773,7 @@ public:
     // ----------------------------------------------------------------------------------------
     float getTimeTarget() const { return m_time_target; }
     // ----------------------------------------------------------------------------------------
-    int getMinorModeTarget() const { return m_minor_mode_target; }
-    // ----------------------------------------------------------------------------------------
     float getLifeTarget() const { return m_life_target; }
-    // ----------------------------------------------------------------------------------------
-    float getTagTarget() const { return m_tag_target; }
     // ----------------------------------------------------------------------------------------
     int getTrackNumber() const { return m_track_number; }
     // ----------------------------------------------------------------------------------------
@@ -883,7 +860,7 @@ public:
         const int id = (int)m_minor_mode;
         // This uses the  numerical id of the mode, see the macros
         // LINEAR_RACE and TAG_ZOMBIE_BATTLE_ARENA above for exact meaning.
-        if (id >= 2008 && id <= 2010) return true;
+        if (id >= 2008 && id <= 20010) return true;
         else            return false;
     }   // isSoccerMode
 
@@ -895,8 +872,7 @@ public:
 
     // ----------------------------------------------------------------------------------------
     bool isCTFMode() const { return m_minor_mode == MINOR_MODE_CAPTURE_THE_FLAG; }
-    // ----------------------------------------------------------------------------------------
-    bool isTABLifeMode() const { return m_minor_mode == MINOR_MODE_TEAM_ARENA_BATTLE_LIFE; }
+
     // ----------------------------------------------------------------------------------------
     bool isEggHuntMode() const { return m_minor_mode == MINOR_MODE_EASTER_EGG; }
 
@@ -1055,26 +1031,6 @@ public:
             MINOR_MODE_TEAM_ARENA_BATTLE_LIFE;
     }
     // ----------------------------------------------------------------------------------------
-    bool getNbTeams() const
-    {
-        return m_nb_teams;
-    }
-    // ----------------------------------------------------------------------------------------
-    void setNbTeams(bool nbTeams)
-    {
-        m_nb_teams = nbTeams;
-    }
-    // ----------------------------------------------------------------------------------------
-    bool getTeamsSelectionEnabled() const
-    {
-        return m_teams_selection;
-    }
-    // ----------------------------------------------------------------------------------------
-    void setTeamsSelectionEnabled(bool activated)
-    {
-        m_teams_selection = activated;
-    }
-    // ----------------------------------------------------------------------------------------
     void setFlagReturnTicks(unsigned ticks) { m_flag_return_ticks = ticks; }
     // ----------------------------------------------------------------------------------------
     unsigned getFlagReturnTicks() const { return m_flag_return_ticks; }
@@ -1114,26 +1070,6 @@ public:
             m_minor_mode == MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE ||
             m_minor_mode == MINOR_MODE_FREE_FOR_ALL;
     }
-
-    // ------------------------------------------------------------------------
-    /** Called to determine whether this race mode uses bonus boxes. */
-    bool haveBonusBoxes() const { return m_bonusBoxes; }
-    // ------------------------------------------------------------------------
-    /** Called to determine whether this race mode uses bonus boxes. */
-    void setBonusBoxes(bool bonusBoxes) { m_bonusBoxes = bonusBoxes; }
-    // ------------------------------------------------------------------------
-    /** Called to determine whether this race mode uses bottle of nitro. */
-    bool haveBottleNitro() const { return m_nitro; }
-    // ------------------------------------------------------------------------
-    /** Called to set whether this race mode uses bottle of nitro. */
-    void setBottleNitro(bool nitro) { m_nitro = nitro; }
-    // ------------------------------------------------------------------------
-    /** Called to determine whether this race mode uses banana. */
-    bool haveBananna() const { return m_banana; }
-    // ------------------------------------------------------------------------
-    /** Called to determine whether this race mode uses banana. */
-    void setBananna(bool banana) { m_banana = banana; }
-
 };   // RaceManager
 
 #endif

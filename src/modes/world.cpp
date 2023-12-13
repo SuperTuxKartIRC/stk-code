@@ -1523,17 +1523,6 @@ void World::getDefaultCollectibles(int *collectible_type, int *amount )
     *amount = 0;
 }   // getDefaultCollectibles
 
-bool World::timerPower()
-{
-    return false;
-}
-
-void World::getItem(int* collectible_type, int* amount)
-{
-    *collectible_type = PowerupManager::POWERUP_NOTHING;
-    *amount = 0;
-}   // getItem
-
 //-----------------------------------------------------------------------------
 /** Pauses the music (and then pauses WorldStatus).
  */
@@ -1904,17 +1893,18 @@ void World::updateAchievementDataEndRace()
                     PlayerManager::increaseAchievement(getKartTeam(i) == KART_TEAM_RED ? ACS::TAG_ZOMBIE_ARENA_SURVIVOR_POINTS : ACS::TAG_ZOMBIE_ARENA_ZOMBIE_POINTS, tagzab->getKartPointsResult(i));
                 }
             }
-            //else if (RaceManager::get()->isTeamArenaBattleMode()) {
-            //    if (RaceManager::get()->getNumPlayers() >= 4) {
-            //        auto it = std::find(m_winning_teams.begin(), m_winning_teams.end(), m_karts[i]);
-            //        if (it != m_winning_teams.end()) {
-            //            PlayerManager::increaseAchievement(ACS::TEAM_ARENA_WIN, 1);
-            //            PlayerManager::increaseAchievement(getKartTeam(i) == KART_TEAM_RED ? ACS::TEAM_ARENA_RED_WIN :
-            //                getKartTeam(i) == KART_TEAM_BLUE ? ACS::TEAM_ARENA_BLUE_WIN :
-            //                getKartTeam(i) == KART_TEAM_GREEN ? ACS::TEAM_ARENA_GREEN_WIN : ACS::TEAM_ARENA_ORANGE_WIN, 1);
-            //        }
-            //    }
-            //}
+            
+            else if (RaceManager::get()->isTeamArenaBattleMode()) {
+                if (RaceManager::get()->getNumPlayers() >= 4) {
+                    std::vector<int>::iterator it = std::find(m_winning_teams.begin(), m_winning_teams.end(), getKartTeam(i)); // Cause problème 
+                    if (it != m_winning_teams.end()) {
+                        PlayerManager::increaseAchievement(ACS::TEAM_ARENA_WIN, 1);
+                        PlayerManager::increaseAchievement(getKartTeam(i) == KART_TEAM_RED ? ACS::TEAM_ARENA_RED_WIN :
+                            getKartTeam(i) == KART_TEAM_BLUE ? ACS::TEAM_ARENA_BLUE_WIN :
+                            getKartTeam(i) == KART_TEAM_GREEN ? ACS::TEAM_ARENA_GREEN_WIN : ACS::TEAM_ARENA_ORANGE_WIN, 1);
+                    }
+                }
+            }
 
             updateAchievementModeCounters(false /*start*/);
          } // if m_karts[i]->getController()->canGetAchievements()

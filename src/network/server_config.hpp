@@ -132,14 +132,6 @@ namespace ServerConfig
         SERVER_CFG_DEFAULT(IntServerConfigParam(2, "server-game-nb-team",
             "The number of team"));
 
-    SERVER_CFG_PREFIX IntServerConfigParam m_server_game_nb_tag
-        SERVER_CFG_DEFAULT(IntServerConfigParam(2, "server-game-nb-tag",
-            "The number of tag"));
-
-    SERVER_CFG_PREFIX BoolServerConfigParam m_server_game_teams_selection
-        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "server-game-teams-selection",
-            "You can chose the teams ?"));
-
     SERVER_CFG_PREFIX IntServerConfigParam m_gp_track_count
         SERVER_CFG_DEFAULT(IntServerConfigParam(3, "gp-track-count",
         "Number of grand prix tracks per game (If grand prix enabled)."));

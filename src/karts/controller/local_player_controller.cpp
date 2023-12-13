@@ -420,7 +420,7 @@ void LocalPlayerController::collectedItem(const ItemState &item_state,
     }
     else
     {
-        switch (item_state.getType())
+        switch(item_state.getType())
         {
         case Item::ITEM_BANANA:
         case Item::ITEM_BUBBLEGUM:
@@ -428,7 +428,6 @@ void LocalPlayerController::collectedItem(const ItemState &item_state,
             //See Kart::collectedItem()
             m_kart->playSound(m_ugh_sound);
             break;
-        case Item::ITEM_BARREL: // TODO: barrel sound
         default:
             m_kart->playSound(m_grab_sound);
             break;

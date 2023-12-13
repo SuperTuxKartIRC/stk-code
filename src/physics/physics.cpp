@@ -237,7 +237,7 @@ void Physics::update(int ticks)
                     });
             }
 
-            if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE)
+            if (RaceManager::get()->isTagzArenaBattleMode())
             {
                 kartid1 = p->getUserPointer(0)->getPointerKart()->getWorldKartId();
                 kartid2 = p->getUserPointer(1)->getPointerKart()->getWorldKartId();

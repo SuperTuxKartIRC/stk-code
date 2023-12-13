@@ -751,7 +751,7 @@ void NetworkingLobby::updatePlayerPings()
         {
             m_player_list->renameItem(id, name_with_ping, p.second.m_icon_id);
             // Don't show chosen team color for spectator
-            if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE)
+            if (RaceManager::RaceManager::get()->isTagzArenaBattleMode()) // TODO : À vérifier
             {
                 //color nothing
             }
@@ -963,7 +963,7 @@ void NetworkingLobby::updatePlayers()
         m_player_list->addItem(internal_name, player_name,
             player.m_icon_id);
         // Don't show chosen team color for spectator
-        if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE)
+        if (RaceManager::RaceManager::get()->isTagzArenaBattleMode())
         {
             //color nothing
         }

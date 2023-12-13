@@ -165,11 +165,10 @@ void NetworkKartSelectionScreen::allPlayersDone()
     auto cl = LobbyProtocol::get<ClientLobby>();
     if (!m_live_join && cl && cl->serverEnabledTrackVoting())
     { // TODO : Besoins de modification
-        if ((RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM ||
+        if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM ||
             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER ||
             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER ||
-            RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE) && 
-            RaceManager::get()->getTeamsSelectionEnabled())
+            RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE)
         {
             TracksScreen::getInstance()->setNetworkTracks();
             TracksScreen::getInstance()->push();

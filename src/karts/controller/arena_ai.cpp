@@ -504,25 +504,6 @@ void ArenaAI::useItems(const float dt)
 
             break;
         }   // POWERUP_CAKE
-    case PowerupManager::POWERUP_BARREL:
-    {
-        // if the kart has a shield, do not break it by using a barrel.
-        if (m_kart->getShieldTime() > min_bubble_time)
-            break;
-
-        // Leave some time between shots
-        if (m_time_since_last_shot < 1.0f) break;
-
-        if (dist_to_kart < 25.0f &&
-            !m_closest_kart->isInvulnerable())
-        {
-            m_controls->setFire(true);
-            m_controls->setLookBack(fire_behind);
-            break;
-        }
-
-        break;
-    }   // POWERUP_BARREL
 
     case PowerupManager::POWERUP_BOWLING:
         {
