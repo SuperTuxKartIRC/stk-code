@@ -38,7 +38,7 @@
 #include "race/race_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
-
+#include "items/barrel.hpp"
 #include <IMesh.h>
 
 PowerupManager* powerup_manager=0;
@@ -109,7 +109,7 @@ PowerupManager::PowerupType
     // Must match the order of PowerupType in powerup_manager.hpp!!
     static std::string powerup_names[] = {
         "",            /* Nothing */
-        "bubblegum", "cake", "bowling", "zipper", "plunger", "switch",
+        "bubblegum", "cake", "barrel", "bowling", "zipper", "plunger", "switch",
         "swatter", "rubber-ball", "parachute", "anchor"
     };
 
@@ -507,6 +507,8 @@ void PowerupManager::loadPowerup(PowerupType type, const XMLNode &node)
              Plunger::init(node, m_all_meshes[type]);    break;
         case POWERUP_CAKE:
              Cake::init(node, m_all_meshes[type]);       break;
+        case POWERUP_BARREL:
+            Barrel::init(node, m_all_meshes[type]);       break;
         case POWERUP_RUBBERBALL:
              RubberBall::init(node, m_all_meshes[type]); break;
         default: break;
@@ -625,7 +627,7 @@ PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
         stk_config->ticks2Time(World::getWorld()->getTicksSinceStart()) <
                                       stk_config->m_no_explosive_items_timeout)
     {
-        if (powerup == POWERUP_CAKE || powerup == POWERUP_RUBBERBALL)
+        if (powerup == POWERUP_CAKE || powerup == POWERUP_BARREL || powerup == POWERUP_RUBBERBALL)
             powerup = POWERUP_BOWLING;
     }
     return (PowerupType)powerup;

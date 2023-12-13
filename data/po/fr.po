@@ -2539,6 +2539,11 @@ msgstr "Nombre de tags"
 
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
+msgid "Number of survivors"
+msgstr "Nombre de survivants"
+
+#. I18N: ./data/gui/screens/track_info.stkgui
+#. I18N: In the track info screen
 msgid "Deactivate"
 msgstr "Désactivé"
 
@@ -6346,13 +6351,20 @@ msgstr "Les Bleus l’emportent"
 
 #: src/states_screens/race_result_gui.cpp:638
 #: src/states_screens/race_result_gui.cpp:1533
+#: src/modes/tag_zombie_arena_battle.cpp:275
 msgid "The zombie team Wins!"
 msgstr "L'équipe des zombies l’emportent"
 
 #: src/states_screens/race_result_gui.cpp:638
 #: src/states_screens/race_result_gui.cpp:1533
+#: src/modes/tag_zombie_arena_battle.cpp:280
 msgid "The survivor team Wins!"
 msgstr "L'équipe des survivants l’emportent"
+
+#: src/modes/tag_zombie_arena_battle.cpp:270
+msgid "The survivor (%s) Win!"
+msgstr "Le survivant (%s) gagne!"
+
 
 #: src/states_screens/race_result_gui.cpp:640
 #: src/states_screens/race_result_gui.cpp:1538

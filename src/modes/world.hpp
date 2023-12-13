@@ -289,8 +289,9 @@ public:
     virtual void    reset(bool restart=false) OVERRIDE;
     virtual void    pause(Phase phase) OVERRIDE;
     virtual void    unpause() OVERRIDE;
-    virtual void    getDefaultCollectibles(int *collectible_type,
-                                           int *amount );
+    virtual void    getDefaultCollectibles(int *collectible_type, int *amount );
+    virtual bool    timerPower();
+    virtual void    getItem(int* collectible_type, int* amount);
     // ------------------------------------------------------------------------
     /** Receives notification if an item is collected. Used for easter eggs. */
     virtual void collectedItem(const AbstractKart *kart, 
@@ -302,6 +303,12 @@ public:
     // ------------------------------------------------------------------------
     /** Called to determine whether this race mode uses bonus boxes. */
     virtual bool haveBonusBoxes() { return true; }
+    // ------------------------------------------------------------------------
+    /** Called to determine whether this race mode uses bottle of nitro. */
+    virtual bool haveBottleNitro() { return true; }
+    // ------------------------------------------------------------------------
+    /** Called to determine whether this race mode uses banana. */
+    virtual bool haveBananna() { return true; }
     // ------------------------------------------------------------------------
     /** Returns if this mode should use fast music (if available). */
     virtual bool useFastMusicNearEnd() const { return true; }

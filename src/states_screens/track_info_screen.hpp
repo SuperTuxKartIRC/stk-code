@@ -47,11 +47,15 @@ class TrackInfoScreen : public GUIEngine::Screen,
 
     bool m_record_this_race;
 
+    bool m_has_laps;
+
     bool m_is_soccer;
 
     bool m_is_team_arena;
 
     bool m_is_lap_trial;
+
+    bool m_is_time_trial;
 
     bool m_is_team_arena_battle;
 
@@ -62,6 +66,13 @@ class TrackInfoScreen : public GUIEngine::Screen,
     bool m_is_arena_mode;
 
     bool m_show_ffa_spinner;
+
+    // The option is activate or not
+    bool m_state_powerup;
+
+    bool m_state_nitro;
+
+    bool m_state_banana;
 
     // When there is no need to tab through / click on images/labels, we can add directly
     // irrlicht labels (more complicated uses require the use of our widget set)
@@ -141,6 +152,21 @@ class TrackInfoScreen : public GUIEngine::Screen,
     /** Check box for record race. */
     GUIEngine::CheckBoxWidget* m_record_race;
 
+    /** Icon button for deactivate gift box. */
+    GUIEngine::IconButtonWidget* m_powerup;
+
+    /** Icon button for deactivate bottle of nitro. */
+    GUIEngine::IconButtonWidget* m_nitro;
+
+    /** Icon button for deactivate bananna . */
+    GUIEngine::IconButtonWidget* m_banana;
+
+    /** Icon button for selection powerup page. */
+    GUIEngine::IconButtonWidget* m_powerup_selection;
+
+    /** Icon button for special option page (option like : all speed car are boosted). */
+    GUIEngine::IconButtonWidget* m_special_option;
+
     /** The label of the highscore list. */
     GUIEngine::LabelWidget* m_highscore_label;
 
@@ -158,6 +184,9 @@ class TrackInfoScreen : public GUIEngine::Screen,
     void teamsSpinnerUpdate(std::string team);
     void setTeamArenaBattleWidgets(bool has_AI);
     void setWidgetsValueZeroDeactivateText(GUIEngine::SpinnerWidget* spinner, GUIEngine::LabelWidget* label, const std::string& normalText, const std::string& zeroText);
+    void changeIconButtonImage(GUIEngine::IconButtonWidget* iconButton, std::string name, bool isActive);
+    void getConfigValue();
+    void setConfigValue();
 
 public:
     TrackInfoScreen();

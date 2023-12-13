@@ -134,6 +134,7 @@ RaceManager::RaceManager()
     m_coin_target        = 0;
     m_started_from_overworld = false;
     m_have_kart_last_position_on_overworld = false;
+    m_teams_selection   = false;
     m_num_local_players = 0;
     m_hit_capture_limit = 0;
     m_flag_return_ticks = stk_config->time2Ticks(20.0f);
@@ -141,6 +142,9 @@ RaceManager::RaceManager()
     m_skipped_tracks_in_gp = 0;
     m_gp_time_target = 0.0f;
     m_gp_total_laps = 0;
+    m_bonusBoxes = true;
+    m_nitro = true;
+    m_banana = true;
     setMaxGoal(0);
     setTimeTarget(0.0f);
     setReverseTrack(false);

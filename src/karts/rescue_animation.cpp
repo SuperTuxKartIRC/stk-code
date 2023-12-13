@@ -33,6 +33,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <modes/tag_zombie_arena_battle.hpp>
 
 RescueAnimation* RescueAnimation::create(AbstractKart* kart,
                                          bool is_auto_rescue)

@@ -365,7 +365,7 @@ public:
                              int fade_in_time) = 0;
     // ------------------------------------------------------------------------
     virtual void setSlowdown(unsigned int category, float max_speed_fraction,
-                             int fade_in_time, int duration) = 0;
+        int fade_in_time, int duration) = 0;
     // ------------------------------------------------------------------------
     /** Returns the remaining collected energy. */
     virtual float getEnergy() const = 0;

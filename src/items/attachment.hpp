@@ -117,6 +117,7 @@ public:
          ~Attachment();
     void  clear();
     void  hitBanana(ItemState *item);
+    void  hitBarrel(ItemState* item);
     void  updateGraphics(float dt);
 
     void  update(int ticks);

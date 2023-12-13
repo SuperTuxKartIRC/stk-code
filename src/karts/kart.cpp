@@ -499,9 +499,8 @@ void Kart::setSlowdown(unsigned int category, float max_speed_fraction,
     m_max_speed->setSlowdown(category, max_speed_fraction,  fade_in_time);
 }   // setSlowdown
 
-// -----------------------------------------------------------------------------
 void Kart::setSlowdown(unsigned int category, float max_speed_fraction,
-                       int fade_in_time, int duration)
+    int fade_in_time, int duration)
 {
     m_max_speed->setSlowdown(category, max_speed_fraction, fade_in_time, duration);
 }   // setSlowdown
@@ -1186,6 +1185,10 @@ void Kart::collectedItem(ItemState *item_state)
 
         // Play appropriate custom character sound
         playCustomSFX(SFXManager::CUSTOM_GOO);
+        break;
+
+    case Item::ITEM_BARREL:
+        m_attachment->hitBarrel(item_state); //TODO: barrel Explosion au lieu de la banane hit
         break;
     default        : break;
     }   // switch TYPE

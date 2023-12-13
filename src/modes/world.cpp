@@ -1523,6 +1523,17 @@ void World::getDefaultCollectibles(int *collectible_type, int *amount )
     *amount = 0;
 }   // getDefaultCollectibles
 
+bool World::timerPower()
+{
+    return false;
+}
+
+void World::getItem(int* collectible_type, int* amount)
+{
+    *collectible_type = PowerupManager::POWERUP_NOTHING;
+    *amount = 0;
+}   // getItem
+
 //-----------------------------------------------------------------------------
 /** Pauses the music (and then pauses WorldStatus).
  */
@@ -1896,7 +1907,7 @@ void World::updateAchievementDataEndRace()
             
             else if (RaceManager::get()->isTeamArenaBattleMode()) {
                 if (RaceManager::get()->getNumPlayers() >= 4) {
-                    std::vector<int>::iterator it = std::find(m_winning_teams.begin(), m_winning_teams.end(), getKartTeam(i)); // Cause problème 
+                    std::vector<int>::iterator it = std::find(m_winning_teams.begin(), m_winning_teams.end(), getKartTeam(i));
                     if (it != m_winning_teams.end()) {
                         PlayerManager::increaseAchievement(ACS::TEAM_ARENA_WIN, 1);
                         PlayerManager::increaseAchievement(getKartTeam(i) == KART_TEAM_RED ? ACS::TEAM_ARENA_RED_WIN :

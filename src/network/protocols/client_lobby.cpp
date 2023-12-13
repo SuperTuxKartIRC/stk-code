@@ -322,15 +322,21 @@ void ClientLobby::addAllPlayers(Event* event)
 
     uint32_t random_seed = data.getUInt32();
     ItemManager::updateRandomSeed(random_seed);
-    if (RaceManager::get()->teamPlusEnabled())
+    if (RaceManager::get()->isTeamArenaBattleMode() || RaceManager::get()->isTagzArenaBattleMode())
     {
-        int hit_capture_limit = data.getUInt32();
-        float time_limit = data.getFloat();
-        int nb_ai = data.getUInt8();
-        int nb_team = data.getUInt8();
+        int hit_capture_limit = data.getUInt32(); // 2 A
+        float time_limit = data.getFloat(); // 1
+        int life = data.getUInt32();  // 2 B
+        int nb_ai = data.getUInt8(); // 3
+        int nb_team = data.getUInt8(); // 4 Optionnel
+        //int nb_tag = data.getUInt8(); // 2 C
+        bool teams_selection = (bool)data.getUInt8(); // 5 Optionnel
 
-        m_game_setup->setHitCaptureTime(hit_capture_limit, time_limit);
+        m_game_setup->setHitCaptureTime(hit_capture_limit, time_limit *60.f);
+        m_game_setup->setLifeTime(life, time_limit);
         m_game_setup->setNbAiTeam(nb_ai, nb_team); // TODO : Besoins de modif ??? // William Lussier 
+        m_game_setup->setTeamSelection(teams_selection); // TODO : Besoins de modif ??? // William Lussier 
+        // Qu'est-ce que ça fait la ? // Dois être enlever 
         uint16_t flag_return_timeout = data.getUInt16();
         RaceManager::get()->setFlagReturnTicks(flag_return_timeout);
         unsigned flag_deactivated_time = data.getUInt16();
@@ -770,16 +776,64 @@ void ClientLobby::handleServerInfo(Event* event)
     total_lines += _("Game mode: %s", mode_name);
     total_lines += L"\n";
 
+    int mode = u_data;
 
     // TODO : Besoins de modification pour aller chercher et envoyer le data // William Lussier 2023-10-25
     //I18N: In the networking lobby
-    //core::stringw time = ServerConfig::getModeName(u_data);
-    //core::stringw nb_team = ServerConfig::getModeName(u_data);
-    //core::stringw nb_ai = ServerConfig::getModeName(u_data);
-    //total_lines += _("Time limit: %s", time);
-    //total_lines += _(", Nb team: %s", nb_team);
-    //total_lines += _(", Nb AI: %s", nb_ai);
-    //total_lines += L"\n";
+    int time_limite = (int)data.getUInt8();
+    int nb_ai = (int)data.getUInt8();
+    uint8_t data_1 = -1; // nb_life
+    uint8_t data_2 = -1; // nb_team
+    //uint8_t data_3 = -1; // nb_hit // Pour team_selection ???
+    //uint8_t nb_tag  = -1;
+    bool team_selection = 0;
+    if (mode==13) {
+        data_1 = (int)data.getUInt8(); // nb_tag
+    }
+    else if (mode == 12) {
+        data_1 = (int)data.getUInt8();
+        data_2 = (int)data.getUInt8();
+        team_selection = (int)data.getUInt8();
+    }
+    else if (mode == 9 || mode == 10 || mode == 11) {
+        data_1 = (int)data.getUInt8(); // nb_hit
+        data_2 = (int)data.getUInt8();
+        team_selection = (int)data.getUInt8();
+    }
+
+    if (time_limite != -1)
+        total_lines += _("\xE2\x8F\xB1\xEF\xB8\x8F: %s ", time_limite); // Time limit
+    //if (nb_ai != -1)
+    //    total_lines += _("\xF0\x9F\xA4\x96: %s ", nb_ai); // Nb de AI
+
+    switch (u_data)
+    {
+        case 9:
+        case 10:
+        case 11:
+            if (data_1 != -1)
+                total_lines += _("\xF0\x9F\x8F\x86: %s ", data_1); // Nb de hit
+            if (data_2 != -1)
+                total_lines += _("\xF0\x9F\x91\xA5: %s ", data_2); // Nb team
+            total_lines += _("\xF0\x9F\x8F\xB4: %s ", team_selection); // Ts
+            break;
+        case 12:
+            if (data_1 != -1)
+                total_lines += _("\xE2\x9D\xA4\xEF\xB8\x8F: %s ", data_1); // Nb life
+            if (data_2 != -1)
+                total_lines += _("\xF0\x9F\x91\xA5: %s ", data_2); // Nb team
+            total_lines += _("\xF0\x9F\x8F\xB4: %s ", team_selection); // Ts
+            break;
+        case 13:
+            if (data_1 != -1)
+                total_lines += _("\xF0\x9F\xA7\x9F: %s ", data_1); // Nb de tag
+            break;
+        default:
+            break;
+    }
+
+
+    total_lines += L"\n";
 
 
     uint8_t extra_server_info = data.getUInt8();

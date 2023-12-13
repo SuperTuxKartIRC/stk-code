@@ -1,4 +1,4 @@
-#include "tag_zombie_arena_battle.hpp"
+ï»¿#include "tag_zombie_arena_battle.hpp"
 
 #include "audio/music_manager.hpp"
 #include "karts/abstract_kart.hpp"
@@ -10,6 +10,8 @@
 #include "world_status.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+#include "karts/max_speed.hpp"
+#include <karts/kart.hpp>
 
 TagZombieArenaBattle::TagZombieArenaBattle()
 {
@@ -25,17 +27,31 @@ TagZombieArenaBattle::~TagZombieArenaBattle()
 // ----------------------------------------------------------------------------
 void TagZombieArenaBattle::init()
 {
+    AbstractKart* m_kart;
     WorldWithRank::init();
     m_display_rank = false;
     m_count_down_reached_zero = false;
     m_use_highscores = false;
     initGameInfo();
+
+    for (size_t i = 0; i < m_total_player; i++) {
+        // Besoins de changement // William Lussier 2023-11-11 16h27
+        if (getKartTeam(i) == m_tag_zombie_team)
+        {
+            changeKart(i);
+            m_kart = World::getKart(i);
+        }
+        changeKartTeam(i, m_player_team); // Update the team for the kart
+    }
+    initializeClassPowerMap();
 }   // init
 
 // ----------------------------------------------------------------------------
 void TagZombieArenaBattle::reset(bool restart)
 {
     WorldWithRank::reset(restart);
+    AbstractKart* m_kart;
+
     m_count_down_reached_zero = false;
     m_is_game_terminated = false;
     if (RaceManager::get()->hasTimeTarget())
@@ -63,6 +79,7 @@ void TagZombieArenaBattle::reset(bool restart)
                 getKartAtPosition(i + 1)->setKartTeam(m_player_team);
             changeKart(i);
         }
+        m_kart_info[i].m_type = getRandomClassType();
     }
 
     initGameInfo();
@@ -128,10 +145,10 @@ void TagZombieArenaBattle::setKartsInfoFromServer(NetworkString& ns)
 {
     uint8_t kart_id = ns.getUInt8();
     int8_t zombie_id = ns.getInt8();
-    
-    if(zombie_id == -2)
+
+    if (zombie_id == -2)
         setSurvivor(kart_id);
-    else 
+    else
         setZombie(kart_id, zombie_id);
 }   // setKartScoreFromServer
 
@@ -163,7 +180,7 @@ void TagZombieArenaBattle::getKartsDisplayInfo(
                 rank_info.m_text += flag;
             }
         }
-        if(m_kart_info[i].m_nb_player_converted > 0)
+        if (m_kart_info[i].m_nb_player_converted > 0)
             rank_info.m_text += core::stringw(L" (") + StringUtils::toWString(m_kart_info[i].m_nb_player_converted) + L")";
     }
 }   // getKartsDisplayInfo
@@ -292,7 +309,7 @@ bool TagZombieArenaBattle::isRaceOver()
  */
 const std::string& TagZombieArenaBattle::getIdent() const
 {
-    if(RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE)
+    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE)
         return IDENT_TAG_Z;
     else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE)
         return IDENT_TAG_Z_S;
@@ -303,7 +320,7 @@ const std::string& TagZombieArenaBattle::getIdent() const
 // ----------------------------------------------------------------------------
 void TagZombieArenaBattle::saveCompleteState(BareNetworkString* bns, STKPeer* peer)
 {
-    // TODO : Vérifier que ça fonctionne
+    // TODO : Vï¿½rifier que ï¿½a fonctionne
     for (unsigned i = 0; i < m_team_info.size(); i++)
         bns->addUInt32(m_team_info[i].m_inlife_player);
 }   // saveCompleteState
@@ -311,7 +328,7 @@ void TagZombieArenaBattle::saveCompleteState(BareNetworkString* bns, STKPeer* pe
 // ----------------------------------------------------------------------------
 void TagZombieArenaBattle::restoreCompleteState(const BareNetworkString& b)
 {
-    // TODO : Vérifier que ça fonctionne
+    // TODO : Vï¿½rifier que ï¿½a fonctionne
     for (unsigned i = 0; i < m_team_info.size(); i++)
         m_team_info[i].m_inlife_player = b.getUInt32();
 }   // restoreCompleteState
@@ -348,6 +365,21 @@ void TagZombieArenaBattle::setZombie(int kartId, int zombieId)
         p.addUInt8((uint8_t)kartId).addInt24((int8_t)zombieId);
         STKHost::get()->sendPacketToAllPeers(&p, true);
     }
+
+    /*for (size_t i = 0; i < m_kart_info.size(); ++i)
+    {
+        int random = rand() % 50 + 1;
+        if (random > 0 && random <= 12)
+            m_kart_info[i].m_type = VITESSE;
+        else if (random > 12 && random <= 24)
+            m_kart_info[i].m_type = FORCE;
+        else if (random > 24 && random <= 36)
+            m_kart_info[i].m_type = DEFENSE;
+        else if (random > 36 && random <= 48)
+            m_kart_info[i].m_type = CONTROLE;
+        else if (random > 48 && random <= 50)
+            m_kart_info[i].m_type = JACK_OF_ALL_TRADE;
+    }*/
 }
 
 // ----------------------------------------------------------------------------
@@ -363,6 +395,15 @@ void TagZombieArenaBattle::setSurvivor(int kartId)
     m_team_info[ZNBT].m_inlife_player--; // m_tag_zombie_team
 
     m_kart_info[kartId].m_converted_time = -1;
+    m_kart_info[kartId].m_type = POWERFULL_SURVIROR;
+
+    // Changement de la type de classe 
+    //m_kart_info[kartId].m_type = ;
+    m_iPower = kartId;
+
+    //int *collectible_type = (int*)PowerupManager::POWERUP_ZIPPER;
+    //int *amount = (int*)10;
+    //getItem(collectible_type, amount);
 
     // Changement ???
     m_convert_player = true;
@@ -391,9 +432,9 @@ bool TagZombieArenaBattle::setZombieStart()
         generateUniqueRandomNumbers();
         for (int8_t i = 0; i < m_nb_tags_zombie; i++) {
             if (m_tag_zombie_list_rand.size() <= m_nb_tags_zombie) {
-                if(RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE)
+                if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE)
                     setSurvivor(m_tag_zombie_list_rand[i]);
-                else 
+                else
                     setZombie(m_tag_zombie_list_rand[i], -1);
                 m_kart_info[m_tag_zombie_list_rand[i]].m_is_start_zombie = true;
             }
@@ -415,14 +456,14 @@ void TagZombieArenaBattle::generateUniqueRandomNumbers()
     m_tag_zombie_list_rand.reserve(m_nb_tags_zombie);
 
     if (m_total_player > 0) {
-        std::set<int> selectedIndices; // Utiliser un ensemble pour éviter les doublons
+        std::set<int> selectedIndices; // Utiliser un ensemble pour ï¿½viter les doublons
 
         while (selectedIndices.size() < m_nb_tags_zombie) {
             int index = std::rand() % m_total_player;
 
-            // Vérifier si l'index n'a pas déjà été sélectionné
+            // Vï¿½rifier si l'index n'a pas dï¿½jï¿½ ï¿½tï¿½ sï¿½lectionnï¿½
             if (selectedIndices.find(index) == selectedIndices.end()) {
-                // L'index n'a pas été sélectionné, l'ajouter à la liste
+                // L'index n'a pas ï¿½tï¿½ sï¿½lectionnï¿½, l'ajouter ï¿½ la liste
                 selectedIndices.insert(index);
                 m_tag_zombie_list_rand.push_back(index);
             }
@@ -445,8 +486,8 @@ void TagZombieArenaBattle::playMusic(BYTE numP, BYTE numS)
 
 // ----------------------------------------------------------------------------
 /** Function to change the color of a kart depending of the team
- */
-void TagZombieArenaBattle::changeKart(int idKart) 
+    */
+void TagZombieArenaBattle::changeKart(int idKart)
 {
     AbstractKart* kart = World::getWorld()->getKart(idKart);
     HandicapLevel hl = kart->getHandicap();
@@ -472,7 +513,7 @@ void TagZombieArenaBattle::changeKart(int idKart)
 }
 
 // ----------------------------------------------------------------------------
-/** Function to calculate the points at the end of the game 
+/** Function to calculate the points at the end of the game
  */
 void TagZombieArenaBattle::calculatePoints() 
 {
@@ -485,13 +526,12 @@ void TagZombieArenaBattle::calculatePoints()
     for (size_t i = 0; i < m_kart_info.size(); ++i) 
     {
         int points = 0;
-
-        // +5 points pour chaque joueur survivant (équipe rouge)
+        // +5 points pour chaque joueur survivant (ï¿½quipe rouge)
         if (getKartTeam(i) == m_player_team && !getKart(i)->isEliminated()) 
         {
             points += 5;
         }
-        // calcule des points de l'équipe zombie (équipe verte)
+        // calcule des points de l'ï¿½quipe zombie (ï¿½quipe verte)
         if (getKartTeam(i) == m_tag_zombie_team) 
         {
             // +3 points pour chaque joueur qui est un zombie d'origine
@@ -501,10 +541,10 @@ void TagZombieArenaBattle::calculatePoints()
             }
             if (m_kart_info[i].m_points_result != -1 && !getKart(i)->isEliminated()) 
             {
-                // +1 point pour chaque joueur transformé en zombie (sauf le dernier) si l'équipe zombie gagne 
+                // +1 point pour chaque joueur transformï¿½ en zombie (sauf le dernier) si l'ï¿½quipe zombie gagne 
                 if(getWinningTeam().at(0) == m_tag_zombie_team && m_kart_info[i].m_is_start_zombie != true)
                     points += 1;
-                // +1 point pour chaque joueur que le zombie aura transformé en zombie
+                // +1 point pour chaque joueur que le zombie aura transformï¿½ en zombie
                 if (m_kart_info[i].m_nb_player_converted > 0) 
                 {
                     points += std::min(m_kart_info[i].m_nb_player_converted, 5);
@@ -530,7 +570,7 @@ void TagZombieArenaBattle::setZombieTexte(irr::core::stringw winningText, int ka
     if (winningText == "") {
         AbstractKart* kart = getKart(kartId);
         const core::stringw& player = kart->getController()->getName();
-        if (zombieId ==- 2) {
+        if (zombieId == -2) {
             kart = getKart(kartId);
             const core::stringw& zombie = kart->getController()->getName();
             msg = _("%s has been tansformed in survivor!", player);
@@ -548,5 +588,172 @@ void TagZombieArenaBattle::setZombieTexte(irr::core::stringw winningText, int ka
         }
     }
     if (m_race_gui && !msg.empty())
-        m_race_gui->addMessage(msg, NULL, 4.5f, color);
+        m_race_gui->addMessage(msg, NULL, 2.5f, color);
+}
+
+//-----------------------------------------------------------------------------
+void TagZombieArenaBattle::getDefaultCollectibles(int* collectible_type, int* amount)
+{
+    // in tag mode, give zippers
+    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE && m_delay != -1)
+    {
+        *collectible_type = PowerupManager::POWERUP_ZIPPER;
+        *amount = 1; // 1 zipper au dï¿½bart de la partie jusqu'au premier powerup
+    }
+    else World::getDefaultCollectibles(collectible_type, amount);
+
+    //set types for everyone
+
+
+}   // getDefaultCollectibles
+
+bool TagZombieArenaBattle::haveBonusBoxes()
+{
+    // In tag mode, if the bonus boxes is deactivated, the rechargeable powers are activated 
+    return RaceManager::get()->haveBonusBoxes();
+}   // haveBonusBoxes
+
+bool TagZombieArenaBattle::timerPower()
+{
+    float tempsRestant = getTime();
+    float tempsTotal = RaceManager::get()->getTimeTarget();
+
+    if (tempsRestant <= (tempsTotal - m_delayItem))
+    {
+        m_iPower = m_kart_info.size() - 1;
+        m_delayItem += 30;
+        return true;
+    }
+
+    if (m_iPower > 0)
+    {
+        m_iPower--;
+        return true;
+    }
+    else return World::timerPower();
+}
+
+
+void TagZombieArenaBattle::initializeClassPowerMap() {
+    // La performance de ce code devra ï¿½tre vï¿½rifier 
+    // Initialisez la carte avec les pouvoirs disponibles pour chaque ClassesTypes
+    // Exemple pour la ClassesTypes VITESSE avec deux pouvoirs possibles
+
+    // ClassesTypes - VITESSE
+    m_class_power_map[VITESSE].push_back({ PowerupManager::POWERUP_ZIPPER, 3 });
+    //m_class_power_map[VITESSE].push_back({ PowerupManager::POWERUP_PARACHUTE, 1 });
+
+    // ClassesTypes - FORCE
+    m_class_power_map[FORCE].push_back({ PowerupManager::POWERUP_BOWLING, 4 });
+    m_class_power_map[FORCE].push_back({ PowerupManager::POWERUP_CAKE, 1 });
+
+    // ClassesTypes - DEFENSE
+    //m_class_power_map[DEFENSE].push_back({ PowerupManager::POWERUP_ANVIL, 2 });
+    m_class_power_map[DEFENSE].push_back({ PowerupManager::POWERUP_BUBBLEGUM, 4 });
+
+    // ClassesTypes - DEFORCE
+    //m_class_power_map[DEFORCE].push_back({ PowerupManager::POWERUP_ANVIL, 2 });
+    //m_class_power_map[DEFORCE].push_back({ PowerupManager::POWERUP_SWATTER, 4 });
+
+    // ClassesTypes - CONTROLE
+    m_class_power_map[CONTROLE].push_back({ PowerupManager::POWERUP_PARACHUTE, 3 });
+    m_class_power_map[CONTROLE].push_back({ PowerupManager::POWERUP_PLUNGER, 2 });
+
+    // ClassesTypes - SPEED_CONTROLLER
+    //m_class_power_map[SPEED_CONTROLLER].push_back({ PowerupManager::POWERUP_SWITCH, 3 });
+    //m_class_power_map[SPEED_CONTROLLER].push_back({ PowerupManager::POWERUP_PLUNGER, 5 });
+
+    // ClassesTypes - FUNNY
+    m_class_power_map[FUNNY].push_back({ PowerupManager::POWERUP_SWITCH, 5 });
+    //m_class_power_map[FUNNY].push_back({ PowerupManager::POWERUP_PLUNGER, 2 });
+
+    // ClassesTypes - JACK_OF_ALL_TRADE
+    m_class_power_map[JACK_OF_ALL_TRADE].push_back({ PowerupManager::POWERUP_BOWLING, 1 });
+    m_class_power_map[JACK_OF_ALL_TRADE].push_back({ PowerupManager::POWERUP_ZIPPER, 1 });
+    m_class_power_map[JACK_OF_ALL_TRADE].push_back({ PowerupManager::POWERUP_PARACHUTE, 1 });
+    m_class_power_map[JACK_OF_ALL_TRADE].push_back({ PowerupManager::POWERUP_ANVIL, 1 });
+    m_class_power_map[JACK_OF_ALL_TRADE].push_back({ PowerupManager::POWERUP_BUBBLEGUM, 1 });
+    m_class_power_map[JACK_OF_ALL_TRADE].push_back({ PowerupManager::POWERUP_PLUNGER, 1 });
+    m_class_power_map[JACK_OF_ALL_TRADE].push_back({ PowerupManager::POWERUP_SWITCH, 1 });
+    m_class_power_map[JACK_OF_ALL_TRADE].push_back({ PowerupManager::POWERUP_CAKE, 1 });
+
+    m_class_power_map[POWERFULL_SURVIROR].push_back({ PowerupManager::POWERUP_CAKE, 1 });
+    m_class_power_map[POWERFULL_SURVIROR].push_back({ PowerupManager::POWERUP_ZIPPER, 1 });
+    m_class_power_map[POWERFULL_SURVIROR].push_back({ PowerupManager::POWERUP_ANVIL, 1 });
+    m_class_power_map[POWERFULL_SURVIROR].push_back({ PowerupManager::POWERUP_SWITCH, 1 });
+    m_class_power_map[POWERFULL_SURVIROR].push_back({ PowerupManager::POWERUP_BUBBLEGUM, 1 });
+
+    // Ajoutez des entrï¿½es similaires pour d'autres ClassesTypes et leurs pouvoirs
+}
+
+int TagZombieArenaBattle::getRandomPowerForClass(ClassesTypes classType) {
+    // Sï¿½lectionnez un pouvoir alï¿½atoire en fonction de la ClassesTypes
+    const auto& powerInfoList = m_class_power_map[classType];
+    int totalWeight = 0;
+    for (const auto& powerInfo : powerInfoList) {
+        totalWeight += powerInfo.weight;
+    }
+
+    int randomWeight = rand() % totalWeight;
+    int cumulativeWeight = 0;
+    for (const auto& powerInfo : powerInfoList) {
+        cumulativeWeight += powerInfo.weight;
+        if (randomWeight < cumulativeWeight) {
+            return powerInfo.powerType;
+        }
+    }
+
+    // En cas d'erreur, retournez le premier pouvoir
+    return powerInfoList.front().powerType;
+}
+
+
+// ï¿½ vï¿½rifier // Le code dois ï¿½tre vï¿½rifier 
+
+void TagZombieArenaBattle::distributePower(int8_t powerIndex, int* collectible_type, int* amount) {
+	int powerType = getRandomPowerForClass(m_kart_info[m_iPower].m_type);
+	*collectible_type = powerType;
+    if(m_kart_info[m_iPower].m_type == POWERFULL_SURVIROR)
+        *amount = 10;
+    else 
+	    *amount = 1;
+}
+
+TagZombieArenaBattle::ClassesTypes TagZombieArenaBattle::getRandomClassType() {
+    // Liste des ClassesTypes avec leur poids respectif
+    std::vector<std::pair<ClassesTypes, int>> classWeights = {
+        {CONTROLE, 7},         // Poids de 5
+        {FORCE, 7},             // Poids de 4
+        {DEFENSE, 7},           // Poids de 3
+        //{SPEED_CONTROLLER, 7},  // Poids de 3
+        {VITESSE, 5},           // Poids de 2
+        {FUNNY, 3},           // Poids de 1
+        {JACK_OF_ALL_TRADE, 1}  // Poids de 1
+    };
+
+    // Calcul de la somme des poids
+    int totalWeight = 0;
+    for (const auto& classWeight : classWeights) {
+        totalWeight += classWeight.second;
+    }
+
+    // Sï¿½lection d'un nombre alï¿½atoire entre 0 et totalWeight
+    int randomWeight = rand() % totalWeight;
+
+    // Sï¿½lection de la classe en fonction du poids
+    int cumulativeWeight = 0;
+    for (const auto& classWeight : classWeights) {
+        cumulativeWeight += classWeight.second;
+        if (randomWeight < cumulativeWeight) {
+            return classWeight.first;
+        }
+    }
+
+    // En cas d'erreur, retournez la premiï¿½re classe
+    return classWeights.front().first;
+}
+
+void TagZombieArenaBattle::getItem(int* collectible_type, int* amount) {
+    int8_t powerIndex = m_kart_info[m_iPower].m_type;
+    distributePower(powerIndex, collectible_type, amount);
 }
