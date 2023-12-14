@@ -96,7 +96,7 @@ void TrackInfoScreen::loadedFromFile()
     m_nitro = getWidget<IconButtonWidget>("nitro");
     m_banana = getWidget<IconButtonWidget>("banana");
     m_powerup_selection = getWidget<IconButtonWidget>("powerup-selection");
-    m_special_option = getWidget<IconButtonWidget>("special-option");
+    m_special_option    = getWidget<IconButtonWidget>("special-option");
 
     m_icon_bank = new irr::gui::STKModifiedSpriteBank(GUIEngine::getGUIEnv());
 
@@ -238,6 +238,9 @@ void TrackInfoScreen::init()
     m_ai_kart_label->setText(_("Number of red team AI karts"), false);
     m_ai_blue_label->setText(_("Number of blue team AI karts"), false);
 
+    m_powerup_selection->setVisible(false);
+    m_special_option->setVisible(false);
+
     // Number of AIs
     // -------------
     const bool has_AI =
@@ -252,9 +255,14 @@ void TrackInfoScreen::init()
     m_ai_kart_label->setVisible(has_AI);
 
     getConfigValue();
+    changeIconButtonImage(m_powerup, "gift", m_state_powerup);
     changeIconButtonImage(m_nitro, "nitro", m_state_nitro);
     changeIconButtonImage(m_banana, "banana", m_state_banana);
-    changeIconButtonImage(m_powerup, "gift", m_state_powerup);
+
+    RaceManager::get()->setBonusBoxes(m_state_powerup);
+    RaceManager::get()->setBottleNitro(m_state_nitro);
+    RaceManager::get()->setBananna(m_state_banana);
+
     m_powerup->setActive(true);
 
     if (has_AI)
@@ -793,9 +801,6 @@ void TrackInfoScreen::updateHighScores()
 
 void TrackInfoScreen::onEnterPressedInternal()
 {
-
-
-
     RaceManager::get()->setRecordRace(m_record_this_race);
     // Create a copy of member variables we still need, since they will
     // not be accessible after dismiss:
@@ -877,11 +882,17 @@ void TrackInfoScreen::onEnterPressedInternal()
         }
         UserConfigParams::m_use_team_arena_battle_mode = m_target_type_spinner->getValue();
         RaceManager::get()->setTimeTarget(m_target_value_spinner->getValue() * 60);
+
+        getConfigValue();
+
+        changeIconButtonImage(m_powerup, "gift", m_state_powerup);
+        changeIconButtonImage(m_nitro, "nitro", m_state_nitro);
+        changeIconButtonImage(m_banana, "banana", m_state_banana);
+
         UserConfigParams::m_team1_ai_num = m_ai_kart_spinner->getValue();
         UserConfigParams::m_team2_ai_num = m_ai_blue_spinner->getValue();
         UserConfigParams::m_team3_ai_num = m_ai_team3_spinner->getValue();
         UserConfigParams::m_team4_ai_num = m_ai_team4_spinner->getValue();
-
 
     }
     if (m_is_tag_zombie_arena_battle) {
@@ -897,6 +908,12 @@ void TrackInfoScreen::onEnterPressedInternal()
 
         RaceManager::get()->setTimeTarget(m_target_value_spinner->getValue() * 60);
         RaceManager::get()->setNumGreenAI(m_ai_team3_spinner->getValue());
+
+        getConfigValue();
+
+        changeIconButtonImage(m_powerup, "gift", m_state_powerup);
+        changeIconButtonImage(m_nitro, "nitro", m_state_nitro);
+        changeIconButtonImage(m_banana, "banana", m_state_banana);
     }
     if (m_is_lap_trial)
     {
@@ -927,11 +944,10 @@ void TrackInfoScreen::onEnterPressedInternal()
     }
     RaceManager::get()->startSingleRace(m_track->getIdent(), num_laps, false);
 
-    //
     RaceManager::get()->setBonusBoxes(m_state_powerup);
     RaceManager::get()->setBottleNitro(m_state_nitro);
     RaceManager::get()->setBananna(m_state_banana);
-
+    setConfigValue();
 }   // onEnterPressedInternal
 
 // ----------------------------------------------------------------------------
@@ -1297,7 +1313,7 @@ void TrackInfoScreen::getConfigValue()
         m_state_banana = UserConfigParams::m_bananna_race;
     }
     else if (mode == RaceManager::MINOR_MODE_3_STRIKES || mode == RaceManager::MINOR_MODE_FREE_FOR_ALL) {
-        m_state_powerup = UserConfigParams::m_bonus_box_battle_arena; // true
+        m_state_powerup = true;
         m_state_nitro = UserConfigParams::m_bottle_nitro_battle_arena;
         m_state_banana = UserConfigParams::m_bananna_battle_arena;
     }
@@ -1306,37 +1322,36 @@ void TrackInfoScreen::getConfigValue()
         m_state_nitro = UserConfigParams::m_bottle_nitro_soccer;
         m_state_banana = UserConfigParams::m_bananna_soccer;
     }
-    else if (mode == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE) {
+    else if (RaceManager::get()->isTagzArenaBattleMode()) {
       
         m_state_nitro = UserConfigParams::m_bottle_nitro_tag_zombie_arena;
         m_state_banana = UserConfigParams::m_bananna_tag_zombie_arena;
         m_state_powerup = UserConfigParams::m_bonus_box_tag_zombie_arena;
     }
     else if (mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE) {
-        m_state_nitro = UserConfigParams::m_bottle_nitro_team_arena;
+        m_state_nitro = true; 
         m_state_banana = UserConfigParams::m_bananna_team_arena;
         m_state_powerup = UserConfigParams::m_bonus_box_team_arena;
     }
     else if (mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER) {
-        m_state_nitro = UserConfigParams::m_bottle_nitro_team_arena;
+        m_state_nitro = true; 
         m_state_banana = UserConfigParams::m_bananna_team_arena;
         m_state_powerup = UserConfigParams::m_bonus_box_team_arena;
     }
     else if (mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM) {
-        m_state_nitro = UserConfigParams::m_bottle_nitro_team_arena;
+        m_state_nitro = true;
         m_state_banana = UserConfigParams::m_bananna_team_arena;
         m_state_powerup = UserConfigParams::m_bonus_box_team_arena;
     }
     else if (mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER) {
-        m_state_nitro = UserConfigParams::m_bottle_nitro_team_arena;
+        m_state_nitro = true; 
         m_state_banana = UserConfigParams::m_bananna_team_arena;
         m_state_powerup = UserConfigParams::m_bonus_box_team_arena;
     }
-    else if (mode == m_is_team_arena_battle) {
-       
-        m_state_nitro = UserConfigParams::m_bottle_nitro_battle_arena;
-        m_state_banana = UserConfigParams::m_bananna_battle_arena;
-        m_state_powerup = UserConfigParams::m_bonus_box_battle_arena;
+    else {
+        m_state_nitro = true; 
+        m_state_banana = true;
+        m_state_powerup = true;
     }
 }
 void TrackInfoScreen::setConfigValue()
@@ -1364,29 +1379,20 @@ void TrackInfoScreen::setConfigValue()
         UserConfigParams::m_bananna_tag_zombie_arena = m_state_banana;
     }
     else if (mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE) {
-        UserConfigParams::m_bottle_nitro_team_arena = m_state_nitro;
         UserConfigParams::m_bananna_team_arena = m_state_banana;
         UserConfigParams::m_bonus_box_team_arena = m_state_powerup;
     }
     else if (mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER) {
-        UserConfigParams::m_bottle_nitro_team_arena = m_state_nitro;
         UserConfigParams::m_bananna_team_arena = m_state_banana;
         UserConfigParams::m_bonus_box_team_arena = m_state_powerup;
     }
     else if (mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM) {
-        UserConfigParams::m_bottle_nitro_team_arena=m_state_nitro;
         UserConfigParams::m_bananna_team_arena=m_state_banana;
         UserConfigParams::m_bonus_box_team_arena=m_state_powerup;
     }
     else if (mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER) {
-        UserConfigParams::m_bottle_nitro_team_arena = m_state_nitro;
         UserConfigParams::m_bananna_team_arena = m_state_banana;
         UserConfigParams::m_bonus_box_team_arena = m_state_powerup;
 
-    }
-    else if (mode == m_is_team_arena_battle) {
-        UserConfigParams::m_bonus_box_teams_battle_arena    = m_state_powerup;
-        UserConfigParams::m_bonus_box_teams_battle_arena    = m_state_nitro;
-        UserConfigParams::m_bananna_teams_battle_arena      = m_state_banana;
     }
 }
