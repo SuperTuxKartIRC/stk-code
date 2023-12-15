@@ -553,7 +553,3 @@ void TeamsSetupScreen::changeTeamByDirection(int player_id, int direction)
     UserConfigParams::m_default_team_teams = (int)teams;
     changeTeam(player_id, teams);
 }
-
-void TeamsSetupScreen::changeTeamColor(int player_id, int direction)
-{
-}

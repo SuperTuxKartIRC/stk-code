@@ -471,7 +471,7 @@ void TagZombieArenaBattle::generateUniqueRandomNumbers()
     }
 }
 
-void TagZombieArenaBattle::playMusic(BYTE numP, BYTE numS)
+void TagZombieArenaBattle::playMusic(int8_t numP, int8_t numS)
 {
     if (m_total_player > numP && m_nb_not_zombie_player <= numS) 
     {

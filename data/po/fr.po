@@ -6359,7 +6359,7 @@ msgstr "L'équipe des zombies l’emportent"
 #: src/states_screens/race_result_gui.cpp:1533
 #: src/modes/tag_zombie_arena_battle.cpp:280
 msgid "The survivor team Wins!"
-msgstr "L'équipe des survivants l’emportent"
+msgstr "L'équipe des survivants l’emporte"
 
 #: src/modes/tag_zombie_arena_battle.cpp:270
 msgid "The survivor (%s) Win!"

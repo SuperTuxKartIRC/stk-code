@@ -6,7 +6,7 @@
         min-height="0.2"      max-height="1.0"
         force-updown="25"     max-distance="90"         />
   <item name="barrel"      	  icon="barrel-icon.png"       
-		model="barrel.spm"    speed="50"
+		model="barrel.spm"    speed="35"
         min-height="0.2"      max-height="0.5"
         force-updown="25"     max-distance="90"         />
   <item name="bowling"        icon="bowling-icon.png"

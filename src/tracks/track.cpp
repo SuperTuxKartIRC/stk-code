@@ -2694,7 +2694,7 @@ void Track::itemCommand(const XMLNode *node)
         return;
 
     // Some item can be deactivate like bottle of nitro
-    if (type == Item::ITEM_NITRO_SMALL || type == Item::ITEM_NITRO_BIG &&
+    if ((type == Item::ITEM_NITRO_SMALL || type == Item::ITEM_NITRO_BIG) &&
         (!World::getWorld()->haveBottleNitro() ||
         !RaceManager::get()->haveBottleNitro()))
         return;

@@ -1047,12 +1047,12 @@ public:
         return m_minor_mode == MINOR_MODE_SOCCER ||
             m_minor_mode == MINOR_MODE_CAPTURE_THE_FLAG;
     }
-    bool teamPlusEnabled() const // TODO : changement team 
+    bool teamPlusEnabled() const
     {
         return m_minor_mode == MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM ||
-            MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER ||
-            MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER ||
-            MINOR_MODE_TEAM_ARENA_BATTLE_LIFE;
+               m_minor_mode == MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER ||
+               m_minor_mode == MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER ||
+               m_minor_mode == MINOR_MODE_TEAM_ARENA_BATTLE_LIFE;
     }
     // ----------------------------------------------------------------------------------------
     bool getNbTeams() const

@@ -83,7 +83,7 @@ private:
 protected:
     int8_t m_total_player = getNumKarts();
     int8_t m_nb_not_zombie_player;
-    UINT8 m_nb_tags_zombie = NetworkConfig::get()->isNetworking() ? RaceManager::get()->getTagTarget() : RaceManager::get()->getNumberOfGreenAIKarts();
+    int8_t m_nb_tags_zombie = NetworkConfig::get()->isNetworking() ? RaceManager::get()->getTagTarget() : RaceManager::get()->getNumberOfGreenAIKarts();
     float m_delay = 0;
     float m_delayItem = 30;
 
@@ -158,7 +158,7 @@ private:
     // ------------------------------------------------------------------------
     void calculatePoints();
     // ------------------------------------------------------------------------
-    void playMusic(BYTE numP, BYTE numS);
+    void playMusic(int8_t numP, int8_t numS);
     // ------------------------------------------------------------------------
     void resetKartForSwatterHit(int kart_id, int at_world_ticks)
     {
