@@ -568,7 +568,3 @@ void NetworkTeamsSetupScreen::changeTeamByDirection(int player_id, int direction
     UserConfigParams::m_default_team_teams = (int)teams;
     changeTeam(player_id, teams);
 }
-
-void NetworkTeamsSetupScreen::changeTeamColor(int player_id, int direction)
-{
-}

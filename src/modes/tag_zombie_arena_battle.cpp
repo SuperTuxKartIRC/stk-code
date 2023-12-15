@@ -618,19 +618,20 @@ bool TagZombieArenaBattle::timerPower()
     float tempsRestant = getTime();
     float tempsTotal = RaceManager::get()->getTimeTarget();
 
+    if (m_iPower < m_kart_info.size() - 1)
+    {
+        m_iPower++;
+        return true;
+    }
+
     if (tempsRestant <= (tempsTotal - m_delayItem))
     {
-        m_iPower = m_kart_info.size() - 1;
+        m_iPower = 0;
         m_delayItem += 30;
         return true;
     }
 
-    if (m_iPower > 0)
-    {
-        m_iPower--;
-        return true;
-    }
-    else return World::timerPower();
+	else return World::timerPower();
 }
 
 
@@ -714,7 +715,7 @@ void TagZombieArenaBattle::distributePower(int8_t powerIndex, int* collectible_t
 	int powerType = getRandomPowerForClass(m_kart_info[m_iPower].m_type);
 	*collectible_type = powerType;
     if(m_kart_info[m_iPower].m_type == POWERFULL_SURVIROR)
-        *amount = 10;
+        *amount = 5;
     else 
 	    *amount = 1;
 }

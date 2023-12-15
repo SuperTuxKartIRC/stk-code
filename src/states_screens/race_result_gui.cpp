@@ -1616,6 +1616,8 @@ void RaceResultGUI::unload()
         video::SColor white_color = video::SColor(255, 255, 255, 255);
         video::SColor black_color = video::SColor(255, 0, 0, 0);
 
+        black_color = GUIEngine::getSkin()->getColor("text::neutral");
+
         //Draw win text
         core::stringw result_text;
         irr::video::ITexture* kart_icon;
@@ -1685,11 +1687,35 @@ void RaceResultGUI::unload()
             }
             result_text.append("  ");
             irr::u32 offset_x;
+            irr::u32 text_x = 200;
 
             if (modeVal == 1)
                 result_text.append(StringUtils::toWString(tab->getKartScore(kart_id)));
             else if (modeVal == 2)
                 result_text.append(StringUtils::toWString(tabl->getKartLife(kart_id)));
+            //else if (modeVal == 3) {
+            //    if (tagzab->getKartNbConvertedPlayer(kart_id) > 0)
+            //        result_text.append(StringUtils::toWString(tagzab->getKartNbConvertedPlayer(kart_id)));
+            //    if (tagzab->getKartConvertedTime(kart_id) > -1 && kartZombie != NULL) {
+            //        result_text.append("   ");
+            //        result_text.append(StringUtils::timeToString(tagzab->getKartConvertedTime(kart_id), 0).c_str());
+            //        result_text.append("   ");
+            //        if (tagzab->getKartConverteZombie(kart_id) != -1) {
+            //            kart_icon = kartZombie->getKartProperties()->getIconMaterial()->getTexture();
+            //            if (kart_icon == NULL)
+            //                kart_icon = m_zombie_icon;
+            //            source_rect = core::recti(core::vector2di(0, 0), kart_icon->getSize());
+            //            // TODO : Besoins de modification. l'icone n'est pas bien placer  
+            //            irr::u32 offset_x = (irr::u32)(font->getDimension(result_text.c_str()).Width / 1.f); // 1.5f
+            //            dest_rect = core::recti(x + offset_x + m_width_icon, y, x + offset_x, y + m_width_icon);
+            //            draw2DImage(kart_icon, dest_rect, source_rect, NULL, NULL, true);
+            //        }
+            //    }
+            //    if (tagzab->getKartPointsResult(kart_id) > 0) {
+            //        result_text.append("   +");
+            //        result_text.append(StringUtils::toWString(tagzab->getKartPointsResult(kart_id)).c_str());
+            //    }
+            //}
             else if (modeVal == 3) {
                 if (tagzab->getKartNbConvertedPlayer(kart_id) > 0)
                     result_text.append(StringUtils::toWString(tagzab->getKartNbConvertedPlayer(kart_id)));
@@ -1697,29 +1723,38 @@ void RaceResultGUI::unload()
                     result_text.append("   ");
                     result_text.append(StringUtils::timeToString(tagzab->getKartConvertedTime(kart_id), 0).c_str());
                     result_text.append("   ");
+                }
+                if (tagzab->getKartPointsResult(kart_id) > 0) {
+                    result_text.append("   +");
+                    result_text.append(StringUtils::toWString(tagzab->getKartPointsResult(kart_id)).c_str());
+                }
+                if (tagzab->getKartConvertedTime(kart_id) > -1 && kartZombie != NULL) {
                     if (tagzab->getKartConverteZombie(kart_id) != -1) {
                         kart_icon = kartZombie->getKartProperties()->getIconMaterial()->getTexture();
                         if (kart_icon == NULL)
                             kart_icon = m_zombie_icon;
                         source_rect = core::recti(core::vector2di(0, 0), kart_icon->getSize());
                         // TODO : Besoins de modification. l'icone n'est pas bien placer  
-                        irr::u32 offset_x = (irr::u32)(font->getDimension(result_text.c_str()).Width / 1.f); // 1.5f
+                        // Le texte sera centré, il faut donc décaler de (longueur du texte + moitié de la longueur restante), plus une marge
+                        offset_x = (irr::u32)(text_x - (text_x - font->getDimension(result_text.c_str()).Width) / 2 + 15);
                         dest_rect = core::recti(x + offset_x + m_width_icon, y, x + offset_x, y + m_width_icon);
                         draw2DImage(kart_icon, dest_rect, source_rect, NULL, NULL, true);
                     }
                 }
-                if (tagzab->getKartPointsResult(kart_id) > 0) {
-                    result_text.append("   +");
-                    result_text.append(StringUtils::toWString(tagzab->getKartPointsResult(kart_id)).c_str());
-                }
             }
 
             // y + team_icon_height
-            font->draw(result_text, core::rect<s32>(x, y, x + 200, y + 30), kart->getController()->isLocalPlayerController() ? color : black_color, true, false);
+            font->draw(result_text, core::rect<s32>(x, y, x + text_x, y + 30), kart->getController()->isLocalPlayerController() ? color : black_color, true, false);
             kart_icon = kart->getKartProperties()->getIconMaterial()->getTexture();
-            if (kart_icon == NULL) {
-                if (team == tagzab->getTagPlayerTeam()) kart_icon = m_player_icon;
-                else if (team == tagzab->getTagZombieTeam()) kart_icon = m_zombie_icon;
+            if (kart_icon == NULL) 
+            {
+                if (modeVal == 3) 
+                {
+                    if (team == tagzab->getTagPlayerTeam()) kart_icon = m_player_icon;
+                    else if (team == tagzab->getTagZombieTeam()) kart_icon = m_zombie_icon;
+                }
+                else 
+                    kart_icon = m_player_icon;
             }
             source_rect = core::recti(core::vector2di(0, 0), kart_icon->getSize());
             offset_x = (irr::u32)(font->getDimension(result_text.c_str()).Width / 1.5f);
