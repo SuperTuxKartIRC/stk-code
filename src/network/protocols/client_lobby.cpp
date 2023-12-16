@@ -322,7 +322,7 @@ void ClientLobby::addAllPlayers(Event* event)
 
     uint32_t random_seed = data.getUInt32();
     ItemManager::updateRandomSeed(random_seed);
-    if (RaceManager::get()->isTeamArenaBattleMode() || RaceManager::get()->isTagzArenaBattleMode())
+    if (RaceManager::get()->isTeamArenaBattleMode())
     {
         int hit_capture_limit = data.getUInt32(); // 2 A
         float time_limit = data.getFloat(); // 1
@@ -342,16 +342,29 @@ void ClientLobby::addAllPlayers(Event* event)
         unsigned flag_deactivated_time = data.getUInt16();
         RaceManager::get()->setFlagDeactivatedTicks(flag_deactivated_time);
     }
+    else if (RaceManager::get()->isTagzArenaBattleMode())
+    {
+        float time_limit = data.getFloat();
+        int nb_tag = data.getUInt8(); // 2 C
+
+        m_game_setup->setHitCaptureTime(0, time_limit);
+        uint16_t flag_return_timeout = data.getUInt16();
+        RaceManager::get()->setFlagReturnTicks(flag_return_timeout);
+        unsigned flag_deactivated_time = data.getUInt16();
+        RaceManager::get()->setFlagDeactivatedTicks(flag_deactivated_time);
+    }
     else if (RaceManager::get()->isBattleMode())
     {
         int hit_capture_limit = data.getUInt32();
         float time_limit = data.getFloat();
+
         m_game_setup->setHitCaptureTime(hit_capture_limit, time_limit);
         uint16_t flag_return_timeout = data.getUInt16();
         RaceManager::get()->setFlagReturnTicks(flag_return_timeout);
         unsigned flag_deactivated_time = data.getUInt16();
         RaceManager::get()->setFlagDeactivatedTicks(flag_deactivated_time);
     }
+    
     getPlayersAddonKartType(data, players);
     configRemoteKart(players, isSpectator() ? 1 :
         (int)NetworkConfig::get()->getNetworkPlayers().size());

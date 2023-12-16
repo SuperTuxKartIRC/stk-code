@@ -15,6 +15,7 @@
 
 TagZombieArenaBattle::TagZombieArenaBattle()
 {
+    
     if (RaceManager::get()->hasTimeTarget())
         WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN, RaceManager::get()->getTimeTarget());
     else
@@ -94,6 +95,9 @@ void TagZombieArenaBattle::reset(bool restart)
 // ----------------------------------------------------------------------------
 void TagZombieArenaBattle::initGameInfo()
 {
+    if (m_nb_tags_zombie < 1) {
+        m_nb_tags_zombie = 1;
+    }
     m_nb_not_zombie_player = getTeamNum(m_player_team);
     m_total_player = getNumKarts();
     m_nb_tags_zombie = m_nb_tags_zombie > m_total_player ? m_total_player - 1 : m_nb_tags_zombie; // TODO : Besoins de changement (>= ??) ?? // William Lussier 2023-11-16

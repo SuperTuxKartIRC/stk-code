@@ -1792,6 +1792,17 @@ NetworkString* ServerLobby::getLoadWorldMessage(
             ServerConfig::m_flag_deactivated_time);
         load_world_message->addUInt16(flag_deactivated_time);
     }
+    else if (RaceManager::get()->isTagzArenaBattleMode())
+    {
+        load_world_message->addFloat(m_battle_time_limit);
+        load_world_message->addUInt8(m_battle_nb_tag);
+        uint16_t flag_return_time = (uint16_t)stk_config->time2Ticks(
+            ServerConfig::m_flag_return_timeout);
+        load_world_message->addUInt16(flag_return_time);
+        uint16_t flag_deactivated_time = (uint16_t)stk_config->time2Ticks(
+            ServerConfig::m_flag_deactivated_time);
+        load_world_message->addUInt16(flag_deactivated_time);
+    }
     else if (RaceManager::get()->isBattleMode())
     {
         load_world_message->addUInt32(m_battle_hit_capture_limit)
