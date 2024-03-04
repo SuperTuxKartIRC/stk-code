@@ -133,6 +133,8 @@ public:
     // ------------------------------------------------------------------------
     void setWinningTeams();
     // ------------------------------------------------------------------------
+    bool hasWin(int kartId);
+    // ------------------------------------------------------------------------
     void resetKartForSwatterHit(int kart_id, int at_world_ticks)
     {
         m_swatter_reset_kart_ticks[kart_id] = at_world_ticks;

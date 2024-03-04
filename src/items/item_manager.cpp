@@ -464,11 +464,11 @@ void ItemManager::reset()
             deleteItem( *i );
             i++;
         }
-        //if ((*i)->canBeUsedUp() || (*i)->getType() == ItemState::ITEM_BARREL) //TODO: barrel
-        //{
-        //    deleteItem(*i);
-        //    i++;
-        //}
+        if ((*i)->canBeUsedUp() || (*i)->getType() == ItemState::ITEM_BARREL) //TODO: barrel
+        {
+            deleteItem(*i);
+            i++;
+        }
         else
         {
             (*i)->reset();

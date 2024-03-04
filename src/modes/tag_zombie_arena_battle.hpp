@@ -202,7 +202,8 @@ public:
     irr::core::stringw getWinningTeamsTexte() { return m_winning_text; };
     // ------------------------------------------------------------------------
     virtual void setZombieTexte(irr::core::stringw winningText, int kartId, int zombieId);
-
+    // ------------------------------------------------------------------------
+    bool hasWin(int kartId);
 
     int getRandomPowerForClass(ClassesTypes classType);
     void distributePower(int8_t powerIndex, int* collectible_type, int* amount);

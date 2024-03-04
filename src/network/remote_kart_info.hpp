@@ -114,6 +114,11 @@ public:
     bool  isNetworkPlayer() const            { return m_network_player;   }
     const std::string& getKartName() const   { return m_kart_name;        }
     const irr::core::stringw& getPlayerName() const { return m_user_name; }
+    int getKartTeamInt(KartTeam team) const { switch (team) { case KartTeam::KART_TEAM_NONE:return -1;case KartTeam::KART_TEAM_RED:return 0; 
+    case KartTeam::KART_TEAM_BLUE:return 1; case KartTeam::KART_TEAM_GREEN:return 2; case KartTeam::KART_TEAM_ORANGE:return 3; 
+    case KartTeam::KART_TEAM_YELLOW:return 4; case KartTeam::KART_TEAM_PURPLE:return 5; case KartTeam::KART_TEAM_PINK:return 6;
+    case KartTeam::KART_TEAM_TURQUOISE:return 7; case KartTeam::KART_TEAM_DARK_BLUE:return 7; case KartTeam::KART_TEAM_CYAN:return 9;
+    case KartTeam::KART_TEAM_DEFAULT:return 10;}}
     KartTeam getKartTeam() const               { return m_kart_team;      }
     HandicapLevel getHandicap() const        { return m_handicap;         }
     float getDefaultKartColor() const      { return m_default_kart_color; }

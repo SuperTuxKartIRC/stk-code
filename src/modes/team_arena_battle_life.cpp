@@ -353,3 +353,18 @@ void TeamArenaBattlelife::setWinningTeams()
     if (indices.size() > 0)
         World::setWinningTeam(indices);
 }
+
+bool TeamArenaBattlelife::hasWin(int kartId)
+{
+    // Obtenez la valeur de l'équipe du kartId
+    int kartTeam = getKartTeam(kartId);
+
+    // Recherchez la valeur dans la liste m_winning_teams
+    auto it = std::find(m_winning_teams.begin(), m_winning_teams.end(), kartTeam);
+
+    // Vérifiez si la valeur a été trouvée
+    if (it != m_winning_teams.end())
+        return true;
+    else
+        return false;
+}

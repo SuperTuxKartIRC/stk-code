@@ -6,7 +6,8 @@
 #include <utils/string_utils.hpp>
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
-
+#include <vector>
+#include <algorithm> 
 
 TeamArenaBattle::TeamArenaBattle()
 {
@@ -67,11 +68,16 @@ void TeamArenaBattle::countdownReachedZero()
 // ----------------------------------------------------------------------------
 void TeamArenaBattle::terminateRace()
 {
-    const unsigned int kart_amount = getNumKarts();
-    for (unsigned int i = 0; i < kart_amount; i++)
-    {
-        getKart(i)->finishedRace(0.0f, true/*from_server*/);
-    }   // i<kart_amount
+    //const unsigned int kart_amount = getNumKarts();
+    //int size = World::getWinningTeam().size();
+    //for ( int i = 0; i < kart_amount; i++)
+    //{
+    //    getKart(i)->finishedRace(0.0f, true/*from_server*/);
+    //    //if (std::find(0, size, i) != size)
+    //    //{
+    //    //    m_karts[i]->getKartModel()->setAnimation(KartModel::AF_WIN_START, true/* play_non_loop*/);
+    //    //}
+    //}   // i<kart_amount
     WorldWithRank::terminateRace();
 }   // terminateRace
 
@@ -155,6 +161,7 @@ void TeamArenaBattle::handleScoreInServer(int kart_id, int hitter)
                 m_teams[team].m_total_player_get_score--;
             }
         }
+        getKart(kart_id)->getKartModel()->setAnimation(KartModel::AF_WIN_START, true/*play_non_loop*/);
     }
     else {
         m_kart_info[hitter].m_scores++;
@@ -168,6 +175,7 @@ void TeamArenaBattle::handleScoreInServer(int kart_id, int hitter)
                 m_teams[team].m_total_player_get_score++;
             }
         }
+        getKart(hitter)->getKartModel()->setAnimation(KartModel::AF_WIN_START, true/*play_non_loop*/);
     }
 
 
@@ -377,4 +385,19 @@ void TeamArenaBattle::setWinningTeams()
     }
     if (indices.size() > 0)
         World::setWinningTeam(indices);
+}
+
+bool TeamArenaBattle::hasWin(int kartId)
+{
+    // Obtenez la valeur de l'équipe du kartId
+    int kartTeam = getKartTeam(kartId);
+
+    // Recherchez la valeur dans la liste m_winning_teams
+    auto it = std::find(m_winning_teams.begin(), m_winning_teams.end(), kartTeam);
+
+    // Vérifiez si la valeur a été trouvée
+    if (it != m_winning_teams.end())
+        return true;
+    else
+        return false;
 }

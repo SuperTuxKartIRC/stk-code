@@ -68,6 +68,7 @@
 #include "modes/soccer_world.hpp"
 #include "modes/team_arena_battle.hpp"
 #include "modes/team_arena_battle_life.hpp"
+#include "modes/tag_zombie_arena_battle.hpp"
 #include "network/compress_network_body.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/client_lobby.hpp"
@@ -1107,17 +1108,20 @@ void Kart::setRaceResult()
         FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
         m_race_result = ffa->getKartFFAResult(getWorldKartId());
     }
-    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE)
+    else if (RaceManager::get()->isTabLifeMode())
     {
-       
+        TeamArenaBattlelife* tabl = dynamic_cast<TeamArenaBattlelife*>(World::getWorld());
+        m_race_result = tabl->hasWin(getWorldKartId());
     }
-    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE)
+    else if (RaceManager::get()->isTeamArenaBattleMode())
     {
-
+        TeamArenaBattle* tab = dynamic_cast<TeamArenaBattle*>(World::getWorld());
+        m_race_result = tab->hasWin(getWorldKartId());
     }
-    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE)
+    else if (RaceManager::get()->isTagzArenaBattleMode())
     {
-
+        TagZombieArenaBattle* tagz = dynamic_cast<TagZombieArenaBattle*>(World::getWorld());
+        m_race_result = tagz->hasWin(getWorldKartId());
     }
     else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
     {

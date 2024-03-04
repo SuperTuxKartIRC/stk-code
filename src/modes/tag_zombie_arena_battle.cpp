@@ -55,6 +55,7 @@ void TagZombieArenaBattle::reset(bool restart)
 
     m_count_down_reached_zero = false;
     m_is_game_terminated = false;
+    m_has_count_points = false;
     if (RaceManager::get()->hasTimeTarget())
         WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN, RaceManager::get()->getTimeTarget());
     else
@@ -593,6 +594,23 @@ void TagZombieArenaBattle::setZombieTexte(irr::core::stringw winningText, int ka
     }
     if (m_race_gui && !msg.empty())
         m_race_gui->addMessage(msg, NULL, 2.5f, color);
+}
+
+bool TagZombieArenaBattle::hasWin(int kartId)
+{
+    if (m_nb_not_zombie_player >= 1) 
+    {
+        if (getKartTeam(kartId) == m_player_team)
+            return true;
+        else
+            return false;
+    }
+    else if (m_nb_not_zombie_player == 0) {
+        return true;
+    }
+    else {
+        return false;  // Débile ...
+    }
 }
 
 //-----------------------------------------------------------------------------

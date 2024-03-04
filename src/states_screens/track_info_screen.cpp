@@ -1328,25 +1328,10 @@ void TrackInfoScreen::getConfigValue()
         m_state_banana = UserConfigParams::m_bananna_tag_zombie_arena;
         m_state_powerup = UserConfigParams::m_bonus_box_tag_zombie_arena;
     }
-    else if (mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE) {
-        m_state_nitro = true; 
+    else if (RaceManager::get()->isTeamArenaBattleMode()) {
+        m_state_powerup = true;
         m_state_banana = UserConfigParams::m_bananna_team_arena;
-        m_state_powerup = UserConfigParams::m_bonus_box_team_arena;
-    }
-    else if (mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER) {
-        m_state_nitro = true; 
-        m_state_banana = UserConfigParams::m_bananna_team_arena;
-        m_state_powerup = UserConfigParams::m_bonus_box_team_arena;
-    }
-    else if (mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM) {
-        m_state_nitro = true;
-        m_state_banana = UserConfigParams::m_bananna_team_arena;
-        m_state_powerup = UserConfigParams::m_bonus_box_team_arena;
-    }
-    else if (mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER) {
-        m_state_nitro = true; 
-        m_state_banana = UserConfigParams::m_bananna_team_arena;
-        m_state_powerup = UserConfigParams::m_bonus_box_team_arena;
+        m_state_nitro = UserConfigParams::m_bottle_nitro_team_arena;
     }
     else {
         m_state_nitro = true; 

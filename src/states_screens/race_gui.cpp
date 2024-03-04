@@ -1492,12 +1492,12 @@ void RaceGUI::drawLap(const AbstractKart* kart,
         core::rect<s32> source_rect(core::position2d<s32>(0, 0),
             m_champion->getSize());
 
-        pos -= core::position2di(icon_width, 0);
+        pos -= core::position2di(m_champion->getSize().Width, 0);
 
         for (uint8_t i = 0; i < nbTeam; i++)
         {
             team = world->getTeamsInGame(i);
-            
+
             if (team >= 0) {
                 team_score = modeVal == 1 ? tab->getTeamScore(team) : modeVal == 2 ? tabl->getTeamInlifePlayer((int)team) : modeVal == 3 ? tagzab->getTeamInlifePlayer((int)team) : 0;
 
