@@ -178,6 +178,21 @@ void ServerConfigurationMoreOptionsDialog::beforeAddingWidgets()
 
 		break;
 	}
+	case RaceManager::MINOR_MODE_HOT_POTATO_ARENA_BATTLE:
+	{
+
+		break;
+	}
+	case RaceManager::MINOR_MODE_HOT_POTATO_TIME_ARENA_BATTLE:
+	{
+
+		break;
+	}
+	case RaceManager::MINOR_MODE_KING_HAT_ARENA_BATTLE:
+	{
+
+		break;
+	}
 	default:
 	{
 
@@ -261,6 +276,21 @@ ServerConfigurationMoreOptionsDialog::processEvent(const std::string& source)
 			case RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE:
 			{
 				mode = 15;
+				break;
+			}
+			case RaceManager::MINOR_MODE_HOT_POTATO_ARENA_BATTLE:
+			{
+				mode = 16;
+				break;
+			}
+			case RaceManager::MINOR_MODE_HOT_POTATO_TIME_ARENA_BATTLE:
+			{
+				mode = 17;
+				break;
+			}
+			case RaceManager::MINOR_MODE_KING_HAT_ARENA_BATTLE:
+			{
+				mode = 18;
 				break;
 			}
 			}

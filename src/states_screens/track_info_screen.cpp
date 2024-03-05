@@ -145,6 +145,8 @@ void TrackInfoScreen::beforeAddingWidget()
 
     m_is_tag_zombie_arena_battle = RaceManager::get()->isTagzArenaBattleMode();
 
+    m_is_hot_potato_king_hat_arena_battle = RaceManager::get()->isHotPotatoKingHatMode();
+
     m_is_teams_mode = m_is_team_arena_battle;
 
     m_target_type_div->setCollapsed(!m_is_soccer && !m_show_ffa_spinner && !m_is_team_arena_battle && !m_is_tag_zombie_arena_battle, this);
@@ -904,6 +906,26 @@ void TrackInfoScreen::onEnterPressedInternal()
         }
         else {
             RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE);
+        }
+
+        RaceManager::get()->setTimeTarget(m_target_value_spinner->getValue() * 60);
+        RaceManager::get()->setNumGreenAI(m_ai_team3_spinner->getValue());
+
+        getConfigValue();
+
+        changeIconButtonImage(m_powerup, "gift", m_state_powerup);
+        changeIconButtonImage(m_nitro, "nitro", m_state_nitro);
+        changeIconButtonImage(m_banana, "banana", m_state_banana);
+    }
+    if (m_is_hot_potato_king_hat_arena_battle) {
+        if (m_target_type_spinner->getValue() == 0) {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_HOT_POTATO_ARENA_BATTLE);
+        }
+        else if (m_target_type_spinner->getValue() == 1) {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_HOT_POTATO_TIME_ARENA_BATTLE);
+        }
+        else {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_KING_HAT_ARENA_BATTLE);
         }
 
         RaceManager::get()->setTimeTarget(m_target_value_spinner->getValue() * 60);

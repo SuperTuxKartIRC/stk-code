@@ -49,6 +49,9 @@ const int CONFIG_CODE_TAG_Z_ARENA     = 9;
 const int CONFIG_CODE_TAG_Z_S_ARENA   = 10;
 const int CONFIG_CODE_TAG_Z_LS_ARENA  = 11;
 const int CONFIG_CODE_TEAM_ARENA_LIFE = 12;
+const int CONFIG_CODE_HOT_POTATO_ARENA = 12;
+const int CONFIG_CODE_HOT_POTATO_TIME_ARENA = 12;
+const int CONFIG_CODE_KING_HAT_ARENA = 12;
 
 using namespace GUIEngine;
 
@@ -328,6 +331,24 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name,
         {
             RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE);
             UserConfigParams::m_game_mode = CONFIG_CODE_TAG_Z_LS_ARENA;
+            ArenasScreen::getInstance()->push();
+        }
+        else if (selectedMode == IDENT_HOTP)
+        {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_HOT_POTATO_ARENA_BATTLE);
+            UserConfigParams::m_game_mode = CONFIG_CODE_HOT_POTATO_ARENA;
+            ArenasScreen::getInstance()->push();
+        }
+        else if (selectedMode == IDENT_HOTP_T)
+        {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_HOT_POTATO_TIME_ARENA_BATTLE);
+            UserConfigParams::m_game_mode = CONFIG_CODE_HOT_POTATO_TIME_ARENA;
+            ArenasScreen::getInstance()->push();
+        }
+        else if (selectedMode == IDENT_KING_H)
+        {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_KING_HAT_ARENA_BATTLE);
+            UserConfigParams::m_game_mode = CONFIG_CODE_KING_HAT_ARENA;
             ArenasScreen::getInstance()->push();
         }
         else if (selectedMode == "locked")

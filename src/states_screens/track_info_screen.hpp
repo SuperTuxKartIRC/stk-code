@@ -61,6 +61,8 @@ class TrackInfoScreen : public GUIEngine::Screen,
 
     bool m_is_tag_zombie_arena_battle;
 
+    bool m_is_hot_potato_king_hat_arena_battle;
+
     bool m_is_teams_mode;
 
     bool m_is_arena_mode;

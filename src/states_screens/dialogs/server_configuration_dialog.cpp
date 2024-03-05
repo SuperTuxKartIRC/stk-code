@@ -146,7 +146,18 @@ GUIEngine::EventPropagation
                         change.addUInt8(15).addUInt8(0);
                         RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE);
                     }
-
+                    else if (v == 9) {
+                        change.addUInt8(16).addUInt8(0);
+                        RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_HOT_POTATO_ARENA_BATTLE);
+                    }
+                    else if (v == 10) {
+                        change.addUInt8(17).addUInt8(0);
+                        RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_HOT_POTATO_TIME_ARENA_BATTLE);
+                    }
+                    else if (v == 11) {
+                        change.addUInt8(18).addUInt8(0);
+                        RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_KING_HAT_ARENA_BATTLE);
+                    }
                     break;
                 }
                 case 3:

@@ -41,6 +41,7 @@
 #include "modes/easter_egg_hunt.hpp"
 #include "modes/follow_the_leader.hpp"
 #include "modes/free_for_all.hpp"
+#include "modes/hot_potato.hpp"
 #include "modes/overworld.hpp"
 #include "modes/standard_race.hpp"
 #include "modes/tutorial_world.hpp"
@@ -692,6 +693,12 @@ void RaceManager::startNextRace()
             World::setWorld(new TagZombieArenaBattle());
         else if (m_minor_mode == MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE)
             World::setWorld(new TagZombieArenaBattle());
+        else if (m_minor_mode == MINOR_MODE_HOT_POTATO_ARENA_BATTLE)
+            World::setWorld(new HotPotato());
+        else if (m_minor_mode == MINOR_MODE_HOT_POTATO_TIME_ARENA_BATTLE)
+            World::setWorld(new HotPotato());
+        else if (m_minor_mode == MINOR_MODE_KING_HAT_ARENA_BATTLE)
+            World::setWorld(new HotPotato());
     }
     else if(m_minor_mode==MINOR_MODE_SOCCER)
         World::setWorld(new SoccerWorld());
@@ -1327,6 +1334,12 @@ const core::stringw RaceManager::getNameOf(const MinorRaceModeType mode)
         case MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE:      return _("Tag zombie survivor");
         //I18N: Game mode
         case MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE: return _("Tag zombie all survivor");
+        //I18N: Game mode
+        case MINOR_MODE_HOT_POTATO_ARENA_BATTLE: return _("Hot potato");
+        //I18N: Game mode
+        case MINOR_MODE_HOT_POTATO_TIME_ARENA_BATTLE: return _("Hot potato with time");
+        //I18N: Game mode
+        case MINOR_MODE_KING_HAT_ARENA_BATTLE: return _("King hat");
         //I18N: Game mode
         case MINOR_MODE_EASTER_EGG:     return _("Egg Hunt");
         //I18N: Game mode

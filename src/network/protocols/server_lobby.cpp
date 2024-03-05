@@ -662,6 +662,9 @@ void ServerLobby::updateTracksForMode()
         case RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE:
         case RaceManager::MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE:
         case RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE:
+        case RaceManager::MINOR_MODE_HOT_POTATO_ARENA_BATTLE:
+        case RaceManager::MINOR_MODE_HOT_POTATO_TIME_ARENA_BATTLE:
+        case RaceManager::MINOR_MODE_KING_HAT_ARENA_BATTLE:
         {
             auto it = m_available_kts.second.begin();
             while (it != m_available_kts.second.end())
@@ -2719,6 +2722,9 @@ void ServerLobby::startSelection(const Event *event)
         case RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE:
         case RaceManager::MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE:
         case RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE:
+        case RaceManager::MINOR_MODE_HOT_POTATO_ARENA_BATTLE:
+        case RaceManager::MINOR_MODE_HOT_POTATO_TIME_ARENA_BATTLE:
+        case RaceManager::MINOR_MODE_KING_HAT_ARENA_BATTLE:
         {
             m_default_vote->m_num_laps = 0;
             m_default_vote->m_reverse = rg.get(2) == 0;
@@ -5628,7 +5634,12 @@ void ServerLobby::addLiveJoinPlaceholder(
         mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE ||
         mode == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE ||
         mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE ||
-        mode == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE || mode == RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE || mode == RaceManager::MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE) {
+        mode == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE || 
+        mode == RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE || 
+        mode == RaceManager::MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE ||
+        mode == RaceManager::MINOR_MODE_HOT_POTATO_ARENA_BATTLE ||
+        mode == RaceManager::MINOR_MODE_HOT_POTATO_TIME_ARENA_BATTLE ||
+        mode == RaceManager::MINOR_MODE_KING_HAT_ARENA_BATTLE) {
 
     }
     if (RaceManager::get()->isTagzArenaBattleMode() || 

@@ -256,7 +256,8 @@ void TracksScreen::beforeAddingWidget()
             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE ||
             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE ||
             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE ||
-            RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE)
+            RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE ||
+            RaceManager::get()->isHotPotatoKingHatMode())
         {
             m_vote_list->addColumn(irr_driver->getTexture
                 (file_manager->getAsset(FileManager::GUI_ICON,

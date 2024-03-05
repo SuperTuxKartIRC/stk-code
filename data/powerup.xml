@@ -269,6 +269,22 @@
     </weights>
   </tagzombie-weight-list>
   
+  <hotpotato-weight-list>
+    <weights num-karts="1">
+      <!--              bubble  cake  barrel  bowl  zipper  plunger  switch swattr rubber para  anvil-->
+      <weight single  ="40      12    20      240   10      30       40     120    0      20    10"   
+              multi   ="0       0     0       20    0       5        0      0      0      0     0 "    />
+    </weights>
+  </hotpotato-weight-list>
+  
+  <kinghat-weight-list>
+    <weights num-karts="1">
+      <!--              bubble  cake  barrel  bowl  zipper  plunger  switch swattr rubber para  anvil-->
+      <weight single  ="40      12    20      240   10      30       40     120    0      20    10"   
+              multi   ="0       0     0       20    0       5        0      0      0      0     0 "    />
+    </weights>
+  </kinghat-weight-list>
+  
 
   <soccer-weight-list>
     <weights num-karts="1">

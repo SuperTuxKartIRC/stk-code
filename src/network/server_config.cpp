@@ -258,6 +258,15 @@ std::pair<RaceManager::MinorRaceModeType, RaceManager::MajorRaceModeType>
         case 15:
             return { RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE,
                 RaceManager::MAJOR_MODE_SINGLE };
+        case 16:
+            return { RaceManager::MINOR_MODE_HOT_POTATO_ARENA_BATTLE,
+                RaceManager::MAJOR_MODE_SINGLE };
+        case 17:
+            return { RaceManager::MINOR_MODE_HOT_POTATO_TIME_ARENA_BATTLE,
+                RaceManager::MAJOR_MODE_SINGLE };
+        case 18:
+            return { RaceManager::MINOR_MODE_KING_HAT_ARENA_BATTLE,
+                RaceManager::MAJOR_MODE_SINGLE };
         default:
             break;
     }

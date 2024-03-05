@@ -126,6 +126,25 @@ public:
                 m_prev_value = 8;
                 break;
             }
+            case RaceManager::MINOR_MODE_HOT_POTATO_ARENA_BATTLE:
+            {
+                m_prev_mode = 2;
+                m_prev_value = 9;
+                break;
+            }
+            case RaceManager::MINOR_MODE_HOT_POTATO_TIME_ARENA_BATTLE:
+            {
+                m_prev_mode = 2;
+                m_prev_value = 10;
+                break;
+            }
+            case RaceManager::MINOR_MODE_KING_HAT_ARENA_BATTLE:
+            {
+                m_prev_mode = 2;
+                m_prev_value = 11;
+                break;
+            }
+
             default:
             {
                 m_prev_mode = 0;

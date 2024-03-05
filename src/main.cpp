@@ -1264,6 +1264,24 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
             RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE);
             break;
         }
+        case 13:
+        {
+            ServerConfig::m_server_mode = 16;
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_HOT_POTATO_ARENA_BATTLE);
+            break;
+        }
+        case 14:
+        {
+            ServerConfig::m_server_mode = 17;
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_HOT_POTATO_TIME_ARENA_BATTLE);
+            break;
+        }
+        case 15:
+        {
+            ServerConfig::m_server_mode = 18;
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_KING_HAT_ARENA_BATTLE);
+            break;
+        }
         default:
             Log::warn("main", "Invalid race mode '%d' - ignored.", n);
         }

@@ -53,6 +53,9 @@ static const std::string IDENT_TEAM_L("BATTLE_TEAM_LIFE");
 static const std::string IDENT_TAG_Z("BATTLE_TAG_ZOMBIE");
 static const std::string IDENT_TAG_Z_S("BATTLE_TAG_ZOMBIE_SURVIVOR");
 static const std::string IDENT_TAG_Z_LS("BATTLE_TAG_ZOMBIE_LAST_SURVIVOR");
+static const std::string IDENT_HOTP("MINOR_MODE_HOT_POTATO_ARENA_BATTLE");
+static const std::string IDENT_HOTP_T("MINOR_MODE_HOT_POTATO_TIME_ARENA_BATTLE");
+static const std::string IDENT_KING_H("BATTLE_TAG_ZOMBIE_LAST_SURVIVOR");
 static const std::string IDENT_EASTER("EASTER_EGG_HUNT");
 static const std::string IDENT_SOCCER("SOCCER");
 static const std::string IDENT_GHOST("GHOST");
@@ -132,6 +135,9 @@ public:
         MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE = BATTLE_ARENA(8),
         MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE = BATTLE_ARENA(9),
         MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE = BATTLE_ARENA(10),
+        MINOR_MODE_HOT_POTATO_ARENA_BATTLE = BATTLE_ARENA(11),
+        MINOR_MODE_HOT_POTATO_TIME_ARENA_BATTLE = BATTLE_ARENA(12),
+        MINOR_MODE_KING_HAT_ARENA_BATTLE = BATTLE_ARENA(13),
 
         MINOR_MODE_EASTER_EGG = EASTER_EGG(0),
 
@@ -171,6 +177,9 @@ public:
         case MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE:                return IDENT_TAG_Z;
         case MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE:       return IDENT_TAG_Z_S;
         case MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE:  return IDENT_TAG_Z_LS;
+        case MINOR_MODE_HOT_POTATO_ARENA_BATTLE:                return IDENT_HOTP;
+        case MINOR_MODE_HOT_POTATO_TIME_ARENA_BATTLE:           return IDENT_HOTP_T;
+        case MINOR_MODE_KING_HAT_ARENA_BATTLE:                  return IDENT_KING_H;
         case MINOR_MODE_CAPTURE_THE_FLAG:                       return IDENT_CTF;
         case MINOR_MODE_EASTER_EGG:                             return IDENT_EASTER;
         case MINOR_MODE_SOCCER:                                 return IDENT_SOCCER;
@@ -201,6 +210,9 @@ public:
         case MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE:               return "/gui/icons/mode_tag_arena.png";
         case MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE:      return "/gui/icons/mode_tag_arena.png";
         case MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE: return "/gui/icons/mode_tag_arena.png";
+        case MINOR_MODE_HOT_POTATO_ARENA_BATTLE:               return "/gui/icons/mode_hotpotato_arena.png";
+        case MINOR_MODE_HOT_POTATO_TIME_ARENA_BATTLE:          return "/gui/icons/mode_hotpotato_arena.png";
+        case MINOR_MODE_KING_HAT_ARENA_BATTLE:                 return "/gui/icons/mode_kinghat_arena.png";
         case MINOR_MODE_EASTER_EGG:                            return "/gui/icons/mode_easter.png";
         case MINOR_MODE_SOCCER:                                return "/gui/icons/mode_soccer.png";
         default: assert(false); return NULL;
@@ -229,6 +241,9 @@ public:
         case MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE:                 return false;
         case MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE:        return false;
         case MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE:   return false;
+        case MINOR_MODE_HOT_POTATO_ARENA_BATTLE:                 return false;
+        case MINOR_MODE_HOT_POTATO_TIME_ARENA_BATTLE:            return false;
+        case MINOR_MODE_KING_HAT_ARENA_BATTLE:                   return false;
         case MINOR_MODE_EASTER_EGG:                              return false;
         case MINOR_MODE_SOCCER:                                  return true;
         default: assert(false);                                  return false;
@@ -257,6 +272,9 @@ public:
         else if (name == IDENT_TAG_Z)            return MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE;
         else if (name == IDENT_TAG_Z_S)          return MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE;
         else if (name == IDENT_TAG_Z_LS)         return MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE;
+        else if (name == IDENT_HOTP)             return MINOR_MODE_HOT_POTATO_ARENA_BATTLE;
+        else if (name == IDENT_HOTP_T)           return MINOR_MODE_HOT_POTATO_TIME_ARENA_BATTLE;
+        else if (name == IDENT_KING_H)           return MINOR_MODE_KING_HAT_ARENA_BATTLE;
         else if (name == IDENT_EASTER)           return MINOR_MODE_EASTER_EGG;
         else if (name == IDENT_SOCCER)           return MINOR_MODE_SOCCER;
 
@@ -662,6 +680,9 @@ public:
         case MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE:                return "tag-zombie-arena";
         case MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE:       return "tag-zombie-survivor-arena";
         case MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE:  return "tag-zombie-last-survivor-arena";
+        case MINOR_MODE_HOT_POTATO_ARENA_BATTLE:                return "hot-potato-arena";
+        case MINOR_MODE_HOT_POTATO_TIME_ARENA_BATTLE:           return "hot-potato-time-arena";
+        case MINOR_MODE_KING_HAT_ARENA_BATTLE:                  return "king-hat-arena";
         case MINOR_MODE_EASTER_EGG:                             return "egg-hunt";
         case MINOR_MODE_SOCCER:                                 return "soccer";
         default: assert(false);                                 return "";
@@ -888,6 +909,28 @@ public:
     }   // isSoccerMode
 
     // ----------------------------------------------------------------------------------------
+    /** \brief Returns true if the current mode is a hot potato or king hat arena mode. */
+    bool isHotPotatoKingHatMode() const
+    {
+        const int id = (int)m_minor_mode;
+        // This uses the  numerical id of the mode, see the macros
+        // LINEAR_RACE and MINOR_MODE_KING_HAT_ARENA_BATTLE above for exact meaning.
+        if (id >= 2011 && id <= 2013) return true;
+        else            return false;
+    }   // isHotPotatoKingHatMode
+
+        // ----------------------------------------------------------------------------------------
+    /** \brief Returns true if the current mode is a hot potato arena mode. */
+    bool isHotPotatoMode() const
+    {
+        const int id = (int)m_minor_mode;
+        // This uses the  numerical id of the mode, see the macros
+        // LINEAR_RACE and MINOR_MODE_HOT_POTATO_TIME_ARENA_BATTLE above for exact meaning.
+        if (id >= 2011 && id <= 2012) return true;
+        else            return false;
+    }   // isHotPotatoMode
+
+    // ----------------------------------------------------------------------------------------
     bool isTutorialMode() const { return m_minor_mode == MINOR_MODE_TUTORIAL; }
 
     // ----------------------------------------------------------------------------------------
@@ -897,6 +940,8 @@ public:
     bool isCTFMode() const { return m_minor_mode == MINOR_MODE_CAPTURE_THE_FLAG; }
     // ----------------------------------------------------------------------------------------
     bool isTABLifeMode() const { return m_minor_mode == MINOR_MODE_TEAM_ARENA_BATTLE_LIFE; }
+    // ----------------------------------------------------------------------------------------
+    bool isKingHatMode() const { return m_minor_mode == MINOR_MODE_KING_HAT_ARENA_BATTLE; }
     // ----------------------------------------------------------------------------------------
     bool isEggHuntMode() const { return m_minor_mode == MINOR_MODE_EASTER_EGG; }
 
@@ -1112,6 +1157,9 @@ public:
             m_minor_mode == MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE ||
             m_minor_mode == MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE ||
             m_minor_mode == MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE ||
+            m_minor_mode == MINOR_MODE_HOT_POTATO_ARENA_BATTLE ||
+            m_minor_mode == MINOR_MODE_HOT_POTATO_TIME_ARENA_BATTLE ||
+            m_minor_mode == MINOR_MODE_KING_HAT_ARENA_BATTLE ||
             m_minor_mode == MINOR_MODE_FREE_FOR_ALL;
     }
 

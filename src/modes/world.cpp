@@ -235,7 +235,8 @@ void World::init()
          mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE ||
          mode == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE || //
          mode == RaceManager::MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE || //
-         mode == RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE) &&
+         mode == RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE || 
+         RaceManager::get()->isHotPotatoKingHatMode()) &&
         !NetworkConfig::get()->isNetworking())
     {
         track->shuffleStartTransforms();
@@ -1958,6 +1959,13 @@ void World::updateAchievementModeCounters(bool start)
             PlayerManager::increaseAchievement(start ? ACS::TAG_ZOMBIE_SURVIVOR_ARENA_STARTED : ACS::TAG_ZOMBIE_SURVIVOR_ARENA_FINISHED, 1);
         else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE)
             PlayerManager::increaseAchievement(start ? ACS::TAG_ZOMBIE_LAST_SURVIVOR_ARENA_STARTED : ACS::TAG_ZOMBIE_LAST_SURVIVOR_ARENA_FINISHED, 1);
+        
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_HOT_POTATO_ARENA_BATTLE)
+            PlayerManager::increaseAchievement(start ? ACS::HOT_POTATO_ARENA_STARTED : ACS::HOT_POTATO_ARENA_FINISHED, 1);
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_HOT_POTATO_TIME_ARENA_BATTLE)
+            PlayerManager::increaseAchievement(start ? ACS::HOT_POTATO_ARENA_TIME_ARENA_STARTED : ACS::HOT_POTATO_ARENA_TIME_ARENA_FINISHED, 1);
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_KING_HAT_ARENA_BATTLE)
+            PlayerManager::increaseAchievement(start ? ACS::KING_HAT_STARTED : ACS::KING_HAT_FINISHED, 1);
     }
     else // normal races
         PlayerManager::increaseAchievement(start ? ACS::NORMAL_STARTED : ACS::NORMAL_FINISHED,1);

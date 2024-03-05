@@ -150,7 +150,9 @@ void PowerupManager::loadPowerupsModels()
     loadWeights(root, "ftl-weight-list"         );
     loadWeights(root, "battle-weight-list"      );
     loadWeights(root, "teamsarena-weight-list"  );
-    loadWeights(root, "tagzombie-weight-list"   );
+    loadWeights(root, "tagzombie-weight-list");
+    loadWeights(root, "hotpotato-weight-list");
+    loadWeights(root, "kinghat-weight-list"   );
     loadWeights(root, "soccer-weight-list"      );
     loadWeights(root, "tutorial-weight-list"    );
 
@@ -541,6 +543,9 @@ void PowerupManager::computeWeightsForRace(int num_karts)
     case RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE:               class_name = "tagzombie";    break;
     case RaceManager::MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE:      class_name = "tagzombie";    break;
     case RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE: class_name = "tagzombie";    break;
+    case RaceManager::MINOR_MODE_HOT_POTATO_ARENA_BATTLE:               class_name = "hotpotato";    break;
+    case RaceManager::MINOR_MODE_HOT_POTATO_TIME_ARENA_BATTLE:          class_name = "hotpotato";    break;
+    case RaceManager::MINOR_MODE_KING_HAT_ARENA_BATTLE:                 class_name = "kinghat";    break;
     case RaceManager::MINOR_MODE_TUTORIAL:                              class_name = "tutorial";     break;
     case RaceManager::MINOR_MODE_EASTER_EGG:                            /* fall through */
     case RaceManager::MINOR_MODE_OVERWORLD:                           
