@@ -120,10 +120,10 @@ public:
         //m_scores.at(kart_id) = 0;
     }
     // ------------------------------------------------------------------------
-    virtual std::pair<uint32_t, uint32_t> getGameStartedProgress() const OVERRIDE
-    {
-        
-    }
+    //virtual std::pair<uint32_t, uint32_t> getGameStartedProgress() const OVERRIDE
+    //{
+    //    return;
+    //}
     // ------------------------------------------------------------------------
     virtual void saveCompleteState(BareNetworkString* bns, STKPeer* peer) OVERRIDE;
     // ------------------------------------------------------------------------
