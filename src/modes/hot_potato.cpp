@@ -1,4 +1,4 @@
-#include "hot_potato.hpp"
+ï»¿#include "hot_potato.hpp"
 
 #include "audio/music_manager.hpp"
 #include "karts/abstract_kart.hpp"
@@ -11,10 +11,6 @@
 
 HotPotato::HotPotato()
 {
-    if (RaceManager::get()->hasTimeTarget())
-        WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN, RaceManager::get()->getTimeTarget());
-    else
-        WorldStatus::setClockMode(CLOCK_CHRONO); // Only this line ??
 }
 
 HotPotato::~HotPotato()
@@ -26,7 +22,6 @@ void HotPotato::init()
 {
     WorldWithRank::init();
     m_display_rank = false;
-    m_count_down_reached_zero = false;
     m_use_highscores = false;
     initGameInfo();
 }   // init
@@ -35,19 +30,24 @@ void HotPotato::init()
 void HotPotato::reset(bool restart)
 {
     WorldWithRank::reset(restart);
-    m_count_down_reached_zero = false;
-    if (RaceManager::get()->hasTimeTarget())
-        WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN, RaceManager::get()->getTimeTarget());
-    else
-        WorldStatus::setClockMode(CLOCK_CHRONO);
     initGameInfo();
 }   // reset
 
 // ----------------------------------------------------------------------------
 void HotPotato::initGameInfo()
 {
+    if (RaceManager::get()->hasTimeTarget())
+        WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN, RaceManager::get()->getTimeTarget());
+    else
+        WorldStatus::setClockMode(CLOCK_CHRONO); // Only this line ??
+
+    m_count_down_reached_zero = false;
     m_kart_info.clear();
     m_kart_info.resize(getNumKarts());
+
+    m_time_set_object = getTime();
+    m_nb_player_inlife = getNumKarts();
+    m_nb_total_player = getNumKarts();
 }
 
 // ----------------------------------------------------------------------------
@@ -65,15 +65,12 @@ void HotPotato::countdownReachedZero()
 void HotPotato::terminateRace()
 {
     //const unsigned int kart_amount = getNumKarts();
-    //int size = World::getWinningTeam().size();
-    //for ( int i = 0; i < kart_amount; i++)
+    //int size = World::getwinningteam().size();
+    //if (std::find(0, size, i) != size)
     //{
-    //    getKart(i)->finishedRace(0.0f, true/*from_server*/);
-    //    //if (std::find(0, size, i) != size)
-    //    //{
-    //    //    m_karts[i]->getKartModel()->setAnimation(KartModel::AF_WIN_START, true/* play_non_loop*/);
-    //    //}
-    //}   // i<kart_amount
+    //}
+    // Ã€ MODIFIER !!!
+    m_karts[0]->getKartModel()->setAnimation(KartModel::AF_WIN_START, true/* play_non_loop*/);
     WorldWithRank::terminateRace();
 }   // terminateRace
 
@@ -89,14 +86,10 @@ void HotPotato::getKartsDisplayInfo(
         RaceGUIBase::KartIconDisplayInfo& rank_info = (*info)[i];
         rank_info.lap = -1;
         rank_info.m_outlined_font = true;
-        if (getKartTeam(i) == KART_TEAM_RED)
-            rank_info.m_color = video::SColor(255, 255, 0, 0);
-        else if (getKartTeam(i) == KART_TEAM_BLUE)
-            rank_info.m_color = video::SColor(255, 0, 0, 255);
-        else if (getKartTeam(i) == KART_TEAM_GREEN)
-            rank_info.m_color = video::SColor(255, 0, 255, 0);
-        else if (getKartTeam(i) == KART_TEAM_ORANGE)
-            rank_info.m_color = video::SColor(255, 255, 165, 0);
+        if (m_kart_info[i].m_has_object)
+            rank_info.m_color = video::SColor(255, 255, 0, 0); // Better color (red)
+        else 
+            rank_info.m_color = video::SColor(255, 0, 0, 0); // Black color
         rank_info.m_text = getKart(i)->getController()->getName();
         if (RaceManager::get()->getKartGlobalPlayerId(i) > -1)
         {
@@ -109,7 +102,7 @@ void HotPotato::getKartsDisplayInfo(
             }
         }
         rank_info.m_text += core::stringw(L" (") +
-            StringUtils::toWString(m_kart_info[i].m_scores) + L")";
+            StringUtils::toWString(m_kart_info[i].m_number_times_with_object) + L")";
     }
 }   // getKartsDisplayInfo
 
@@ -133,7 +126,18 @@ bool HotPotato::kartHit(int kart_id, int hitter)
     if (isRaceOver())
         return false;
 
-    handleScoreInServer(kart_id, hitter);
+    if (hitter != -1) 
+    {
+        if (m_kart_info.at(kart_id).m_has_object)
+            handleScoreInServer(kart_id, hitter); // First Id is the Id of the player with the object 
+        else if (m_kart_info.at(hitter).m_has_object)
+            handleScoreInServer(hitter, kart_id); // First Id is the Id of the player with the object 
+    }
+    else 
+    {
+        //handleScoreInServer(kart_id, hitter);
+    }
+
     return true;
 }   // kartHit
 
@@ -144,35 +148,45 @@ bool HotPotato::kartHit(int kart_id, int hitter)
  */
 void HotPotato::handleScoreInServer(int kart_id, int hitter)
 {
-    //int team;
-    //if (kart_id == hitter || hitter == -1) {
-    //    m_kart_info[kart_id].m_scores--;
-    //    team = (int)getKartTeam(kart_id);
-    //    m_teams[team].m_scores_teams--;
+    bool playAnimationWin = false;
 
-    //    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER ||
-    //        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER) {
-    //        if (m_kart_info[kart_id].get_score == true && m_kart_info[kart_id].m_scores < hit_capture_limit) {
-    //            m_kart_info[kart_id].get_score = false;
-    //            m_teams[team].m_total_player_get_score--;
-    //        }
-    //    }
-    //    getKart(kart_id)->getKartModel()->setAnimation(KartModel::AF_WIN_START, true/*play_non_loop*/);
-    //}
-    //else {
-    //    m_kart_info[hitter].m_scores++;
-    //    team = (int)getKartTeam(hitter);
-    //    m_teams[team].m_scores_teams++;
+    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_KING_HAT_ARENA_BATTLE) {
+        playAnimationWin = true;
+    }
 
-    //    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER ||
-    //        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER) {
-    //        if (m_kart_info[hitter].get_score == false && m_kart_info[hitter].m_scores >= hit_capture_limit) {
-    //            m_kart_info[hitter].get_score = true;
-    //            m_teams[team].m_total_player_get_score++;
-    //        }
-    //    }
-    //    getKart(hitter)->getKartModel()->setAnimation(KartModel::AF_WIN_START, true/*play_non_loop*/);
+    if (hitter == -1) 
+    {
+        // Some logique 
+    }
+
+    //if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_HOT_POTATO_ARENA_BATTLE ||
+    //    RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_HOT_POTATO_ARENA_BATTLE) {
+
     //}
+
+    m_kart_info.at(kart_id).m_has_object = false;
+    m_kart_info.at(kart_id).m_total_time_with_object += getTime() - m_kart_info.at(kart_id).m_last_start_with_object;
+    
+    m_kart_info.at(hitter).m_has_object = true;
+    m_kart_info.at(hitter).m_last_start_with_object = getTime();
+    m_kart_info.at(hitter).m_last_player_touched = kart_id;
+    m_kart_info.at(hitter).m_number_times_with_object++;
+
+    if (RaceManager::get()->hasLifeTarget()) 
+    {
+        if (m_kart_info.at(hitter).m_lives > 0)
+            m_kart_info.at(hitter).m_lives--;
+        else 
+            m_karts[hitter]->finishedRace(WorldStatus::getTime());
+    }
+
+    // Autres changements 
+
+    // Have maked a points // Animation 
+    if(playAnimationWin)
+        getKart(hitter)->getKartModel()->setAnimation(KartModel::AF_WIN_START, true/*play_non_loop*/);
+    else 
+        getKart(hitter)->getKartModel()->setAnimation(KartModel::AF_LOSE_START, true/*play_non_loop*/);
 
 
     if (NetworkConfig::get()->isNetworking() &&
@@ -202,13 +216,22 @@ void HotPotato::update(int ticks)
     if (Track::getCurrentTrack()->hasNavMesh())
         updateSectorForKarts();
 
+    float time = getTime();
+    if ((RaceManager::get()->hasTimeTarget() && m_time_set_object - getTime()  > m_duration_of_object) || 
+        (!RaceManager::get()->hasTimeTarget() && getTime() - m_time_set_object > m_duration_of_object)) // getTime() - m_time_set_object > m_duration_of_object
+    {
+        setObjectDuration();
+        setPlayerObject();
+    }
+
+
     std::vector<std::pair<int, int> > ranks;
     for (unsigned i = 0; i < m_kart_info.size(); i++)
     {
         // For eliminated (disconnected or reserved player) make his score
         // int min so always last in rank
         int cur_score = getKart(i)->isEliminated() ?
-            std::numeric_limits<int>::min() : m_kart_info[i].m_scores;
+            std::numeric_limits<int>::min() : m_kart_info[i].m_number_times_with_object; // Inverse
         ranks.emplace_back(i, cur_score);
     }
     std::sort(ranks.begin(), ranks.end(),
@@ -222,37 +245,6 @@ void HotPotato::update(int ticks)
     endSetKartPositions();
 }   // update
 
-
-// ----------------------------------------------------------------------------
-video::SColor HotPotato::getColor(unsigned int kart_id) const
-{
-    return GUIEngine::getSkin()->getColor("font::normal");
-    /* getKartTeamsColor(kart_id) == KART_TEAM_COLOR_BLUE ? (0, 0, 255, 255) :
-
-     KART_TEAM_COLOR_RED ? (255, 0, 0, 255) :
-
-     KART_TEAM_COLOR_GREEN ? (0, 255, 0, 255) :
-
-     KART_TEAM_COLOR_YELLOW ? (255, 255, 0, 255) :
-
-     KART_TEAM_COLOR_ORANGE ? (255, 165, 0, 255) :
-
-     KART_TEAM_COLOR_PURPLE ? (128, 0, 128, 255) :
-
-     KART_TEAM_COLOR_PINK ? (255, 192, 203, 255) :
-
-     KART_TEAM_COLOR_TURQUOISE ? (0, 206, 209, 255) :
-
-     KART_TEAM_COLOR_DARK_BLUE ? (0, 0, 139, 255) :
-
-     KART_TEAM_COLOR_CYAN ? (0, 255, 255, 255) :
-
-     KART_TEAM_COLOR_DEFAULT ? (255, 182, 193, 255) :
-
-     (255, 182, 193, 255);*/
-
-}   // getColor
-
 // ----------------------------------------------------------------------------
 bool HotPotato::isRaceOver()
 {
@@ -265,53 +257,46 @@ bool HotPotato::isRaceOver()
     //    return false;
 
 
+    // Use in HOT_POTATO_TIME and KING_HAT gamemodes
     if (m_count_down_reached_zero && RaceManager::get()->hasTimeTarget()) {
-
         //HotPotato::setWinningTeams();
         return true;
     }
 
-    //else if (hit_capture_limit > 0) {
-    //    for (int i = 0; i < 4; i++) // TODO : La valeur du 4 dois être changer par le nombre d'équipe // William Lussier 2023-10-09 8h37
-    //    {
-    //        if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM) {
-    //            if (m_teams[i].m_scores_teams >= hit_capture_limit) {
-    //                // Set the winning team
-    //                World::setWinningTeam(i);
-    //                return true;
-    //            }
-    //            else if (hit_capture_limit > 1 && m_teams[i].m_scores_teams >= hit_capture_limit - 1) {
-    //                if (!m_faster_music_active)
-    //                {
-    //                    music_manager->switchToFastMusic();
-    //                    m_faster_music_active = true;
-    //                }
-    //            }
-    //        }
-    //        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER) {
-    //            if (m_teams[i].m_total_player > 0 && m_teams[i].m_total_player_get_score == m_teams[i].m_total_player) {
-    //                // Set the winning team
-    //                World::setWinningTeam(i);
-    //                return true;
-    //            }
-    //            else if (m_teams[i].m_total_player > 1 && m_teams[i].m_total_player_get_score == m_teams[i].m_total_player - 1) {
-    //                if (!m_faster_music_active)
-    //                {
-    //                    music_manager->switchToFastMusic();
-    //                    m_faster_music_active = true;
-    //                }
-    //            }
-    //        }
-    //        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER) {
-    //            if (m_teams[i].m_total_player > 0 && m_teams[i].m_total_player_get_score == 1) {
-    //                // Set the winning team
-    //                World::setWinningTeam(i);
-    //                return true;
-    //            }
-    //        }
-    //        // TODO : dois aussi regarder si les joueurs encore en vie font partie de la même équipe
-    //    }
-    //}
+    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_HOT_POTATO_ARENA_BATTLE) 
+    {
+        const unsigned int kart_amount = getNumKarts(); // m_nb_total_player
+        if (m_nb_total_player > kart_amount) 
+        {
+            m_nb_total_player = (m_nb_total_player - kart_amount);
+            m_nb_player_inlife -= (m_nb_total_player - kart_amount);
+        }
+        //if (m_nb_player_inlife == 1) 
+        //    return true;
+
+        if (m_nb_player_inlife <= 3)
+            m_have_to_play_speed_music = true;
+    }
+    // Usefull or not ???
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_HOT_POTATO_TIME_ARENA_BATTLE)
+    {
+        // Do nothing ???
+    }
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_KING_HAT_ARENA_BATTLE)
+    {
+        // Check for a number of points 
+    }
+
+    // La fin de partie approche 
+    if (m_have_to_play_speed_music) 
+    {
+        if (!m_faster_music_active)
+        {
+            music_manager->switchToFastMusic();
+            m_faster_music_active = true;
+        }
+    }
+
 
     return false;
 }   // isRaceOver
@@ -320,18 +305,18 @@ bool HotPotato::isRaceOver()
 /** Returns the internal identifier for this race. */
 const std::string& HotPotato::getIdent() const
 {
-    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM)
-        return IDENT_TEAM_PT;
-    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER)
-        return IDENT_TEAM_PP;
-    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER)
-        return IDENT_TEAM_APP;
+    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_HOT_POTATO_ARENA_BATTLE)
+        return IDENT_HOTP;
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_HOT_POTATO_TIME_ARENA_BATTLE)
+        return IDENT_HOTP_T;
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_KING_HAT_ARENA_BATTLE)
+        return IDENT_KING_H;
 }   // getIdent
 
 // ----------------------------------------------------------------------------
 void HotPotato::saveCompleteState(BareNetworkString* bns, STKPeer* peer)
 {
-    // TODO : Vérifier que ça fonctionne // William Lussier 2023-10-07 12h00
+    // TODO : VÃ©rifier que Ã§a fonctionne // William Lussier 2023-10-07 12h00
     //for (unsigned i = 0; i < m_teams.size(); i++)
     //    bns->addUInt32(m_teams[i].m_scores_teams);
 }   // saveCompleteState
@@ -339,22 +324,71 @@ void HotPotato::saveCompleteState(BareNetworkString* bns, STKPeer* peer)
 // ----------------------------------------------------------------------------
 void HotPotato::restoreCompleteState(const BareNetworkString& b)
 {
-    // TODO : Vérifier que ça fonctionne // William Lussier 2023-10-07 12h00
+    // TODO : VÃ©rifier que Ã§a fonctionne // William Lussier 2023-10-07 12h00
     //for (unsigned i = 0; i < m_teams.size(); i++)
     //    m_teams[i].m_scores_teams = b.getUInt32();
 }   // restoreCompleteState
 
 bool HotPotato::hasWin(int kartId)
 {
-    // Obtenez la valeur de l'équipe du kartId
+    // Obtenez la valeur de l'Ã©quipe du kartId
     int kartTeam = getKartTeam(kartId);
 
     // Recherchez la valeur dans la liste m_winning_teams
     auto it = std::find(m_winning_teams.begin(), m_winning_teams.end(), kartTeam);
 
-    // Vérifiez si la valeur a été trouvée
+    // VÃ©rifiez si la valeur a Ã©tÃ© trouvÃ©e
     if (it != m_winning_teams.end())
         return true;
     else
         return false;
+}
+
+void HotPotato::setObjectDuration()
+{
+    m_duration_of_object = 20;
+    m_time_set_object = getTime();
+}
+
+void HotPotato::setPlayerObject()
+{
+    if(m_player_id_with_object != -1)
+        m_karts[m_player_id_with_object]->finishedRace(WorldStatus::getTime());
+    setRandomPlayer();
+    m_kart_info[m_player_id_with_object].m_has_object = true;
+    setPlayerVisualChangeObject();
+}
+
+void HotPotato::setRandomPlayer()
+{
+    std::srand(static_cast<unsigned>(std::time(0))); // Seed the random number generator
+
+    if (getNumKarts() > 0) {
+        std::set<int> selectedIndices; // Utiliser un ensemble pour ï¿½viter les doublons
+
+        int index = std::rand() % getNumKarts();
+        if (m_last_player_id != index)
+        {
+            m_last_player_id = index;
+            m_player_id_with_object = index;
+        }
+        
+    }
+}
+
+void HotPotato::setPlayerVisualChangeObject() 
+{
+    // Set the dynamite or the hat to the player + set new color ??
+
+
+    // Set Red color 
+    AbstractKart* kart = World::getWorld()->getKart(m_player_id_with_object);
+    HandicapLevel hl = kart->getHandicap();
+    std::shared_ptr<GE::GERenderInfo> ri;
+    ri = std::make_shared<GE::GERenderInfo>(1.0f, false);
+    if (NetworkConfig::get()->isNetworking()) {
+        //kart->changeKart(kart->getIdent(), hl, ri, RaceManager::get()->getKartInfo(idKart).getKartData());
+    }
+    else
+        kart->changeKart(kart->getIdent(), hl, ri);
 }

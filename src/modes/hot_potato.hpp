@@ -46,17 +46,28 @@ private:
     int m_total_rescue;
     int m_total_hit;
 
-    struct BattleInfo
+    struct PlayerInfo
     {
-        int  m_scores;
-        bool get_score = false;
-        // For team_arena_battle_life
+        float m_total_time_with_object;
+        float m_last_start_with_object; // To help calculate m_total_time_with_object
+        int m_number_times_with_object;
+        int m_last_player_touched = -1; // PlayerId 
+        bool m_has_object;
+        int m_number_points = 0; // For the victory screen
+        // Usefull or not ??
         int  m_lives = RaceManager::get()->getLifeTarget();
     };
 
 protected:
-    std::vector<BattleInfo> m_kart_info;
+    std::vector<PlayerInfo> m_kart_info;
     int m_nb_player_inlife;
+    int m_nb_total_player;
+    bool m_have_to_play_speed_music = false;
+    float m_duration_of_object = 15; // For dynamite (Potato) and hat
+    float m_time_set_object = getTime();
+
+    int m_last_player_id;
+    int m_player_id_with_object = -1;
     //int hit_capture_limit = RaceManager::get()->getHitCaptureLimit();
 public:
     // ------------------------------------------------------------------------
@@ -97,15 +108,21 @@ public:
     // ------------------------------------------------------------------------
     virtual void terminateRace() OVERRIDE;
     // ------------------------------------------------------------------------
-    virtual video::SColor getColor(unsigned int kart_id) const;
-    // ------------------------------------------------------------------------
     void handleScoreInServer(int kart_id, int hitter);
     // ------------------------------------------------------------------------
     virtual void setKartScoreFromServer(NetworkString& ns);
     // ------------------------------------------------------------------------
-    int getKartScore(int kart_id) const { return m_kart_info.at(kart_id).m_scores; }
+    int getKartNumTimeWithObject(int kart_id) const { return m_kart_info.at(kart_id).m_number_times_with_object; }
     // ------------------------------------------------------------------------
     bool hasWin(int kartId);
+    // ------------------------------------------------------------------------
+    void setObjectDuration();
+    // ------------------------------------------------------------------------
+    void setPlayerObject();
+    // ------------------------------------------------------------------------
+    void setPlayerVisualChangeObject();
+    // ------------------------------------------------------------------------
+    void setRandomPlayer();
     // ------------------------------------------------------------------------
     void resetKartForSwatterHit(int kart_id, int at_world_ticks)
     {

@@ -49,9 +49,9 @@ const int CONFIG_CODE_TAG_Z_ARENA     = 9;
 const int CONFIG_CODE_TAG_Z_S_ARENA   = 10;
 const int CONFIG_CODE_TAG_Z_LS_ARENA  = 11;
 const int CONFIG_CODE_TEAM_ARENA_LIFE = 12;
-const int CONFIG_CODE_HOT_POTATO_ARENA = 12;
-const int CONFIG_CODE_HOT_POTATO_TIME_ARENA = 12;
-const int CONFIG_CODE_KING_HAT_ARENA = 12;
+const int CONFIG_CODE_HOT_POTATO_ARENA = 13;
+const int CONFIG_CODE_HOT_POTATO_TIME_ARENA = 14;
+const int CONFIG_CODE_KING_HAT_ARENA = 15;
 
 using namespace GUIEngine;
 
@@ -135,6 +135,19 @@ void RaceSetupScreen::init()
     //FIXME: avoid duplicating descriptions from the help menu!
     name9 += _("Surviving zombies. Zombies must kill (or touch) all other people (survivor).");
     w2->addItem(name9, IDENT_TAG_Z, RaceManager::getIconOf(RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE));
+
+
+    irr::core::stringw name10 = irr::core::stringw(
+        RaceManager::getNameOf(RaceManager::MINOR_MODE_HOT_POTATO_ARENA_BATTLE)) + L"\n";
+    //FIXME: avoid duplicating descriptions from the help menu!
+    name10 += _("Hot potatao.");
+    w2->addItem(name10, IDENT_HOTP, RaceManager::getIconOf(RaceManager::MINOR_MODE_HOT_POTATO_ARENA_BATTLE));
+
+    //irr::core::stringw name12 = irr::core::stringw(
+    //    RaceManager::getNameOf(RaceManager::MINOR_MODE_KING_HAT_ARENA_BATTLE)) + L"\n";
+    ////FIXME: avoid duplicating descriptions from the help menu!
+    //name12 += _("King hat. You must have the hat ...");
+    //w2->addItem(name12, IDENT_KING_H, RaceManager::getIconOf(RaceManager::MINOR_MODE_KING_HAT_ARENA_BATTLE));
 
     irr::core::stringw name5 = irr::core::stringw(
         RaceManager::getNameOf(RaceManager::MINOR_MODE_SOCCER)) + L"\n";

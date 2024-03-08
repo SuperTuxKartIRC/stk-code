@@ -210,9 +210,9 @@ public:
         case MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE:               return "/gui/icons/mode_tag_arena.png";
         case MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE:      return "/gui/icons/mode_tag_arena.png";
         case MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE: return "/gui/icons/mode_tag_arena.png";
-        case MINOR_MODE_HOT_POTATO_ARENA_BATTLE:               return "/gui/icons/mode_hotpotato_arena.png";
-        case MINOR_MODE_HOT_POTATO_TIME_ARENA_BATTLE:          return "/gui/icons/mode_hotpotato_arena.png";
-        case MINOR_MODE_KING_HAT_ARENA_BATTLE:                 return "/gui/icons/mode_kinghat_arena.png";
+        case MINOR_MODE_HOT_POTATO_ARENA_BATTLE:               return "/gui/icons/mode_hotpotato.png";
+        case MINOR_MODE_HOT_POTATO_TIME_ARENA_BATTLE:          return "/gui/icons/mode_hotpotato.png";
+        case MINOR_MODE_KING_HAT_ARENA_BATTLE:                 return "/gui/icons/mode_kinghat.png";
         case MINOR_MODE_EASTER_EGG:                            return "/gui/icons/mode_easter.png";
         case MINOR_MODE_SOCCER:                                return "/gui/icons/mode_soccer.png";
         default: assert(false); return NULL;
@@ -411,7 +411,7 @@ private:
     unsigned                         m_flag_deactivated_ticks;
     int                              m_coin_target;
     float                            m_time_target;
-    int                              m_life_target;
+    int                              m_life_target = -1;
     int                              m_tag_target;
     int                              m_minor_mode_target=0;
     int                              m_goal_target;
@@ -519,6 +519,8 @@ public:
 
     // ----------------------------------------------------------------------------------------
     bool hasTimeTarget() const { return m_time_target > 0.0f; }
+    // ----------------------------------------------------------------------------------------
+    bool hasLifeTarget() const { return m_life_target > 0; }
     // ----------------------------------------------------------------------------------------
     void setMaxGoal(int max_goal)
     {
@@ -860,7 +862,7 @@ public:
         const int id = (int)m_minor_mode;
         // This uses the  numerical id of the mode, see the macros
         // LINEAR_RACE and BATTLE_ARENA above for exact meaning.
-        if ((id >= 2000 && id <= 2002) || (id >= 2004 && id <=2010)) return true;
+        if ((id >= 2000 && id <= 2002) || (id >= 2004 && id <=2013)) return true;
         else            return false;
     }   // isBattleMode
 
@@ -915,8 +917,15 @@ public:
         const int id = (int)m_minor_mode;
         // This uses the  numerical id of the mode, see the macros
         // LINEAR_RACE and MINOR_MODE_KING_HAT_ARENA_BATTLE above for exact meaning.
-        if (id >= 2011 && id <= 2013) return true;
-        else            return false;
+        //if (id >= 2011 && id <= 2013) return true;
+        //else            return false;
+
+        if (m_minor_mode == MINOR_MODE_HOT_POTATO_ARENA_BATTLE ||
+            m_minor_mode == MINOR_MODE_HOT_POTATO_TIME_ARENA_BATTLE ||
+            m_minor_mode == MINOR_MODE_KING_HAT_ARENA_BATTLE)
+            return true;
+        else 
+            return false;
     }   // isHotPotatoKingHatMode
 
         // ----------------------------------------------------------------------------------------

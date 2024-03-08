@@ -384,7 +384,32 @@ void TrackInfoScreen::init()
         m_ai_team3_label->setVisible(true);
         m_ai_team3_spinner->setActive(true);
     }
+    if (m_is_hot_potato_king_hat_arena_battle) {
+        m_target_type_label->setText(_("Game mode"), false);
+        m_target_type_spinner->clearLabels();
+        m_target_type_spinner->addLabel(_("Hot potato"));
+        m_target_type_spinner->addLabel(_("Hot potato with time"));
+        m_target_type_spinner->addLabel(_("King hat"));
+        //m_target_type_spinner->setValue(UserConfigParams::m_tag_zombie_arena_battle_mode >= 3 ? 2 : UserConfigParams::m_tag_zombie_arena_battle_mode);
 
+
+        m_target_value_spinner->setVisible(true);
+        m_target_value_label->setVisible(true);
+        m_target_value_spinner->setMin(0);
+        m_target_value_label->setText(_("Maximum time (min.)"), false);
+        //m_target_value_spinner->setValue(UserConfigParams::m_tag_zombie_arena_battle_time_limit);
+
+        
+        m_ai_kart_label->setText(_("Number of IA player"), false);
+        m_ai_kart_spinner->setMin(1);
+        //m_ai_kart_spinner->setValue(UserConfigParams::m_tag_zombie_arena_battle_nb_tag);
+
+        m_ai_kart_spinner->setMax(m_track->getMaxArenaPlayers() - 1);
+
+        m_ai_kart_spinner->setVisible(true);
+        m_ai_kart_label->setVisible(true);
+        m_ai_kart_spinner->setActive(true);
+    }
 
     // Lap count m_lap_spinner
     // -----------------------
@@ -929,7 +954,7 @@ void TrackInfoScreen::onEnterPressedInternal()
         }
 
         RaceManager::get()->setTimeTarget(m_target_value_spinner->getValue() * 60);
-        RaceManager::get()->setNumGreenAI(m_ai_team3_spinner->getValue());
+        RaceManager::get()->setNumBlueAI(m_ai_kart_spinner->getValue());
 
         getConfigValue();
 

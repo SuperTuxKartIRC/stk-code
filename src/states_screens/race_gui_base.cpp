@@ -896,6 +896,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
             minor_mode==RaceManager::MINOR_MODE_CAPTURE_THE_FLAG                      ||
             RaceManager::get()->isTeamArenaBattleMode()                               ||
             RaceManager::get()->isTagzArenaBattleMode()                               ||
+            RaceManager::get()->isHotPotatoKingHatMode()                              ||
             minor_mode==RaceManager::MINOR_MODE_EASTER_EGG                            ||
             minor_mode==RaceManager::MINOR_MODE_SOCCER)
         {
