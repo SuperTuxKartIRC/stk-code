@@ -678,19 +678,9 @@ void RaceManager::startNextRace()
             World::setWorld(new FreeForAll());
         else if (m_minor_mode == MINOR_MODE_CAPTURE_THE_FLAG)
             World::setWorld(new CaptureTheFlag());
-        else if (m_minor_mode == MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM)
+        else if (RaceManager::get()->isTeamArenaBattleMode())
             World::setWorld(new TeamArenaBattle());
-        else if (m_minor_mode == MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER)
-            World::setWorld(new TeamArenaBattle());
-        else if (m_minor_mode == MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER)
-            World::setWorld(new TeamArenaBattle());
-        else if (m_minor_mode == MINOR_MODE_TEAM_ARENA_BATTLE_LIFE)
-            World::setWorld(new TeamArenaBattlelife());
-        else if (m_minor_mode == MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE)
-            World::setWorld(new TagZombieArenaBattle());
-        else if (m_minor_mode == MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE)
-            World::setWorld(new TagZombieArenaBattle());
-        else if (m_minor_mode == MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE)
+        else if (RaceManager::get()->isTagzArenaBattleMode())
             World::setWorld(new TagZombieArenaBattle());
     }
     else if(m_minor_mode==MINOR_MODE_SOCCER)

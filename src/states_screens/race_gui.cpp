@@ -1376,7 +1376,6 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
     FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
     TeamArenaBattle* tab = dynamic_cast<TeamArenaBattle*>(World::getWorld());
-    TeamArenaBattlelife* tabl = dynamic_cast<TeamArenaBattlelife*>(World::getWorld());
     TagZombieArenaBattle* tagzab = dynamic_cast<TagZombieArenaBattle*>(World::getWorld());
 
     static video::SColor color = video::SColor(255, 255, 255, 255);
@@ -1458,7 +1457,7 @@ void RaceGUI::drawLap(const AbstractKart* kart,
         return;
     }
     // TODO : Besoins de modifications. Affichages des points pour 4 équipes // William Lussier 2023-10-21 14h44
-    if (tab || tabl) {
+    if (tab) {
         int team_score;
 
         RaceManager::MinorRaceModeType mode = RaceManager::get()->getMinorMode();
@@ -1499,7 +1498,7 @@ void RaceGUI::drawLap(const AbstractKart* kart,
             team = world->getTeamsInGame(i);
 
             if (team >= 0) {
-                team_score = modeVal == 1 ? tab->getTeamScore(team) : modeVal == 2 ? tabl->getTeamInlifePlayer((int)team) : modeVal == 3 ? tagzab->getTeamInlifePlayer((int)team) : 0;
+                team_score = modeVal == 1 ? tab->getTeamScore(team) : modeVal == 2 ? tab->getTeamInlifePlayer((int)team) : modeVal == 3 ? tagzab->getTeamInlifePlayer((int)team) : 0;
 
                 if (i != 0 && nbTeam > 1) {
                     text = L"-";

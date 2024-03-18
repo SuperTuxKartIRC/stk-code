@@ -49,9 +49,12 @@ private:
     struct BattleInfo
     {   
         int  m_scores;
-        bool get_score = false;
+        int  m_number_of_times_hit; // 
+        bool m_has_score = false;
         // For team_arena_battle_life
         int  m_lives = RaceManager::get()->getLifeTarget();
+        // For team_arena_battle_all_player_points 
+        std::vector<std::tuple<int, int>> m_victory_conditions; // List of tuples (team id, number of points required) // hasAllTeamVictoryConditions
     };
 
     struct TeamsInfo
@@ -62,13 +65,24 @@ private:
         // For team_arena_battle_life
         int  m_inlife_player;
         int  m_total_life;
+        std::vector<std::tuple<int, int>> m_victory_conditions; // List of tuples (team id, number of points required) // hasAllTeamVictoryConditions
+        int m_victory_conditions_count;
     };
 
 protected:
     std::vector<BattleInfo> m_kart_info;
     std::vector<TeamsInfo> m_teams;
     int m_nb_player_inlife;
+    int m_team_death = 0; // For battle life
     int hit_capture_limit = RaceManager::get()->getHitCaptureLimit();
+    int m_winning_team = -1; // For isRaceOver()
+
+    // Steals a point from the other player if he has at least 1 point. 
+    // The player will also lost another point. 
+    bool hasThiefMode = false; 
+    // This means, for example, 10 points for each team. 
+    // Touch, for example, 10 players from each team
+    bool hasAllTeamVictoryConditions = false;
     //const unsigned int m_num_team = getNumTeams();
 public:
     // ------------------------------------------------------------------------
@@ -120,6 +134,10 @@ public:
     int getTeamsKartScore(int kart_id);
     // ------------------------------------------------------------------------
     int getTeamScore(KartTeam team) const { return m_teams[(int)team].m_scores_teams; }
+    // ------------------------------------------------------------------------
+    int getTeamInlifePlayer(int team) const { return m_teams[(int)team].m_inlife_player; }
+    // ------------------------------------------------------------------------
+    int getTeamTotalLife(int team) const { return m_teams[(int)team].m_total_life; }
     // ------------------------------------------------------------------------
     int getTeamScore(int team) const 
     { 
@@ -207,5 +225,10 @@ public:
 
         return hue;
     }
+private:
+    // ------------------------------------------------------------------------
+    void playMusic(int8_t numP, int8_t numS);
+    // ------------------------------------------------------------------------
+    void verifyTeamWin(int team_id);
 };
 #endif // TEAM_ARENA_BATTLE_HPP

@@ -1108,11 +1108,6 @@ void Kart::setRaceResult()
         FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
         m_race_result = ffa->getKartFFAResult(getWorldKartId());
     }
-    else if (RaceManager::get()->isTabLifeMode())
-    {
-        TeamArenaBattlelife* tabl = dynamic_cast<TeamArenaBattlelife*>(World::getWorld());
-        m_race_result = tabl->hasWin(getWorldKartId());
-    }
     else if (RaceManager::get()->isTeamArenaBattleMode())
     {
         TeamArenaBattle* tab = dynamic_cast<TeamArenaBattle*>(World::getWorld());

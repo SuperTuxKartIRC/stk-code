@@ -888,6 +888,15 @@ public:
     }   // isSoccerMode
 
     // ----------------------------------------------------------------------------------------
+    bool isTabTPMode() const { return m_minor_mode == MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM; }
+    
+    // ----------------------------------------------------------------------------------------
+    bool isTabAPPMode() const { return m_minor_mode == MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER; }
+
+    // ----------------------------------------------------------------------------------------
+    bool isTabPPMode() const { return m_minor_mode == MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER; }
+
+    // ----------------------------------------------------------------------------------------
     bool isTutorialMode() const { return m_minor_mode == MINOR_MODE_TUTORIAL; }
 
     // ----------------------------------------------------------------------------------------

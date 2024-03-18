@@ -1592,7 +1592,6 @@ void RaceResultGUI::unload()
     void RaceResultGUI::displayTeamPlayers(KartTeam teams, int x, int y) {
         World* world = World::getWorld();
         TeamArenaBattle* tab = (TeamArenaBattle*)World::getWorld();
-        TeamArenaBattlelife* tabl = (TeamArenaBattlelife*)World::getWorld();
         TagZombieArenaBattle* tagzab = (TagZombieArenaBattle*)World::getWorld();
 
         int score;
@@ -1606,7 +1605,7 @@ void RaceResultGUI::unload()
         }
         else if (mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE) {
             modeVal = 2;
-            score = tabl->getTeamTotalLife(teams);
+            score = tab->getTeamTotalLife(teams);
         }
         else if (RaceManager::get()->isTagzArenaBattleMode()) {
             modeVal = 3;
@@ -1661,9 +1660,9 @@ void RaceResultGUI::unload()
                 team = tab->getKartTeam(kart_id);
             }
             else if (modeVal == 2) {
-                kart = tabl->getKartAtPosition(i + 1);
+                kart = tab->getKartAtPosition(i + 1);
                 kart_id = kart->getWorldKartId();
-                team = tabl->getKartTeam(kart_id);
+                team = tab->getKartTeam(kart_id);
             }
             else if (modeVal == 3) {
                 kart = tagzab->getKartAtPosition(i + 1);
@@ -1692,7 +1691,7 @@ void RaceResultGUI::unload()
             if (modeVal == 1)
                 result_text.append(StringUtils::toWString(tab->getKartScore(kart_id)));
             else if (modeVal == 2)
-                result_text.append(StringUtils::toWString(tabl->getKartLife(kart_id)));
+                result_text.append(StringUtils::toWString(tab->getKartLife(kart_id))); // TODO : MODIF ??
             //else if (modeVal == 3) {
             //    if (tagzab->getKartNbConvertedPlayer(kart_id) > 0)
             //        result_text.append(StringUtils::toWString(tagzab->getKartNbConvertedPlayer(kart_id)));
