@@ -76,6 +76,7 @@ protected:
     int m_team_death = 0; // For battle life
     int hit_capture_limit = RaceManager::get()->getHitCaptureLimit();
     int m_winning_team = -1; // For isRaceOver()
+    irr::core::stringw m_winning_text;
 
     // Steals a point from the other player if he has at least 1 point. 
     // The player will also lost another point. 
@@ -225,7 +226,13 @@ public:
 
         return hue;
     }
+    // ------------------------------------------------------------------------
+    irr::core::stringw getWinningTeamsTexte() { return m_winning_text; };
 private:
+    // ------------------------------------------------------------------------
+    std::string getKartTeamsColorName(KartTeam teamColorName); // Inutile
+    // ------------------------------------------------------------------------
+    void setWinningTeamsTexte(irr::core::stringw winningText) { m_winning_text = winningText; };
     // ------------------------------------------------------------------------
     void playMusic(int8_t numP, int8_t numS);
     // ------------------------------------------------------------------------

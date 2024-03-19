@@ -1517,6 +1517,7 @@ void RaceResultGUI::unload()
 
     void RaceResultGUI::displayTeamsArenaResults() {
         World* world = (World*)World::getWorld();
+        TeamArenaBattle* tab = (TeamArenaBattle*)World::getWorld();
         TagZombieArenaBattle* tagzab = (TagZombieArenaBattle*)World::getWorld();
         RaceManager::MinorRaceModeType mode = RaceManager::get()->getMinorMode();
 
@@ -1544,38 +1545,40 @@ void RaceResultGUI::unload()
         }
 
         // Affichage du texte en fonction du nombre d'équipes gagnantes
-        std::string winText = "";
         core::stringw winTextw;
+
+        if (RaceManager::get()->isTagzArenaBattleMode())
+            winTextw = tagzab->getWinningTeamsTexte();
+        else if (RaceManager::get()->isTeamArenaBattleMode())
+            winTextw = tab->getWinningTeamsTexte();
 
         if (winningTeams.size() == 1) {
             //irr::video::SColor color = RaceGUIBase::rgbaColorKartTeamsColor((KartTeam)winningTeams[0]);
             std::string colorName = RaceGUIBase::getKartTeamsColorName((KartTeam)winningTeams[0]);
 
-            if (RaceManager::get()->isTagzArenaBattleMode()) {
-                winTextw = tagzab->getWinningTeamsTexte();
-            }
-            else
-                winText = (colorName + " Wins!");
+            //if (!RaceManager::get()->isTagzArenaBattleMode() && !RaceManager::get()->isTeamArenaBattleMode())
+            //    winText = ("The team " + colorName + " Wins!");
         }
         else if (winningTeams.size() > 1) {
-            winText = "It's a draw between Teams ";
+            //if (!RaceManager::get()->isTeamArenaBattleMode())
+            //    winText = "It's a draw between Teams ";
             for (size_t i = 0; i < winningTeams.size(); ++i) {
-                //irr::video::SColor color = RaceGUIBase::rgbaColorKartTeamsColor((KartTeam)winningTeams[i]);
                 std::string colorName = RaceGUIBase::getKartTeamsColorName((KartTeam)winningTeams[i]);
+                irr::core::stringw teamColor = irr::core::stringw(colorName.c_str());
+                teamColor = _(teamColor.c_str());
 
-                winText += (colorName);
+                winTextw += teamColor;
                 if (i < winningTeams.size() - 1) {
-                    winText += ", ";
+                    if (i == winningTeams.size() - 2)
+                        winTextw += _(" and ");
+                    else 
+                        winTextw += ", ";
                 }
             }
         }
         else {
-            winText = "No Teams win";
+            //winText = "No Teams Win!";
             // Ajouter un message personnalisé si aucune team gagne 
-        }
-
-        if (!winText.empty()) {
-            winTextw = winText.c_str();
         }
 
         core::rect<s32> pos(current_x, current_y, current_x, current_y);

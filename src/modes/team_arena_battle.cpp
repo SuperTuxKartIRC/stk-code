@@ -8,6 +8,7 @@
 #include "network/network_string.hpp"
 #include <vector>
 #include <algorithm> 
+#include <utils/translation.hpp>
 
 TeamArenaBattle::TeamArenaBattle()
 {
@@ -196,7 +197,7 @@ void TeamArenaBattle::handleScoreInServer(int kart_id, int hitter)
     }
 
     // Player lives
-    if (m_kart_info[kart_id].m_lives > 0)
+    if (RaceManager::get()->isTabLifeMode() && m_kart_info[kart_id].m_lives > 0)
     {
         m_kart_info[kart_id].m_lives--;
         m_teams[getKartTeam(kart_id)].m_total_life--;
@@ -374,8 +375,8 @@ void TeamArenaBattle::setWinningTeams()
             }
         }
         if (RaceManager::get()->isTabLifeMode()) {
-            if (team.m_total_life > maxScore) {
-                maxScore = team.m_total_life;
+            if (team.m_scores_teams > maxScore) {
+                maxScore = team.m_scores_teams;
             }
         }
         else { // highest Team score
@@ -388,17 +389,33 @@ void TeamArenaBattle::setWinningTeams()
     // Find the indices of the occurrences of the largest value
     std::vector<int> indices;
     for (int i = 0; i < m_teams.size(); ++i) {
-        if (maxScore < 0) {
+        if (maxScore > 0) {
             if ((RaceManager::get()->isTabTPMode() && m_teams[i].m_scores_teams == maxScore) ||
                 (RaceManager::get()->isTabAPPMode() && m_teams[i].m_total_player_get_score == maxScore) ||
                 (RaceManager::get()->isTabPPMode() && m_teams[i].m_total_player_get_score == maxScore) ||
-                (RaceManager::get()->isTabLifeMode() && m_teams[i].m_total_life == maxScore)) {
+                (RaceManager::get()->isTabLifeMode() && m_teams[i].m_scores_teams == maxScore)) {
                 indices.push_back(i);
             }
         }
+        else
+            return;
     }
     if (indices.size() > 0)
         World::setWinningTeam(indices);
+
+    if(indices.size() >= 2)
+        setWinningTeamsTexte(_("It's a tie between Teams "));
+    else if (indices.size() == 0)
+        setWinningTeamsTexte(_("No team Won!"));
+    else if (indices.size() >= 5)
+        setWinningTeamsTexte(_("It's a draw between Teams "));
+    else 
+    {
+        std::string str = getKartTeamsColorName(KartTeam(m_winning_team)); // RaceGUIBase::
+        irr::core::stringw teamColor = irr::core::stringw(str.c_str());
+        teamColor = _(teamColor.c_str());
+        setWinningTeamsTexte(_("The %s team Wins!", indices.at(0)));
+    }
 }
 
 bool TeamArenaBattle::hasWin(int kartId)
@@ -482,4 +499,29 @@ void TeamArenaBattle::verifyTeamWin(int team_id)
             m_winning_team = team_id;
         }
     }
+
+    if (m_winning_team != -1) 
+    {
+        std::string str = getKartTeamsColorName(KartTeam(m_winning_team)); // RaceGUIBase::
+        irr::core::stringw teamColor = irr::core::stringw(str.c_str());
+        teamColor = _(teamColor.c_str());
+        setWinningTeamsTexte(_("The %s team Wins!", teamColor));
+    }
+}
+
+std::string TeamArenaBattle::getKartTeamsColorName(KartTeam teamColorName)
+{ 
+    return teamColorName == KART_TEAM_BLUE ? "blue" :
+        teamColorName == KART_TEAM_RED ? "red" :
+        teamColorName == KART_TEAM_GREEN ? "green" :
+        teamColorName == KART_TEAM_ORANGE ? "orange" :
+        teamColorName == KART_TEAM_YELLOW ? "yellow" :
+        teamColorName == KART_TEAM_PURPLE ? "purple" :
+        teamColorName == KART_TEAM_PINK ? "pink" :
+        teamColorName == KART_TEAM_TURQUOISE ? "turquoise" :
+        teamColorName == KART_TEAM_DARK_BLUE ? "dark_blue" :
+        teamColorName == KART_TEAM_CYAN ? "cyan" :
+        teamColorName == KART_TEAM_DEFAULT ? "pinky" :
+        "pinky";
+
 }

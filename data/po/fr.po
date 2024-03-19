@@ -6365,6 +6365,46 @@ msgstr "L'équipe des survivants l’emporte"
 msgid "The survivor (%s) Win!"
 msgstr "Le survivant (%s) gagne!"
 
+#: src/states_screens/race_result_gui.cpp:640
+msgid "red"
+msgstr "rouge"
+
+#: src/states_screens/race_result_gui.cpp:640
+msgid "blue"
+msgstr "bleu"
+
+#: src/states_screens/race_result_gui.cpp:640
+msgid "green"
+msgstr "vert"
+
+#: src/states_screens/race_result_gui.cpp:640
+msgid "orange"
+msgstr "orange"
+
+#: src/states_screens/race_result_gui.cpp:640
+#: src/states_screens/race_result_gui.cpp:1538
+msgid "The %s team Wins!"
+msgstr "L'équipes %s Gagne!"
+
+#: src/states_screens/race_result_gui.cpp:640
+#: src/states_screens/race_result_gui.cpp:1538
+msgid "It's a draw between Teams "
+msgstr "C'est un match nul entre l'équipe "
+
+#: src/states_screens/race_result_gui.cpp:640
+#: src/states_screens/race_result_gui.cpp:1538
+msgid "It's a tie between Teams "
+msgstr "C'est une égalité entre l'équipe "
+
+#: src/states_screens/race_result_gui.cpp:640
+#: src/states_screens/race_result_gui.cpp:1538
+msgid " and "
+msgstr " et "
+
+#: src/states_screens/race_result_gui.cpp:640
+#: src/states_screens/race_result_gui.cpp:1538
+msgid "No team Won!"
+msgstr "Aucune équipe n'a gagné!"
 
 #: src/states_screens/race_result_gui.cpp:640
 #: src/states_screens/race_result_gui.cpp:1538
