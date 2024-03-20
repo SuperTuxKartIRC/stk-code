@@ -54,7 +54,9 @@ private:
         // For team_arena_battle_life
         int  m_lives = RaceManager::get()->getLifeTarget();
         // For team_arena_battle_all_player_points 
-        std::vector<std::tuple<int, int>> m_victory_conditions; // List of tuples (team id, number of points required) // hasAllTeamVictoryConditions
+        std::map<int, int> m_opposing_team_touches; // Map of opposing team IDs and their number of times hit // hasAllTeamVictoryConditions
+        std::map<int, bool> m_opposing_team_touches_v; // Map of opposing team IDs and if the points off a team have benn reach // hasAllTeamVictoryConditions
+        int m_opposing_team_touches_win_nb;
     };
 
     struct TeamsInfo
@@ -65,8 +67,9 @@ private:
         // For team_arena_battle_life
         int  m_inlife_player;
         int  m_total_life;
-        std::vector<std::tuple<int, int>> m_victory_conditions; // List of tuples (team id, number of points required) // hasAllTeamVictoryConditions
-        int m_victory_conditions_count;
+        std::map<int, int> m_opposing_team_touches; // Map of opposing team IDs and their number of times hit // hasAllTeamVictoryConditions
+        std::map<int, bool> m_opposing_team_touches_v; // Map of opposing team IDs and if the points off a team have benn reach // hasAllTeamVictoryConditions
+        int m_opposing_team_touches_win_nb;
     };
 
 protected:
@@ -84,7 +87,14 @@ protected:
     // This means, for example, 10 points for each team. 
     // Touch, for example, 10 players from each team
     bool hasAllTeamVictoryConditions = false;
-    //const unsigned int m_num_team = getNumTeams();
+    
+    // For the thief Mode 
+    int m_nb_point_thief;
+    int m_nb_point_player_lose;
+    // A player may steal or cause another player to lose more points 
+    // depending on how many people he touches during the game. 
+    bool hasMultiplierPointThiefMode = false; 
+    int multiplierPointThiefNb; // Usefull or not 
 public:
     // ------------------------------------------------------------------------
     TeamArenaBattle();
@@ -237,5 +247,14 @@ private:
     void playMusic(int8_t numP, int8_t numS);
     // ------------------------------------------------------------------------
     void verifyTeamWin(int team_id);
+    // ------------------------------------------------------------------------
+    void configureTheifModeValue();
+    // ------------------------------------------------------------------------
+    void calculateTheifPoints();
+
+    // ------------------------------------------------------------------------
+    void calculateAllTeamVictoryConditionsPoints(int player_id, int team_id);
+    // ------------------------------------------------------------------------
+    void calculateAllTeamVictoryWinConditions();
 };
 #endif // TEAM_ARENA_BATTLE_HPP

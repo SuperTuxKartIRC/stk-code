@@ -64,6 +64,12 @@ void TeamArenaBattle::initGameInfo()
     }
     m_winning_team = -1;
     m_team_death = 0;
+
+    hasThiefMode = true; // 
+    hasAllTeamVictoryConditions = true; // 
+
+    if (hasThiefMode)
+        configureTheifModeValue();
 }
 
 // ----------------------------------------------------------------------------
@@ -182,6 +188,37 @@ void TeamArenaBattle::handleScoreInServer(int kart_id, int hitter)
                 m_kart_info[hitter].m_has_score = true;
             }
         }
+
+        // À la bonne place ou pas
+        if (hasThiefMode)
+            calculateTheifPoints();
+
+        // À vérifier // Team / Player scores for hasAllTeamVictoryConditions
+        int team_kart_id = getKartTeam(kart_id);
+        m_teams[getKartTeam(hitter)].m_opposing_team_touches[team_kart_id]++;
+        m_kart_info[hitter].m_opposing_team_touches[team_kart_id]++;
+
+        if (m_kart_info[hitter].m_opposing_team_touches[team_kart_id] == RaceManager::get()->getHitCaptureLimit() &&
+            m_kart_info[hitter].m_opposing_team_touches_v[team_kart_id] != true) // Modif bool 
+        {
+            m_kart_info[hitter].m_opposing_team_touches_win_nb++;
+            m_kart_info[hitter].m_opposing_team_touches_v[team_kart_id] == true;
+
+            if (RaceManager::get()->isTabAPPMode() || RaceManager::get()->isTabPPMode())
+            {
+                // m_kart_info[hitter].m_opposing_team_touches_win_nb++;
+                if (m_kart_info[hitter].m_opposing_team_touches_win_nb == getNumTeams() -1)
+                {
+                    m_teams[getKartTeam(hitter)].m_opposing_team_touches_win_nb++;
+                    m_teams[getKartTeam(hitter)].m_opposing_team_touches_v[team_kart_id] == true;
+                }
+            }
+            else {
+                m_teams[getKartTeam(hitter)].m_opposing_team_touches_win_nb++;
+                m_teams[getKartTeam(hitter)].m_opposing_team_touches_v[team_kart_id] == true;
+            }
+        }
+
         getKart(hitter)->getKartModel()->setAnimation(KartModel::AF_WIN_START, true/*play_non_loop*/);
     }
     else if (m_teams[getKartTeam(kart_id)].m_scores_teams > 0)
@@ -215,12 +252,14 @@ void TeamArenaBattle::handleScoreInServer(int kart_id, int hitter)
 
     getKart(kart_id)->getKartModel()->setAnimation(KartModel::AF_LOSE_START, true/*play_non_loop*/);
 
-    if (hitter != -1)
-        verifyTeamWin(getKartTeam(hitter));
-    else 
-    {
-        verifyTeamWin(getKartTeam(kart_id));
+
+    if (hitter != -1) {
+        if (hasAllTeamVictoryConditions && !RaceManager::get()->isTabLifeMode())
+            calculateAllTeamVictoryConditionsPoints(hitter,getKartTeam(hitter));
+        else 
+            verifyTeamWin(getKartTeam(hitter));
     }
+
 
     if (NetworkConfig::get()->isNetworking() &&
         NetworkConfig::get()->isServer())
@@ -524,4 +563,50 @@ std::string TeamArenaBattle::getKartTeamsColorName(KartTeam teamColorName)
         teamColorName == KART_TEAM_DEFAULT ? "pinky" :
         "pinky";
 
+}
+
+// ------------------------------------------------------------------------
+void TeamArenaBattle::configureTheifModeValue() 
+{
+    int m_nb_point_thief = 1;
+    int m_nb_point_player_lose = 1;
+
+    bool hasMultiplierPointThiefMode = true; // Not here 
+    int multiplierPointThiefNb = 1; // Usefull or not 
+}
+
+// ------------------------------------------------------------------------
+void TeamArenaBattle::calculateTheifPoints() 
+{
+
+}
+
+// ------------------------------------------------------------------------
+void TeamArenaBattle::calculateAllTeamVictoryConditionsPoints(int player_id, int team_id)
+{
+    // À vérifier 
+    // hasAllTeamVictoryConditions
+
+    if (RaceManager::get()->isTabTPMode()) 
+    {
+        if (m_teams[team_id].m_opposing_team_touches_win_nb == getNumTeams() - 1)
+            m_winning_team = team_id;
+    }
+    if (RaceManager::get()->isTabAPPMode()) 
+    {
+        if (m_kart_info[player_id].m_opposing_team_touches_win_nb == getTeamNum(KartTeam(player_id))) // 
+            m_winning_team = team_id;
+    }
+    if (RaceManager::get()->isTabPPMode()) 
+    {
+        //if (m_kart_info[player_id].m_opposing_team_touches_win_nb == getNumTeams() - 1)
+        if (m_teams[team_id].m_opposing_team_touches_win_nb == 1 )
+            m_winning_team = team_id;
+    }
+}
+
+// ------------------------------------------------------------------------
+void TeamArenaBattle::calculateAllTeamVictoryWinConditions()
+{
+    // Inutile pour le moment 
 }
