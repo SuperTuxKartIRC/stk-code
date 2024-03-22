@@ -106,6 +106,8 @@ public:
     // ------------------------------------------------------------------------
     void initGameInfo();
     // ------------------------------------------------------------------------
+    void setClockModeFromRaceManager();
+    // ------------------------------------------------------------------------
     virtual void getKartsDisplayInfo(
     std::vector<RaceGUIBase::KartIconDisplayInfo>* info) OVERRIDE;
     // ------------------------------------------------------------------------
@@ -227,5 +229,9 @@ private:
     void kartsRankInfo();
     // ------------------------------------------------------------------------
     irr::core::stringw setWinningTeamNameText();
+    // ------------------------------------------------------------------------
+    void updateScores(int kart_id, int hitter);
+    // ------------------------------------------------------------------------
+    void updatePlayerLives(int kart_id, int hitter);
 };
 #endif // TEAM_ARENA_BATTLE_HPP

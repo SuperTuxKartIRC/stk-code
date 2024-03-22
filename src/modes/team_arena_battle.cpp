@@ -12,10 +12,7 @@
 
 TeamArenaBattle::TeamArenaBattle()
 {
-    if (RaceManager::get()->hasTimeTarget())
-        WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN, RaceManager::get()->getTimeTarget());
-    else
-        WorldStatus::setClockMode(CLOCK_CHRONO);
+    setClockModeFromRaceManager();
 }
 
 TeamArenaBattle::~TeamArenaBattle()
@@ -37,15 +34,11 @@ void TeamArenaBattle::reset(bool restart)
 {
     WorldWithRank::reset(restart);
     m_count_down_reached_zero = false;
-    if (RaceManager::get()->hasTimeTarget())
-        WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN, RaceManager::get()->getTimeTarget());
-    else
-        WorldStatus::setClockMode(CLOCK_CHRONO);
+    setClockModeFromRaceManager();
     initGameInfo();
 
-    // Reset player lives 
     for (unsigned int i = 0; i < getNumKarts(); i++) {
-        m_kart_info[i].m_lives = 3;
+        m_kart_info[i].m_lives = RaceManager::get()->getLifeTarget();
     }
 }   // reset
 
@@ -70,6 +63,15 @@ void TeamArenaBattle::initGameInfo()
 
     if (hasThiefMode)
         configureTheifModeValue();
+}
+
+// ----------------------------------------------------------------------------
+void TeamArenaBattle::setClockModeFromRaceManager()
+{
+    if (RaceManager::get()->hasTimeTarget())
+        WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN, RaceManager::get()->getTimeTarget());
+    else
+        WorldStatus::setClockMode(CLOCK_CHRONO);
 }
 
 // ----------------------------------------------------------------------------
@@ -173,67 +175,16 @@ bool TeamArenaBattle::kartHit(int kart_id, int hitter)
  */
 void TeamArenaBattle::handleScoreInServer(int kart_id, int hitter)
 {
-    // Team / Player scores 
-    if (hitter != -1) 
-    {
-        m_teams[getKartTeam(hitter)].m_scores_teams++;
-        m_kart_info[hitter].m_scores++;
-
-        if (RaceManager::get()->isTabAPPMode() || RaceManager::get()->isTabPPMode()) {
-            if (m_kart_info[hitter].m_scores > m_teams[getKartTeam(hitter)].m_scores_teams) {
-                m_teams[getKartTeam(hitter)].m_scores_teams = m_kart_info[hitter].m_scores;
-            }
-            if (m_kart_info[hitter].m_scores >= hit_capture_limit && m_kart_info[hitter].m_has_score == false) {
-                m_teams[getKartTeam(hitter)].m_total_player_get_score++;
-                m_kart_info[hitter].m_has_score = true;
-            }
-        }
-
-        // À la bonne place ou pas
-        //if (hasThiefMode)
-        //    calculateTheifPoints(kart_id, hitter);
-
-        // hitter
-        calculatePointsForAllTeamVictoryConditionsPoints(getKartTeam(kart_id), hitter, getKartTeam(hitter), 1);
-
-        getKart(hitter)->getKartModel()->setAnimation(KartModel::AF_WIN_START, true/*play_non_loop*/);
-    }
-    else if (m_teams[getKartTeam(kart_id)].m_scores_teams > 0)
-    {
-        m_teams[getKartTeam(kart_id)].m_scores_teams--;
-        m_kart_info[kart_id].m_scores--;
-
-        // Mal gérer 
-        if (m_kart_info[kart_id].m_scores < hit_capture_limit && m_kart_info[kart_id].m_has_score == true) {
-            m_teams[getKartTeam(kart_id)].m_total_player_get_score--;
-            m_kart_info[kart_id].m_has_score = false;
-        }
-
-        // player 
-        calculatePointsForAllTeamVictoryConditionsPoints(-1, kart_id, getKartTeam(kart_id), -1);
-    }
+    // Player and Team points
+    updateScores(kart_id, hitter);
 
     // Player lives
-    if (RaceManager::get()->isTabLifeMode() && m_kart_info[kart_id].m_lives > 0)
-    {
-        m_kart_info[kart_id].m_lives--;
-        m_teams[getKartTeam(kart_id)].m_total_life--;
-
-        if (m_kart_info[kart_id].m_lives == 0)
-            m_teams[getKartTeam(kart_id)].m_inlife_player--;
-        if (m_teams[getKartTeam(kart_id)].m_inlife_player == 0)
-            m_team_death++;
-
-        if (m_kart_info[kart_id].m_lives == 0) {
-            eliminateKart(kart_id, /*notify_of_elimination*/ true);
-            m_karts[kart_id]->finishedRace(WorldStatus::getTime());
-        }
-    }
+    updatePlayerLives(kart_id, hitter);
 
     getKart(kart_id)->getKartModel()->setAnimation(KartModel::AF_LOSE_START, true/*play_non_loop*/);
 
-
-    if (hitter != -1) {
+    if (hitter != -1) 
+    {
         if (hasAllTeamVictoryConditions && !RaceManager::get()->isTabLifeMode())
             calculateAllTeamVictoryConditionsPoints(hitter,getKartTeam(hitter));
         else 
@@ -390,8 +341,9 @@ void TeamArenaBattle::setWinningTeams()
 
     // Find the indices of the occurrences of the largest value
     std::vector<int> indices;
-    for (int i = 0; i < m_teams.size(); ++i) {
-        if (maxScore > 0) {
+    if (maxScore > 0) {
+        for (int i = 0; i < m_teams.size(); ++i) {
+
             if ((RaceManager::get()->isTabTPMode() && m_teams[i].m_scores_teams == maxScore) ||
                 (RaceManager::get()->isTabAPPMode() && m_teams[i].m_total_player_get_score == maxScore) ||
                 (RaceManager::get()->isTabPPMode() && m_teams[i].m_total_player_get_score == maxScore) ||
@@ -399,9 +351,8 @@ void TeamArenaBattle::setWinningTeams()
                 indices.push_back(i);
             }
         }
-        else
-            return;
     }
+
     if (indices.size() > 0)
         World::setWinningTeam(indices);
 
@@ -689,4 +640,68 @@ irr::core::stringw TeamArenaBattle::setWinningTeamNameText()
     irr::core::stringw teamColor = irr::core::stringw(str.c_str());
     teamColor = _(teamColor.c_str());
     return teamColor;
+}
+
+// ------------------------------------------------------------------------
+void TeamArenaBattle::updateScores(int kart_id, int hitter) 
+{
+    if (hitter != -1)
+    {
+        m_teams[getKartTeam(hitter)].m_scores_teams++;
+        m_kart_info[hitter].m_scores++;
+
+        if (RaceManager::get()->isTabAPPMode() || RaceManager::get()->isTabPPMode()) 
+        {
+            if (m_kart_info[hitter].m_scores > m_teams[getKartTeam(hitter)].m_scores_teams) 
+                m_teams[getKartTeam(hitter)].m_scores_teams = m_kart_info[hitter].m_scores;
+            if (m_kart_info[hitter].m_scores >= hit_capture_limit && m_kart_info[hitter].m_has_score == false) 
+            {
+                m_teams[getKartTeam(hitter)].m_total_player_get_score++;
+                m_kart_info[hitter].m_has_score = true;
+            }
+        }
+
+        // À la bonne place ou pas
+        //if (hasThiefMode)
+        //    calculateTheifPoints(kart_id, hitter);
+
+        calculatePointsForAllTeamVictoryConditionsPoints(getKartTeam(kart_id), hitter, getKartTeam(hitter), 1);
+
+        getKart(hitter)->getKartModel()->setAnimation(KartModel::AF_WIN_START, true/*play_non_loop*/);
+    }
+    else if (m_teams[getKartTeam(kart_id)].m_scores_teams > 0)
+    {
+        m_teams[getKartTeam(kart_id)].m_scores_teams--;
+        m_kart_info[kart_id].m_scores--;
+
+        if (m_kart_info[kart_id].m_scores < hit_capture_limit && m_kart_info[kart_id].m_has_score == true) 
+        { // Mal gérer 
+            m_teams[getKartTeam(kart_id)].m_total_player_get_score--;
+            m_kart_info[kart_id].m_has_score = false;
+        }
+
+        // player 
+        calculatePointsForAllTeamVictoryConditionsPoints(-1, kart_id, getKartTeam(kart_id), -1);
+    }
+}
+
+// ------------------------------------------------------------------------
+void TeamArenaBattle::updatePlayerLives(int kart_id, int hitter) 
+{
+    if (RaceManager::get()->isTabLifeMode() && m_kart_info[kart_id].m_lives > 0)
+    {
+        m_kart_info[kart_id].m_lives--;
+        m_teams[getKartTeam(kart_id)].m_total_life--;
+
+        if (m_kart_info[kart_id].m_lives == 0)
+            m_teams[getKartTeam(kart_id)].m_inlife_player--;
+        if (m_teams[getKartTeam(kart_id)].m_inlife_player == 0)
+            m_team_death++;
+
+        if (m_kart_info[kart_id].m_lives == 0) 
+        {
+            eliminateKart(kart_id, /*notify_of_elimination*/ true);
+            m_karts[kart_id]->finishedRace(WorldStatus::getTime());
+        }
+    }
 }
