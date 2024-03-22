@@ -62,7 +62,7 @@ private:
     struct TeamsInfo
     {
         int  m_scores_teams;
-        int  m_total_player_get_score;
+        int  m_total_player_get_score; // 
         int  m_total_player;
         // For team_arena_battle_life
         int  m_inlife_player;
@@ -75,7 +75,6 @@ private:
 protected:
     std::vector<BattleInfo> m_kart_info;
     std::vector<TeamsInfo> m_teams;
-    int m_nb_player_inlife;
     int m_team_death = 0; // For battle life
     int hit_capture_limit = RaceManager::get()->getHitCaptureLimit();
     int m_winning_team = -1; // For isRaceOver()
@@ -169,8 +168,6 @@ public:
         m_swatter_reset_kart_ticks[kart_id] = at_world_ticks;
     }
     // ------------------------------------------------------------------------
-
-    // ------------------------------------------------------------------------
     virtual void addReservedKart(int kart_id) OVERRIDE
     {
         WorldWithRank::addReservedKart(kart_id);
@@ -203,39 +200,6 @@ public:
     virtual void saveCompleteState(BareNetworkString* bns, STKPeer* peer) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void restoreCompleteState(const BareNetworkString& b) OVERRIDE;
-    float rgbToHue(int r, int g, int b) {
-        float hue = 0.0f;
-
-        // Convert RGB values to the range [0, 1]
-        float r_normalized = r / 255.0f;
-        float g_normalized = g / 255.0f;
-        float b_normalized = b / 255.0f;
-
-        float cmax = std::max(r_normalized, std::max(g_normalized, b_normalized));
-        float cmin = std::min(r_normalized, std::min(g_normalized, b_normalized));
-        float delta = cmax - cmin;
-
-        // Calculate the hue value
-        if (delta != 0) {
-            if (cmax == r_normalized) {
-                hue = fmod((g_normalized - b_normalized) / delta, 6.0f);
-            }
-            else if (cmax == g_normalized) {
-                hue = (b_normalized - r_normalized) / delta + 2.0f;
-            }
-            else {
-                hue = (r_normalized - g_normalized) / delta + 4.0f;
-            }
-        }
-
-        hue *= 60.0f; // Convert hue to degrees
-
-        if (hue < 0) {
-            hue += 360.0f;
-        }
-
-        return hue;
-    }
     // ------------------------------------------------------------------------
     irr::core::stringw getWinningTeamsTexte() { return m_winning_text; };
 private:
@@ -250,11 +214,18 @@ private:
     // ------------------------------------------------------------------------
     void configureTheifModeValue();
     // ------------------------------------------------------------------------
-    void calculateTheifPoints();
-
+    void calculateTheifPoints(int kart_id, int hitter);
+    // ------------------------------------------------------------------------
+    void calculatePointsForAllTeamVictoryConditionsPoints(int team_id, int hitter, int team_hitter_id, int points);
     // ------------------------------------------------------------------------
     void calculateAllTeamVictoryConditionsPoints(int player_id, int team_id);
     // ------------------------------------------------------------------------
     void calculateAllTeamVictoryWinConditions();
+    // ------------------------------------------------------------------------
+    int findTeamIdForLosePoints(int kart_id);
+    // ------------------------------------------------------------------------
+    void kartsRankInfo();
+    // ------------------------------------------------------------------------
+    irr::core::stringw setWinningTeamNameText();
 };
 #endif // TEAM_ARENA_BATTLE_HPP

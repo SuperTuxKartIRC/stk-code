@@ -190,34 +190,11 @@ void TeamArenaBattle::handleScoreInServer(int kart_id, int hitter)
         }
 
         // À la bonne place ou pas
-        if (hasThiefMode)
-            calculateTheifPoints();
+        //if (hasThiefMode)
+        //    calculateTheifPoints(kart_id, hitter);
 
-        // À vérifier // Team / Player scores for hasAllTeamVictoryConditions
-        int team_kart_id = getKartTeam(kart_id);
-        m_teams[getKartTeam(hitter)].m_opposing_team_touches[team_kart_id]++;
-        m_kart_info[hitter].m_opposing_team_touches[team_kart_id]++;
-
-        if (m_kart_info[hitter].m_opposing_team_touches[team_kart_id] == RaceManager::get()->getHitCaptureLimit() &&
-            m_kart_info[hitter].m_opposing_team_touches_v[team_kart_id] != true) // Modif bool 
-        {
-            m_kart_info[hitter].m_opposing_team_touches_win_nb++;
-            m_kart_info[hitter].m_opposing_team_touches_v[team_kart_id] == true;
-
-            if (RaceManager::get()->isTabAPPMode() || RaceManager::get()->isTabPPMode())
-            {
-                // m_kart_info[hitter].m_opposing_team_touches_win_nb++;
-                if (m_kart_info[hitter].m_opposing_team_touches_win_nb == getNumTeams() -1)
-                {
-                    m_teams[getKartTeam(hitter)].m_opposing_team_touches_win_nb++;
-                    m_teams[getKartTeam(hitter)].m_opposing_team_touches_v[team_kart_id] == true;
-                }
-            }
-            else {
-                m_teams[getKartTeam(hitter)].m_opposing_team_touches_win_nb++;
-                m_teams[getKartTeam(hitter)].m_opposing_team_touches_v[team_kart_id] == true;
-            }
-        }
+        // hitter
+        calculatePointsForAllTeamVictoryConditionsPoints(getKartTeam(kart_id), hitter, getKartTeam(hitter), 1);
 
         getKart(hitter)->getKartModel()->setAnimation(KartModel::AF_WIN_START, true/*play_non_loop*/);
     }
@@ -231,6 +208,9 @@ void TeamArenaBattle::handleScoreInServer(int kart_id, int hitter)
             m_teams[getKartTeam(kart_id)].m_total_player_get_score--;
             m_kart_info[kart_id].m_has_score = false;
         }
+
+        // player 
+        calculatePointsForAllTeamVictoryConditionsPoints(-1, kart_id, getKartTeam(kart_id), -1);
     }
 
     // Player lives
@@ -260,6 +240,7 @@ void TeamArenaBattle::handleScoreInServer(int kart_id, int hitter)
             verifyTeamWin(getKartTeam(hitter));
     }
 
+    kartsRankInfo();
 
     if (NetworkConfig::get()->isNetworking() &&
         NetworkConfig::get()->isServer())
@@ -299,24 +280,8 @@ void TeamArenaBattle::update(int ticks)
     if (Track::getCurrentTrack()->hasNavMesh())
         updateSectorForKarts();
 
-    std::vector<std::pair<int, int> > ranks;
-    for (unsigned i = 0; i < m_kart_info.size(); i++)
-    {
-        // For eliminated (disconnected or reserved player) make his score
-        // int min so always last in rank
-        int cur_score = getKart(i)->isEliminated() ?
-            std::numeric_limits<int>::min() : m_kart_info[i].m_scores;
-        ranks.emplace_back(i, cur_score);
-    }
-    std::sort(ranks.begin(), ranks.end(),
-        [](const std::pair<int, int>& a, const std::pair<int, int>& b)
-        {
-            return a.second > b.second;
-        });
-    beginSetKartPositions();
-    for (unsigned i = 0; i < ranks.size(); i++)
-        setKartPosition(ranks[i].first, i + 1);
-    endSetKartPositions();
+    // kartsRankInfo() ??
+
 }   // update
 
 
@@ -357,15 +322,13 @@ bool TeamArenaBattle::isRaceOver()
         return false;
 
     if (m_count_down_reached_zero && RaceManager::get()->hasTimeTarget()) {
-        TeamArenaBattle::setWinningTeams();
+        if(m_winning_team != -2)
+            TeamArenaBattle::setWinningTeams();
         return true;
     }
 
     if (m_winning_team != -1) 
-    {
-        World::setWinningTeam(m_winning_team);
         return true;
-    }
 
     // Manque la condition pour jouer la musique // Les conditions 
 
@@ -449,12 +412,9 @@ void TeamArenaBattle::setWinningTeams()
     else if (indices.size() >= 5)
         setWinningTeamsTexte(_("It's a draw between Teams "));
     else 
-    {
-        std::string str = getKartTeamsColorName(KartTeam(m_winning_team)); // RaceGUIBase::
-        irr::core::stringw teamColor = irr::core::stringw(str.c_str());
-        teamColor = _(teamColor.c_str());
-        setWinningTeamsTexte(_("The %s team Wins!", indices.at(0)));
-    }
+        setWinningTeamsTexte(_("The %s team Wins!", setWinningTeamNameText()));
+
+    m_winning_team = -2;
 }
 
 bool TeamArenaBattle::hasWin(int kartId)
@@ -518,51 +478,49 @@ void TeamArenaBattle::playMusic(int8_t numP, int8_t numS)
 // ------------------------------------------------------------------------
 void TeamArenaBattle::verifyTeamWin(int team_id)
 {
-    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM) {
-        if (m_teams[team_id].m_scores_teams >= hit_capture_limit) {
+    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM) 
+    {
+        if (m_teams[team_id].m_scores_teams >= hit_capture_limit)
             m_winning_team = team_id;
-        }
     }
-    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER) {
-        if (m_teams[team_id].m_total_player > 0 && m_teams[team_id].m_total_player_get_score >= m_teams[team_id].m_total_player) {
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER) 
+    {
+        if (m_teams[team_id].m_total_player > 0 && m_teams[team_id].m_total_player_get_score >= m_teams[team_id].m_total_player)
             m_winning_team = team_id;
-        }
     }
-    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER) {
-        if (m_teams[team_id].m_total_player > 0 && m_teams[team_id].m_total_player_get_score == 1) {
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER) 
+    {
+        if (m_teams[team_id].m_total_player > 0 && m_teams[team_id].m_total_player_get_score == 1)
             m_winning_team = team_id;
-        }
     }
-    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE) {
-        if (m_team_death == getNumTeams() -1 && m_teams[team_id].m_inlife_player > 0) {
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE) 
+    {
+        if (m_team_death == getNumTeams() -1 && m_teams[team_id].m_inlife_player > 0)
             m_winning_team = team_id;
-        }
     }
 
     if (m_winning_team != -1) 
     {
-        std::string str = getKartTeamsColorName(KartTeam(m_winning_team)); // RaceGUIBase::
-        irr::core::stringw teamColor = irr::core::stringw(str.c_str());
-        teamColor = _(teamColor.c_str());
-        setWinningTeamsTexte(_("The %s team Wins!", teamColor));
+        setWinningTeamsTexte(_("The %s team Wins!", setWinningTeamNameText()));
+        World::setWinningTeam(m_winning_team);
     }
 }
 
+// ------------------------------------------------------------------------
 std::string TeamArenaBattle::getKartTeamsColorName(KartTeam teamColorName)
 { 
     return teamColorName == KART_TEAM_BLUE ? "blue" :
-        teamColorName == KART_TEAM_RED ? "red" :
-        teamColorName == KART_TEAM_GREEN ? "green" :
-        teamColorName == KART_TEAM_ORANGE ? "orange" :
-        teamColorName == KART_TEAM_YELLOW ? "yellow" :
-        teamColorName == KART_TEAM_PURPLE ? "purple" :
-        teamColorName == KART_TEAM_PINK ? "pink" :
-        teamColorName == KART_TEAM_TURQUOISE ? "turquoise" :
-        teamColorName == KART_TEAM_DARK_BLUE ? "dark_blue" :
-        teamColorName == KART_TEAM_CYAN ? "cyan" :
-        teamColorName == KART_TEAM_DEFAULT ? "pinky" :
-        "pinky";
-
+           teamColorName == KART_TEAM_RED ? "red" :
+           teamColorName == KART_TEAM_GREEN ? "green" :
+           teamColorName == KART_TEAM_ORANGE ? "orange" :
+           teamColorName == KART_TEAM_YELLOW ? "yellow" :
+           teamColorName == KART_TEAM_PURPLE ? "purple" :
+           teamColorName == KART_TEAM_PINK ? "pink" :
+           teamColorName == KART_TEAM_TURQUOISE ? "turquoise" :
+           teamColorName == KART_TEAM_DARK_BLUE ? "dark_blue" :
+           teamColorName == KART_TEAM_CYAN ? "cyan" :
+           teamColorName == KART_TEAM_DEFAULT ? "pinky" :
+           "pinky";
 }
 
 // ------------------------------------------------------------------------
@@ -576,9 +534,21 @@ void TeamArenaBattle::configureTheifModeValue()
 }
 
 // ------------------------------------------------------------------------
-void TeamArenaBattle::calculateTheifPoints() 
+void TeamArenaBattle::calculateTheifPoints(int kart_id, int hitter) 
 {
+    // À vérifier 
+    m_teams[getKartTeam(hitter)].m_scores_teams++;
+    m_kart_info[hitter].m_scores++;
 
+    if (RaceManager::get()->isTabAPPMode() || RaceManager::get()->isTabPPMode()) {
+        if (m_kart_info[hitter].m_scores > m_teams[getKartTeam(hitter)].m_scores_teams) {
+            m_teams[getKartTeam(hitter)].m_scores_teams = m_kart_info[hitter].m_scores;
+        }
+        if (m_kart_info[hitter].m_scores <= hit_capture_limit && m_kart_info[hitter].m_has_score == true) {
+            m_teams[getKartTeam(hitter)].m_total_player_get_score--;
+            m_kart_info[hitter].m_has_score = false;
+        }
+    }
 }
 
 // ------------------------------------------------------------------------
@@ -594,14 +564,80 @@ void TeamArenaBattle::calculateAllTeamVictoryConditionsPoints(int player_id, int
     }
     if (RaceManager::get()->isTabAPPMode()) 
     {
-        if (m_kart_info[player_id].m_opposing_team_touches_win_nb == getTeamNum(KartTeam(player_id))) // 
+        if (m_teams[team_id].m_opposing_team_touches_win_nb == getTeamNum(KartTeam(player_id))) // 
             m_winning_team = team_id;
     }
     if (RaceManager::get()->isTabPPMode()) 
     {
-        //if (m_kart_info[player_id].m_opposing_team_touches_win_nb == getNumTeams() - 1)
         if (m_teams[team_id].m_opposing_team_touches_win_nb == 1 )
             m_winning_team = team_id;
+    }
+
+    if (m_winning_team != -1)
+    {
+        setWinningTeamsTexte(_("The %s team Wins!", setWinningTeamNameText()));
+        World::setWinningTeam(m_winning_team);
+    }
+}
+
+// ------------------------------------------------------------------------
+void TeamArenaBattle::calculatePointsForAllTeamVictoryConditionsPoints(int team_kart_id, int hitter, int team_hitter_id, int points)
+{
+    // We have to find a team_hitter_id
+    if (team_kart_id == -1) {
+        team_hitter_id = findTeamIdForLosePoints(hitter);
+        if (team_hitter_id == -1)
+            return;
+    }
+
+    if (team_kart_id != -1)
+    {
+        m_teams[getKartTeam(hitter)].m_opposing_team_touches[team_kart_id] += points;
+        m_kart_info[hitter].m_opposing_team_touches[team_kart_id] += points;
+
+        // Point du joueur  
+        if (m_kart_info[hitter].m_opposing_team_touches[team_kart_id] == RaceManager::get()->getHitCaptureLimit() &&
+            m_kart_info[hitter].m_opposing_team_touches_v[team_kart_id] == false)
+        {
+            m_kart_info[hitter].m_opposing_team_touches_win_nb += 1;
+            m_kart_info[hitter].m_opposing_team_touches_v[team_kart_id] == true;
+        }
+        else if (m_kart_info[hitter].m_opposing_team_touches[team_hitter_id] < RaceManager::get()->getHitCaptureLimit() &&
+                 m_kart_info[hitter].m_opposing_team_touches_v[team_hitter_id] == true)
+        {
+            m_kart_info[hitter].m_opposing_team_touches_win_nb -= 1;
+            m_kart_info[hitter].m_opposing_team_touches_v[team_kart_id] == false;
+        }
+
+
+        // Point de l'équipe 
+        if (RaceManager::get()->isTabAPPMode() || RaceManager::get()->isTabPPMode())
+        {
+            if (m_kart_info[hitter].m_opposing_team_touches_win_nb == getNumTeams() - 1 &&
+                m_kart_info[hitter].m_opposing_team_touches_v[team_kart_id] == false)
+            {
+                m_teams[team_hitter_id].m_opposing_team_touches_win_nb += 1;
+                m_teams[team_hitter_id].m_opposing_team_touches_v[team_kart_id] == true;
+            }
+            else if (m_kart_info[hitter].m_opposing_team_touches_win_nb != getNumTeams() - 1 &&
+                     m_kart_info[hitter].m_opposing_team_touches_v[team_kart_id] == true)
+            {
+                m_teams[team_hitter_id].m_opposing_team_touches_win_nb -= 1;
+                m_teams[team_hitter_id].m_opposing_team_touches_v[team_kart_id] == false;
+            }
+        }
+        else if (m_teams[team_hitter_id].m_opposing_team_touches[team_kart_id] == RaceManager::get()->getHitCaptureLimit() &&
+                m_teams[team_hitter_id].m_opposing_team_touches_v[team_kart_id] == false)
+        {
+            m_teams[team_hitter_id].m_opposing_team_touches_win_nb += 1;
+            m_teams[team_hitter_id].m_opposing_team_touches_v[team_kart_id] == true;
+        }
+        else if (m_teams[team_hitter_id].m_opposing_team_touches[team_kart_id] < RaceManager::get()->getHitCaptureLimit() &&
+                 m_teams[team_hitter_id].m_opposing_team_touches_v[team_kart_id] == true)
+        {
+            m_teams[team_hitter_id].m_opposing_team_touches_win_nb -= 1;
+            m_teams[team_hitter_id].m_opposing_team_touches_v[team_kart_id] == false;
+        }
     }
 }
 
@@ -609,4 +645,48 @@ void TeamArenaBattle::calculateAllTeamVictoryConditionsPoints(int player_id, int
 void TeamArenaBattle::calculateAllTeamVictoryWinConditions()
 {
     // Inutile pour le moment 
+}
+
+// ------------------------------------------------------------------------
+int TeamArenaBattle::findTeamIdForLosePoints(int kart_id) 
+{   // We have to find a team_hitter_id
+    for (size_t i = 0; i < m_kart_info[kart_id].m_opposing_team_touches.size(); i++)
+    {
+        if (m_kart_info[kart_id].m_opposing_team_touches[i] >= 1) {
+            return m_kart_info[kart_id].m_opposing_team_touches[i];
+        }
+    }
+    return -1;
+}
+
+// ------------------------------------------------------------------------
+void TeamArenaBattle::kartsRankInfo() 
+{
+    std::vector<std::pair<int, int> > ranks;
+    for (unsigned i = 0; i < m_kart_info.size(); i++)
+    {
+        // For eliminated (disconnected or reserved player) make his score
+        // int min so always last in rank
+        int cur_score = getKart(i)->isEliminated() ?
+            std::numeric_limits<int>::min() : m_kart_info[i].m_scores;
+        ranks.emplace_back(i, cur_score);
+    }
+    std::sort(ranks.begin(), ranks.end(),
+        [](const std::pair<int, int>& a, const std::pair<int, int>& b)
+        {
+            return a.second > b.second;
+        });
+    beginSetKartPositions();
+    for (unsigned i = 0; i < ranks.size(); i++)
+        setKartPosition(ranks[i].first, i + 1);
+    endSetKartPositions();
+}
+
+// ------------------------------------------------------------------------
+irr::core::stringw TeamArenaBattle::setWinningTeamNameText()
+{
+    std::string str = getKartTeamsColorName(KartTeam(m_winning_team)); // RaceGUIBase::
+    irr::core::stringw teamColor = irr::core::stringw(str.c_str());
+    teamColor = _(teamColor.c_str());
+    return teamColor;
 }
