@@ -485,20 +485,37 @@ void TeamArenaBattle::configureTheifModeValue()
 }
 
 // ------------------------------------------------------------------------
-void TeamArenaBattle::calculateTheifPoints(int kart_id, int hitter) 
+void TeamArenaBattle::calculateTheifPoints(int kart_id, int hitter)
 {
+    int nb_thief_point;
     // À vérifier 
-    m_teams[getKartTeam(hitter)].m_scores_teams++;
-    m_kart_info[hitter].m_scores++;
 
-    if (RaceManager::get()->isTabAPPMode() || RaceManager::get()->isTabPPMode()) {
-        if (m_kart_info[hitter].m_scores > m_teams[getKartTeam(hitter)].m_scores_teams) {
-            m_teams[getKartTeam(hitter)].m_scores_teams = m_kart_info[hitter].m_scores;
-        }
-        if (m_kart_info[hitter].m_scores <= hit_capture_limit && m_kart_info[hitter].m_has_score == true) {
-            m_teams[getKartTeam(hitter)].m_total_player_get_score--;
-            m_kart_info[hitter].m_has_score = false;
-        }
+    // Lives  
+    if (RaceManager::get()->isTABLifeMode()) 
+    {
+        if (m_kart_info[kart_id].m_lives > m_nb_point_thief)
+            nb_thief_point = m_nb_point_thief;
+        else
+            nb_thief_point = m_kart_info[kart_id].m_lives;
+
+        m_kart_info[kart_id].m_lives -= m_nb_point_thief;
+        m_teams[getKartTeam(kart_id)].m_total_life -= m_nb_point_thief;
+
+        m_kart_info[hitter].m_lives += m_nb_point_thief;
+        m_teams[getKartTeam(hitter)].m_total_life += m_nb_point_thief;
+    }
+    else // Points 
+    {
+        if (m_kart_info[kart_id].m_scores > m_nb_point_thief)
+            nb_thief_point = m_nb_point_thief;
+        else
+            nb_thief_point = m_kart_info[kart_id].m_scores;
+
+        m_kart_info[kart_id].m_scores -= m_nb_point_thief;
+        m_teams[getKartTeam(kart_id)].m_scores_teams -= m_nb_point_thief;
+
+        m_kart_info[hitter].m_scores += m_nb_point_thief;
+        m_teams[getKartTeam(hitter)].m_scores_teams += m_nb_point_thief;
     }
 }
 
@@ -662,8 +679,8 @@ void TeamArenaBattle::updateScores(int kart_id, int hitter)
         }
 
         // À la bonne place ou pas
-        //if (hasThiefMode)
-        //    calculateTheifPoints(kart_id, hitter);
+        if (hasThiefMode)
+            calculateTheifPoints(kart_id, hitter);
 
         calculatePointsForAllTeamVictoryConditionsPoints(getKartTeam(kart_id), hitter, getKartTeam(hitter), 1);
 
