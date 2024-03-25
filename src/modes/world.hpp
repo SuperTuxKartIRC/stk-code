@@ -411,6 +411,12 @@ public:
     // ------------------------------------------------------------------------
     /** Get the team of kart in world (including AIs) */
     KartTeam getKartTeam(unsigned int kart_id) const;
+    //-------------------------------------------------------------------------
+    int getKartIdTeamIndex(unsigned int kart_id) const;
+    //-------------------------------------------------------------------------
+    int getKartTeamIndex(unsigned int team_id) const;
+    //-------------------------------------------------------------------------
+    int getKartTeamIndex(KartTeam team) const;
     // ------------------------------------------------------------------------
     int getTeamNum(KartTeam team) const;
     // ------------------------------------------------------------------------

@@ -1769,6 +1769,43 @@ KartTeam World::getKartTeam(unsigned int kart_id) const
     return n->second;
 }   // getKartTeam
 
+//-----------------------------------------------------------------------------
+int World::getKartIdTeamIndex(unsigned int kart_id) const
+{
+    auto it = std::find(m_teamsInGame.begin(), m_teamsInGame.end(), getKartTeam(kart_id));
+
+    // Vérification si la valeur est trouvée et retour de l'index si c'est le cas
+    if (it != m_teamsInGame.end())
+        return std::distance(m_teamsInGame.begin(), it);
+    else
+        return -1;
+}   // getKartTeamIndex
+
+
+//-----------------------------------------------------------------------------
+int World::getKartTeamIndex(unsigned int team_id) const
+{
+    auto it = std::find(m_teamsInGame.begin(), m_teamsInGame.end(), (KartTeam)team_id);
+
+    // Vérification si la valeur est trouvée et retour de l'index si c'est le cas
+    if (it != m_teamsInGame.end())
+        return std::distance(m_teamsInGame.begin(), it);
+    else
+        return -1;
+}   // getKartTeamIndex
+
+//-----------------------------------------------------------------------------
+int World::getKartTeamIndex(KartTeam team) const
+{
+    auto it = std::find(m_teamsInGame.begin(), m_teamsInGame.end(), team);
+
+    // Vérification si la valeur est trouvée et retour de l'index si c'est le cas
+    if (it != m_teamsInGame.end())
+        return std::distance(m_teamsInGame.begin(), it);
+    else
+        return -1;
+}   // getKartTeamIndex
+
 void World::changeKartTeam(unsigned int kart_id, const KartTeam& new_team) {
     std::map<int, KartTeam>::iterator n =
         m_kart_team_map.find(kart_id);

@@ -1489,10 +1489,16 @@ void RaceGUI::drawLap(const AbstractKart* kart,
         uint8_t nbTeam = world->getNumTeams();
         KartTeam team;
         int icon_width = irr_driver->getActualScreenSize().Height / 19;
-        core::rect<s32> indicator_pos(viewport.LowerRightCorner.X - (icon_width + 10),
+        core::rect<s32> indicator_pos(viewport.LowerRightCorner.X - (2*icon_width + 20),
             pos.UpperLeftCorner.Y,
             viewport.LowerRightCorner.X - 10,
             pos.UpperLeftCorner.Y + icon_width);
+
+        core::rect<s32> indicator_pos2(viewport.LowerRightCorner.X - (2*icon_width + 20),
+            pos.UpperLeftCorner.Y,
+            viewport.LowerRightCorner.X - (icon_width + 20),
+            pos.UpperLeftCorner.Y + icon_width);
+
         core::rect<s32> source_rect(core::position2d<s32>(0, 0),
             m_champion->getSize());
 
@@ -1535,20 +1541,20 @@ void RaceGUI::drawLap(const AbstractKart* kart,
 
             // m_winning_podium_icon // m_thief_icon // m_thief_live_icon
 
-            //if (modeVal == 1) 
-            //{
-            //    if (RaceManager::get()->hasSpecialVictoryMode()) {
-            //        draw2DImage(m_winning_podium_icon, indicator_pos, source_rect, NULL, NULL, true);
-            //    }
-            //    if (RaceManager::get()->hasThiefMode()) {
-            //        if (RaceManager::get()->isTabLifeMode()) {
-            //            draw2DImage(m_thief_live_icon, indicator_pos, source_rect, NULL, NULL, true);
-            //        }
-            //        else {
-            //            draw2DImage(m_thief_icon, indicator_pos, source_rect, NULL, NULL, true);
-            //        }
-            //    }
-            //}
+            if (modeVal == 1) 
+            {
+                if (RaceManager::get()->hasSpecialVictoryMode()) {
+                    draw2DImage(m_winning_podium_icon, indicator_pos2, source_rect, NULL, NULL, true);
+                }
+                if (RaceManager::get()->hasThiefMode()) {
+                    if (RaceManager::get()->isTabLifeMode()) {
+                        draw2DImage(m_thief_live_icon, indicator_pos2, source_rect, NULL, NULL, true);
+                    }
+                    else {
+                        draw2DImage(m_thief_icon, indicator_pos2, source_rect, NULL, NULL, true);
+                    }
+                }
+            }
 
             //if(tab)
             //    draw2DImage(m_champion, indicator_pos, source_rect,NULL, NULL, true);

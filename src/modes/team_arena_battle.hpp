@@ -145,20 +145,20 @@ public:
     // ------------------------------------------------------------------------
     int getTeamsKartScore(int kart_id);
     // ------------------------------------------------------------------------
-    int getTeamScore(KartTeam team) const { return m_teams[(int)team].m_scores_teams; }
+    int getTeamScore(KartTeam team) const { return m_teams[getKartTeamIndex(team)].m_scores_teams; }
     // ------------------------------------------------------------------------
-    int getTeamInlifePlayer(int team) const { return m_teams[(int)team].m_inlife_player; }
+    int getTeamInlifePlayer(int team) const { return m_teams[getKartTeamIndex(team)].m_inlife_player; }
     // ------------------------------------------------------------------------
-    int getTeamTotalLife(int team) const { return m_teams[(int)team].m_total_life; }
+    int getTeamTotalLife(int team) const { return m_teams[getKartTeamIndex(team)].m_total_life; }
     // ------------------------------------------------------------------------
     int getTeamScore(int team) const 
     { 
         if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER || 
             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER) {
-            return m_teams[team].m_total_player_get_score;
+            return m_teams[getKartTeamIndex(team)].m_total_player_get_score;
         }
         else 
-            return m_teams[team].m_scores_teams;
+            return m_teams[getKartTeamIndex(team)].m_scores_teams;
     }
     // ------------------------------------------------------------------------
     void setWinningTeams();

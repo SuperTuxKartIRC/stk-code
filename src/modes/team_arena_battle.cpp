@@ -46,10 +46,10 @@ void TeamArenaBattle::reset(bool restart)
 void TeamArenaBattle::initGameInfo()
 {
     m_teams.clear();
-    m_teams.resize(4);
+    m_teams.resize(getNumTeams());
     m_kart_info.clear();
     m_kart_info.resize(getNumKarts());
-    for (unsigned int i = 0; i < 4; i++)
+    for (unsigned int i = 0; i < getNumTeams(); i++)
     {
         m_teams[i].m_inlife_player = getTeamNum((KartTeam)i);
         m_teams[i].m_total_life = getTeamNum((KartTeam)i) * (RaceManager::get()->getLifeTarget());
@@ -185,9 +185,9 @@ void TeamArenaBattle::handleScoreInServer(int kart_id, int hitter)
     if (hitter != -1) 
     {
         if (m_hasAllTeamVictoryConditions && !RaceManager::get()->isTabLifeMode())
-            calculateAllTeamVictoryConditionsPoints(hitter,getKartTeam(hitter));
+            calculateAllTeamVictoryConditionsPoints(hitter, getKartIdTeamIndex(hitter));
         else 
-            verifyTeamWin(getKartTeam(hitter));
+            verifyTeamWin(getKartIdTeamIndex(hitter));
     }
 
     kartsRankInfo();
@@ -215,11 +215,11 @@ void TeamArenaBattle::setKartScoreFromServer(NetworkString& ns)
 int TeamArenaBattle::getTeamsKartScore(int kart_id)
 {
     if (RaceManager::get()->isTabAPPMode())
-        return m_teams[(int)getKartTeam(kart_id)].m_total_player_get_score;
+        return m_teams[getKartIdTeamIndex(kart_id)].m_total_player_get_score;
     else if (RaceManager::get()->isTabLifeMode())
-        return m_teams[(int)getKartTeam(kart_id)].m_total_life;
+        return m_teams[getKartIdTeamIndex(kart_id)].m_total_life;
     else 
-        return m_teams[(int)getKartTeam(kart_id)].m_scores_teams;
+        return m_teams[getKartIdTeamIndex(kart_id)].m_scores_teams;
 }
 
 // ----------------------------------------------------------------------------
@@ -513,10 +513,10 @@ void TeamArenaBattle::calculateTheifPoints(int kart_id, int hitter)
             nb_thief_point = m_kart_info[kart_id].m_lives;
 
         m_kart_info[kart_id].m_lives -= m_nb_point_thief;
-        m_teams[getKartTeam(kart_id)].m_total_life -= m_nb_point_thief;
+        m_teams[getKartIdTeamIndex(kart_id)].m_total_life -= m_nb_point_thief;
 
         m_kart_info[hitter].m_lives += m_nb_point_thief;
-        m_teams[getKartTeam(hitter)].m_total_life += m_nb_point_thief;
+        m_teams[getKartIdTeamIndex(hitter)].m_total_life += m_nb_point_thief;
     }
     else // Points 
     {
@@ -526,10 +526,10 @@ void TeamArenaBattle::calculateTheifPoints(int kart_id, int hitter)
             nb_thief_point = m_kart_info[kart_id].m_scores;
 
         m_kart_info[kart_id].m_scores -= m_nb_point_thief;
-        m_teams[getKartTeam(kart_id)].m_scores_teams -= m_nb_point_thief;
+        m_teams[getKartIdTeamIndex(kart_id)].m_scores_teams -= m_nb_point_thief;
 
         m_kart_info[hitter].m_scores += m_nb_point_thief;
-        m_teams[getKartTeam(hitter)].m_scores_teams += m_nb_point_thief;
+        m_teams[getKartIdTeamIndex(hitter)].m_scores_teams += m_nb_point_thief;
     }
 }
 
@@ -574,7 +574,7 @@ void TeamArenaBattle::calculatePointsForAllTeamVictoryConditionsPoints(int team_
 
     if (team_kart_id != -1)
     {
-        m_teams[getKartTeam(hitter)].m_opposing_team_touches[team_kart_id] += points;
+        m_teams[getKartIdTeamIndex(hitter)].m_opposing_team_touches[team_kart_id] += points;
         m_kart_info[hitter].m_opposing_team_touches[team_kart_id] += points;
 
         // Point du joueur  
@@ -679,16 +679,16 @@ void TeamArenaBattle::updateScores(int kart_id, int hitter)
 {
     if (hitter != -1)
     {
-        m_teams[getKartTeam(hitter)].m_scores_teams++;
+        m_teams[getKartIdTeamIndex(hitter)].m_scores_teams++;
         m_kart_info[hitter].m_scores++;
 
         if (RaceManager::get()->isTabAPPMode() || RaceManager::get()->isTabPPMode()) 
         {
-            if (m_kart_info[hitter].m_scores > m_teams[getKartTeam(hitter)].m_scores_teams) 
-                m_teams[getKartTeam(hitter)].m_scores_teams = m_kart_info[hitter].m_scores;
+            if (m_kart_info[hitter].m_scores > m_teams[getKartIdTeamIndex(hitter)].m_scores_teams)
+                m_teams[getKartIdTeamIndex(hitter)].m_scores_teams = m_kart_info[hitter].m_scores;
             if (m_kart_info[hitter].m_scores >= hit_capture_limit && m_kart_info[hitter].m_has_score == false) 
             {
-                m_teams[getKartTeam(hitter)].m_total_player_get_score++;
+                m_teams[getKartIdTeamIndex(hitter)].m_total_player_get_score++;
                 m_kart_info[hitter].m_has_score = true;
             }
         }
@@ -697,23 +697,23 @@ void TeamArenaBattle::updateScores(int kart_id, int hitter)
         if (m_hasThiefMode)
             calculateTheifPoints(kart_id, hitter);
 
-        calculatePointsForAllTeamVictoryConditionsPoints(getKartTeam(kart_id), hitter, getKartTeam(hitter), 1);
+        calculatePointsForAllTeamVictoryConditionsPoints(getKartIdTeamIndex(kart_id), hitter, getKartIdTeamIndex(hitter), 1);
 
         getKart(hitter)->getKartModel()->setAnimation(KartModel::AF_WIN_START, true/*play_non_loop*/);
     }
-    else if (m_teams[getKartTeam(kart_id)].m_scores_teams > 0)
+    else if (m_teams[getKartIdTeamIndex(kart_id)].m_scores_teams > 0)
     {
-        m_teams[getKartTeam(kart_id)].m_scores_teams--;
+        m_teams[getKartIdTeamIndex(kart_id)].m_scores_teams--;
         m_kart_info[kart_id].m_scores--;
 
         if (m_kart_info[kart_id].m_scores < hit_capture_limit && m_kart_info[kart_id].m_has_score == true) 
         { // Mal gérer 
-            m_teams[getKartTeam(kart_id)].m_total_player_get_score--;
+            m_teams[getKartIdTeamIndex(kart_id)].m_total_player_get_score--;
             m_kart_info[kart_id].m_has_score = false;
         }
 
         // player 
-        calculatePointsForAllTeamVictoryConditionsPoints(-1, kart_id, getKartTeam(kart_id), -1);
+        calculatePointsForAllTeamVictoryConditionsPoints(-1, kart_id, getKartIdTeamIndex(kart_id), -1);
     }
 }
 
@@ -723,11 +723,11 @@ void TeamArenaBattle::updatePlayerLives(int kart_id, int hitter)
     if (RaceManager::get()->isTabLifeMode() && m_kart_info[kart_id].m_lives > 0)
     {
         m_kart_info[kart_id].m_lives--;
-        m_teams[getKartTeam(kart_id)].m_total_life--;
+        m_teams[getKartIdTeamIndex(kart_id)].m_total_life--;
 
         if (m_kart_info[kart_id].m_lives == 0)
-            m_teams[getKartTeam(kart_id)].m_inlife_player--;
-        if (m_teams[getKartTeam(kart_id)].m_inlife_player == 0)
+            m_teams[getKartIdTeamIndex(kart_id)].m_inlife_player--;
+        if (m_teams[getKartIdTeamIndex(kart_id)].m_inlife_player == 0)
             m_team_death++;
 
         if (m_kart_info[kart_id].m_lives == 0) 
