@@ -108,6 +108,11 @@ RaceGUI::RaceGUI()
     m_soccer_ball = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_normal.png");
     m_heart_icon = irr_driver->getTexture(FileManager::GUI_ICON, "heart.png");
     m_basket_ball_icon = irr_driver->getTexture(FileManager::GUI_ICON, "rubber_ball-icon.png");
+
+    m_winning_podium_icon = irr_driver->getTexture(FileManager::GUI_ICON, "winningPodium.png"); // For special victory win
+    m_thief_icon = irr_driver->getTexture(FileManager::GUI_ICON, "Thief.png");
+    m_thief_live_icon = irr_driver->getTexture(FileManager::GUI_ICON, "ThiefLivee.png");
+
     m_champion = irr_driver->getTexture(FileManager::GUI_ICON, "cup_gold.png");
 }   // RaceGUI
 
@@ -1497,7 +1502,7 @@ void RaceGUI::drawLap(const AbstractKart* kart,
         {
             team = world->getTeamsInGame(i);
 
-            if (team >= 0) {
+            if (team >= 0 && i <= 3) {  // Besoins de modif 
                 team_score = modeVal == 1 ? tab->getTeamScore(team) : modeVal == 2 ? tab->getTeamInlifePlayer((int)team) : modeVal == 3 ? tagzab->getTeamInlifePlayer((int)team) : 0;
 
                 if (i != 0 && nbTeam > 1) {
@@ -1526,6 +1531,24 @@ void RaceGUI::drawLap(const AbstractKart* kart,
             pos += core::position2di(d.Width, 0);
 
             modeVal == 2 ? draw2DImage(m_heart_icon, indicator_pos, source_rect, NULL, NULL, true) : draw2DImage(m_champion, indicator_pos, source_rect, NULL, NULL, true);
+
+
+            // m_winning_podium_icon // m_thief_icon // m_thief_live_icon
+
+            //if (modeVal == 1) 
+            //{
+            //    if (RaceManager::get()->hasSpecialVictoryMode()) {
+            //        draw2DImage(m_winning_podium_icon, indicator_pos, source_rect, NULL, NULL, true);
+            //    }
+            //    if (RaceManager::get()->hasThiefMode()) {
+            //        if (RaceManager::get()->isTabLifeMode()) {
+            //            draw2DImage(m_thief_live_icon, indicator_pos, source_rect, NULL, NULL, true);
+            //        }
+            //        else {
+            //            draw2DImage(m_thief_icon, indicator_pos, source_rect, NULL, NULL, true);
+            //        }
+            //    }
+            //}
 
             //if(tab)
             //    draw2DImage(m_champion, indicator_pos, source_rect,NULL, NULL, true);

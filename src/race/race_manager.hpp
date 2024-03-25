@@ -395,6 +395,8 @@ private:
     float                            m_time_target;
     int                              m_life_target;
     int                              m_tag_target;
+    bool                             m_thief_mode;
+    bool                             m_special_victory_mode;
     int                              m_minor_mode_target=0;
     int                              m_goal_target;
     int                              m_hit_capture_limit;
@@ -507,6 +509,14 @@ public:
         m_time_target = 0.0f;
         m_goal_target = max_goal;
     }   // setMaxGoal
+    // ----------------------------------------------------------------------------------------
+    void setThiefMode(bool hasMode) { m_thief_mode = hasMode; }
+    // ----------------------------------------------------------------------------------------
+    bool hasThiefMode() const { return m_thief_mode; }
+    // ----------------------------------------------------------------------------------------
+    void setSpecialVictoryMode(bool hasMode) { m_special_victory_mode = hasMode; }
+    // ----------------------------------------------------------------------------------------
+    bool hasSpecialVictoryMode() const { return m_special_victory_mode; }
     // ----------------------------------------------------------------------------------------
     int getMaxGoal() { return m_goal_target; }
     // ----------------------------------------------------------------------------------------

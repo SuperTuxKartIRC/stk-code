@@ -82,10 +82,10 @@ protected:
 
     // Steals a point from the other player if he has at least 1 point. 
     // The player will also lost another point. 
-    bool hasThiefMode = false; 
+    bool m_hasThiefMode = false; 
     // This means, for example, 10 points for each team. 
     // Touch, for example, 10 players from each team
-    bool hasAllTeamVictoryConditions = false;
+    bool m_hasAllTeamVictoryConditions = false;
     
     // For the thief Mode 
     int m_nb_point_thief;
@@ -216,13 +216,13 @@ private:
     // ------------------------------------------------------------------------
     void configureTheifModeValue();
     // ------------------------------------------------------------------------
+    void calculateMultiplierPointThiefMode();
+    // ------------------------------------------------------------------------
     void calculateTheifPoints(int kart_id, int hitter);
     // ------------------------------------------------------------------------
     void calculatePointsForAllTeamVictoryConditionsPoints(int team_id, int hitter, int team_hitter_id, int points);
     // ------------------------------------------------------------------------
     void calculateAllTeamVictoryConditionsPoints(int player_id, int team_id);
-    // ------------------------------------------------------------------------
-    void calculateAllTeamVictoryWinConditions();
     // ------------------------------------------------------------------------
     int findTeamIdForLosePoints(int kart_id);
     // ------------------------------------------------------------------------

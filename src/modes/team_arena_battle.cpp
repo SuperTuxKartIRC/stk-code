@@ -58,11 +58,10 @@ void TeamArenaBattle::initGameInfo()
     m_winning_team = -1;
     m_team_death = 0;
 
-    hasThiefMode = true; // 
-    hasAllTeamVictoryConditions = true; // 
+    m_hasThiefMode = true; // 
+    m_hasAllTeamVictoryConditions = true; // 
 
-    if (hasThiefMode)
-        configureTheifModeValue();
+    configureTheifModeValue();
 }
 
 // ----------------------------------------------------------------------------
@@ -185,7 +184,7 @@ void TeamArenaBattle::handleScoreInServer(int kart_id, int hitter)
 
     if (hitter != -1) 
     {
-        if (hasAllTeamVictoryConditions && !RaceManager::get()->isTabLifeMode())
+        if (m_hasAllTeamVictoryConditions && !RaceManager::get()->isTabLifeMode())
             calculateAllTeamVictoryConditionsPoints(hitter,getKartTeam(hitter));
         else 
             verifyTeamWin(getKartTeam(hitter));
@@ -477,6 +476,21 @@ std::string TeamArenaBattle::getKartTeamsColorName(KartTeam teamColorName)
 // ------------------------------------------------------------------------
 void TeamArenaBattle::configureTheifModeValue() 
 {
+    // Initialiser le générateur de nombres aléatoires
+    srand(time(nullptr));
+
+    // Générer un nombre aléatoire entre 0 et 1
+    int randomNumber = rand() % 2; // 0 ou 1
+    m_hasThiefMode = randomNumber;
+
+    RaceManager::get()->setThiefMode(m_hasThiefMode);
+
+    RaceManager::get()->setThiefMode(true); // Pour tester 
+    RaceManager::get()->setSpecialVictoryMode(true); // Pour tester 
+
+    if (!m_hasThiefMode)
+        return;
+
     int m_nb_point_thief = 1;
     int m_nb_point_player_lose = 1;
 
@@ -610,9 +624,10 @@ void TeamArenaBattle::calculatePointsForAllTeamVictoryConditionsPoints(int team_
 }
 
 // ------------------------------------------------------------------------
-void TeamArenaBattle::calculateAllTeamVictoryWinConditions()
+void TeamArenaBattle::calculateMultiplierPointThiefMode()
 {
     // Inutile pour le moment 
+
 }
 
 // ------------------------------------------------------------------------
@@ -679,7 +694,7 @@ void TeamArenaBattle::updateScores(int kart_id, int hitter)
         }
 
         // À la bonne place ou pas
-        if (hasThiefMode)
+        if (m_hasThiefMode)
             calculateTheifPoints(kart_id, hitter);
 
         calculatePointsForAllTeamVictoryConditionsPoints(getKartTeam(kart_id), hitter, getKartTeam(hitter), 1);
