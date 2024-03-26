@@ -62,6 +62,8 @@ void TeamArenaBattle::initGameInfo()
     m_hasAllTeamVictoryConditions = true; // 
 
     configureTheifModeValue();
+
+    kartsRankInfo(); // Fonctionne vraiment ???
 }
 
 // ----------------------------------------------------------------------------
@@ -106,6 +108,11 @@ void TeamArenaBattle::terminateRace()
 void TeamArenaBattle::getKartsDisplayInfo(
     std::vector<RaceGUIBase::KartIconDisplayInfo>* info)
 {
+    if (!m_hit) {
+        m_hit = false;
+        return;
+    }
+
     const unsigned int kart_amount = getNumKarts();
     for (unsigned int i = 0; i < kart_amount; i++)
     {
@@ -190,6 +197,8 @@ void TeamArenaBattle::handleScoreInServer(int kart_id, int hitter)
             verifyTeamWin(getKartIdTeamIndex(hitter));
     }
 
+    m_hit = true;
+
     kartsRankInfo();
 
     if (NetworkConfig::get()->isNetworking() &&
@@ -230,7 +239,7 @@ void TeamArenaBattle::update(int ticks)
     if (Track::getCurrentTrack()->hasNavMesh())
         updateSectorForKarts();
 
-    // kartsRankInfo() ??
+    // kartsRankInfo(); // ??
 
 }   // update
 

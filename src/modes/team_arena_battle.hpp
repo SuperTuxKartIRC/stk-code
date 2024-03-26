@@ -79,6 +79,7 @@ protected:
     int hit_capture_limit = RaceManager::get()->getHitCaptureLimit();
     int m_winning_team = -1; // For isRaceOver()
     irr::core::stringw m_winning_text;
+    bool m_hit = false; // Un test pour améliorer les performances
 
     // Steals a point from the other player if he has at least 1 point. 
     // The player will also lost another point. 
