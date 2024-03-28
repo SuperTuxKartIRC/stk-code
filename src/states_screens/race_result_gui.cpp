@@ -1692,9 +1692,11 @@ void RaceResultGUI::unload()
             irr::u32 text_x = 200;
 
             if (modeVal == 1)
-                result_text.append(StringUtils::toWString(tab->getKartScore(kart_id)));
-            else if (modeVal == 2)
-                result_text.append(StringUtils::toWString(tab->getKartLife(kart_id))); // TODO : MODIF ??
+                result_text.append(StringUtils::toWString(tab->getTeamsKartScore(kart_id)));
+            if (modeVal == 1)
+                result_text.append(StringUtils::toWString(tab->getPlayerScoreInformationVictory(kart_id)));
+            //else if (modeVal == 2)
+            //    result_text.append(StringUtils::toWString(tab->getKartLife(kart_id))); // TODO : MODIF ??
             //else if (modeVal == 3) {
             //    if (tagzab->getKartNbConvertedPlayer(kart_id) > 0)
             //        result_text.append(StringUtils::toWString(tagzab->getKartNbConvertedPlayer(kart_id)));

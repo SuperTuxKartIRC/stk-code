@@ -58,13 +58,14 @@ void TeamArenaBattle::initGameInfo()
     m_winning_team = -1;
     m_team_death = 0;
 
-    m_hasThiefMode = true; // 
-    m_hasAllTeamVictoryConditions = true; // 
+    //m_hasThiefMode = true; // 
+    //m_hasAllTeamVictoryConditions = true; // 
 
     configureTheifModeValue();
 
     m_hit = true;
-    kartsRankInfo(); // Fonctionne vraiment ???
+    m_hit_RI = true;
+    //kartsRankInfo(); // Fonctionne vraiment ???
 }
 
 // ----------------------------------------------------------------------------
@@ -199,8 +200,9 @@ void TeamArenaBattle::handleScoreInServer(int kart_id, int hitter)
     }
 
     m_hit = true;
+    m_hit_RI = true;
 
-    kartsRankInfo();
+    //kartsRankInfo();
 
     if (NetworkConfig::get()->isNetworking() &&
         NetworkConfig::get()->isServer())
@@ -253,8 +255,10 @@ void TeamArenaBattle::update(int ticks)
     if (Track::getCurrentTrack()->hasNavMesh())
         updateSectorForKarts();
 
-    //if(m_hit)
-        //kartsRankInfo(); // ??
+    if(m_hit_RI){
+        m_hit_RI = false;
+        kartsRankInfo(); // ??
+    }
 
 }   // update
 
@@ -717,6 +721,7 @@ void TeamArenaBattle::updateScores(int kart_id, int hitter)
     {
         m_teams[getKartIdTeamIndex(hitter)].m_scores_teams++;
         m_kart_info[hitter].m_scores++;
+        m_kart_info[hitter].m_number_of_times_hit++;
 
         if (RaceManager::get()->isTabAPPMode() || RaceManager::get()->isTabPPMode()) 
         {

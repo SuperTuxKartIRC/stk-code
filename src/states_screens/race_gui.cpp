@@ -111,7 +111,7 @@ RaceGUI::RaceGUI()
 
     m_winning_podium_icon = irr_driver->getTexture(FileManager::GUI_ICON, "winningPodium.png"); // For special victory win
     m_thief_icon = irr_driver->getTexture(FileManager::GUI_ICON, "player.png");  // thief
-    m_thief_live_icon = irr_driver->getTexture(FileManager::GUI_ICON, "thief_lives.png");
+    m_thief_live_icon = irr_driver->getTexture(FileManager::GUI_ICON, "player.png"); // thief_lives
 
     m_champion = irr_driver->getTexture(FileManager::GUI_ICON, "cup_gold.png");
 }   // RaceGUI

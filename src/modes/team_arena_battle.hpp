@@ -80,6 +80,7 @@ protected:
     int m_winning_team = -1; // For isRaceOver()
     irr::core::stringw m_winning_text;
     bool m_hit = false; // Un test pour améliorer les performances
+    bool m_hit_RI = false; // Un test pour améliorer les performances
 
     // Steals a point from the other player if he has at least 1 point. 
     // The player will also lost another point. 
@@ -143,12 +144,12 @@ public:
     virtual void setKartScoreFromServer(NetworkString& ns);
     // ------------------------------------------------------------------------
     virtual void setGameSetupFromServer(NetworkString& ns);
-    // ------------------------------------------------------------------------
-    int getKartScore(int kart_id) const { return m_kart_info.at(kart_id).m_scores; }
+    //// ------------------------------------------------------------------------
+    //int getKartScore(int kart_id) const { return m_kart_info.at(kart_id).m_scores; }
     // ------------------------------------------------------------------------
     int getTeamsKartScore(int kart_id);
-    // ------------------------------------------------------------------------
-    int getTeamScore(KartTeam team) const { return m_teams[getKartTeamIndex(team)].m_scores_teams; }
+    //// ------------------------------------------------------------------------
+    //int getTeamScore(KartTeam team) const { return m_teams[getKartTeamIndex(team)].m_scores_teams; }
     // ------------------------------------------------------------------------
     int getTeamInlifePlayer(int team) const { return m_teams[getKartTeamIndex(team)].m_inlife_player; }
     // ------------------------------------------------------------------------
@@ -171,7 +172,7 @@ public:
             RaceManager::get()->isTabAPPMode()) {
             str = m_kart_info[id_player].m_scores;
             str += ", ";
-            str = m_kart_info[id_player].m_number_of_times_hit;
+            str += m_kart_info[id_player].m_number_of_times_hit;
 
             if (RaceManager::get()->hasSpecialVictoryMode()) {
                 str += ", ";
@@ -181,9 +182,9 @@ public:
         else {
             str = m_kart_info[id_player].m_scores;
             str += ", ";
-            str = m_kart_info[id_player].m_number_of_times_hit;
+            str += m_kart_info[id_player].m_number_of_times_hit;
             str += ", ";
-            str = m_kart_info[id_player].m_lives;
+            str += m_kart_info[id_player].m_lives;
         }
         return str;
     }
