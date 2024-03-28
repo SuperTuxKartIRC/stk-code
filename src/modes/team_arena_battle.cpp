@@ -228,8 +228,8 @@ void TeamArenaBattle::setGameSetupFromServer(NetworkString& ns)
     uint8_t hasSpecialVictoryMode = ns.getUInt8();
     uint8_t hasThiefMode = ns.getUInt8();
 
-    RaceManager::get()->setSpecialVictoryMode(hasSpecialVictoryMode);
-    RaceManager::get()->setThiefMode(hasThiefMode);
+    m_hasAllTeamVictoryConditions = hasSpecialVictoryMode;
+    m_hasThiefMode = hasThiefMode;
     configureTheifModeValue();
 
 }   // setGameSetupFromServer
@@ -506,25 +506,26 @@ void TeamArenaBattle::configureTheifModeValue()
     //RaceManager::get()->setThiefMode(false); // Pour tester 
     //RaceManager::get()->setSpecialVictoryMode(false); // Pour tester 
 
-    m_hasThiefMode = RaceManager::get()->hasThiefMode();
-    m_hasAllTeamVictoryConditions = RaceManager::get()->hasSpecialVictoryMode();
+    // Générer un nombre aléatoire entre 0 et 1
+    if (!NetworkConfig::get()->isNetworking() || (NetworkConfig::get()->isNetworking() &&
+        !NetworkConfig::get()->isServer())) {
+        m_hasAllTeamVictoryConditions = rand() % 2; // 0 ou 1
+        m_hasThiefMode = rand() % 2; // 0 ou 1
+    }
+
+    RaceManager::get()->setThiefMode(m_hasThiefMode);
+    RaceManager::get()->setSpecialVictoryMode(m_hasAllTeamVictoryConditions);
 
     int m_nb_point_thief = 1;
     int m_nb_point_player_lose = 1;
 
-    bool hasMultiplierPointThiefMode = true; // Not here 
+    bool hasMultiplierPointThiefMode = true; // Not here ??
     int multiplierPointThiefNb = 1; // Usefull or not 
 
 
     if (NetworkConfig::get()->isNetworking() &&
         NetworkConfig::get()->isServer())
     {
-        // Générer un nombre aléatoire entre 0 et 1
-        m_hasAllTeamVictoryConditions = rand() % 2; // 0 ou 1
-        m_hasThiefMode = rand() % 2; // 0 ou 1
-        RaceManager::get()->setThiefMode(m_hasThiefMode);
-        RaceManager::get()->setSpecialVictoryMode(m_hasAllTeamVictoryConditions);
-
         NetworkString p(PROTOCOL_GAME_EVENTS);
         p.setSynchronous(true);
         p.addUInt8(GameEventsProtocol::GE_SETUP_GAME);

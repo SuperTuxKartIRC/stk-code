@@ -164,6 +164,30 @@ public:
             return m_teams[getKartTeamIndex(team)].m_scores_teams;
     }
     // ------------------------------------------------------------------------
+    std::string getPlayerScoreInformationVictory(int id_player) const
+    {
+        std::string str = "";
+        if (RaceManager::get()->isTabTPMode() || RaceManager::get()->isTabAPPMode() ||
+            RaceManager::get()->isTabAPPMode()) {
+            str = m_kart_info[id_player].m_scores;
+            str += ", ";
+            str = m_kart_info[id_player].m_number_of_times_hit;
+
+            if (RaceManager::get()->hasSpecialVictoryMode()) {
+                str += ", ";
+                str = m_kart_info[id_player].m_opposing_team_touches_win_nb;
+            }
+        }
+        else {
+            str = m_kart_info[id_player].m_scores;
+            str += ", ";
+            str = m_kart_info[id_player].m_number_of_times_hit;
+            str += ", ";
+            str = m_kart_info[id_player].m_lives;
+        }
+        return str;
+    }
+    // ------------------------------------------------------------------------
     void setWinningTeams();
     // ------------------------------------------------------------------------
     bool hasWin(int kartId);
