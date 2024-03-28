@@ -110,8 +110,8 @@ RaceGUI::RaceGUI()
     m_basket_ball_icon = irr_driver->getTexture(FileManager::GUI_ICON, "rubber_ball-icon.png");
 
     m_winning_podium_icon = irr_driver->getTexture(FileManager::GUI_ICON, "winningPodium.png"); // For special victory win
-    m_thief_icon = irr_driver->getTexture(FileManager::GUI_ICON, "Thief.png");
-    m_thief_live_icon = irr_driver->getTexture(FileManager::GUI_ICON, "ThiefLives.png");
+    m_thief_icon = irr_driver->getTexture(FileManager::GUI_ICON, "player.png");  // thief
+    m_thief_live_icon = irr_driver->getTexture(FileManager::GUI_ICON, "thief_lives.png");
 
     m_champion = irr_driver->getTexture(FileManager::GUI_ICON, "cup_gold.png");
 }   // RaceGUI
@@ -1489,26 +1489,47 @@ void RaceGUI::drawLap(const AbstractKart* kart,
         uint8_t nbTeam = world->getNumTeams();
         KartTeam team;
         int icon_width = irr_driver->getActualScreenSize().Height / 19;
-        core::rect<s32> indicator_pos(viewport.LowerRightCorner.X - (2*icon_width + 20),
+
+        core::rect<s32> indicator_pos(viewport.LowerRightCorner.X - (icon_width + 10),
             pos.UpperLeftCorner.Y,
             viewport.LowerRightCorner.X - 10,
             pos.UpperLeftCorner.Y + icon_width);
 
-        core::rect<s32> indicator_pos2(viewport.LowerRightCorner.X - (2*icon_width + 20),
+        core::rect<s32> indicator_pos2(viewport.LowerRightCorner.X - (2 * icon_width + 20),
             pos.UpperLeftCorner.Y,
             viewport.LowerRightCorner.X - (icon_width + 20),
             pos.UpperLeftCorner.Y + icon_width);
+
+        core::rect<s32> indicator_pos3(viewport.LowerRightCorner.X - (3 * icon_width + 20),
+            pos.UpperLeftCorner.Y,
+            viewport.LowerRightCorner.X - (2 * icon_width + 20),
+            pos.UpperLeftCorner.Y + icon_width);
+
+        if (!RaceManager::get()->hasThiefMode()) 
+        {
+            indicator_pos3 = indicator_pos2;
+            indicator_pos2 = indicator_pos;
+        }
+        if (!RaceManager::get()->hasSpecialVictoryMode())
+            indicator_pos3 = indicator_pos;
 
         core::rect<s32> source_rect(core::position2d<s32>(0, 0),
             m_champion->getSize());
 
         pos -= core::position2di(m_champion->getSize().Width, 0);
 
+        // Condition pour la valeur max de i
+        int val = 0;
+        if (RaceManager::get()->hasSpecialVictoryMode())
+            val++;
+        if(RaceManager::get()->hasThiefMode())
+            val++;
+
         for (uint8_t i = 0; i < nbTeam; i++)
         {
             team = world->getTeamsInGame(i);
 
-            if (team >= 0 && i <= 3) {  // Besoins de modif 
+            if (team >= 0 && i < 4 - val) {  // Besoins de modif 
                 team_score = modeVal == 1 ? tab->getTeamScore(team) : modeVal == 2 ? tab->getTeamInlifePlayer((int)team) : modeVal == 3 ? tagzab->getTeamInlifePlayer((int)team) : 0;
 
                 if (i != 0 && nbTeam > 1) {
@@ -1536,7 +1557,7 @@ void RaceGUI::drawLap(const AbstractKart* kart,
             d = font->getDimension(text.c_str());
             pos += core::position2di(d.Width, 0);
 
-            modeVal == 2 ? draw2DImage(m_heart_icon, indicator_pos, source_rect, NULL, NULL, true) : draw2DImage(m_champion, indicator_pos, source_rect, NULL, NULL, true);
+            modeVal == 2 ? draw2DImage(m_heart_icon, indicator_pos3, source_rect, NULL, NULL, true) : draw2DImage(m_champion, indicator_pos3, source_rect, NULL, NULL, true);
 
 
             // m_winning_podium_icon // m_thief_icon // m_thief_live_icon
@@ -1548,10 +1569,10 @@ void RaceGUI::drawLap(const AbstractKart* kart,
                 }
                 if (RaceManager::get()->hasThiefMode()) {
                     if (RaceManager::get()->isTabLifeMode()) {
-                        draw2DImage(m_thief_live_icon, indicator_pos2, source_rect, NULL, NULL, true);
+                        draw2DImage(m_thief_live_icon, indicator_pos, source_rect, NULL, NULL, true);
                     }
                     else {
-                        draw2DImage(m_thief_icon, indicator_pos2, source_rect, NULL, NULL, true);
+                        draw2DImage(m_thief_icon, indicator_pos, source_rect, NULL, NULL, true);
                     }
                 }
             }

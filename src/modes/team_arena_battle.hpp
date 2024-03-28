@@ -142,6 +142,8 @@ public:
     // ------------------------------------------------------------------------
     virtual void setKartScoreFromServer(NetworkString& ns);
     // ------------------------------------------------------------------------
+    virtual void setGameSetupFromServer(NetworkString& ns);
+    // ------------------------------------------------------------------------
     int getKartScore(int kart_id) const { return m_kart_info.at(kart_id).m_scores; }
     // ------------------------------------------------------------------------
     int getTeamsKartScore(int kart_id);

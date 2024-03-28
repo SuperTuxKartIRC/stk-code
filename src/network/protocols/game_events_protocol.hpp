@@ -18,6 +18,7 @@ public:
         GE_RESET_BALL = 5,
         GE_PLAYER_GOAL = 6,
         GE_CHECK_LINE = 7,
+        GE_SETUP_GAME = 8,
 
     };   // GameEventType
 private:

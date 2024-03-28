@@ -158,6 +158,13 @@ bool GameEventsProtocol::notifyEvent(Event* event)
             lw->updateCheckLinesClient(data);
         break;
     }
+    case GE_SETUP_GAME: 
+    {
+        if (!tab )
+            throw std::invalid_argument("No team-arena-battle world");
+        else if (tab)
+            tab->setKartScoreFromServer(data);
+    }
     default:
         Log::warn("GameEventsProtocol", "Unknown message type.");
         break;

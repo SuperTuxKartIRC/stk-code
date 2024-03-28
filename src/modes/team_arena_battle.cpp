@@ -63,6 +63,7 @@ void TeamArenaBattle::initGameInfo()
 
     configureTheifModeValue();
 
+    m_hit = true;
     kartsRankInfo(); // Fonctionne vraiment ???
 }
 
@@ -207,7 +208,7 @@ void TeamArenaBattle::handleScoreInServer(int kart_id, int hitter)
         NetworkString p(PROTOCOL_GAME_EVENTS);
         p.setSynchronous(true);
         p.addUInt8(GameEventsProtocol::GE_BATTLE_KART_SCORE);
-        p.addUInt8((uint8_t)kart_id).addUInt8((int8_t)hitter);
+        p.addUInt8((uint8_t)kart_id).addUInt8((uint8_t)hitter);
         STKHost::get()->sendPacketToAllPeers(&p, true);
     }
 }   // handleScoreInServer
@@ -216,9 +217,22 @@ void TeamArenaBattle::handleScoreInServer(int kart_id, int hitter)
 void TeamArenaBattle::setKartScoreFromServer(NetworkString& ns)
 {
     uint8_t kart_id = ns.getUInt8();
-    int8_t hitter = ns.getUInt8();
+    uint8_t hitter = ns.getUInt8();
+
     handleScoreInServer(kart_id, hitter);
 }   // setKartScoreFromServer
+
+// ----------------------------------------------------------------------------
+void TeamArenaBattle::setGameSetupFromServer(NetworkString& ns)
+{
+    uint8_t hasSpecialVictoryMode = ns.getUInt8();
+    uint8_t hasThiefMode = ns.getUInt8();
+
+    RaceManager::get()->setSpecialVictoryMode(hasSpecialVictoryMode);
+    RaceManager::get()->setThiefMode(hasThiefMode);
+    configureTheifModeValue();
+
+}   // setGameSetupFromServer
 
 // ----------------------------------------------------------------------------
 int TeamArenaBattle::getTeamsKartScore(int kart_id)
@@ -239,7 +253,8 @@ void TeamArenaBattle::update(int ticks)
     if (Track::getCurrentTrack()->hasNavMesh())
         updateSectorForKarts();
 
-    // kartsRankInfo(); // ??
+    //if(m_hit)
+        //kartsRankInfo(); // ??
 
 }   // update
 
@@ -488,23 +503,34 @@ void TeamArenaBattle::configureTheifModeValue()
     // Initialiser le générateur de nombres aléatoires
     srand(time(nullptr));
 
-    // Générer un nombre aléatoire entre 0 et 1
-    int randomNumber = rand() % 2; // 0 ou 1
-    m_hasThiefMode = randomNumber;
+    //RaceManager::get()->setThiefMode(false); // Pour tester 
+    //RaceManager::get()->setSpecialVictoryMode(false); // Pour tester 
 
-    RaceManager::get()->setThiefMode(m_hasThiefMode);
-
-    RaceManager::get()->setThiefMode(true); // Pour tester 
-    RaceManager::get()->setSpecialVictoryMode(true); // Pour tester 
-
-    if (!m_hasThiefMode)
-        return;
+    m_hasThiefMode = RaceManager::get()->hasThiefMode();
+    m_hasAllTeamVictoryConditions = RaceManager::get()->hasSpecialVictoryMode();
 
     int m_nb_point_thief = 1;
     int m_nb_point_player_lose = 1;
 
     bool hasMultiplierPointThiefMode = true; // Not here 
     int multiplierPointThiefNb = 1; // Usefull or not 
+
+
+    if (NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->isServer())
+    {
+        // Générer un nombre aléatoire entre 0 et 1
+        m_hasAllTeamVictoryConditions = rand() % 2; // 0 ou 1
+        m_hasThiefMode = rand() % 2; // 0 ou 1
+        RaceManager::get()->setThiefMode(m_hasThiefMode);
+        RaceManager::get()->setSpecialVictoryMode(m_hasAllTeamVictoryConditions);
+
+        NetworkString p(PROTOCOL_GAME_EVENTS);
+        p.setSynchronous(true);
+        p.addUInt8(GameEventsProtocol::GE_SETUP_GAME);
+        p.addUInt8((uint8_t)m_hasAllTeamVictoryConditions).addUInt8((uint8_t)m_hasThiefMode);
+        STKHost::get()->sendPacketToAllPeers(&p, true);
+    }
 }
 
 // ------------------------------------------------------------------------
