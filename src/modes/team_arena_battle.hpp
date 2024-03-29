@@ -157,11 +157,11 @@ public:
     // ------------------------------------------------------------------------
     int getTeamScore(int team) const 
     { 
-        if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER || 
-            RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER) {
+        if (RaceManager::get()->isTabAPPMode())
             return m_teams[getKartTeamIndex(team)].m_total_player_get_score;
-        }
-        else 
+        else if (RaceManager::get()->isTabLifeMode())
+            return m_teams[getKartTeamIndex(team)].m_total_life;
+        else
             return m_teams[getKartTeamIndex(team)].m_scores_teams;
     }
     // ------------------------------------------------------------------------

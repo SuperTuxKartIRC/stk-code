@@ -1601,14 +1601,9 @@ void RaceResultGUI::unload()
         RaceManager::MinorRaceModeType mode = RaceManager::get()->getMinorMode();
 
         int modeVal = 0;
-        if (mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM || mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER ||
-            mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER) {
+        if (RaceManager::get()->isTeamArenaBattleMode()) {
             modeVal = 1;
             score = tab->getTeamScore(teams);
-        }
-        else if (mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE) {
-            modeVal = 2;
-            score = tab->getTeamTotalLife(teams);
         }
         else if (RaceManager::get()->isTagzArenaBattleMode()) {
             modeVal = 3;
@@ -1657,12 +1652,7 @@ void RaceResultGUI::unload()
             AbstractKart* kartZombie; // The zombie that kill the player (survivant) // For his icon
             unsigned kart_id;
             KartTeam team;
-            if (modeVal == 1) {
-                kart = tab->getKartAtPosition(i + 1);
-                kart_id = kart->getWorldKartId();
-                team = tab->getKartTeam(kart_id);
-            }
-            else if (modeVal == 2) {
+            if (RaceManager::get()->isTeamArenaBattleMode()) {
                 kart = tab->getKartAtPosition(i + 1);
                 kart_id = kart->getWorldKartId();
                 team = tab->getKartTeam(kart_id);
@@ -1691,10 +1681,10 @@ void RaceResultGUI::unload()
             irr::u32 offset_x;
             irr::u32 text_x = 200;
 
-            if (modeVal == 1)
+            if (RaceManager::get()->isTeamArenaBattleMode())
                 result_text.append(StringUtils::toWString(tab->getTeamsKartScore(kart_id)));
-            if (modeVal == 1)
-                result_text.append(StringUtils::toWString(tab->getPlayerScoreInformationVictory(kart_id)));
+            //if (modeVal == 1)
+            //    result_text.append(StringUtils::toWString(tab->getPlayerScoreInformationVictory(kart_id)));
             //else if (modeVal == 2)
             //    result_text.append(StringUtils::toWString(tab->getKartLife(kart_id))); // TODO : MODIF ??
             //else if (modeVal == 3) {

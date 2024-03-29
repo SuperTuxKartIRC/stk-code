@@ -414,6 +414,8 @@ public:
     //-------------------------------------------------------------------------
     int getKartIdTeamIndex(unsigned int kart_id) const;
     //-------------------------------------------------------------------------
+    int getTeamIndexValue(unsigned int team_index) const;
+    //-------------------------------------------------------------------------
     int getKartTeamIndex(unsigned int team_id) const;
     //-------------------------------------------------------------------------
     int getKartTeamIndex(KartTeam team) const;

@@ -240,11 +240,11 @@ void TeamArenaBattle::setGameSetupFromServer(NetworkString& ns)
 int TeamArenaBattle::getTeamsKartScore(int kart_id)
 {
     if (RaceManager::get()->isTabAPPMode())
-        return m_teams[getKartIdTeamIndex(kart_id)].m_total_player_get_score;
+        return m_kart_info[getKartIdTeamIndex(kart_id)].m_scores;
     else if (RaceManager::get()->isTabLifeMode())
-        return m_teams[getKartIdTeamIndex(kart_id)].m_total_life;
+        return m_kart_info[getKartIdTeamIndex(kart_id)].m_lives;
     else 
-        return m_teams[getKartIdTeamIndex(kart_id)].m_scores_teams;
+        return m_kart_info[getKartIdTeamIndex(kart_id)].m_scores;
 }
 
 // ----------------------------------------------------------------------------
@@ -517,6 +517,9 @@ void TeamArenaBattle::configureTheifModeValue()
         m_hasThiefMode = rand() % 2; // 0 ou 1
     }
 
+    m_hasAllTeamVictoryConditions = false;
+    m_hasThiefMode = false;
+
     RaceManager::get()->setThiefMode(m_hasThiefMode);
     RaceManager::get()->setSpecialVictoryMode(m_hasAllTeamVictoryConditions);
 
@@ -708,7 +711,7 @@ void TeamArenaBattle::kartsRankInfo()
 // ------------------------------------------------------------------------
 irr::core::stringw TeamArenaBattle::setWinningTeamNameText()
 {
-    std::string str = getKartTeamsColorName(KartTeam(m_winning_team)); // RaceGUIBase::
+    std::string str = getKartTeamsColorName(KartTeam(getTeamIndexValue(m_winning_team))); // RaceGUIBase::
     irr::core::stringw teamColor = irr::core::stringw(str.c_str());
     teamColor = _(teamColor.c_str());
     return teamColor;

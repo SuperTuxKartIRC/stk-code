@@ -1781,6 +1781,11 @@ int World::getKartIdTeamIndex(unsigned int kart_id) const
         return -1;
 }   // getKartTeamIndex
 
+    //-------------------------------------------------------------------------
+int World::getTeamIndexValue(unsigned int team_index) const
+{
+    return m_teamsInGame[team_index];
+} // getTeamIndexValue
 
 //-----------------------------------------------------------------------------
 int World::getKartTeamIndex(unsigned int team_id) const
