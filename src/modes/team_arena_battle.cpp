@@ -51,9 +51,9 @@ void TeamArenaBattle::initGameInfo()
     m_kart_info.resize(getNumKarts());
     for (unsigned int i = 0; i < getNumTeams(); i++)
     {
-        m_teams[i].m_inlife_player = getTeamNum((KartTeam)i);
+        m_teams[i].m_inlife_player = getTeamNum((KartTeam)getTeamIndexValue(i));
         m_teams[i].m_total_life = getTeamNum((KartTeam)i) * (RaceManager::get()->getLifeTarget());
-        m_teams[i].m_total_player = getTeamNum((KartTeam)i);
+        m_teams[i].m_total_player = getTeamNum((KartTeam)getTeamIndexValue(i));
     }
     m_winning_team = -1;
     m_team_death = 0;
