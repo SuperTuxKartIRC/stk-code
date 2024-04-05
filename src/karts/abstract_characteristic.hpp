@@ -97,7 +97,7 @@ public:
         ENGINE_MAX_SPEED,
         ENGINE_GENERIC_MAX_SPEED,
         ENGINE_BRAKE_FACTOR,
-        ENGINE_BRAKE_TIME_INCREASE,
+        ENGINE_TIME_FULL_BRAKE,
         ENGINE_MAX_SPEED_REVERSE_RATIO,
 
         // Gear
@@ -164,9 +164,22 @@ public:
         PLUNGER_BAND_FADE_OUT_TIME,
         PLUNGER_IN_FACE_TIME,
 
+        // Nitrohack
+        NITROHACK_DURATION,
+        NITROHACK_FACTOR,
+
+        // Electro-shield
+        ELECTRO_DURATION,
+        ELECTRO_ENGINE_MULT,
+        ELECTRO_MAX_SPEED_INCREASE,
+        ELECTRO_FADE_OUT_TIME,
+
         // Startup
         STARTUP_TIME,
         STARTUP_BOOST,
+        STARTUP_ENGINE_FORCE,
+        STARTUP_DURATION,
+        STARTUP_FADE_OUT_TIME,
 
         // Rescue
         RESCUE_DURATION,
@@ -186,6 +199,7 @@ public:
         NITRO_SMALL_CONTAINER,
         NITRO_BIG_CONTAINER,
         NITRO_MAX_SPEED_INCREASE,
+        NITRO_MIN_BURST,
         NITRO_FADE_OUT_TIME,
         NITRO_MAX,
 
@@ -214,6 +228,7 @@ public:
         SKID_TIME_TILL_BONUS,
         SKID_BONUS_SPEED,
         SKID_BONUS_TIME,
+        SKID_FADE_OUT_TIME,
         SKID_BONUS_FORCE,
         SKID_PHYSICAL_JUMP_TIME,
         SKID_GRAPHICAL_JUMP_TIME,
@@ -280,7 +295,7 @@ public:
     float getEngineMaxSpeed() const;
     float getEngineGenericMaxSpeed() const;
     float getEngineBrakeFactor() const;
-    float getEngineBrakeTimeIncrease() const;
+    float getEngineTimeFullBrake() const;
     float getEngineMaxSpeedReverseRatio() const;
 
     std::vector<float> getGearSwitchRatio() const;
@@ -335,8 +350,19 @@ public:
     float getPlungerBandFadeOutTime() const;
     float getPlungerInFaceTime() const;
 
+    float getNitrohackDuration() const;
+    float getNitrohackFactor() const;
+
+    float getElectroDuration() const;
+    float getElectroEngineMult() const;
+    float getElectroMaxSpeedIncrease() const;
+    float getElectroFadeOutTime() const;
+
     std::vector<float> getStartupTime() const;
     std::vector<float> getStartupBoost() const;
+    std::vector<float> getStartupEngineForce() const;
+    float getStartupDuration() const;
+    float getStartupFadeOutTime() const;
 
     float getRescueDuration() const;
     float getRescueVertOffset() const;
@@ -353,6 +379,7 @@ public:
     float getNitroSmallContainer() const;
     float getNitroBigContainer() const;
     float getNitroMaxSpeedIncrease() const;
+    float getNitroMinBurst() const;
     float getNitroFadeOutTime() const;
     float getNitroMax() const;
 
@@ -379,6 +406,7 @@ public:
     std::vector<float> getSkidTimeTillBonus() const;
     std::vector<float> getSkidBonusSpeed() const;
     std::vector<float> getSkidBonusTime() const;
+    std::vector<float> getSkidFadeOutTime() const;
     std::vector<float> getSkidBonusForce() const;
     float getSkidPhysicalJumpTime() const;
     float getSkidGraphicalJumpTime() const;

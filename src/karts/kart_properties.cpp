@@ -99,7 +99,7 @@ KartProperties::KartProperties(const std::string &filename)
     m_color                      = video::SColor(255, 0, 0, 0);
     m_shape                      = 32;  // close enough to a circle.
     m_engine_sfx_type            = "engine_small";
-    m_nitro_min_consumption      = 64;
+
     // The default constructor for stk_config uses filename=""
     if (filename != "")
     {
@@ -475,6 +475,8 @@ void KartProperties::getAllData(const XMLNode * root)
     {
         const XMLNode *easy = ai_node->getNode("easy");
         m_ai_properties[RaceManager::DIFFICULTY_EASY]->load(easy);
+        const XMLNode *casual = ai_node->getNode("casual");
+        m_ai_properties[RaceManager::DIFFICULTY_CASUAL]->load(casual);
         const XMLNode *medium = ai_node->getNode("medium");
         m_ai_properties[RaceManager::DIFFICULTY_MEDIUM]->load(medium);
         const XMLNode *hard = ai_node->getNode("hard");
@@ -842,10 +844,10 @@ float KartProperties::getEngineBrakeFactor() const
 }  // getEngineBrakeFactor
 
 // ----------------------------------------------------------------------------
-float KartProperties::getEngineBrakeTimeIncrease() const
+float KartProperties::getEngineTimeFullBrake() const
 {
-    return m_cached_characteristic->getEngineBrakeTimeIncrease();
-}  // getEngineBrakeTimeIncrease
+    return m_cached_characteristic->getEngineTimeFullBrake();
+}  // getEngineTimeFullBrake
 
 // ----------------------------------------------------------------------------
 float KartProperties::getEngineMaxSpeedReverseRatio() const
@@ -1094,6 +1096,42 @@ float KartProperties::getPlungerInFaceTime() const
 }  // getPlungerInFaceTime
 
 // ----------------------------------------------------------------------------
+float KartProperties::getNitrohackDuration() const
+{
+    return m_cached_characteristic->getNitrohackDuration();
+}  // getNitrohackDuration
+
+// ----------------------------------------------------------------------------
+float KartProperties::getNitrohackFactor() const
+{
+    return m_cached_characteristic->getNitrohackFactor();
+}  // getNitrohackFactor
+
+// ----------------------------------------------------------------------------
+float KartProperties::getElectroDuration() const
+{
+    return m_cached_characteristic->getElectroDuration();
+}  // getElectroDuration
+
+// ----------------------------------------------------------------------------
+float KartProperties::getElectroEngineMult() const
+{
+    return m_cached_characteristic->getElectroEngineMult();
+}  // getElectroEngineMult
+
+// ----------------------------------------------------------------------------
+float KartProperties::getElectroMaxSpeedIncrease() const
+{
+    return m_cached_characteristic->getElectroMaxSpeedIncrease();
+}  // getElectroMaxSpeedIncrease
+
+// ----------------------------------------------------------------------------
+float KartProperties::getElectroFadeOutTime() const
+{
+    return m_cached_characteristic->getElectroFadeOutTime();
+}  // getElectroFadeOutTime
+
+// ----------------------------------------------------------------------------
 std::vector<float> KartProperties::getStartupTime() const
 {
     return m_cached_characteristic->getStartupTime();
@@ -1104,6 +1142,24 @@ std::vector<float> KartProperties::getStartupBoost() const
 {
     return m_cached_characteristic->getStartupBoost();
 }  // getStartupBoost
+
+// ----------------------------------------------------------------------------
+std::vector<float> KartProperties::getStartupEngineForce() const
+{
+    return m_cached_characteristic->getStartupEngineForce();
+}  // getStartupEngineForce
+
+// ----------------------------------------------------------------------------
+float KartProperties::getStartupDuration() const
+{
+    return m_cached_characteristic->getStartupDuration();
+}  // getStartupDuration
+
+// ----------------------------------------------------------------------------
+float KartProperties::getStartupFadeOutTime() const
+{
+    return m_cached_characteristic->getStartupFadeOutTime();
+}  // getStartupFadeOutTime
 
 // ----------------------------------------------------------------------------
 float KartProperties::getRescueDuration() const
@@ -1182,6 +1238,12 @@ float KartProperties::getNitroMaxSpeedIncrease() const
 {
     return m_cached_characteristic->getNitroMaxSpeedIncrease();
 }  // getNitroMaxSpeedIncrease
+
+// ----------------------------------------------------------------------------
+float KartProperties::getNitroMinBurst() const
+{
+    return m_cached_characteristic->getNitroMinBurst();
+}  // getNitroMinBurst
 
 // ----------------------------------------------------------------------------
 float KartProperties::getNitroFadeOutTime() const
@@ -1326,6 +1388,12 @@ std::vector<float> KartProperties::getSkidBonusTime() const
 {
     return m_cached_characteristic->getSkidBonusTime();
 }  // getSkidBonusTime
+
+// ----------------------------------------------------------------------------
+std::vector<float> KartProperties::getSkidFadeOutTime() const
+{
+    return m_cached_characteristic->getSkidFadeOutTime();
+}  // getSkidFadeOutTime
 
 // ----------------------------------------------------------------------------
 std::vector<float> KartProperties::getSkidBonusForce() const

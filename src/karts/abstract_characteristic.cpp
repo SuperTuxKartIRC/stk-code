@@ -93,7 +93,7 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_FLOAT;
     case ENGINE_BRAKE_FACTOR:
         return TYPE_FLOAT;
-    case ENGINE_BRAKE_TIME_INCREASE:
+    case ENGINE_TIME_FULL_BRAKE:
         return TYPE_FLOAT;
     case ENGINE_MAX_SPEED_REVERSE_RATIO:
         return TYPE_FLOAT;
@@ -177,10 +177,28 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_FLOAT;
     case PLUNGER_IN_FACE_TIME:
         return TYPE_FLOAT;
+    case NITROHACK_DURATION:
+        return TYPE_FLOAT;
+    case NITROHACK_FACTOR:
+        return TYPE_FLOAT;
+    case ELECTRO_DURATION:
+        return TYPE_FLOAT;
+    case ELECTRO_ENGINE_MULT:
+        return TYPE_FLOAT;
+    case ELECTRO_MAX_SPEED_INCREASE:
+        return TYPE_FLOAT;
+    case ELECTRO_FADE_OUT_TIME:
+        return TYPE_FLOAT;
     case STARTUP_TIME:
         return TYPE_FLOAT_VECTOR;
     case STARTUP_BOOST:
         return TYPE_FLOAT_VECTOR;
+    case STARTUP_ENGINE_FORCE:
+        return TYPE_FLOAT_VECTOR;
+    case STARTUP_DURATION:
+        return TYPE_FLOAT;
+    case STARTUP_FADE_OUT_TIME:
+        return TYPE_FLOAT;
     case RESCUE_DURATION:
         return TYPE_FLOAT;
     case RESCUE_VERT_OFFSET:
@@ -206,6 +224,8 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
     case NITRO_BIG_CONTAINER:
         return TYPE_FLOAT;
     case NITRO_MAX_SPEED_INCREASE:
+        return TYPE_FLOAT;
+    case NITRO_MIN_BURST:
         return TYPE_FLOAT;
     case NITRO_FADE_OUT_TIME:
         return TYPE_FLOAT;
@@ -254,6 +274,8 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
     case SKID_BONUS_SPEED:
         return TYPE_FLOAT_VECTOR;
     case SKID_BONUS_TIME:
+        return TYPE_FLOAT_VECTOR;
+    case SKID_FADE_OUT_TIME:
         return TYPE_FLOAT_VECTOR;
     case SKID_BONUS_FORCE:
         return TYPE_FLOAT_VECTOR;
@@ -327,8 +349,8 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "ENGINE_GENERIC_MAX_SPEED";
     case ENGINE_BRAKE_FACTOR:
         return "ENGINE_BRAKE_FACTOR";
-    case ENGINE_BRAKE_TIME_INCREASE:
-        return "ENGINE_BRAKE_TIME_INCREASE";
+    case ENGINE_TIME_FULL_BRAKE:
+        return "ENGINE_TIME_FULL_BRAKE";
     case ENGINE_MAX_SPEED_REVERSE_RATIO:
         return "ENGINE_MAX_SPEED_REVERSE_RATIO";
     case GEAR_SWITCH_RATIO:
@@ -411,10 +433,28 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "PLUNGER_BAND_FADE_OUT_TIME";
     case PLUNGER_IN_FACE_TIME:
         return "PLUNGER_IN_FACE_TIME";
+    case NITROHACK_DURATION:
+        return "NITROHACK_DURATION";
+    case NITROHACK_FACTOR:
+        return "NITROHACK_FACTOR";
+    case ELECTRO_DURATION:
+        return "ELECTRO_DURATION";
+    case ELECTRO_ENGINE_MULT:
+        return "ELECTRO_ENGINE_MULT";
+    case ELECTRO_MAX_SPEED_INCREASE:
+        return "ELECTRO_MAX_SPEED_INCREASE";
+    case ELECTRO_FADE_OUT_TIME:
+        return "ELECTRO_FADE_OUT_TIME";
     case STARTUP_TIME:
         return "STARTUP_TIME";
     case STARTUP_BOOST:
         return "STARTUP_BOOST";
+    case STARTUP_ENGINE_FORCE:
+        return "STARTUP_ENGINE_FORCE";
+    case STARTUP_DURATION:
+        return "STARTUP_DURATION";
+    case STARTUP_FADE_OUT_TIME:
+        return "STARTUP_FADE_OUT_TIME";
     case RESCUE_DURATION:
         return "RESCUE_DURATION";
     case RESCUE_VERT_OFFSET:
@@ -441,6 +481,8 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "NITRO_BIG_CONTAINER";
     case NITRO_MAX_SPEED_INCREASE:
         return "NITRO_MAX_SPEED_INCREASE";
+    case NITRO_MIN_BURST:
+        return "NITRO_MIN_BURST";
     case NITRO_FADE_OUT_TIME:
         return "NITRO_FADE_OUT_TIME";
     case NITRO_MAX:
@@ -489,6 +531,8 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "SKID_BONUS_SPEED";
     case SKID_BONUS_TIME:
         return "SKID_BONUS_TIME";
+    case SKID_FADE_OUT_TIME:
+        return "SKID_FADE_OUT_TIME";
     case SKID_BONUS_FORCE:
         return "SKID_BONUS_FORCE";
     case SKID_PHYSICAL_JUMP_TIME:
@@ -744,16 +788,16 @@ float AbstractCharacteristic::getEngineBrakeFactor() const
 }  // getEngineBrakeFactor
 
 // ----------------------------------------------------------------------------
-float AbstractCharacteristic::getEngineBrakeTimeIncrease() const
+float AbstractCharacteristic::getEngineTimeFullBrake() const
 {
     float result;
     bool is_set = false;
-    process(ENGINE_BRAKE_TIME_INCREASE, &result, &is_set);
+    process(ENGINE_TIME_FULL_BRAKE, &result, &is_set);
     if (!is_set)
         Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(ENGINE_BRAKE_TIME_INCREASE).c_str());
+                    getName(ENGINE_TIME_FULL_BRAKE).c_str());
     return result;
-}  // getEngineBrakeTimeIncrease
+}  // getEngineTimeFullBrake
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getEngineMaxSpeedReverseRatio() const
@@ -1248,6 +1292,78 @@ float AbstractCharacteristic::getPlungerInFaceTime() const
 }  // getPlungerInFaceTime
 
 // ----------------------------------------------------------------------------
+float AbstractCharacteristic::getNitrohackDuration() const
+{
+    float result;
+    bool is_set = false;
+    process(NITROHACK_DURATION, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(NITROHACK_DURATION).c_str());
+    return result;
+}  // getNitrohackDuration
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getNitrohackFactor() const
+{
+    float result;
+    bool is_set = false;
+    process(NITROHACK_FACTOR, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(NITROHACK_FACTOR).c_str());
+    return result;
+}  // getNitrohackFactor
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getElectroDuration() const
+{
+    float result;
+    bool is_set = false;
+    process(ELECTRO_DURATION, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(ELECTRO_DURATION).c_str());
+    return result;
+}  // getElectroDuration
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getElectroEngineMult() const
+{
+    float result;
+    bool is_set = false;
+    process(ELECTRO_ENGINE_MULT, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(ELECTRO_ENGINE_MULT).c_str());
+    return result;
+}  // getElectroEngineMult
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getElectroMaxSpeedIncrease() const
+{
+    float result;
+    bool is_set = false;
+    process(ELECTRO_MAX_SPEED_INCREASE, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(ELECTRO_MAX_SPEED_INCREASE).c_str());
+    return result;
+}  // getElectroMaxSpeedIncrease
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getElectroFadeOutTime() const
+{
+    float result;
+    bool is_set = false;
+    process(ELECTRO_FADE_OUT_TIME, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(ELECTRO_FADE_OUT_TIME).c_str());
+    return result;
+}  // getElectroFadeOutTime
+
+// ----------------------------------------------------------------------------
 std::vector<float> AbstractCharacteristic::getStartupTime() const
 {
     std::vector<float> result;
@@ -1270,6 +1386,42 @@ std::vector<float> AbstractCharacteristic::getStartupBoost() const
                     getName(STARTUP_BOOST).c_str());
     return result;
 }  // getStartupBoost
+
+// ----------------------------------------------------------------------------
+std::vector<float> AbstractCharacteristic::getStartupEngineForce() const
+{
+    std::vector<float> result;
+    bool is_set = false;
+    process(STARTUP_ENGINE_FORCE, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(STARTUP_ENGINE_FORCE).c_str());
+    return result;
+}  // getStartupEngineForce
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getStartupDuration() const
+{
+    float result;
+    bool is_set = false;
+    process(STARTUP_DURATION, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(STARTUP_DURATION).c_str());
+    return result;
+}  // getStartupDuration
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getStartupFadeOutTime() const
+{
+    float result;
+    bool is_set = false;
+    process(STARTUP_FADE_OUT_TIME, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(STARTUP_FADE_OUT_TIME).c_str());
+    return result;
+}  // getStartupFadeOutTime
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getRescueDuration() const
@@ -1426,6 +1578,18 @@ float AbstractCharacteristic::getNitroMaxSpeedIncrease() const
                     getName(NITRO_MAX_SPEED_INCREASE).c_str());
     return result;
 }  // getNitroMaxSpeedIncrease
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getNitroMinBurst() const
+{
+    float result;
+    bool is_set = false;
+    process(NITRO_MIN_BURST, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(NITRO_MIN_BURST).c_str());
+    return result;
+}  // getNitroMinBurst
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getNitroFadeOutTime() const
@@ -1714,6 +1878,18 @@ std::vector<float> AbstractCharacteristic::getSkidBonusTime() const
                     getName(SKID_BONUS_TIME).c_str());
     return result;
 }  // getSkidBonusTime
+
+// ----------------------------------------------------------------------------
+std::vector<float> AbstractCharacteristic::getSkidFadeOutTime() const
+{
+    std::vector<float> result;
+    bool is_set = false;
+    process(SKID_FADE_OUT_TIME, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_FADE_OUT_TIME).c_str());
+    return result;
+}  // getSkidFadeOutTime
 
 // ----------------------------------------------------------------------------
 std::vector<float> AbstractCharacteristic::getSkidBonusForce() const

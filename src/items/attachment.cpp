@@ -32,7 +32,7 @@
 #include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "items/swatter.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_properties.hpp"
@@ -48,7 +48,7 @@
 
 /** Initialises the attachment each kart has.
  */
-Attachment::Attachment(AbstractKart* kart)
+Attachment::Attachment(Kart* kart)
 {
     m_type                 = ATTACH_NOTHING;
     m_ticks_left           = 0;
@@ -114,7 +114,7 @@ Attachment::~Attachment()
  *         previous owner exists.
  */
 void Attachment::set(AttachmentType type, int ticks,
-                     AbstractKart *current_kart,
+                     Kart *current_kart,
                      bool set_by_rewind_parachute)
 {
     bool was_bomb = m_type == ATTACH_BOMB;
@@ -275,11 +275,10 @@ void Attachment::hitBanana(ItemState *item_state)
         if (RaceManager::get()->isLinearRaceMode())
             PlayerManager::increaseAchievement(AchievementsStatus::BANANA_1RACE, 1);
     }
-    //Bubble gum shield effect:
-    if(m_type == ATTACH_BUBBLEGUM_SHIELD ||
-       m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD)
+    //Shield effect: protect but is used
+    if(m_kart->isShielded())
     {
-        m_ticks_left = 0;
+        m_kart->decreaseShieldTime();
         return;
     }
 
@@ -398,7 +397,7 @@ void Attachment::hitBanana(ItemState *item_state)
  *  the attachment for both karts.
  *  \param other Pointer to the other kart hit.
  */
-void Attachment::handleCollisionWithKart(AbstractKart *other)
+void Attachment::handleCollisionWithKart(Kart *other)
 {
     Attachment *attachment_other=other->getAttachment();
 
@@ -472,7 +471,7 @@ void Attachment::update(int ticks)
 
     if (m_plugin)
     {
-        if (m_plugin->updateAndTestFinished(ticks))
+        if (m_plugin->updateAndTestFinished())
         {
             clear();  // also removes the plugin
             return;
@@ -544,6 +543,8 @@ void Attachment::update(int ticks)
     }
     case ATTACH_BUBBLEGUM_SHIELD:
     case ATTACH_NOLOK_BUBBLEGUM_SHIELD:
+    case ATTACH_BUBBLEGUM_SHIELD_SMALL:
+    case ATTACH_NOLOK_BUBBLEGUM_SHIELD_SMALL:
         m_initial_speed = 0;
         if (m_ticks_left <= 0)
         {
@@ -556,7 +557,30 @@ void Attachment::update(int ticks)
                 m_bubble_explode_sound->play();
             }
             if (!m_kart->isGhostKart())
-                Track::getCurrentTrack()->getItemManager()->dropNewItem(Item::ITEM_BUBBLEGUM, m_kart);
+            {
+                if (m_type == ATTACH_BUBBLEGUM_SHIELD || m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD)
+                    Track::getCurrentTrack()->getItemManager()->dropNewItem(Item::ITEM_BUBBLEGUM, m_kart);
+                else
+                    Track::getCurrentTrack()->getItemManager()->dropNewItem(Item::ITEM_BUBBLEGUM_SMALL, m_kart);
+            }
+        }
+        break;
+
+    case ATTACH_ELECTRO_SHIELD:
+        m_initial_speed = 0;
+        if (m_ticks_left <= 0)
+        {
+            //TODO Add a sound effect for when the electro shield stops working
+            /*
+            if (!RewindManager::get()->isRewinding())
+            {
+                if (m_electro_malfunction_sound) m_electro_malfunction_sound->deleteSFX();
+                m_electro_malfunction_sound =
+                    SFXManager::get()->createSoundSource("electro_malfunction");
+                m_electro_malfunction_sound->setPosition(m_kart->getXYZ());
+                m_electro_malfunction_sound->play();
+            }
+            */
         }
         break;
     }   // switch
@@ -609,10 +633,15 @@ void Attachment::updateGraphics(float dt)
     if (m_type != ATTACH_NOTHING)
     {
         m_node->setVisible(true);
-        bool is_shield = m_type == ATTACH_BUBBLEGUM_SHIELD ||
-                        m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD;
-        float wanted_node_scale = is_shield ?
-            std::max(1.0f, m_kart->getHighestPoint() * 1.1f) : 1.0f;
+        bool is_big_gum_shield = m_type == ATTACH_BUBBLEGUM_SHIELD ||
+                                 m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD;
+        bool is_small_gum_shield = m_type == ATTACH_BUBBLEGUM_SHIELD_SMALL ||
+                                   m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD_SMALL;
+        bool is_gum_shield = is_big_gum_shield || is_small_gum_shield;
+        // FIXME : it is wasteful to do this every frame
+        float wanted_node_scale = is_big_gum_shield   ? std::max(1.173f, m_kart->getHighestPoint() * 1.196f) :
+                                  is_small_gum_shield ? std::max( 1.02f, m_kart->getHighestPoint() * 1.04f) :
+                                                        1.0f;
         float scale_ratio = stk_config->ticks2Time(m_scaling_end_ticks -
             World::getWorld()->getTicksSinceStart()) / 0.7f;
         if (scale_ratio > 0.0f)
@@ -626,8 +655,8 @@ void Attachment::updateGraphics(float dt)
             m_node->setScale(core::vector3df(
                 wanted_node_scale, wanted_node_scale, wanted_node_scale));
         }
-        int slow_flashes = stk_config->time2Ticks(3.0f);
-        if (is_shield && m_ticks_left < slow_flashes)
+        int slow_flashes = stk_config->time2Ticks(2.0f);
+        if (is_gum_shield && m_ticks_left < slow_flashes)
         {
             // Bubble gum flashing when close to dropping
             int ticks_per_flash = stk_config->time2Ticks(0.2f);

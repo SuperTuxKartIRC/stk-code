@@ -59,6 +59,7 @@
 #include "karts/kart_properties_manager.hpp"
 #include "karts/kart_rewinder.hpp"
 #include "karts/max_speed.hpp"
+#include "karts/official_karts.hpp"
 #include "karts/rescue_animation.hpp"
 #include "karts/skidding.hpp"
 #include "main_loop.hpp"
@@ -105,8 +106,104 @@
 #  pragma warning(disable:4355)
 #endif
 
+void Kart::loadKartProperties(const std::string& new_ident,
+                                      HandicapLevel handicap,
+                                      std::shared_ptr<GE::GERenderInfo> ri,
+                                      const KartData& kart_data)
+{
+    m_kart_properties.reset(new KartProperties());
+    KartProperties* tmp_kp = NULL;
+    const KartProperties* kp = kart_properties_manager->getKart(new_ident);
+    const KartProperties* kp_addon = NULL;
+    bool new_hitbox = false;
+    Vec3 gravity_shift;
+    if (NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->useTuxHitboxAddon() && kp && kp->isAddon())
+    {
+        // For addon kart in network we use the same hitbox (tux) so anyone
+        // can use any addon karts with different graphical kart model
+        if (!UserConfigParams::m_addon_tux_online)
+            kp_addon = kp;
+        kp = kart_properties_manager->getKart(std::string("tux"));
+    }
+    if (kp == NULL)
+    {
+        bool official_kart = !StringUtils::startsWith(new_ident, "addon_");
+        if (!NetworkConfig::get()->isNetworking() ||
+            (!NetworkConfig::get()->useTuxHitboxAddon() && !official_kart))
+        {
+            Log::warn("Abstract_Kart", "Unknown kart %s, fallback to tux",
+                new_ident.c_str());
+        }
+        kp = kart_properties_manager->getKart(std::string("tux"));
+        if (NetworkConfig::get()->isNetworking() && official_kart)
+        {
+            const KartProperties* official_kp = OfficialKarts::getKartByIdent(
+                new_ident, &m_kart_width, &m_kart_height, &m_kart_length,
+                &gravity_shift);
+            if (official_kp)
+            {
+                kp = official_kp;
+                new_hitbox = true;
+            }
+        }
+    }
+
+    if (NetworkConfig::get()->isNetworking() &&
+        !kart_data.m_kart_type.empty() &&
+        kart_properties_manager->hasKartTypeCharacteristic(
+        kart_data.m_kart_type))
+    {
+        tmp_kp = new KartProperties();
+        tmp_kp->copyFrom(kp);
+        tmp_kp->initKartWithDifferentType(kart_data.m_kart_type);
+        kp = tmp_kp;
+        m_kart_width = kart_data.m_width;
+        m_kart_height = kart_data.m_height;
+        m_kart_length = kart_data.m_length;
+        gravity_shift = kart_data.m_gravity_shift;
+        new_hitbox = true;
+    }
+
+    m_kart_properties->copyForPlayer(kp, handicap);
+    if (kp_addon)
+        m_kart_properties->adjustForOnlineAddonKart(kp_addon);
+
+    if (new_hitbox)
+    {
+        m_kart_properties->updateForOnlineKart(new_ident, gravity_shift,
+            m_kart_length);
+    }
+    m_name = m_kart_properties->getName();
+    m_handicap = handicap;
+    m_kart_animation  = NULL;
+    assert(m_kart_properties);
+
+    // We have to take a copy of the kart model, since otherwise
+    // the animations will be mixed up (i.e. different instances of
+    // the same model will set different animation frames).
+    // Technically the mesh in m_kart_model needs to be grab'ed and
+    // released when the kart is deleted, but since the original
+    // kart_model is stored in the kart_properties all the time,
+    // there is no risk of a mesh being deleted too early.
+    if (kp_addon)
+        m_kart_model.reset(kp_addon->getKartModelCopy(ri));
+    else
+        m_kart_model.reset(m_kart_properties->getKartModelCopy(ri));
+    if (!new_hitbox)
+    {
+        m_kart_width  = kp->getMasterKartModel().getWidth();
+        m_kart_height = kp->getMasterKartModel().getHeight();
+        m_kart_length = kp->getMasterKartModel().getLength();
+    }
+    m_kart_highest_point = m_kart_model->getHighestPoint();
+    m_wheel_graphics_position = m_kart_model->getWheelsGraphicsPosition();
+    delete tmp_kp;
+}   // loadKartProperties
+
 /** The kart constructor.
  *  \param ident  The identifier for the kart model to use.
+ *  \param world_kart_id  The world index of this kart.
  *  \param position The position (or rank) for this kart (between 1 and
  *         number of karts). This is used to determine the start position.
  *  \param init_transform  The initial position and rotation for this kart.
@@ -114,13 +211,20 @@
 Kart::Kart (const std::string& ident, unsigned int world_kart_id,
             int position, const btTransform& init_transform,
             HandicapLevel handicap, std::shared_ptr<GE::GERenderInfo> ri)
-     : AbstractKart(ident, world_kart_id, position, init_transform,
-             handicap, ri)
-
+     : Moveable()
+{
+    m_world_kart_id   = world_kart_id;
+    if (RaceManager::get()->getKartGlobalPlayerId(m_world_kart_id) > -1)
+    {
+        const RemoteKartInfo& rki = RaceManager::get()->getKartInfo(
+            m_world_kart_id);
+        loadKartProperties(ident, handicap, ri, rki.getKartData());
+    }
+    else
+        loadKartProperties(ident, handicap, ri);
 #if defined(WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__)
 #  pragma warning(1:4355)
 #endif
-{
     m_max_speed            = new MaxSpeed(this);
     m_terrain_info         = new TerrainInfo();
     m_powerup              = new Powerup(this);
@@ -132,11 +236,17 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_saved_controller     = NULL;
     m_consumption_per_tick = stk_config->ticks2Time(1) *
                              m_kart_properties->getNitroConsumption();
+    m_nitro_hack_ticks     = 0;
+    m_nitro_hack_factor    = 1.0f;
+    m_stolen_nitro_ticks   = 0;
+    m_stolen_nitro_amount  = 0.0f;
     m_fire_clicked         = 0;
     m_default_suspension_force = 0.0f;
     m_boosted_ai           = false;
     m_type                 = RaceManager::KT_AI;
     m_flying               = false;
+    m_powerup_mask         = 0;
+    m_powerup_buckets.clear();
 
     m_xyz_history_size     = stk_config->time2Ticks(XYZ_HISTORY_TIME);
 
@@ -227,7 +337,12 @@ void Kart::changeKart(const std::string& new_ident,
                       std::shared_ptr<GE::GERenderInfo> ri,
                       const KartData& kart_data)
 {
-    AbstractKart::changeKart(new_ident, handicap, ri, kart_data);
+    // Reset previous kart (including delete old animation above)
+    reset();
+    // Remove kart body
+    Physics::get()->removeKart(this);
+    loadKartProperties(new_ident, handicap, ri, kart_data);
+
     m_kart_model->setKart(this);
 
     scene::ISceneNode* old_node = m_node;
@@ -272,6 +387,11 @@ Kart::~Kart()
             SFXManager::get()->deleteSFX(m_custom_sounds[n]);
     }*/
 
+    if (m_kart_animation)
+    {
+        m_kart_animation->handleResetRace();
+        delete m_kart_animation;
+    }
     if (m_engine_sound)
         m_engine_sound->deleteSFX();
     if (m_skid_sound)
@@ -330,6 +450,14 @@ void Kart::reset()
     m_energy_to_min_ratio = 0;
     m_consumption_per_tick = stk_config->ticks2Time(1) *
                              m_kart_properties->getNitroConsumption();
+    m_nitro_hack_ticks = 0;
+    m_nitro_hack_factor = 1.0f;
+    m_stolen_nitro_ticks   = 0;
+    m_stolen_nitro_amount  = 0.0f;
+
+    // Reset the powerup mask
+    m_powerup_mask = 0;
+    m_powerup_buckets.clear();
 
     // Reset star effect in case that it is currently being shown.
     if (m_stars_effect)
@@ -371,6 +499,7 @@ void Kart::reset()
     m_bubblegum_ticks      = 0;
     m_bubblegum_torque_sign = true;
     m_invulnerable_ticks   = 0;
+    m_basket_squash_invulnerable_ticks = 0;
     m_min_nitro_ticks      = 0;
     m_energy_to_min_ratio  = 0;
     m_collected_energy     = 0;
@@ -386,6 +515,8 @@ void Kart::reset()
     m_is_jumping           = false;
     m_flying               = false;
     m_startup_boost        = 0.0f;
+    m_startup_engine_force = 0.0f;
+    m_startup_boost_level  = 1; // 0 penalty, 1 nothing, 2+ boost
 
     if (m_node)
         m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
@@ -418,6 +549,7 @@ void Kart::reset()
         m_engine_sound->stop();
 
     m_controls.reset();
+    m_effective_steer      = 0.0f;
     m_slipstream->reset();
     
     if(m_vehicle)
@@ -434,7 +566,17 @@ void Kart::reset()
 
     applyEngineForce (0.0f);
 
-    AbstractKart::reset();
+    m_live_join_util = 0;
+    // important to delete animations before calling reset, as some animations
+    // set the kart velocity in their destructor (e.g. cannon) which "reset"
+    // can then cancel. See #2738
+    if (m_kart_animation)
+    {
+        m_kart_animation->handleResetRace();
+        delete m_kart_animation;
+        m_kart_animation = NULL;
+    }
+    Moveable::reset();
 #ifndef SERVER_ONLY
     if (m_skidmarks)
     {
@@ -467,7 +609,7 @@ void Kart::reset()
 // -----------------------------------------------------------------------------
 void Kart::setXYZ(const Vec3& a)
 {
-    AbstractKart::setXYZ(a);
+    Moveable::setXYZ(a);
     Vec3 front(0, 0, getKartLength()*0.5f);
     m_xyz_front = getTrans()(front);
 }    // setXYZ
@@ -597,7 +739,7 @@ void Kart::setPosition(int p)
 
 // -----------------------------------------------------------------------------
 /** Sets that the view is blocked by a plunger. The duration depends on
- *  the difficulty, see KartPorperties getPlungerInFaceTime.
+ *  the difficulty, see KartProperties getPlungerInFaceTime.
  */
 void Kart::blockViewWithPlunger()
 {
@@ -877,6 +1019,7 @@ void Kart::updateWeight()
     if (m_weight != mass)
     {
         m_weight = mass;
+        // Bullet inertia is negligible
         btVector3 inertia;
         m_kart_chassis->calculateLocalInertia(mass, inertia);
         m_body->setMassProps(mass, inertia);
@@ -913,6 +1056,10 @@ float Kart::getMaxSteerAngle(float speed) const
         turn_angle_at_speed.setY(i, sinf( 1.0f / turn_angle_at_speed.getY(i))
                                     * m_kart_properties->getWheelBase());
 
+    // Make reverse mode turn the same way as forward
+    if (speed < 0.0f)
+        speed = -speed;
+
     return turn_angle_at_speed.get(speed);
 }   // getMaxSteerAngle
 
@@ -937,10 +1084,8 @@ void Kart::finishedRace(float time, bool from_server)
     // it would trigger a race end again.
     if (m_finished_race) return;
 
-    const bool is_linear_race =
-        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE ||
-        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL  ||
-        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER;
+    const bool is_linear_race = RaceManager::get()->isLinearRaceMode();
+
     if (NetworkConfig::get()->isNetworking() && !from_server)
     {
         if (NetworkConfig::get()->isServer())
@@ -1008,21 +1153,26 @@ void Kart::finishedRace(float time, bool from_server)
         RaceGUIBase* m = World::getWorld()->getRaceGUI();
         if (m)
         {
-            bool won_the_race = false, too_slow = false;
+            bool won_the_race = false, too_slow = false, one_kart = false;
             unsigned int win_position = 1;
 
             if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
                 win_position = 2;
 
+            // There is no win if there is no possibility of losing
+            if (RaceManager::get()->getNumberOfKarts() == 1)
+                one_kart = true;
+
             if ((getPosition() == (int)win_position &&
-                World::getWorld()->getNumKarts() > win_position) || RaceManager::get()->getNumberOfKarts() == 1)
+                World::getWorld()->getNumKarts() > win_position))
                 won_the_race = true;
 
             if (RaceManager::get()->hasTimeTarget() && m_finish_time > RaceManager::get()->getTimeTarget())
                 too_slow = true;
 
-            m->addMessage((too_slow     ? _("You were too slow!") :
-                           won_the_race ? _("You won the race!")  :
+            m->addMessage((too_slow     ? _("You were too slow!")     :
+                           one_kart     ? _("You finished the race!") :
+                           won_the_race ? _("You won the race!")      :
                                           _("You finished the race in rank %d!", getPosition())),
             this, 2.0f, video::SColor(255, 255, 255, 255), true, true, true);
         }
@@ -1058,27 +1208,23 @@ void Kart::setRaceResult()
         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL  ||
         RaceManager::get()->isLapTrialMode())
     {
+        bool standard_result_animation = true;
         if (m_controller->isLocalPlayerController()) // if player is on this computer
         {
-            PlayerProfile *player = PlayerManager::getCurrentPlayer();
-            const ChallengeStatus *challenge = player->getCurrentChallengeStatus();
+            const ChallengeStatus *challenge = PlayerManager::getCurrentPlayer()->getCurrentChallengeStatus();
             // In case of a GP challenge don't make the end animation depend
             // on if the challenge is fulfilled
             if (challenge && !challenge->getData()->isGrandPrix())
             {
+                standard_result_animation = false;
                 if (challenge->getData()->isChallengeFulfilled())
                     m_race_result = true;
                 else
                     m_race_result = false;
             }
-            else if (this->getPosition() <= 0.5f *
-                World::getWorld()->getCurrentNumKarts() ||
-                this->getPosition() == 1)
-                m_race_result = true;
-            else
-                m_race_result = false;
         }
-        else
+        // Display a happy animation if in the first half, sad otherwise
+        if (standard_result_animation)
         {
             if (this->getPosition() <= 0.5f *
                 World::getWorld()->getCurrentNumKarts() ||
@@ -1088,7 +1234,7 @@ void Kart::setRaceResult()
                 m_race_result = false;
         }
     }
-    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER ||
+    else if (RaceManager::get()->isFollowMode() ||
              RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
     {
         // the kart wins if it isn't eliminated
@@ -1109,7 +1255,7 @@ void Kart::setRaceResult()
         SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
         m_race_result = sw->getKartSoccerResult(this->getWorldKartId());
     }
-    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG)
+    else if (RaceManager::get()->isEggHuntMode())
     {
         // Easter egg mode only has one player, so always win
         m_race_result = true;
@@ -1141,11 +1287,10 @@ void Kart::collectedItem(ItemState *item_state)
         m_collected_energy += m_kart_properties->getNitroBigContainer();
         break;
     case Item::ITEM_BONUS_BOX  :
-        {
-            m_powerup->hitBonusBox(*item_state);
-            break;
-        }
+        m_powerup->hitBonusBox(*item_state);
+        break;
     case Item::ITEM_BUBBLEGUM:
+    case Item::ITEM_BUBBLEGUM_SMALL:
         m_has_caught_nolok_bubblegum = 
             (item_state->getPreviousOwner()&&
              item_state->getPreviousOwner()->getIdent() == "nolok");
@@ -1171,31 +1316,59 @@ void Kart::collectedItem(ItemState *item_state)
 
     if ( m_collected_energy > m_kart_properties->getNitroMax())
         m_collected_energy = m_kart_properties->getNitroMax();
+
+    // Play sound effects if the kart is controlled by a local player
     m_controller->collectedItem(*item_state, old_energy);
 
 }   // collectedItem
 
+bool Kart::hasHeldMini() const
+{
+    return (m_powerup->getType() == PowerupManager::POWERUP_MINI);
+}   // hasHeldMini
+
 //-----------------------------------------------------------------------------
 /** Called the first time a kart accelerates after 'ready'. It searches
- *  through the startup times to find the appropriate slot, and returns the
- *  speed-boost from the corresponding entry.
+ *  through the startup times to find the appropriate slot, and sets up
+ *  m_startup_boost and m_startup_engine_force to the appropriate values
  *  If the kart started too slow (i.e. slower than the longest time in the
  *  startup times list), it returns 0.
  */
-float Kart::getStartupBoostFromStartTicks(int ticks) const
+void Kart::setStartupBoostFromStartTicks(int ticks)
 {
     int ticks_since_ready = ticks - stk_config->time2Ticks(1.0f);
     if (ticks_since_ready < 0)
-        return 0.0f;
+        return;
     float t = stk_config->ticks2Time(ticks_since_ready);
     std::vector<float> startup_times = m_kart_properties->getStartupTime();
     for (unsigned int i = 0; i < startup_times.size(); i++)
     {
         if (t <= startup_times[i])
-            return m_kart_properties->getStartupBoost()[i];
+        {
+            m_startup_boost = m_kart_properties->getStartupBoost()[i];
+            m_startup_engine_force = m_kart_properties->getStartupEngineForce()[i];
+            m_startup_boost_level = 1 + startup_times.size() - i;
+            return;
+        }
     }
-    return 0.0f;
-}   // getStartupBoostFromStartTicks
+    m_startup_boost = 0.0f;
+    m_startup_engine_force = 0.0f;
+    m_startup_boost_level = 1;
+
+}   // setStartupBoostFromStartTicks
+
+//-----------------------------------------------------------------------------
+/** Called directly in networking mode */
+void Kart::setStartupBoost(uint8_t boost_level)
+{
+    std::vector<float> startup_times = m_kart_properties->getStartupTime();
+    int index = m_kart_properties->getStartupTime().size() - boost_level + 1;
+    assert(index >= 0 && index <= (int)m_kart_properties->getStartupTime().size());
+
+    m_startup_boost = m_kart_properties->getStartupBoost()[index];
+    m_startup_engine_force = m_kart_properties->getStartupEngineForce()[index];
+    m_startup_boost_level = boost_level;
+}   // setStartupBoost
 
 //-----------------------------------------------------------------------------
 /** Simulates gears by adjusting the force of the engine. It also takes the
@@ -1246,7 +1419,8 @@ bool Kart::isNearGround() const
 }   // isNearGround
 
 // ------------------------------------------------------------------------
-/** Enables a kart shield protection for a certain amount of time.
+/** Sets the duration of an active shield protection.
+ * This does not increase the boost time for the electro-shield.
  */
 void Kart::setShieldTime(float t)
 {
@@ -1262,17 +1436,56 @@ void Kart::setShieldTime(float t)
  */
 bool Kart::isShielded() const
 {
-    if(getAttachment() != NULL)
+    if(getAttachment() != NULL && getAttachment()->getTicksLeft() > 0)
     {
         Attachment::AttachmentType type = getAttachment()->getType();
-        return type == Attachment::ATTACH_BUBBLEGUM_SHIELD ||
-               type == Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD;
+        return isGumShielded() ||
+               type == Attachment::ATTACH_ELECTRO_SHIELD;
     }
     else
     {
         return false;
     }
 }   // isShielded
+
+// ------------------------------------------------------------------------
+/**
+ * Returns true if the kart is protected by a gum shield.
+ */
+bool Kart::isGumShielded() const
+{
+    if(getAttachment() != NULL && getAttachment()->getTicksLeft() > 0)
+    {
+        Attachment::AttachmentType type = getAttachment()->getType();
+        return type == Attachment::ATTACH_BUBBLEGUM_SHIELD ||
+               type == Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD ||
+               type == Attachment::ATTACH_BUBBLEGUM_SHIELD_SMALL ||
+               type == Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD_SMALL;
+    }
+    else
+    {
+        return false;
+    }
+}   // isGumShielded
+
+// ------------------------------------------------------------------------
+/**
+ * Returns true if the kart is protected by a weak shield.
+ * This is used when the basket-ball reaches its target.
+ */
+bool Kart::isWeakShielded() const
+{
+    if(getAttachment() != NULL && getAttachment()->getTicksLeft() > 0)
+    {
+        Attachment::AttachmentType type = getAttachment()->getType();
+        return type == Attachment::ATTACH_BUBBLEGUM_SHIELD_SMALL ||
+               type == Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD_SMALL;
+    }
+    else
+    {
+        return false;
+    }
+}   // isWeakShielded
 
 // ------------------------------------------------------------------------
 /**
@@ -1288,17 +1501,38 @@ float Kart::getShieldTime() const
 
 // ------------------------------------------------------------------------
 /**
- * Decreases the kart's shield time.
- * \param t The time subtracted from the shield timer. If t == 0.0f, the
-             default amout of time is subtracted.
- */
+ * Decreases the kart's shield time to zero. */
 void Kart::decreaseShieldTime()
 {
     if (isShielded())
     {
+        // If the shield is an electro-shield, also disable the speed boost
+        if(getAttachment()->getType() == Attachment::ATTACH_ELECTRO_SHIELD)
+            unsetElectroShield();
+
         getAttachment()->setTicksLeft(0);
     }
 }   // decreaseShieldTime
+
+// ------------------------------------------------------------------------
+/** Called before go phase to make sure all karts start at the same
+ *  position in case there is a slope. */
+void Kart::makeKartRest()
+{
+    btTransform t = m_starting_transform;
+    if (m_live_join_util != 0)
+    {
+        t.setOrigin(t.getOrigin() +
+            m_starting_transform.getBasis().getColumn(1) * 3.0f);
+    }
+
+    btRigidBody *body = getBody();
+    body->clearForces();
+    body->setLinearVelocity(Vec3(0.0f));
+    body->setAngularVelocity(Vec3(0.0f));
+    body->proceedToTransform(t);
+    setTrans(t);
+}   // makeKartRest
 
 //-----------------------------------------------------------------------------
 /** Shows the star effect for a certain time.
@@ -1487,6 +1721,9 @@ void Kart::update(int ticks)
     if(m_invulnerable_ticks>0)
         m_invulnerable_ticks -= ticks;
 
+    if(m_basket_squash_invulnerable_ticks>0)
+        m_basket_squash_invulnerable_ticks -= ticks;
+
     if (!RewindManager::get()->isRewinding())
         m_slipstream->update(ticks);
     m_slipstream->updateSpeedIncrease();
@@ -1598,8 +1835,7 @@ void Kart::update(int ticks)
             !has_animation_before && fabs(roll) > 60 * DEGREE_TO_RAD &&
             fabs(getSpeed()) < 3.0f)
         {
-            RescueAnimation::create(this, /*is_auto_rescue*/true);
-            m_last_factor_engine_sound = 0.0f;
+            handleRescue(/*is_auto_rescue*/ true);
         }
     }
 
@@ -1689,16 +1925,14 @@ void Kart::update(int ticks)
         if((min->getY() - getXYZ().getY() > 17 || dist_to_sector > 25) && !m_flying &&
            !has_animation_before)
         {
-            RescueAnimation::create(this);
-            m_last_factor_engine_sound = 0.0f;
+            handleRescue();
         }
     }
     else
     {
         if (!has_animation_before && material->isDriveReset() && isOnGround())
         {
-            RescueAnimation::create(this);
-            m_last_factor_engine_sound = 0.0f;
+            handleRescue();
         }
         else if(material->isZipper()     && isOnGround())
         {
@@ -1707,8 +1941,14 @@ void Kart::update(int ticks)
         }
         else
         {
+            // If a zipper boost (from the zipper item, texture or a startup boost)
+            // is active, reduce the texture penalty by half
+            float terrain_speed_fraction = material->getMaxSpeedFraction();;
+            if (m_max_speed->isSpeedIncreaseActive(MaxSpeed::MS_INCREASE_ZIPPER) > 0)
+                terrain_speed_fraction += (1.0f - terrain_speed_fraction)*0.5f;
+            
             m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_TERRAIN,
-                                     material->getMaxSpeedFraction(),
+                                     terrain_speed_fraction,
                                      material->getSlowDownTicks()    );
 #ifdef DEBUG
             if(UserConfigParams::m_material_debug)
@@ -1837,6 +2077,52 @@ void Kart::showZipperFire()
 {
     m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_ZIPPER, 800.0f);
 }
+
+void Kart::updatePowerupMask(int bucket)
+{
+    uint32_t temp_mask = 1 << bucket;
+    m_powerup_mask = m_powerup_mask | temp_mask; // Bitwise OR
+    m_powerup_buckets.push_back(bucket);
+
+    // std::popcount is C++20 only
+    std::bitset<32> b(m_powerup_mask);
+
+    // We remove the first (oldest) element of the list and
+    // update the bitmask accordingly
+    // MAX_BUCKETS is defined in powerup_manager.hpp
+    if (b.count() > MAX_BUCKETS)
+    {
+        temp_mask = 1 << m_powerup_buckets[0];
+        m_powerup_mask = m_powerup_mask ^ temp_mask; // Bitwise XOR
+        m_powerup_buckets.erase(m_powerup_buckets.begin());
+    }
+} // updatePowerupMask
+
+//-----------------------------------------------------------------------------
+/** This activates the kart's electro-shield. */
+void Kart::setElectroShield()
+{
+    float max_speed_increase = m_kart_properties->getElectroMaxSpeedIncrease();
+    float duration           = m_kart_properties->getElectroDuration();
+    float fade_out_time      = m_kart_properties->getElectroFadeOutTime();
+
+    // The engine multiplier is automatically enabled when
+    // a speed increase from MS_INCREASE_ELECTRO is detected.
+
+    m_max_speed->increaseMaxSpeed(MaxSpeed::MS_INCREASE_ELECTRO,
+                                     max_speed_increase,
+                                     /* engine force */ 0,
+                                     stk_config->time2Ticks(duration),
+                                     stk_config->time2Ticks(fade_out_time));
+}   // setElectroShield
+
+//-----------------------------------------------------------------------------
+/** This disables the kart's electro-shield. */
+void Kart::unsetElectroShield()
+{
+    // Ends the speed increase without disabling fade out time
+    m_max_speed->endSpeedIncrease(MaxSpeed::MS_INCREASE_ELECTRO);
+}   // unsetElectroShield
 
 //-----------------------------------------------------------------------------
 /** Squashes this kart: it will scale the kart in up direction, and causes
@@ -2156,7 +2442,7 @@ void Kart::handleMaterialGFX(float dt)
 
 //-----------------------------------------------------------------------------
 /** Sets zipper time, and apply one time additional speed boost. It can be
- *  used with a specific material, in which case the zipper parmaters are
+ *  used with a specific material, in which case the zipper parameters are
  *  taken from this material (parameters that are <0 will be using the
  *  kart-specific values from kart-properties.
  *  \param material If not NULL, will be used to determine the zipper
@@ -2164,8 +2450,9 @@ void Kart::handleMaterialGFX(float dt)
  *                  will be used.
  * \param play_sound If true this will cause a sfx to be played even if the
  *                  terrain hasn't changed. It is used by the zipper powerup.
+ * \param mini If true, the duration and other bonuses will be lower.
  */
-void Kart::handleZipper(const Material *material, bool play_sound)
+void Kart::handleZipper(const Material *material, bool play_sound, bool mini_zipper)
 {
     /** The additional speed allowed on top of the kart-specific maximum kart
      *  speed. */
@@ -2181,6 +2468,9 @@ void Kart::handleZipper(const Material *material, bool play_sound)
     /** Additional engine force. */
     float engine_force;
 
+	/*MS_INCREASE_ZIPPER or MS_INCREASE_GROUND_ZIPPER*/
+    unsigned int boost_category;
+
     if(material)
     {
         material->getZipperParameter(&max_speed_increase, &duration,
@@ -2195,19 +2485,32 @@ void Kart::handleZipper(const Material *material, bool play_sound)
             fade_out_time      = m_kart_properties->getZipperFadeOutTime();
         if(engine_force<0)
             engine_force       = m_kart_properties->getZipperForce();
+        boost_category = MaxSpeed::MS_INCREASE_GROUND_ZIPPER;
     }
     else
     {
-        max_speed_increase = m_kart_properties->getZipperMaxSpeedIncrease();
-        duration           = m_kart_properties->getZipperDuration();
-        speed_gain         = m_kart_properties->getZipperSpeedGain();
-        fade_out_time      = m_kart_properties->getZipperFadeOutTime();
-        engine_force       = m_kart_properties->getZipperForce();
+        if (mini_zipper)
+        {
+            max_speed_increase = m_kart_properties->getZipperMaxSpeedIncrease()*0.6;
+            duration           = m_kart_properties->getZipperDuration()*0.5;
+            speed_gain         = m_kart_properties->getZipperSpeedGain()*0.75;
+            fade_out_time      = m_kart_properties->getZipperFadeOutTime()*0.5;
+            engine_force       = m_kart_properties->getZipperForce()*0.5;
+        }
+        else
+        {
+            max_speed_increase = m_kart_properties->getZipperMaxSpeedIncrease();
+            duration           = m_kart_properties->getZipperDuration();
+            speed_gain         = m_kart_properties->getZipperSpeedGain();
+            fade_out_time      = m_kart_properties->getZipperFadeOutTime();
+            engine_force       = m_kart_properties->getZipperForce();
+        }
+        boost_category = MaxSpeed::MS_INCREASE_ZIPPER;
     }
     // Ignore a zipper that's activated while braking
     if(m_controls.getBrake() || m_speed<0) return;
 
-    m_max_speed->instantSpeedIncrease(MaxSpeed::MS_INCREASE_ZIPPER,
+    m_max_speed->instantSpeedIncrease(boost_category,
                                      max_speed_increase, speed_gain,
                                      engine_force,
                                      stk_config->time2Ticks(duration),
@@ -2223,18 +2526,113 @@ void Kart::handleZipper(const Material *material, bool play_sound)
 
 }   // handleZipper
 
+// ----------------------------------------------------------------------------
+/** Sets a new kart animation. This function should either be called to
+ *  remove an existing kart animation (ka=NULL), or to set a new kart
+ *  animation, in which case the current kart animation must be NULL.
+ *  \param ka The new kart animation, or NULL if the current kart animation
+ *            is to be stopped.
+ */
+void Kart::setKartAnimation(AbstractKartAnimation *ka)
+{
+#ifdef DEBUG
+    if( ( (ka!=NULL) ^ (m_kart_animation!=NULL) ) ==0)
+    {
+        if(ka) Log::debug("Abstract_Kart", "Setting kart animation to '%s'.",
+                          ka->getName().c_str());
+        else   Log::debug("Abstract_Kart", "Setting kart animation to NULL.");
+        if(m_kart_animation) Log::info("Abstract_Kart", "Current kart"
+                                       "animation is '%s'.",
+                                        m_kart_animation->getName().c_str());
+        else   Log::debug("Abstract_Kart", "Current kart animation is NULL.");
+    }
+#endif
+    if (ka != NULL && m_kart_animation != NULL)
+    {
+        delete m_kart_animation;
+        m_kart_animation = NULL;
+    }
+
+    // Make sure that the either the current animation is NULL and a new (!=0)
+    // is set, or there is a current animation, then it must be set to 0. This
+    // makes sure that the calling logic of this function is correct.
+    assert( (ka!=NULL) ^ (m_kart_animation!=NULL) );
+    m_kart_animation = ka;
+}   // setKartAnimation
+
+/** Allows to add nitro while enforcing max nitro storage. */
+void Kart::addEnergy(float val, bool allow_negative = false)
+{
+    // Negative nitro is allowed in general, but this specific
+    // change to the nitro level is not allowed to make it negative
+    // or more negative
+    if (!allow_negative && val < 0 && m_collected_energy > 0)
+    {
+        if (-val > m_collected_energy)
+            m_collected_energy = 0;
+        else
+            m_collected_energy += val;
+    }
+    else
+    {
+        m_collected_energy += val;
+    }
+
+    // Max nitro is always enforced no matter what
+    if (m_collected_energy > m_kart_properties->getNitroMax())
+        m_collected_energy = m_kart_properties->getNitroMax();
+}
+
+//-----------------------------------------------------------------------------
+/** Called when the NitroHack powerup is used by the kart. **/
+void Kart::activateNitroHack()
+{
+    m_nitro_hack_ticks = stk_config->time2Ticks(m_kart_properties->getNitrohackDuration());
+    m_nitro_hack_factor = m_kart_properties->getNitrohackFactor();
+}   // activateNitroHack
+
+//-----------------------------------------------------------------------------
+/** Called when the NitroHack powerup targets this kart. **/
+void Kart::setStolenNitro(float amount, float duration)
+{
+    // If a second steal happens while the first one is displayed,
+    // display both until the expiration of the second one.
+    m_stolen_nitro_amount += amount;
+    m_stolen_nitro_ticks = stk_config->time2Ticks(duration);
+}   // setStolenNitro
+
 // -----------------------------------------------------------------------------
 /** Updates the current nitro status.
  *  \param ticks Number of physics time steps - should be 1.
  */
 void Kart::updateNitro(int ticks)
 {
-    if (m_collected_energy == 0)
+    if (m_stolen_nitro_ticks > 0)
+    {
+        // Decrement ticks and, if now negative, reset relevant variables
+        if ((m_stolen_nitro_ticks -= ticks) <= 0)
+        {
+            m_stolen_nitro_ticks = 0;
+            m_stolen_nitro_amount = 0.0f;            
+        }
+    }
+
+    if (m_nitro_hack_ticks > 0)
+    {
+        // Decrement ticks and, if now negative, reset relevant variables
+        if ((m_nitro_hack_ticks -= ticks) <= 0)
+        {
+            m_nitro_hack_ticks = 0;
+            m_nitro_hack_factor = 1.0f;           
+        }
+    }
+
+    if (m_collected_energy <= 0)
         m_min_nitro_ticks = 0;
 
     if (m_controls.getNitro() && m_min_nitro_ticks <= 0 && m_collected_energy > 0)
     {
-        m_min_nitro_ticks = m_kart_properties->getNitroMinConsumptionTicks();
+        m_min_nitro_ticks = stk_config->time2Ticks(m_kart_properties->getNitroMinBurst());
         float min_consumption = m_min_nitro_ticks * m_consumption_per_tick;
         m_energy_to_min_ratio = std::min<float>(1, m_collected_energy/min_consumption);
     }
@@ -2259,13 +2657,17 @@ void Kart::updateNitro(int ticks)
         return;
     }
 
-
+    float previous_energy = m_collected_energy;
     m_collected_energy -= m_consumption_per_tick*ticks;
-    if (m_collected_energy < 0)
+
+    // We don't allow nitro to go into the negative
+    // as a result of normal nitro usage.
+    // It can happen as a result of the Nitro-Hack powerup, however.
+    if (previous_energy >= 0 && m_collected_energy < 0)
     {
+        m_collected_energy = 0;
         if(m_nitro_sound->getStatus() == SFXBase::SFX_PLAYING && !rewinding)
             m_nitro_sound->stop();
-        m_collected_energy = 0;
         return;
     }
 
@@ -2275,8 +2677,8 @@ void Kart::updateNitro(int ticks)
             m_nitro_sound->play();
 
         m_max_speed->increaseMaxSpeed(MaxSpeed::MS_INCREASE_NITRO,
-            m_kart_properties->getNitroMaxSpeedIncrease(),
-            m_kart_properties->getNitroEngineForce(),
+            m_kart_properties->getNitroMaxSpeedIncrease()*m_nitro_hack_factor,
+            m_kart_properties->getNitroEngineForce()*m_nitro_hack_factor,
             stk_config->time2Ticks(m_kart_properties->getNitroDuration()*m_energy_to_min_ratio),
             stk_config->time2Ticks(m_kart_properties->getNitroFadeOutTime()));
     }
@@ -2300,7 +2702,7 @@ void Kart::setSlipstreamEffect(float f)
  *  \param update_attachments If true the attachment of this kart and the
  *          other kart hit will be updated (e.g. bombs will be moved)
  */
-void Kart::crashed(AbstractKart *k, bool update_attachments)
+void Kart::crashed(Kart *k, bool update_attachments)
 {
     if(update_attachments)
     {
@@ -2430,8 +2832,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
 #endif
         if (m->getCollisionReaction() == Material::RESCUE)
         {
-            RescueAnimation::create(this);
-            m_last_factor_engine_sound = 0.0f;
+            handleRescue();
         }
         else if (m->getCollisionReaction() == Material::PUSH_BACK)
         {
@@ -2450,11 +2851,21 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
 }   // crashed(Material)
 
 // -----------------------------------------------------------------------------
+/** Create the rescue animation and reset some relevant variables
+ *  World takes care of moving the kart to its rescue position. */
+void Kart::handleRescue(bool auto_rescue)
+{
+    RescueAnimation::create(this, /*is_auto_rescue*/ auto_rescue);
+    m_last_factor_engine_sound = 0.0f;
+    m_effective_steer = 0.0f;
+} // handleRescue
+
+// -----------------------------------------------------------------------------
 /** Common code used when a kart or a material was hit.
  * @param m The material collided into, or NULL if none
  * @param k The kart collided into, or NULL if none
  */
-void Kart::playCrashSFX(const Material* m, AbstractKart *k)
+void Kart::playCrashSFX(const Material* m, Kart *k)
 {
     int ticks_since_start = World::getWorld()->getTicksSinceStart();
     if(ticks_since_start-m_ticks_last_crash < 60) return;
@@ -2485,6 +2896,9 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
                 const float LengthOfDifference = VelocityDifference.length();
             
                 volume = sqrt( abs(LengthOfDifference / speed_for_max_volume));
+                // temporary fix for kart collision sounds being annoying
+                // TODO : find a new sound for kart-on-kart collisions
+                volume *= 0.5f;
             }
             
             if (volume > max_volume) { volume = max_volume; }
@@ -2495,7 +2909,7 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
             
             // In case that the sfx is longer than 0.5 seconds, only play it if
             // it's not already playing.
-            if (isShielded() || (k != NULL && k->isShielded()))
+            if (isGumShielded() || (k != NULL && k->isGumShielded()))
             {
                 crash_sound_emitter->play(getSmoothedXYZ(), m_boing_sound);
             }
@@ -2603,22 +3017,23 @@ void Kart::updatePhysics(int ticks)
             m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_ZIPPER,
                 100.0f * m_startup_boost);
             m_max_speed->instantSpeedIncrease(MaxSpeed::MS_INCREASE_ZIPPER,
-                0.9f * m_startup_boost, m_startup_boost,
-                /*engine_force*/200.0f,
-                /*duration*/stk_config->time2Ticks(5.0f),
-                /*fade_out_time*/stk_config->time2Ticks(5.0f));
+                /*instant speed*/ m_startup_boost, /*max speed*/ m_startup_boost,
+                /*engine_force*/ m_startup_engine_force,
+                /*duration*/ stk_config->time2Ticks(m_kart_properties->getStartupDuration()),
+                /*fade_out_time*/ stk_config->time2Ticks(m_kart_properties->getStartupFadeOutTime()));
         }
     }
     if (m_bounce_back_ticks > 0)
         m_bounce_back_ticks -= ticks;
 
     updateEnginePowerAndBrakes(ticks);
+    updateSteering(ticks);
 
     // apply flying physics if relevant
     if (m_flying)
         updateFlying();
 
-    m_skidding->update(ticks, isOnGround(), m_controls.getSteer(),
+    m_skidding->update(ticks, isOnGround(), m_effective_steer,
                        m_controls.getSkidControl());
     if( ( m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_LEFT ||
           m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_RIGHT  ) &&
@@ -2703,11 +3118,34 @@ void Kart::updateEngineSFX(float dt)
 }   // updateEngineSFX
 
 
-
 //-----------------------------------------------------------------------------
 /** Reduces the engine power according to speed
  *  
  *  TODO : find where the physics already apply a linear force decrease
+ *  TODO : While this work fine, it should ideally be in physics
+ *  \param engine_power : the engine power on which to apply the decrease
+ */
+float Kart::compensateLinearSlowdown(float engine_power)
+{
+    //The physics already do that a certain amount of engine force is needed to keep going
+    //at a given speed (~39,33 engine force = 1 speed for a mass of 350)
+    //But it's either too slow to accelerate to a target speed or makes it
+    //too easy to accelerate farther.
+    //Instead of making increasing gears have enormous power gaps, we use air friction
+
+    float mass_factor = m_kart_properties->getMass()/350.0f;
+
+    // Compensate the linear slowdown
+    float compensate_linear_slowdown = 39.33f*getSpeed()*mass_factor;
+
+    engine_power += compensate_linear_slowdown;
+
+    return engine_power;
+} //compensateLinearSlowdown
+
+//-----------------------------------------------------------------------------
+/** Simulates air friction by reducing the engine power according to speed
+ *  
  *  TODO : While this work fine, it should ideally be in physics
  *         However, the function use some kart properties and parachute
  *         effect needs to be applied, so keep both working if moving
@@ -2715,22 +3153,11 @@ void Kart::updateEngineSFX(float dt)
  */
 float Kart::applyAirFriction(float engine_power)
 {
-    //The physics already do that a certain amount of engine force is needed to keep going
-    //at a given speed (~39,33 engine force = 1 speed for a mass of 350)
-    //But it's either too slow to accelerate to a target speed or makes it
-    //too easy to accelerate farther.
-    //Instead of making increasing gears have enormous power gaps, apply friction
-
-    float mass_factor = m_kart_properties->getMass()/350.0f;
-    float compense_linear_slowdown = 39.33f*fabsf(getSpeed())*mass_factor;
-
-    engine_power += compense_linear_slowdown;
-
     // The result will always be a positive number
     float friction_intensity = fabsf(getSpeed());
 
     // Not a pure quadratic evolution as it would be too brutal
-    friction_intensity *= sqrt(friction_intensity)*5;
+    friction_intensity *= sqrt(friction_intensity)*5.0f;
 
     // Apply parachute physics
     // Currently, all karts have the same base friction
@@ -2745,7 +3172,8 @@ float Kart::applyAirFriction(float engine_power)
     // 2)That way, engine boosts remain useful at high speed
     // 3)It helps heavier karts, who have an higher engine power
 
-    engine_power-=friction_intensity;
+    float sign = (getSpeed() < 0) ? -1.0f : 1.0f;
+    engine_power-=friction_intensity*sign;
 
     return engine_power;
 } //applyAirFriction
@@ -2766,6 +3194,12 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
         engine_power*= m_kart_properties->getNitroEngineMult();
     }
 
+    // apply electro-shield engine boost if relevant
+    if(getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_ELECTRO) > 0)
+    {
+        engine_power*= m_kart_properties->getElectroEngineMult();
+    }
+
     // apply bubblegum physics if relevant
     if (m_bubblegum_ticks > 0)
     {
@@ -2774,6 +3208,9 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
             m_kart_properties->getBubblegumTorque() *
             (m_bubblegum_torque_sign ? 1.0f : -1.0f), 0.0));
     }
+
+    // Acceleration and braking can happen simultaneously
+    float base_engine_power = engine_power;
 
     if(m_controls.getAccel())   // accelerating
     {
@@ -2785,90 +3222,124 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
         // hits a wall, he needs to be able to start again quickly after
         // going backwards)
         else if(m_speed < 0.0f)
-            engine_power *= 5.0f;
+            engine_power *= 4.0f;
 
         // Lose some traction when skidding, to balance the advantage
         if (m_controls.getSkidControl() &&
             m_kart_properties->getSkidVisualTime() == 0)
             engine_power *= 0.5f;
 
-        // This also applies parachute physics if relevant
-        engine_power = applyAirFriction(engine_power);
+        // In case the acceleration value is analog,
+        // moderate the engine power accordingly
+        engine_power *= m_controls.getAccel();
+    } // if getAccel
+    else
+    {
+        engine_power = 0;
+    }
 
-        applyEngineForce(engine_power*m_controls.getAccel());
+    if(m_controls.getBrake())   // braking
+    {
+        // check if the player is currently only slowing down
+        // or moving backwards
 
+        // Still going forward while braking
+        if(m_speed > 0.0f) 
+        {
+            m_brake_ticks += ticks;
+            // Apply the brakes - include the time dependent brake increase
+
+            float f = stk_config->ticks2Time(m_brake_ticks);
+
+            if (f >= m_kart_properties->getEngineTimeFullBrake())
+                f = 1.0f;
+            else
+                f = f * (0.35f + 0.65f / m_kart_properties->getEngineTimeFullBrake());
+
+            float brake_factor = m_kart_properties->getEngineBrakeFactor() * f;
+            // Setting 
+            m_vehicle->setAllBrakes(brake_factor);
+        } // m_speed > 0
+        // If not going forward and acceleration is pressed, ignore the brake input
+        // If acceleration is not set, interpret the brake input as a request
+        // for backward acceleration using the reverse gear
+        else if (!m_controls.getAccel())
+        {
+            m_vehicle->setAllBrakes(0);
+            // going backward, apply reverse gear ratio (unless he goes
+            // too fast backwards)
+            if ( -m_speed <  m_max_speed->getCurrentMaxSpeed()
+                             *m_kart_properties->getEngineMaxSpeedReverseRatio())
+                engine_power = -2 * base_engine_power;
+            else  // -m_speed >= max speed on this terrain
+                engine_power = 0;
+        }   // m_speed <00
+    } // if getBrake
+    else
+    {
+        m_brake_ticks = 0;
+
+        // If not giving power (forward or reverse gear) or braking, and speed is low
+        // we are "parking" the kart, so in battle mode we can ambush people
+        if (!m_controls.getAccel() && std::abs(m_speed) < 5.0f)
+            m_vehicle->setAllBrakes(20.0f);
         // Either all or no brake is set, so test only one to avoid
         // resetting all brakes most of the time.
-        if(m_vehicle->getWheelInfo(0).m_brake &&
+        else if (m_vehicle->getWheelInfo(0).m_brake &&
             !World::getWorld()->isStartPhase())
-            m_vehicle->setAllBrakes(0);
-        m_brake_ticks = 0;
+            m_vehicle->setAllBrakes(0);        
     }
-    else // not accelerating
-    {
-        //The engine power is still guaranteed >= 0 at this point
-        float braking_power = engine_power;
 
-        // This also applies parachute physics if relevant
-        engine_power = applyAirFriction(engine_power);
-       
-        if(m_controls.getBrake())
-        {   // check if the player is currently only slowing down
-            // or moving backwards
-            if(m_speed > 0.0f)
-            {   // Still going forward while braking
-                applyEngineForce(engine_power-braking_power*3);
-                m_brake_ticks += ticks;
-                // Apply the brakes - include the time dependent brake increase
-                float f = 1.0f + stk_config->ticks2Time(m_brake_ticks)
-                               * m_kart_properties->getEngineBrakeTimeIncrease();
-                m_vehicle->setAllBrakes(m_kart_properties->getEngineBrakeFactor() * f);
-            }
-            else   // m_speed < 0
-            {
-                m_vehicle->setAllBrakes(0);
-                // going backward, apply reverse gear ratio (unless he goes
-                // too fast backwards)
-                if ( -m_speed <  m_max_speed->getCurrentMaxSpeed()
-                                 *m_kart_properties->getEngineMaxSpeedReverseRatio())
-                {
-                    // The backwards acceleration is artificially increased to
-                    // allow players to get "unstuck" quicker if they hit e.g.
-                    // a wall.
-                    applyEngineForce(engine_power-braking_power*3);
-                }
-                else  // -m_speed >= max speed on this terrain
-                {
-                    applyEngineForce(0.0f);
-                }
+    // This also applies parachute physics if relevant
+    engine_power = applyAirFriction(engine_power);
+    // An engine power of 0 keeps the kart speed constant
+    // after correcting for the linear slowdown.
+    engine_power = compensateLinearSlowdown(engine_power);
 
-            }   // m_speed <00
-        }
-        else   // no braking and no acceleration
-        {
-            m_brake_ticks = 0;
-            // lift the foot from throttle, let friction slow it down
-            assert(!std::isnan(m_controls.getAccel()));
-            assert(!std::isnan(engine_power));
 
-            // If not giving power (forward or reverse gear), and speed is low
-            // we are "parking" the kart, so in battle mode we can ambush people
-            if (std::abs(m_speed) < 5.0f)
-            {
-                // Engine must be 0, otherwise braking is not used at all
-                applyEngineForce(0);
-                m_vehicle->setAllBrakes(20.0f);
-            }
-            else
-            {
-                // This ensure that parachute and air friction are applied
-                // and that the kart gracefully slows down
-                applyEngineForce(engine_power-braking_power);
-                m_vehicle->setAllBrakes(0);
-            }
-        }   // no braking and no acceleration
-    }   // not accelerating
+    applyEngineForce(engine_power);
 }   // updateEnginePowerAndBrakes
+
+// ----------------------------------------------------------------------------
+/** The steer value from controls contains the steer value requested by the
+ *  controller (AI or player). We convert it here into an effective steering
+ *  value accounting for the TimeToFullSteer properties of the kart. This
+ *  allows uniform behavior without duplicate code or abnormally located code. */
+void Kart::updateSteering(int ticks)
+{
+    // Get the requested value, compute the new steering value,
+    // and set it at the end of this function
+    float requested_steer = m_controls.getSteer();
+    if(stk_config->m_disable_steer_while_unskid &&
+       m_controls.getSkidControl()==KartControl::SC_NONE &&
+       getSkidding()->getVisualSkidRotation()!=0)
+    {
+        requested_steer = 0;
+    }
+
+    // Changes in steering are limited according to timeFullSteer
+    // If the steering is 'back to straight', we use the time
+    // to full steer for a current steer of 0 (which should be
+    // the highest possible value)
+    float dt = stk_config->ticks2Time(ticks);
+    const float STEER_CHANGE = ( (requested_steer > m_effective_steer && m_effective_steer < 0) ||
+                                 (requested_steer < m_effective_steer && m_effective_steer > 0)   )
+                     ? dt/getTimeFullSteer(0.0f)
+                     : dt/getTimeFullSteer(fabsf(m_effective_steer));
+
+    if (requested_steer < m_effective_steer)
+    {
+        m_effective_steer -= STEER_CHANGE;
+        m_effective_steer = std::max(m_effective_steer, requested_steer);
+    }
+    else if(requested_steer > m_effective_steer)
+    {
+        m_effective_steer += STEER_CHANGE;
+        m_effective_steer = std::min(m_effective_steer, requested_steer);
+    }
+
+    // If requested steer is equal to m_effective steer, there is nothing else to do
+}   // updateSteering
 
 // ----------------------------------------------------------------------------
 /** Handles sliding, i.e. the kart sliding off terrain that is too steep.
@@ -2963,9 +3434,9 @@ void Kart::updateFlying()
         }
     }
 
-    if (m_controls.getSteer()!= 0.0f)
+    if (m_effective_steer!= 0.0f)
     {
-        m_body->applyTorque(btVector3(0.0, m_controls.getSteer()*3500.0f, 0.0));
+        m_body->applyTorque(btVector3(0.0, m_effective_steer*3500.0f, 0.0));
     }
 
     // dampen any roll while flying, makes the kart hard to control
@@ -3085,7 +3556,11 @@ void Kart::applyEngineForce(float force)
  */
 void Kart::kartIsInRestNow()
 {
-    AbstractKart::kartIsInRestNow();
+    // Update the kart transforms with the newly computed position
+    // after all karts are reset
+    m_starting_transform = getBody()->getWorldTransform();
+    setTrans(m_starting_transform);
+
     m_default_suspension_force = 0.0f;
     for (int i = 0; i < m_vehicle->getNumWheels(); i++)
     {
@@ -3117,6 +3592,18 @@ SFXBase* Kart::getNextEmitter()
 
     return m_emitters[m_emitter_id];
 }
+
+//-----------------------------------------------------------------------------
+
+const std::string& Kart::getIdent() const
+{
+    return m_kart_properties->getIdent();
+}
+
+bool Kart::isWheeless() const
+{
+    return m_kart_model->getWheelModel(0)==NULL;
+}   // isWheeless
 
 //-----------------------------------------------------------------------------
 /** Updates the graphics model. It is responsible for positioning the graphical
@@ -3291,7 +3778,7 @@ void Kart::updateGraphics(float dt)
         // the normal maximum speed of the kart.
         if(nitro_frac>1.0f) nitro_frac = 1.0f;
     }
-    m_kart_gfx->updateNitroGraphics(nitro_frac);
+    m_kart_gfx->updateNitroGraphics(nitro_frac, m_nitro_hack_ticks > 0);
 
     // Handle leaning of karts
     // -----------------------
@@ -3309,11 +3796,10 @@ void Kart::updateGraphics(float dt)
     {
         // Use steering and speed ^ 2,
         // which means less effect at lower steering and speed.
-        speed_frac = std::min(speed_frac - 0.6f, 1.0f);
+        speed_frac = std::min(speed_frac - 0.55f, 1.0f);
         steer_frac = (steer_frac+0.25f)*0.8f;
-        const float f = m_skidding->getSteeringFraction();
         const float max_lean = -m_kart_properties->getLeanMax() * DEGREE_TO_RAD
-                             * f * speed_frac * speed_frac;
+                             * steer_frac * speed_frac * speed_frac;
 
         int max_lean_sign = extract_sign(max_lean);
         m_current_lean += max_lean_sign * dt* roll_speed;
@@ -3329,6 +3815,15 @@ void Kart::updateGraphics(float dt)
         if (lean_sign != extract_sign(m_current_lean))
             m_current_lean = 0.0f;
     }
+
+    float temp_lean = 0.0f;
+    if (getVehicle()->getCentralImpulseTicks() > 0)
+        temp_lean = getVehicle()->getCollisionLean();
+
+    if (temp_lean > 0.0f)
+        m_current_lean = std::max(temp_lean, m_current_lean);
+    else if (temp_lean < 0.0f)
+        m_current_lean = std::min(temp_lean, m_current_lean);
 
     // If the kart is leaning, part of the kart might end up 'in' the track.
     // To avoid this, raise the kart enough to offset the leaning.

@@ -26,7 +26,7 @@
 
 #include <set>
 
-class AbstractKart;
+class Kart;
 class BareNetworkString;
 class ItemState;
 class SFXBase;
@@ -43,21 +43,28 @@ private:
     /** The powerup type. */
     PowerupManager::PowerupType m_type;
 
+    /** The mini-state (used only by the mini-wish powerup) */
+    PowerupManager::MiniState m_mini_state;
+
     /** Number of collected powerups. */
     int                         m_number;
 
     /** The owner (kart) of this powerup. */
-    AbstractKart*               m_kart;
+    Kart*                       m_kart;
 
     std::set<int>               m_played_sound_ticks;
 
+    /** Returns an integer in the 0-32767 range.*/
+    int simplePRNG(const int seed, const int time, const int item_id, const int position);
+    void useBubblegum(bool has_played_sound, bool mini = false);
+
 public:
-                    Powerup      (AbstractKart* kart_);
+                    Powerup      (Kart* kart_);
                    ~Powerup      ();
     void            set          (PowerupManager::PowerupType _type, int n = 1);
     void            setNum       (int n = 1);
     void            reset        ();
-    Material*       getIcon      () const;
+    Material*       getIcon      (bool wide=false) const;
     void            adjustSound  ();
     void            use          ();
     void            hitBonusBox (const ItemState &item);
@@ -72,6 +79,12 @@ public:
     PowerupManager::PowerupType
                     getType      () const {return m_type;  }
     // ------------------------------------------------------------------------
+    PowerupManager::MiniState getMiniState () const { return m_mini_state; }
+    // ------------------------------------------------------------------------
+    void setMiniState (PowerupManager::MiniState new_mini_state)
+            { m_mini_state = new_mini_state; }
+    // ------------------------------------------------------------------------
+    bool            hasWideIcon  () const {return m_type == PowerupManager::POWERUP_MINI; }
 };
 
 #endif

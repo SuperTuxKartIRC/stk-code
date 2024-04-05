@@ -25,7 +25,7 @@
 #include <vector>
 #include <string>
 
-class AbstractKart;
+class Kart;
 class ParticleEmitter;
 class ParticleKind;
 class Vec3;
@@ -47,6 +47,8 @@ public:
      *  is the number of entries and must therefore be last. */
     enum KartGFXType { KGFX_NITRO1=0,
                        KGFX_NITRO2,
+                       KGFX_NITROHACK1,
+                       KGFX_NITROHACK2,
                        KGFX_NITROSMOKE1,
                        KGFX_NITROSMOKE2,
                        KGFX_ZIPPER,
@@ -57,6 +59,8 @@ public:
                        KGFX_SKID1R = KGFX_SKIDR,
                        KGFX_SKID2L,
                        KGFX_SKID2R,
+                       KGFX_SKID3L,
+                       KGFX_SKID3R,
                        KGFX_SKID0L,
                        KGFX_SKID0R,
                        KGFX_EXHAUST1,
@@ -64,20 +68,24 @@ public:
                        KGFX_COUNT};
 
 private:
-    /** The particle kind for skidding bonus level 0. */
+    /** The particle kind for skidding bonus level 0 (no boost yet). */
     const ParticleKind *m_skid_kind0;
 
-    /** The particle kind for skidding bonus level 1. */
+    /** The particle kind for skidding bonus level 1 (yellow). */
     const ParticleKind *m_skid_kind1;
 
-    /** The particle kind for skidding bonus level 2. */
+    /** The particle kind for skidding bonus level 2 (red). */
     const ParticleKind *m_skid_kind2;
+
+    /** The particle kind for skidding bonus level 3 (purple). */
+    const ParticleKind *m_skid_kind3;
+
 
     /** Vector of all particle emitters. */
     std::vector<ParticleEmitter*> m_all_emitters;
 
     /** Pointer to the owner of this kart. */
-    const AbstractKart *m_kart;
+    const Kart *m_kart;
 
     /** Used to alternate particle effects from the rear wheels. */
     int         m_wheel_toggle;
@@ -88,18 +96,24 @@ private:
     /** A light that's shown when the kart uses nitro. */
     irr::scene::ISceneNode* m_nitro_light;
 
+    /** A light that's shown when the kart uses nitro with "nitro-hack" on. */
+    irr::scene::ISceneNode* m_nitro_hack_light;
+
     /** Light that is shown when the kart is skidding. */
     irr::scene::ISceneNode* m_skidding_light_1;
 
     /** A light that's shown on the second skid-level with another color. */
     irr::scene::ISceneNode* m_skidding_light_2;
 
+    /** A light that's shown on the third skid-level with another color. */
+    irr::scene::ISceneNode* m_skidding_light_3;
+
     void addEffect(KartGFXType type, const std::string &file_name,
                    const Vec3 &position, bool important);
     void resizeBox(const KartGFXType type, float new_size);
 
 public:
-         KartGFX(const AbstractKart *kart, bool is_day);
+         KartGFX(const Kart *kart, bool is_day);
         ~KartGFX();
     void reset();
     void setSkidLevel(const unsigned int level);
@@ -109,12 +123,12 @@ public:
     void setCreationRateRelative(const KartGFXType type, float f);
     void updateTerrain(const ParticleKind *pk);
     void update(float dt);
-    void updateNitroGraphics(float f);
+    void updateNitroGraphics(float f, bool isNitroHackOn);
     void updateSkidLight(unsigned int level);
     void getGFXStatus(int* nitro, bool* zipper,
-                      int* skidding, bool* red_skidding) const;
+                      int* skidding, bool* red_skidding, bool* purple_skidding) const;
     void setGFXFromReplay(int nitro, bool zipper,
-                          int skidding, bool red_skidding);
+                          int skidding, bool red_skidding, bool purple_skidding);
     void setGFXInvisible();
 
 };   // KartWGFX

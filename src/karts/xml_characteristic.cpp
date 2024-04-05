@@ -353,8 +353,6 @@ void XmlCharacteristic::load(const XMLNode *node)
     {
         sub_node->get("radius",
             &m_values[TURN_RADIUS]);
-        sub_node->get("time-reset-steer",
-            &m_values[TURN_TIME_RESET_STEER]);
         sub_node->get("time-full-steer",
             &m_values[TURN_TIME_FULL_STEER]);
     }
@@ -369,8 +367,8 @@ void XmlCharacteristic::load(const XMLNode *node)
             &m_values[ENGINE_GENERIC_MAX_SPEED]);
         sub_node->get("brake-factor",
             &m_values[ENGINE_BRAKE_FACTOR]);
-        sub_node->get("brake-time-increase",
-            &m_values[ENGINE_BRAKE_TIME_INCREASE]);
+        sub_node->get("time-full-brake",
+            &m_values[ENGINE_TIME_FULL_BRAKE]);
         sub_node->get("max-speed-reverse-ratio",
             &m_values[ENGINE_MAX_SPEED_REVERSE_RATIO]);
     }
@@ -503,12 +501,38 @@ void XmlCharacteristic::load(const XMLNode *node)
             &m_values[PLUNGER_IN_FACE_TIME]);
     }
 
+    if (const XMLNode *sub_node = node->getNode("nitro-hack"))
+    {
+        sub_node->get("duration",
+            &m_values[NITROHACK_DURATION]);
+        sub_node->get("factor",
+            &m_values[NITROHACK_FACTOR]);
+    }
+
+    if (const XMLNode *sub_node = node->getNode("electro"))
+    {
+        sub_node->get("duration",
+            &m_values[ELECTRO_DURATION]);
+        sub_node->get("engine-mult",
+            &m_values[ELECTRO_ENGINE_MULT]);
+        sub_node->get("max-speed-increase",
+            &m_values[ELECTRO_MAX_SPEED_INCREASE]);
+        sub_node->get("fade-out-time",
+            &m_values[ELECTRO_FADE_OUT_TIME]);
+    }
+
     if (const XMLNode *sub_node = node->getNode("startup"))
     {
         sub_node->get("time",
             &m_values[STARTUP_TIME]);
         sub_node->get("boost",
             &m_values[STARTUP_BOOST]);
+        sub_node->get("engine-force",
+            &m_values[STARTUP_ENGINE_FORCE]);
+        sub_node->get("duration",
+            &m_values[STARTUP_DURATION]);
+        sub_node->get("fade-out-time",
+            &m_values[STARTUP_FADE_OUT_TIME]);
     }
 
     if (const XMLNode *sub_node = node->getNode("rescue"))
@@ -547,6 +571,8 @@ void XmlCharacteristic::load(const XMLNode *node)
             &m_values[NITRO_BIG_CONTAINER]);
         sub_node->get("max-speed-increase",
             &m_values[NITRO_MAX_SPEED_INCREASE]);
+        sub_node->get("min-burst",
+            &m_values[NITRO_MIN_BURST]);
         sub_node->get("fade-out-time",
             &m_values[NITRO_FADE_OUT_TIME]);
         sub_node->get("max",
@@ -603,6 +629,8 @@ void XmlCharacteristic::load(const XMLNode *node)
             &m_values[SKID_BONUS_SPEED]);
         sub_node->get("bonus-time",
             &m_values[SKID_BONUS_TIME]);
+        sub_node->get("fade-out-time",
+            &m_values[SKID_FADE_OUT_TIME]);
         sub_node->get("bonus-force",
             &m_values[SKID_BONUS_FORCE]);
         sub_node->get("physical-jump-time",

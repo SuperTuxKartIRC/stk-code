@@ -46,7 +46,7 @@
 #include "items/powerup.hpp"
 #include "items/powerup_manager.hpp"
 #include "items/attachment.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/rescue_animation.hpp"
@@ -123,6 +123,8 @@ enum DebugMenuCommand
     DEBUG_POWERUP_SWATTER,
     DEBUG_POWERUP_SWITCH,
     DEBUG_POWERUP_ZIPPER,
+    DEBUG_POWERUP_SUDO,
+    DEBUG_POWERUP_ELECTRO,
     DEBUG_POWERUP_NITRO,
     DEBUG_POWERUP_NOTHING,
     DEBUG_NITRO_CLEAR,
@@ -182,7 +184,7 @@ void addPowerup(PowerupManager::PowerupType powerup, int amount)
     if (!world) return;
     for(unsigned int i = 0; i < RaceManager::get()->getNumLocalPlayers(); i++)
     {
-        AbstractKart* kart = world->getLocalPlayerKart(i);
+        Kart* kart = world->getLocalPlayerKart(i);
         kart->setPowerup(powerup, amount);
     }
 }   // addPowerup
@@ -196,7 +198,7 @@ void setNitro(int amount)
         RaceManager::get()->getNumLocalPlayers();
     for (unsigned int i = 0; i < num_local_players; i++)
     {
-        AbstractKart* kart = world->getLocalPlayerKart(i);
+        Kart* kart = world->getLocalPlayerKart(i);
         kart->setEnergy(amount);
     }
 }   // setNitro
@@ -208,7 +210,7 @@ void addAttachment(Attachment::AttachmentType type)
     if (world == NULL) return;
     for (unsigned int i = 0; i < world->getNumKarts(); i++)
     {
-        AbstractKart *kart = world->getLocalPlayerKart(i);
+        Kart *kart = world->getLocalPlayerKart(i);
         if (kart == NULL)
            continue;
         //if (!kart->getController()->isLocalPlayerController())
@@ -249,7 +251,7 @@ void changeCameraTarget(u32 num)
 
     if (num < (world->getNumKarts() + 1))
     {
-        AbstractKart* kart = world->getKart(num - 1);
+        Kart* kart = world->getKart(num - 1);
         if (kart == NULL) return;
         cam->setMode(Camera::CM_NORMAL);
         cam->setKart(kart);
@@ -571,6 +573,12 @@ bool handleContextMenuAction(s32 cmd_id)
     case DEBUG_POWERUP_ZIPPER:
         addPowerup(PowerupManager::POWERUP_ZIPPER, 255);
         break;
+    case DEBUG_POWERUP_SUDO:
+        addPowerup(PowerupManager::POWERUP_SUDO, 255);
+        break;
+    case DEBUG_POWERUP_ELECTRO:
+        addPowerup(PowerupManager::POWERUP_ELECTRO, 255);
+        break;
     case DEBUG_POWERUP_NITRO:
     {
         setNitro(100.0f);
@@ -621,7 +629,7 @@ bool handleContextMenuAction(s32 cmd_id)
      case DEBUG_ATTACHMENT_SQUASH:
         for (unsigned int i = 0; i < RaceManager::get()->getNumLocalPlayers(); i++)
         {
-            AbstractKart* kart = world->getLocalPlayerKart(i);
+            Kart* kart = world->getLocalPlayerKart(i);
             const KartProperties *kp = kart->getKartProperties();
             kart->setSquash(kp->getSwatterSquashDuration(), kp->getSwatterSquashSlowdown());
         }
@@ -629,14 +637,14 @@ bool handleContextMenuAction(s32 cmd_id)
     case DEBUG_ATTACHMENT_PLUNGER:
         for (unsigned int i = 0; i < RaceManager::get()->getNumLocalPlayers(); i++)
         {
-            AbstractKart* kart = world->getLocalPlayerKart(i);
+            Kart* kart = world->getLocalPlayerKart(i);
             kart->blockViewWithPlunger();
         }
         break;
     case DEBUG_ATTACHMENT_EXPLOSION:
         for (unsigned int i = 0; i < RaceManager::get()->getNumLocalPlayers(); i++)
         {
-            AbstractKart* kart = world->getLocalPlayerKart(i);
+            Kart* kart = world->getLocalPlayerKart(i);
             ExplosionAnimation::create(kart, kart->getXYZ(), true);
         }
         break;
@@ -654,7 +662,7 @@ bool handleContextMenuAction(s32 cmd_id)
         if (!world) return false;
         for (unsigned int n = 0; n<world->getNumKarts(); n++)
         {
-            AbstractKart* kart = world->getKart(n);
+            Kart* kart = world->getKart(n);
             if (kart->getController()->isPlayerController())
                 kart->getNode()->setVisible(false);
         }
@@ -663,7 +671,7 @@ bool handleContextMenuAction(s32 cmd_id)
         if (!world) return false;
         for (unsigned int i = 0; i < RaceManager::get()->getNumLocalPlayers(); i++)
         {
-            AbstractKart* kart = world->getLocalPlayerKart(i);
+            Kart* kart = world->getLocalPlayerKart(i);
             RescueAnimation::create(kart);
         }
         break;
@@ -834,7 +842,7 @@ bool handleContextMenuAction(s32 cmd_id)
         if (!world) return false;
         for (unsigned int i = 0; i<world->getNumKarts(); i++)
         {
-            AbstractKart *kart = world->getKart(i);
+            Kart *kart = world->getKart(i);
             Log::info(kart->getIdent().c_str(),
                 "<start position=\"%d\" x=\"%f\" y=\"%f\" z=\"%f\" h=\"%f\"/>",
                 i, kart->getXYZ().getX(), kart->getXYZ().getY(),
@@ -1255,6 +1263,8 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Swatter (F8)", DEBUG_POWERUP_SWATTER );
             sub->addItem(L"Switch (F9)", DEBUG_POWERUP_SWITCH );
             sub->addItem(L"Zipper (F10)", DEBUG_POWERUP_ZIPPER );
+            sub->addItem(L"Nitro-hack", DEBUG_POWERUP_SUDO );
+            sub->addItem(L"Electro-Shield", DEBUG_POWERUP_ELECTRO );
             sub->addItem(L"Nitro (Insert)", DEBUG_POWERUP_NITRO );
 
             mnu->addItem(L"Attachments >",-1,true, true);
@@ -1606,7 +1616,7 @@ void handleStaticAction(int key, int value, bool control_pressed, bool shift_pre
         // Flying up and down
         case IRR_KEY_I:
         {
-            AbstractKart* kart = world->getLocalPlayerKart(0);
+            Kart* kart = world->getLocalPlayerKart(0);
             if (kart == NULL) break;
 
             kart->flyUp();
@@ -1614,7 +1624,7 @@ void handleStaticAction(int key, int value, bool control_pressed, bool shift_pre
         }
         case IRR_KEY_K:
         {
-            AbstractKart* kart = world->getLocalPlayerKart(0);
+            Kart* kart = world->getLocalPlayerKart(0);
             if (kart == NULL) break;
 
             kart->flyDown();

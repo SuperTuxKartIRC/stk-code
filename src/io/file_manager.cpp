@@ -883,7 +883,6 @@ bool FileManager::searchTextureContainerId(std::string& container_id,
             return true;
         }
     }
-    full_path = "";
     return false;
 }   // findFile
 
@@ -1066,7 +1065,7 @@ void FileManager::checkAndCreateConfigDir()
     if(m_user_config_dir.size()>0 && *m_user_config_dir.rbegin()!='/')
         m_user_config_dir += "/";
 
-    m_user_config_dir += "config-0.10/";
+    m_user_config_dir += "config-2.X-dev/";
     if(!checkAndCreateDirectoryP(m_user_config_dir))
     {
         Log::warn("FileManager", "Can not  create config dir '%s', "

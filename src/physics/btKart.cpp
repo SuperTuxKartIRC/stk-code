@@ -115,13 +115,15 @@ void btKart::reset()
     m_num_wheels_on_ground       = 0;
     m_additional_impulse         = btVector3(0,0,0);
     m_ticks_additional_impulse   = 0;
+    m_ticks_total_impulse        = 0;
     m_additional_rotation        = 0;
     m_ticks_additional_rotation  = 0;
     m_max_speed                  = -1.0f;
     m_min_speed                  = 0.0f;
+    m_leaning_right              = true;
 
     // Set the brakes so that karts don't slide downhill
-    setAllBrakes(5.0f);
+    setAllBrakes(20.0f);
 
 }   // reset
 
@@ -212,12 +214,6 @@ void btKart::updateWheelTransformsWS(btWheelInfo& wheel,
 void btKart::updateAllWheelTransformsWS()
 {
     updateAllWheelPositions();
-
-    const btTransform& chassisTrans = getChassisWorldTransform();
-
-    btVector3 forwardW(chassisTrans.getBasis()[0][m_indexForwardAxis],
-                       chassisTrans.getBasis()[1][m_indexForwardAxis],
-                       chassisTrans.getBasis()[2][m_indexForwardAxis]);
 
     // Simulate suspension
     // -------------------
@@ -493,9 +489,17 @@ void btKart::updateVehicle( btScalar step )
     float dif = m_kart->getKartProperties()->getStabilityDownwardImpulseFactor();
     if(dif!=0 && m_num_wheels_on_ground==4)
     {
-        float f = -fabsf(m_kart->getSpeed()) * dif;
+        float f1 = fabsf(m_kart->getSpeed());
+        // Excessive downward impulse at high speeds is harmful
+        if (f1 > 35.0f)
+            f1 = 35.0f;
+        // Adjust the impulse force for the time step,
+        // to prevent changes to physics FPS from breaking things.
+        // An increase in impulse frequency is almost equivalent to
+        // an increase in impulse strength of the same factor.
+        float f2 = -f1 * dif * step * 120.0f;
         btVector3 downwards_impulse = m_chassisBody->getWorldTransform().getBasis()
-                                    * btVector3(0, f, 0);
+                                    * btVector3(0, f2, 0);
         m_chassisBody->applyCentralImpulse(downwards_impulse);
     }
 
@@ -505,7 +509,22 @@ void btKart::updateVehicle( btScalar step )
     {
         // We have fixed timestep
         float dt = stk_config->ticks2Time(1);
-        m_chassisBody->applyCentralImpulse(m_additional_impulse*dt);
+        float impulse_strength;
+
+        float remaining_impulse_time_fraction = (float)m_ticks_additional_impulse /
+                                                (float)m_ticks_total_impulse;
+
+        // The impulse strength will increase rapidly at the beginning
+        // up to maximum strength (as (1.0f - 0.8f)*5.0f = 1.0f)
+        // Then fade away slower.
+        if (remaining_impulse_time_fraction < 0.8f)
+            impulse_strength = remaining_impulse_time_fraction*1.25f;
+        else
+            impulse_strength = (1.0f - remaining_impulse_time_fraction)*5.0f;
+
+        m_chassisBody->applyCentralImpulse(m_additional_impulse*dt*impulse_strength);
+        // Prevent the kart from getting rotated
+        m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
         m_ticks_additional_impulse--;
     }
 
@@ -533,6 +552,20 @@ void btKart::updateVehicle( btScalar step )
     }
     adjustSpeed(m_min_speed, m_max_speed);
 }   // updateVehicle
+
+// ----------------------------------------------------------------------------
+float btKart::getCollisionLean() const
+{
+    float lean_factor = (float)m_ticks_additional_impulse /
+                        (float)m_ticks_total_impulse;
+    if (lean_factor > 0.5f)
+        lean_factor = 1.0f - lean_factor;
+
+    if (!m_leaning_right)
+        lean_factor = -lean_factor;
+
+    return 0.35f*m_leaning_factor*lean_factor;
+} // getCollisionLean
 
 // ----------------------------------------------------------------------------
 void btKart::setSteeringValue(btScalar steering, int wheel)
@@ -758,28 +791,19 @@ void btKart::updateFriction(btScalar timeStep)
         btScalar rollingFriction = 0.f;
 
         if (wheelInfo.m_engineForce != 0.f)
-        {
             rollingFriction = wheelInfo.m_engineForce* timeStep;
-        }
-        else
+
+        // Apply braking
+        if (wheelInfo.m_brake)
         {
-            btScalar defaultRollingFrictionImpulse = 0.f;
-            btScalar maxImpulse = wheelInfo.m_brake
-                ? wheelInfo.m_brake
-                : defaultRollingFrictionImpulse;
-            btWheelContactPoint contactPt(m_chassisBody, groundObject,
-                wheelInfo.m_raycastInfo.m_contactPointWS,
-                m_forwardWS[wheel], maxImpulse);
-            rollingFriction = calcRollingFriction(contactPt);
-            // This is a work around for the problem that a kart shakes
-            // if it is braking: we get a minor impulse forward, which
-            // bullet then tries to offset by applying a backward
-            // impulse - which is a bit too big, causing a impulse
-            // backwards, ... till the kart is shaking backwards and
-            // forwards. By only applying half of the impulse in case
-            // of low friction this goes away.
-            if (wheelInfo.m_brake && fabsf(rollingFriction) < 10)
-                rollingFriction *= 0.5f;
+            // Rolling friction gets weaker and weaker as the speed gets lower
+            // whereas braking should apply strong friction on the wheels even if
+            // the vehicle is moving at low speed
+            float speed_brake_factor = 1000 / (fabsf(m_kart->getSpeed()) + 10.0f);
+                btWheelContactPoint contactPt(m_chassisBody, groundObject,
+            wheelInfo.m_raycastInfo.m_contactPointWS,
+            m_forwardWS[wheel], wheelInfo.m_brake);
+            rollingFriction += calcRollingFriction(contactPt)*timeStep*speed_brake_factor;
         }
 
         m_forwardImpulse[wheel] = rollingFriction;

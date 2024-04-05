@@ -35,7 +35,7 @@
 #include "io/file_manager.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/projectile_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_properties.hpp"
@@ -60,7 +60,7 @@
  *  \param ticks Swatter duration.
  *  \param attachment class attachment from karts.
  */
-Swatter::Swatter(AbstractKart *kart, int16_t bomb_ticks, int ticks,
+Swatter::Swatter(Kart *kart, int16_t bomb_ticks, int ticks,
                   Attachment* attachment)
        : AttachmentPlugin(kart, attachment)
 {
@@ -231,7 +231,7 @@ void Swatter::updateGraphics(float dt)
  *  \param ticks Time step size.
  *  \return True if the attachment should be discarded.
  */
-bool Swatter::updateAndTestFinished(int ticks)
+bool Swatter::updateAndTestFinished()
 {
     const int ticks_start = World::getWorld()->getTicksSinceStart();
     if (World::getWorld()->getTicksSinceStart() > m_discard_ticks)
@@ -250,8 +250,8 @@ bool Swatter::updateAndTestFinished(int ticks)
             {
                 // Avoid swatter near the start and the end lifetime of swatter
                 // to make sure all clients know the existence of swatter each other
-                if (m_swatter_duration - m_attachment->getTicksLeft() < 60 ||
-                    m_attachment->getTicksLeft() < 90) // ~20 and ~60 below
+                if (m_swatter_duration - m_attachment->getTicksLeft() < stk_config->time2Ticks(0.5f) ||
+                    m_attachment->getTicksLeft() < stk_config->time2Ticks(0.75f) ) // ~0.167f and ~0.5f below
                     return false;
 
                 chooseTarget();
@@ -278,7 +278,7 @@ bool Swatter::updateAndTestFinished(int ticks)
                     // Start squashing
                     m_animation_phase = SWATTER_TO_TARGET;
                     m_swatter_animation_ticks =
-                        m_attachment->getTicksLeft() - 20;
+                        m_attachment->getTicksLeft() - stk_config->time2Ticks(0.167f);
                 }
             }
             break;
@@ -286,13 +286,13 @@ bool Swatter::updateAndTestFinished(int ticks)
             {
                 // Did we just finish the first part of the movement?
                 if (m_attachment->getTicksLeft() < m_swatter_animation_ticks &&
-                    m_attachment->getTicksLeft() > 60)
+                    m_attachment->getTicksLeft() > stk_config->time2Ticks(0.5f))
                 {
                     // Squash the karts and items around and
                     // change the current phase
                     squashThingsAround();
                     m_animation_phase = SWATTER_FROM_TARGET;
-                    const int end_ticks = ticks_start + 60;
+                    const int end_ticks = ticks_start + stk_config->time2Ticks(0.5f);
                     if (RaceManager::get()->isBattleMode() ||
                         RaceManager::get()->isSoccerMode())
                     {
@@ -302,7 +302,7 @@ bool Swatter::updateAndTestFinished(int ticks)
                         m_discard_ticks = end_ticks;
                     }
                     m_swatter_animation_ticks =
-                        m_attachment->getTicksLeft() - 60;
+                        m_attachment->getTicksLeft() - stk_config->time2Ticks(0.5f);
                 }
             }
             break;
@@ -326,12 +326,12 @@ void Swatter::chooseTarget()
 {
     // TODO: for the moment, only handle karts...
     const World*  world         = World::getWorld();
-    AbstractKart* closest_kart  = NULL;
+    Kart* closest_kart  = NULL;
     float         min_dist2     = FLT_MAX;
 
     for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
-        AbstractKart *kart = world->getKart(i);
+        Kart *kart = world->getKart(i);
         // TODO: isSwatterReady(), isSquashable()?
         if(kart->isEliminated() || kart==m_kart || kart->getKartAnimation())
             continue;
