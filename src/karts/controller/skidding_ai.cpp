@@ -1191,6 +1191,7 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
         } // POWERUP_BUBBLEGUM
           
     case PowerupManager::POWERUP_CAKE:
+    case PowerupManager::POWERUP_VOLLEYBALL: // TODO : NEED CHANGE ??
         {
             // if the kart has a shield, do not break it by using a cake.
             if((m_kart->getShieldTime() > min_bubble_time) && (stk_config->m_shield_restrict_weapons == true))
@@ -1209,7 +1210,15 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
             handleBowling(item_skill);
             break;
         }   // POWERUP_BOWLING
+    case PowerupManager::POWERUP_SMALL_SOCCER_BALL:
+    {
+        // if the kart has a shield, do not break it by using a bowling ball.
+        if ((m_kart->getShieldTime() > min_bubble_time) && (stk_config->m_shield_restrict_weapons == true))
+            break;
 
+        handleBowling(item_skill);
+        break;
+    }   // POWERUP_SMALL_SOCCER_BALL
     case PowerupManager::POWERUP_ZIPPER:
         // Do nothing. Further up a zipper is used if nitro should be selected,
         // saving the (potential more valuable nitro) for later
@@ -1317,11 +1326,13 @@ void SkiddingAI::handleBubblegum(int item_skill,
 {
     float shield_radius = m_ai_properties->m_shield_incoming_radius;
 
-    int projectile_types[4]; //[3] basket, [2] cakes, [1] plunger, [0] bowling
+    int projectile_types[6]; //[3] basket, [2] cakes, [1] plunger, [0] bowling
     projectile_types[0] = ProjectileManager::get()->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_BOWLING);
     projectile_types[1] = ProjectileManager::get()->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_PLUNGER);
     projectile_types[2] = ProjectileManager::get()->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_CAKE);
     projectile_types[3] = ProjectileManager::get()->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_RUBBERBALL);
+    projectile_types[4] = ProjectileManager::get()->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_SMALL_SOCCER_BALL);
+    projectile_types[5] = ProjectileManager::get()->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_VOLLEYBALL);
    
     bool projectile_is_close = false;
     projectile_is_close = ProjectileManager::get()->projectileIsClose(m_kart, shield_radius);
@@ -1370,7 +1381,8 @@ void SkiddingAI::handleBubblegum(int item_skill,
     {
        if( !m_kart->isShielded() && projectile_is_close)
        {
-          if (projectile_types[0] >=1 || projectile_types[2] >=1 || projectile_types[3] >=1 )
+          if (projectile_types[0] >=1 || projectile_types[2] >=1 || projectile_types[3] >=1 ||
+              projectile_types[4] >= 1 || projectile_types[5] >= 1)
           {
              m_controls->setFire(true);
              m_controls->setLookBack(false);

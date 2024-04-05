@@ -185,6 +185,11 @@ void Powerup::set(PowerupManager::PowerupType type, int n)
             m_sound_use = SFXManager::get()->createSoundSource("bowling_shoot");
             break ;
 
+        // TODO : add sound effects
+        case PowerupManager::POWERUP_SMALL_SOCCER_BALL:
+            m_sound_use = SFXManager::get()->createSoundSource("shoot");
+            break;
+
         case PowerupManager::POWERUP_ANVIL:
             m_sound_use = SFXManager::get()->createSoundSource("anvil");
             break;
@@ -204,6 +209,7 @@ void Powerup::set(PowerupManager::PowerupType type, int n)
         case PowerupManager::POWERUP_NOTHING:
         case PowerupManager::POWERUP_CAKE:
         case PowerupManager::POWERUP_PLUNGER:
+        case PowerupManager::POWERUP_VOLLEYBALL:
         default :
             m_sound_use = SFXManager::get()->createSoundSource("shoot");
             break ;
@@ -342,7 +348,9 @@ void Powerup::use()
     case PowerupManager::POWERUP_CAKE:
     case PowerupManager::POWERUP_RUBBERBALL:
     case PowerupManager::POWERUP_BOWLING:
+    case PowerupManager::POWERUP_SMALL_SOCCER_BALL:
     case PowerupManager::POWERUP_PLUNGER:
+    case PowerupManager::POWERUP_VOLLEYBALL:
         // make weapon usage destroy gum shields
         if(stk_config->m_shield_restrict_weapons &&
             m_kart->isGumShielded())
@@ -422,7 +430,8 @@ void Powerup::use()
                 m_sound_use = SFXManager::get()->createSoundSource("sudo_good");
                 //In this case this is a workaround, since the sudo item has two different sounds
 
-                m_sound_use->play();
+                if(m_sound_use != NULL)
+                    m_sound_use->play();
             }
             // Play a bad sound if the affected kart (but not the user) is a local player
             else if (!has_played_sound && player_kart != NULL)

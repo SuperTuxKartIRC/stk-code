@@ -26,6 +26,7 @@
 #include "items/powerup_manager.hpp"
 #include "items/powerup.hpp"
 #include "items/rubber_ball.hpp"
+#include "items/volleyball.hpp"
 #include "karts/kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "modes/world.hpp"
@@ -36,6 +37,7 @@
 #include "utils/string_utils.hpp"
 
 #include <typeinfo>
+#include "small_soccer_ball.hpp"
 
 //=============================================================================================
 ProjectileManager* g_projectile_manager[PT_COUNT];
@@ -188,6 +190,9 @@ std::shared_ptr<Flyable>
         case PowerupManager::POWERUP_BOWLING:
             f = std::make_shared<Bowling>(kart);
             break;
+        case PowerupManager::POWERUP_SMALL_SOCCER_BALL:
+            f = std::make_shared<SmallSoccerBall>(kart);
+            break;
         case PowerupManager::POWERUP_PLUNGER:
             f = std::make_shared<Plunger>(kart);
             break;
@@ -199,6 +204,9 @@ std::shared_ptr<Flyable>
             break;
         case PowerupManager::POWERUP_RUBBERBALL:
             f = std::make_shared<RubberBall>(kart);
+            break;
+        case PowerupManager::POWERUP_VOLLEYBALL:
+            f = std::make_shared<Volleyball>(kart);
             break;
         default:
             return nullptr;
@@ -291,6 +299,11 @@ std::string ProjectileManager::getUniqueIdentity(Kart* kart,
             uid.addUInt8(RN_BOWLING);
             break;
         }
+        case PowerupManager::POWERUP_SMALL_SOCCER_BALL:
+        {
+            uid.addUInt8(RN_SMALL_SOCCER_BALL);
+            break;
+        }
         case PowerupManager::POWERUP_PLUNGER:
         {
             uid.addUInt8(RN_PLUNGER);
@@ -298,7 +311,7 @@ std::string ProjectileManager::getUniqueIdentity(Kart* kart,
         }
         case PowerupManager::POWERUP_CAKE:
         {
-            uid.addUInt8(RN_CAKE);
+            uid.addUInt8(RN_VOLLEYBALL);
             break;
         }
         case PowerupManager::POWERUP_MINI:
@@ -307,6 +320,11 @@ std::string ProjectileManager::getUniqueIdentity(Kart* kart,
             break;
         }
         case PowerupManager::POWERUP_RUBBERBALL:
+        {
+            uid.addUInt8(RN_RUBBERBALL);
+            break;
+        }
+        case PowerupManager::POWERUP_VOLLEYBALL:
         {
             uid.addUInt8(RN_RUBBERBALL);
             break;

@@ -120,11 +120,13 @@ enum DebugMenuCommand
     DEBUG_POWERUP_PARACHUTE,
     DEBUG_POWERUP_PLUNGER,
     DEBUG_POWERUP_RUBBERBALL,
+    DEBUG_POWERUP_SMALL_SOCCER_BALL,
     DEBUG_POWERUP_SWATTER,
     DEBUG_POWERUP_SWITCH,
     DEBUG_POWERUP_ZIPPER,
     DEBUG_POWERUP_SUDO,
     DEBUG_POWERUP_ELECTRO,
+    DEBUG_POWERUP_VOLLEYBALL,
     DEBUG_POWERUP_NITRO,
     DEBUG_POWERUP_NOTHING,
     DEBUG_NITRO_CLEAR,
@@ -564,6 +566,9 @@ bool handleContextMenuAction(s32 cmd_id)
     case DEBUG_POWERUP_RUBBERBALL:
         addPowerup(PowerupManager::POWERUP_RUBBERBALL, 255);
         break;
+    case DEBUG_POWERUP_SMALL_SOCCER_BALL:
+        addPowerup(PowerupManager::POWERUP_SMALL_SOCCER_BALL, 255);
+        break;
     case DEBUG_POWERUP_SWATTER:
         addPowerup(PowerupManager::POWERUP_SWATTER, 255);
         break;
@@ -578,6 +583,9 @@ bool handleContextMenuAction(s32 cmd_id)
         break;
     case DEBUG_POWERUP_ELECTRO:
         addPowerup(PowerupManager::POWERUP_ELECTRO, 255);
+        break;
+    case DEBUG_POWERUP_VOLLEYBALL:
+        addPowerup(PowerupManager::POWERUP_VOLLEYBALL, 255);
         break;
     case DEBUG_POWERUP_NITRO:
     {
@@ -1264,7 +1272,9 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Switch (F9)", DEBUG_POWERUP_SWITCH );
             sub->addItem(L"Zipper (F10)", DEBUG_POWERUP_ZIPPER );
             sub->addItem(L"Nitro-hack", DEBUG_POWERUP_SUDO );
-            sub->addItem(L"Electro-Shield", DEBUG_POWERUP_ELECTRO );
+            sub->addItem(L"Electro-Shield", DEBUG_POWERUP_ELECTRO);
+            sub->addItem(L"Small-Soccer-Ball", DEBUG_POWERUP_SMALL_SOCCER_BALL );
+            sub->addItem(L"Volleyball", DEBUG_POWERUP_VOLLEYBALL );
             sub->addItem(L"Nitro (Insert)", DEBUG_POWERUP_NITRO );
 
             mnu->addItem(L"Attachments >",-1,true, true);

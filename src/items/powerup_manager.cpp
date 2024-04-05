@@ -34,12 +34,14 @@
 #include "items/cake.hpp"
 #include "items/plunger.hpp"
 #include "items/rubber_ball.hpp"
+#include "items/volleyball.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 
 #include <IMesh.h>
+#include "small_soccer_ball.hpp"
 
 PowerupManager* powerup_manager=0;
 
@@ -111,7 +113,7 @@ PowerupManager::PowerupType
         "",            /* Nothing */
         "bubblegum", "cake", "bowling", "zipper", "plunger", "switch",
         "swatter", "rubber-ball", "parachute", "nitro-hack", "electro-shield",
-        "mini-wish", "anchor"
+        "mini-wish", "anchor", "small-soccer-ball", "volleyball"
     };
 
     for(unsigned int i=POWERUP_FIRST; i<=POWERUP_LAST; i++)
@@ -646,7 +648,9 @@ void PowerupManager::loadPowerup(PowerupType type, const XMLNode &node)
     // Load special attributes for certain powerups
     switch (type) {
         case POWERUP_BOWLING:
-             Bowling::init(node, m_all_meshes[type]);    break;
+             Bowling::init(node, m_all_meshes[type]);           break;
+        case POWERUP_SMALL_SOCCER_BALL:
+             SmallSoccerBall::init(node, m_all_meshes[type]);   break;
         case POWERUP_PLUNGER:
              Plunger::init(node, m_all_meshes[type]);    break;
         case POWERUP_CAKE:
@@ -922,7 +926,8 @@ PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
             powerup = POWERUP_ZIPPER;
             *n = 1;            
         }
-        else if (powerup == POWERUP_SWATTER || powerup == POWERUP_BOWLING)
+        else if (powerup == POWERUP_SWATTER || powerup == POWERUP_BOWLING || 
+                 powerup == POWERUP_VOLLEYBALL)
         {
             powerup = POWERUP_BUBBLEGUM;
             *n = 1;        

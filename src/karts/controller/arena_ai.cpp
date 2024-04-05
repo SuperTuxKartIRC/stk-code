@@ -506,6 +506,8 @@ void ArenaAI::useItems(const float dt)
         }   // POWERUP_CAKE
 
     case PowerupManager::POWERUP_BOWLING:
+    case PowerupManager::POWERUP_SMALL_SOCCER_BALL:
+    case PowerupManager::POWERUP_VOLLEYBALL: // TODO : NEED CHANGE ??
         {
             // if the kart has a shield, do not break it by using a bowling ball.
             if (m_kart->getShieldTime() > min_bubble_time)
@@ -525,7 +527,6 @@ void ArenaAI::useItems(const float dt)
 
             break;
         }   // POWERUP_BOWLING
-
     case PowerupManager::POWERUP_SWATTER:
         {
             // Squared distance for which the swatter works

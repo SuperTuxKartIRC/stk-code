@@ -39,6 +39,8 @@ enum RewinderName : char
     RN_RUBBERBALL = 0x08,
     RN_PHYSICAL_OBJ = 0x09,
     RN_CAKE_MINI = 0x0A,
+    RN_SMALL_SOCCER_BALL = 0x0B,
+    RN_VOLLEYBALL = 0x0C,
 };
 
 class Rewinder : public std::enable_shared_from_this<Rewinder>

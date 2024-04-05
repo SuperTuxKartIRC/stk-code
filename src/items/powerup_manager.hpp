@@ -150,7 +150,9 @@ public:
                       POWERUP_SUDO, POWERUP_ELECTRO,
                       POWERUP_MINI,
                       POWERUP_ANVIL,
-                      POWERUP_LAST=POWERUP_ANVIL,
+                      POWERUP_SMALL_SOCCER_BALL,
+                      POWERUP_VOLLEYBALL,
+                      POWERUP_LAST= POWERUP_VOLLEYBALL,
                       POWERUP_MAX
     };
 

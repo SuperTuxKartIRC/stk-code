@@ -1245,6 +1245,7 @@ void SkiddingAI::handleItems(const float dt)
             break;   // POWERUP_BUBBLEGUM
         }
     case PowerupManager::POWERUP_CAKE:
+    case PowerupManager::POWERUP_VOLLEYBALL: // TODO : NEED CHANGE ??
         {
             // if the kart has a shield, do not break it by using a cake.
             if(m_kart->getShieldTime() > min_bubble_time)
@@ -1293,6 +1294,7 @@ void SkiddingAI::handleItems(const float dt)
         }   // POWERUP_CAKE
 
     case PowerupManager::POWERUP_BOWLING:
+    case PowerupManager::POWERUP_SMALL_SOCCER_BALL:
         {
             // if the kart has a shield, do not break it by using a bowling ball.
             if(m_kart->getShieldTime() > min_bubble_time)

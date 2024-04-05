@@ -209,9 +209,11 @@ namespace Scripting
             engine->RegisterEnumValue("PowerupType", "PARACHUTE", PowerupManager::PowerupType::POWERUP_PARACHUTE);
             engine->RegisterEnumValue("PowerupType", "PLUNGER", PowerupManager::PowerupType::POWERUP_PLUNGER);
             engine->RegisterEnumValue("PowerupType", "RUBBERBALL", PowerupManager::PowerupType::POWERUP_RUBBERBALL);
+            engine->RegisterEnumValue("PowerupType", "SMALL_SOCCER_BALL", PowerupManager::PowerupType::POWERUP_SMALL_SOCCER_BALL);
             engine->RegisterEnumValue("PowerupType", "SWATTER", PowerupManager::PowerupType::POWERUP_SWATTER);
             engine->RegisterEnumValue("PowerupType", "SWITCH", PowerupManager::PowerupType::POWERUP_SWITCH);
             engine->RegisterEnumValue("PowerupType", "ZIPPER", PowerupManager::PowerupType::POWERUP_ZIPPER);
+            engine->RegisterEnumValue("PowerupType", "VOLLEYBALL", PowerupManager::PowerupType::POWERUP_VOLLEYBALL);
         }
     }
 
