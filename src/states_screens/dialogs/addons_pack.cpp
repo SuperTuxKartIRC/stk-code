@@ -123,7 +123,7 @@ AddonsPack::AddonsPack(const std::string& url) : ModalDialog(0.8f, 0.8f)
     actions_ribbon->select("back", PLAYER_ID_GAME_MASTER);
     icon = getWidget<IconButtonWidget>("install");
     icon->setImage(file_manager->getAsset(FileManager::GUI_ICON,
-        "blue_plus.png"), IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+        "blue_plus_menu.png"), IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
     icon->setLabel(_("Background download"));
     icon->setVisible(true);
     getWidget("uninstall")->setVisible(false);
