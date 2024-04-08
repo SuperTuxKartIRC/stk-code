@@ -185,10 +185,10 @@ public:
             case MINOR_MODE_3_STRIKES:                  return "/gui/icons/mode_3strikes.png";
             case MINOR_MODE_FREE_FOR_ALL:               return "/gui/icons/mode_weapons.png";
             case MINOR_MODE_CAPTURE_THE_FLAG:           return "/gui/icons/mode_weapons.png";
-            case MINOR_MODE_TAB_POINTS_TEAM:            return "/gui/icons/mode_team-arena-battle.png";
-            case MINOR_MODE_TAB_POINTS_PLAYER:          return "/gui/icons/mode_team-arena-battle.png";
-            case MINOR_MODE_TAB_ALL_POINTS_PLAYER:      return "/gui/icons/mode_team-arena-battle.png";
-            case MINOR_MODE_TAB_LIFE:                   return "/gui/icons/mode_team-arena-battle.png";
+            case MINOR_MODE_TAB_POINTS_TEAM:            return "/gui/icons/mode_team_arena.png";
+            case MINOR_MODE_TAB_POINTS_PLAYER:          return "/gui/icons/mode_team_arena.png";
+            case MINOR_MODE_TAB_ALL_POINTS_PLAYER:      return "/gui/icons/mode_team_arena.png";
+            case MINOR_MODE_TAB_LIFE:                   return "/gui/icons/mode_team_arena.png";
             case MINOR_MODE_EASTER_EGG:                 return "/gui/icons/mode_easter.png";
             case MINOR_MODE_SOCCER:                     return "/gui/icons/mode_soccer.png";
             default: assert(false); return NULL;
