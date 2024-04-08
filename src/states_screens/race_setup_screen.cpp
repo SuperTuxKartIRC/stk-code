@@ -118,8 +118,8 @@ void RaceSetupScreen::init()
 
     irr::core::stringw name8 = irr::core::stringw(_("Battle")) + L"\n";
     //FIXME: avoid duplicating descriptions from the help menu!
-    name4 += _("Hit other players' teams with weapons to score points.");
-    w2->addItem(name4, IDENT_TEAM_PT, RaceManager::getIconOf(RaceManager::MINOR_MODE_TAB_POINTS_TEAM));
+    name8 += _("Hit other players' teams with weapons to score points.");
+    w2->addItem(name8, IDENT_TEAM_PT, RaceManager::getIconOf(RaceManager::MINOR_MODE_TAB_POINTS_TEAM));
 
     irr::core::stringw name5 = irr::core::stringw(
         RaceManager::getNameOf(RaceManager::MINOR_MODE_SOCCER)) + L"\n";
