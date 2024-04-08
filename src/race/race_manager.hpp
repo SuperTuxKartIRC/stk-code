@@ -46,6 +46,10 @@ static const std::string IDENT_FTL      ("FOLLOW_LEADER"   );
 static const std::string IDENT_STRIKES  ("BATTLE_3_STRIKES");
 static const std::string IDENT_FFA      ("BATTLE_FFA"      );
 static const std::string IDENT_CTF      ("BATTLE_CTF"      );
+static const std::string IDENT_TEAM_PT  ("BATTLE_TEAM_PT"  );
+static const std::string IDENT_TEAM_PP  ("BATTLE_TEAM_PP"  );
+static const std::string IDENT_TEAM_APP ("BATTLE_TEAM_APP" );
+static const std::string IDENT_TEAM_L   ("BATTLE_TEAM_L"   );
 static const std::string IDENT_EASTER   ("EASTER_EGG_HUNT" );
 static const std::string IDENT_SOCCER   ("SOCCER"          );
 static const std::string IDENT_GHOST    ("GHOST"           );
@@ -108,23 +112,27 @@ public:
      *  Make sure to use the 'LINEAR_RACE/BATTLE_ARENA' macros. */
     enum MinorRaceModeType
     {
-        MINOR_MODE_NONE             = -1,
-
-        MINOR_MODE_NORMAL_RACE      = LINEAR_RACE(0, true),
-        MINOR_MODE_TIME_TRIAL       = LINEAR_RACE(1, true),
-        MINOR_MODE_FOLLOW_LEADER    = LINEAR_RACE(2, false),
-
-        MINOR_MODE_3_STRIKES        = BATTLE_ARENA(0),
-        MINOR_MODE_FREE_FOR_ALL     = BATTLE_ARENA(1),
-        MINOR_MODE_CAPTURE_THE_FLAG = BATTLE_ARENA(2),
-        MINOR_MODE_SOCCER           = BATTLE_ARENA(3),
-
-        MINOR_MODE_EASTER_EGG       = EASTER_EGG(0),
-
-        MINOR_MODE_OVERWORLD        = MISC(0),
-        MINOR_MODE_TUTORIAL         = MISC(1),
-        MINOR_MODE_CUTSCENE         = MISC(2),
-        MINOR_MODE_LAP_TRIAL        = MISC(3)
+        MINOR_MODE_NONE                     = -1,
+                                            
+        MINOR_MODE_NORMAL_RACE              = LINEAR_RACE(0, true),
+        MINOR_MODE_TIME_TRIAL               = LINEAR_RACE(1, true),
+        MINOR_MODE_FOLLOW_LEADER            = LINEAR_RACE(2, false),
+                                            
+        MINOR_MODE_3_STRIKES                = BATTLE_ARENA(0),
+        MINOR_MODE_FREE_FOR_ALL             = BATTLE_ARENA(1),
+        MINOR_MODE_CAPTURE_THE_FLAG         = BATTLE_ARENA(2),
+        MINOR_MODE_SOCCER                   = BATTLE_ARENA(3),
+        MINOR_MODE_TAB_POINTS_TEAM          = BATTLE_ARENA(4),
+        MINOR_MODE_TAB_POINTS_PLAYER        = BATTLE_ARENA(5),
+        MINOR_MODE_TAB_ALL_POINTS_PLAYER    = BATTLE_ARENA(6),
+        MINOR_MODE_TAB_LIFE                 = BATTLE_ARENA(7),
+                                                       
+        MINOR_MODE_EASTER_EGG               = EASTER_EGG(0),
+                                            
+        MINOR_MODE_OVERWORLD                = MISC(0),
+        MINOR_MODE_TUTORIAL                 = MISC(1),
+        MINOR_MODE_CUTSCENE                 = MISC(2),
+        MINOR_MODE_LAP_TRIAL                = MISC(3)
     };
 
     // ----------------------------------------------------------------------------------------
@@ -144,16 +152,20 @@ public:
     {
         switch (mode)
         {
-            case MINOR_MODE_NORMAL_RACE:      return IDENT_STD;
-            case MINOR_MODE_TIME_TRIAL:       return IDENT_TTRIAL;
-            case MINOR_MODE_FOLLOW_LEADER:    return IDENT_FTL;
-            case MINOR_MODE_LAP_TRIAL:        return IDENT_LAP_TRIAL;
-            case MINOR_MODE_3_STRIKES:        return IDENT_STRIKES;
-            case MINOR_MODE_FREE_FOR_ALL:     return IDENT_FFA;
-            case MINOR_MODE_CAPTURE_THE_FLAG: return IDENT_CTF;
-            case MINOR_MODE_EASTER_EGG:       return IDENT_EASTER;
-            case MINOR_MODE_SOCCER:           return IDENT_SOCCER;
-            default: assert(false);
+            case MINOR_MODE_NORMAL_RACE:            return IDENT_STD;
+            case MINOR_MODE_TIME_TRIAL:             return IDENT_TTRIAL;
+            case MINOR_MODE_FOLLOW_LEADER:          return IDENT_FTL;
+            case MINOR_MODE_LAP_TRIAL:              return IDENT_LAP_TRIAL;
+            case MINOR_MODE_3_STRIKES:              return IDENT_STRIKES;
+            case MINOR_MODE_FREE_FOR_ALL:           return IDENT_FFA;
+            case MINOR_MODE_TAB_POINTS_TEAM:        return IDENT_TEAM_PT;
+            case MINOR_MODE_TAB_POINTS_PLAYER:      return IDENT_TEAM_PP;
+            case MINOR_MODE_TAB_ALL_POINTS_PLAYER:  return IDENT_TEAM_APP;
+            case MINOR_MODE_TAB_LIFE:               return IDENT_TEAM_L;
+            case MINOR_MODE_CAPTURE_THE_FLAG:       return IDENT_CTF;
+            case MINOR_MODE_EASTER_EGG:             return IDENT_EASTER;
+            case MINOR_MODE_SOCCER:                 return IDENT_SOCCER;
+            default: assert(false);                
                      return IDENT_STD;  // stop compiler warning
         }
     }   // getIdentOf
@@ -166,15 +178,19 @@ public:
     {
         switch (mode)
         {
-            case MINOR_MODE_NORMAL_RACE:    return "/gui/icons/mode_normal.png";
-            case MINOR_MODE_TIME_TRIAL:     return "/gui/icons/mode_tt.png";
-            case MINOR_MODE_FOLLOW_LEADER:  return "/gui/icons/mode_ftl.png";
-            case MINOR_MODE_LAP_TRIAL:      return "/gui/icons/mode_laptrial.png";
-            case MINOR_MODE_3_STRIKES:      return "/gui/icons/mode_3strikes.png";
-            case MINOR_MODE_FREE_FOR_ALL:   return "/gui/icons/mode_weapons.png";
-            case MINOR_MODE_CAPTURE_THE_FLAG: return "/gui/icons/mode_weapons.png";
-            case MINOR_MODE_EASTER_EGG:     return "/gui/icons/mode_easter.png";
-            case MINOR_MODE_SOCCER:         return "/gui/icons/mode_soccer.png";
+            case MINOR_MODE_NORMAL_RACE:                return "/gui/icons/mode_normal.png";
+            case MINOR_MODE_TIME_TRIAL:                 return "/gui/icons/mode_tt.png";
+            case MINOR_MODE_FOLLOW_LEADER:              return "/gui/icons/mode_ftl.png";
+            case MINOR_MODE_LAP_TRIAL:                  return "/gui/icons/mode_laptrial.png";
+            case MINOR_MODE_3_STRIKES:                  return "/gui/icons/mode_3strikes.png";
+            case MINOR_MODE_FREE_FOR_ALL:               return "/gui/icons/mode_weapons.png";
+            case MINOR_MODE_CAPTURE_THE_FLAG:           return "/gui/icons/mode_weapons.png";
+            case MINOR_MODE_TAB_POINTS_TEAM:            return "/gui/icons/mode_team-arena-battle.png";
+            case MINOR_MODE_TAB_POINTS_PLAYER:          return "/gui/icons/mode_team-arena-battle.png";
+            case MINOR_MODE_TAB_ALL_POINTS_PLAYER:      return "/gui/icons/mode_team-arena-battle.png";
+            case MINOR_MODE_TAB_LIFE:                   return "/gui/icons/mode_team-arena-battle.png";
+            case MINOR_MODE_EASTER_EGG:                 return "/gui/icons/mode_easter.png";
+            case MINOR_MODE_SOCCER:                     return "/gui/icons/mode_soccer.png";
             default: assert(false); return NULL;
         }
     }   // getIconOf
@@ -187,16 +203,20 @@ public:
     {
         switch (m_minor_mode)
         {
-            case MINOR_MODE_NORMAL_RACE:    return true;
-            case MINOR_MODE_TIME_TRIAL:     return true;
-            case MINOR_MODE_FOLLOW_LEADER:  return true;
-            case MINOR_MODE_LAP_TRIAL:      return true;
-            case MINOR_MODE_3_STRIKES:      return true;
-            case MINOR_MODE_FREE_FOR_ALL:   return false;
-            case MINOR_MODE_CAPTURE_THE_FLAG: return false;
-            case MINOR_MODE_EASTER_EGG:     return false;
-            case MINOR_MODE_SOCCER:         return true;
-            default: assert(false);         return false;
+            case MINOR_MODE_NORMAL_RACE:            return true;
+            case MINOR_MODE_TIME_TRIAL:             return true;
+            case MINOR_MODE_FOLLOW_LEADER:          return true;
+            case MINOR_MODE_LAP_TRIAL:              return true;
+            case MINOR_MODE_3_STRIKES:              return true;
+            case MINOR_MODE_FREE_FOR_ALL:           return false;
+            case MINOR_MODE_CAPTURE_THE_FLAG:       return false;
+            case MINOR_MODE_TAB_POINTS_TEAM:        return true;
+            case MINOR_MODE_TAB_POINTS_PLAYER:      return true;
+            case MINOR_MODE_TAB_ALL_POINTS_PLAYER:  return true;
+            case MINOR_MODE_TAB_LIFE:               return true;
+            case MINOR_MODE_EASTER_EGG:             return false;
+            case MINOR_MODE_SOCCER:                 return true;
+            default: assert(false);                 return false;
         }
     }   // hasAI
 
@@ -209,15 +229,19 @@ public:
     static const MinorRaceModeType getModeIDFromInternalName(
                                                        const std::string &name)
     {
-        if      (name==IDENT_STD    ) return MINOR_MODE_NORMAL_RACE;
-        else if (name==IDENT_TTRIAL ) return MINOR_MODE_TIME_TRIAL;
-        else if (name==IDENT_FTL    ) return MINOR_MODE_FOLLOW_LEADER;
-        else if (name==IDENT_STRIKES) return MINOR_MODE_3_STRIKES;
-        else if (name==IDENT_FFA)     return MINOR_MODE_FREE_FOR_ALL;
-        else if (name==IDENT_CTF)     return MINOR_MODE_CAPTURE_THE_FLAG;
-        else if (name==IDENT_EASTER ) return MINOR_MODE_EASTER_EGG;
-        else if (name==IDENT_SOCCER)  return MINOR_MODE_SOCCER;
-
+        if      (name==IDENT_STD     )  return MINOR_MODE_NORMAL_RACE;
+        else if (name==IDENT_TTRIAL  )  return MINOR_MODE_TIME_TRIAL;
+        else if (name==IDENT_FTL     )  return MINOR_MODE_FOLLOW_LEADER;
+        else if (name==IDENT_STRIKES )  return MINOR_MODE_3_STRIKES;
+        else if (name==IDENT_FFA     )  return MINOR_MODE_FREE_FOR_ALL;
+        else if (name==IDENT_TEAM_PT )  return MINOR_MODE_TAB_POINTS_TEAM;
+        else if (name==IDENT_TEAM_PP )  return MINOR_MODE_TAB_POINTS_PLAYER;
+        else if (name==IDENT_TEAM_APP)  return MINOR_MODE_TAB_ALL_POINTS_PLAYER;
+        else if (name==IDENT_TEAM_L  )  return MINOR_MODE_TAB_LIFE;
+        else if (name==IDENT_CTF     )  return MINOR_MODE_CAPTURE_THE_FLAG;
+        else if (name==IDENT_EASTER  )  return MINOR_MODE_EASTER_EGG;
+        else if (name==IDENT_SOCCER  )  return MINOR_MODE_SOCCER;
+                                       
         assert(0);
         return MINOR_MODE_NONE;
     }
@@ -559,15 +583,19 @@ public:
     {
         switch (m_minor_mode)
         {
-            case MINOR_MODE_NORMAL_RACE:    return "normal";
-            case MINOR_MODE_TIME_TRIAL:     return "time-trial";
-            case MINOR_MODE_FOLLOW_LEADER:  return "follow-the-leader";
-            case MINOR_MODE_3_STRIKES:      return "battle";
-            case MINOR_MODE_FREE_FOR_ALL:   return "ffa";
-            case MINOR_MODE_CAPTURE_THE_FLAG: return "ctf";
-            case MINOR_MODE_EASTER_EGG:     return "egg-hunt";
-            case MINOR_MODE_SOCCER:         return "soccer";
-            default: assert(false);         return "";
+            case MINOR_MODE_NORMAL_RACE:                    return "normal";
+            case MINOR_MODE_TIME_TRIAL:                     return "time-trial";
+            case MINOR_MODE_FOLLOW_LEADER:                  return "follow-the-leader";
+            case MINOR_MODE_3_STRIKES:                      return "battle";
+            case MINOR_MODE_FREE_FOR_ALL:                   return "ffa";
+            case MINOR_MODE_CAPTURE_THE_FLAG:               return "ctf";
+            case MINOR_MODE_TAB_POINTS_TEAM:                return "tab-pt";
+            case MINOR_MODE_TAB_POINTS_PLAYER:              return "tab-pp";
+            case MINOR_MODE_TAB_ALL_POINTS_PLAYER:          return "tab-app";
+            case MINOR_MODE_TAB_LIFE:                       return "tab-l";
+            case MINOR_MODE_EASTER_EGG:                     return "egg-hunt";
+            case MINOR_MODE_SOCCER:                         return "soccer";
+            default: assert(false);                         return "";
         }
     }
     // ----------------------------------------------------------------------------------------
@@ -751,6 +779,17 @@ public:
         else            return false;
     }   // isSoccerMode
 
+        // ----------------------------------------------------------------------------------------
+    /** \brief Returns true if the current mode is a team arena battle mode. */
+    bool isTABMode() const
+    {
+        const int id = (int)m_minor_mode;
+        // This uses the  numerical id of the mode, see the macros
+        // LINEAR_RACE and BATTLE_ARENA above for exact meaning.
+        if (id >= 2004 && id <= 2007) return true;
+        else            return false;
+    }   // isTABMode
+
     // ----------------------------------------------------------------------------------------
     bool isTutorialMode() const  { return m_minor_mode == MINOR_MODE_TUTORIAL; }
 
@@ -932,7 +971,8 @@ public:
     {
         return m_minor_mode == MINOR_MODE_SOCCER ||
             m_minor_mode == MINOR_MODE_CAPTURE_THE_FLAG ||
-            m_minor_mode == MINOR_MODE_FREE_FOR_ALL;
+            m_minor_mode == MINOR_MODE_FREE_FOR_ALL || 
+            RaceManager::get()->isTABMode();
     }
 };   // RaceManager
 

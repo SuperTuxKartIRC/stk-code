@@ -891,9 +891,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         int lap = info.lap;
 
         // In battle mode mode there is no distance along track etc.
-        if (minor_mode==RaceManager::MINOR_MODE_3_STRIKES ||
-            minor_mode==RaceManager::MINOR_MODE_FREE_FOR_ALL ||
-            minor_mode==RaceManager::MINOR_MODE_CAPTURE_THE_FLAG ||
+        if (RaceManager::get()->isBattleMode() ||
             minor_mode==RaceManager::MINOR_MODE_EASTER_EGG ||
             minor_mode==RaceManager::MINOR_MODE_SOCCER)
         {

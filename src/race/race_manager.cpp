@@ -671,6 +671,15 @@ void RaceManager::startNextRace()
             World::setWorld(new FreeForAll());
         else if (m_minor_mode == MINOR_MODE_CAPTURE_THE_FLAG)
             World::setWorld(new CaptureTheFlag());
+
+        else if (m_minor_mode == MINOR_MODE_TAB_POINTS_TEAM)
+            World::setWorld(new CaptureTheFlag());
+        else if (m_minor_mode == MINOR_MODE_TAB_POINTS_PLAYER)
+            World::setWorld(new CaptureTheFlag());
+        else if (m_minor_mode == MINOR_MODE_TAB_ALL_POINTS_PLAYER)
+            World::setWorld(new CaptureTheFlag());
+        else if (m_minor_mode == MINOR_MODE_TAB_LIFE)
+            World::setWorld(new CaptureTheFlag());
     }
     else if(m_minor_mode==MINOR_MODE_SOCCER)
         World::setWorld(new SoccerWorld());
@@ -1279,23 +1288,31 @@ const core::stringw RaceManager::getNameOf(const MinorRaceModeType mode)
     switch (mode)
     {
         //I18N: Game mode
-        case MINOR_MODE_NORMAL_RACE:    return _("Normal Race");
+        case MINOR_MODE_NORMAL_RACE:           return _("Normal Race");
+        //I18N: Game mode                      
+        case MINOR_MODE_TIME_TRIAL:            return _("Time Trial");
+        //I18N: Game mode                      
+        case MINOR_MODE_FOLLOW_LEADER:         return _("Follow the Leader");
+        //I18N: Game mode                      
+        case MINOR_MODE_LAP_TRIAL:             return _("Lap Trial");
+        //I18N: Game mode                      
+        case MINOR_MODE_3_STRIKES:             return _("3 Strikes Battle");
+        //I18N: Game mode                      
+        case MINOR_MODE_FREE_FOR_ALL:          return _("Free-For-All");
         //I18N: Game mode
-        case MINOR_MODE_TIME_TRIAL:     return _("Time Trial");
+        case MINOR_MODE_CAPTURE_THE_FLAG:      return _("Capture The Flag");
         //I18N: Game mode
-        case MINOR_MODE_FOLLOW_LEADER:  return _("Follow the Leader");
+        case MINOR_MODE_TAB_POINTS_TEAM:       return _("Team Arena Battle Points Team");
         //I18N: Game mode
-        case MINOR_MODE_LAP_TRIAL:      return _("Lap Trial");
+        case MINOR_MODE_TAB_POINTS_PLAYER:     return _("Team Arena Battle Points Player");
         //I18N: Game mode
-        case MINOR_MODE_3_STRIKES:      return _("3 Strikes Battle");
+        case MINOR_MODE_TAB_ALL_POINTS_PLAYER: return _("Team Arena Battle All Points Player");
         //I18N: Game mode
-        case MINOR_MODE_FREE_FOR_ALL:   return _("Free-For-All");
+        case MINOR_MODE_TAB_LIFE:              return _("Last Team Standing");
         //I18N: Game mode
-        case MINOR_MODE_CAPTURE_THE_FLAG: return _("Capture The Flag");
-        //I18N: Game mode
-        case MINOR_MODE_EASTER_EGG:     return _("Egg Hunt");
-        //I18N: Game mode
-        case MINOR_MODE_SOCCER:         return _("Soccer");
+        case MINOR_MODE_EASTER_EGG:            return _("Egg Hunt");
+        //I18N: Game mode                      
+        case MINOR_MODE_SOCCER:                return _("Soccer");
         default: return L"";
     }
 }   // getNameOf

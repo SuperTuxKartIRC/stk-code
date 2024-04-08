@@ -89,6 +89,14 @@ public :
            CTF_FINISHED                  = 31,
            FFA_STARTED                   = 32,
            FFA_FINISHED                  = 33,
+           TAB_PT_STARTED                = 54,
+           TAB_PT_FINISHED               = 55,
+           TAB_PP_STARTED                = 56,
+           TAB_PP_FINISHED               = 57,
+           TAB_APP_STARTED               = 58,
+           TAB_APP_FINISHED              = 59,
+           TAB_L_STARTED                 = 60,
+           TAB_L_FINISHED                = 61,
 
            // Count the number of powerups used by the player.
            POWERUP_USED                  = 34,
@@ -119,7 +127,7 @@ public :
            SKIDDING_1LAP_MAX             = 53,
 
 
-           ACHIEVE_DATA_NUM              = 54
+           ACHIEVE_DATA_NUM              = 62
     };
 
 private:

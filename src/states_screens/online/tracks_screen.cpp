@@ -249,7 +249,8 @@ void TracksScreen::beforeAddingWidget()
         m_vote_list->clearColumns();
         auto cl = LobbyProtocol::get<ClientLobby>();
         assert(cl);
-        if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
+        if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
+            RaceManager::get()->isTABMode())
         {
             m_vote_list->addColumn(irr_driver->getTexture
                 (file_manager->getAsset(FileManager::GUI_ICON,
@@ -464,7 +465,8 @@ void TracksScreen::init()
         if (UserConfigParams::m_num_laps == 0 ||
             UserConfigParams::m_num_laps > 20)
             UserConfigParams::m_num_laps = 1;
-        if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
+        if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
+            RaceManager::get()->isTABMode())
         {
             getWidget("lap-text")->setVisible(false);
             m_laps->setValue(0);
@@ -677,7 +679,8 @@ void TracksScreen::voteForPlayer()
     if (PlayerManager::getCurrentPlayer())
         player_name = PlayerManager::getCurrentPlayer()->getName();
     vote.encodeString(player_name);
-    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
+    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
+        RaceManager::get()->isTABMode())
     {
         vote.encodeString(m_selected_track->getIdent())
             .addUInt8(0).addUInt8(m_reversed->getState() ? 1 : 0);
@@ -815,7 +818,8 @@ void TracksScreen::updatePlayerVotes()
         std::vector<GUIEngine::ListWidget::ListCell> row;
         core::stringw y = L"\u2714";
         core::stringw n = L"\u2716";
-        if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
+        if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
+            RaceManager::get()->isTABMode())
         {
             row.push_back(GUIEngine::ListWidget::ListCell
                 (p->m_player_name , -1, 5));

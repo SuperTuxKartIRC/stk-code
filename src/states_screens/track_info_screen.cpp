@@ -114,8 +114,9 @@ void TrackInfoScreen::beforeAddingWidget()
 {
     m_is_soccer = RaceManager::get()->isSoccerMode();
     m_is_lap_trial = RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_LAP_TRIAL;
-    m_show_ffa_spinner = RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES
-                        || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL;
+    m_show_ffa_spinner = RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES || 
+                         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL || 
+                         RaceManager::get()->isTABMode();
 
     m_target_type_div->setCollapsed(!m_is_soccer && !m_show_ffa_spinner, this);
 
@@ -181,9 +182,10 @@ void TrackInfoScreen::init()
     // Number of AIs
     // -------------
     const bool has_AI =
-        (   RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES
-         || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL
-         || m_is_soccer ?
+        (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES || 
+         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL || 
+         m_is_soccer || 
+         RaceManager::get()->isTABMode() ?
          m_track->hasNavMesh() && (max_arena_players - local_players) > 0 :
          RaceManager::get()->hasAI());
 
@@ -577,7 +579,8 @@ void TrackInfoScreen::onEnterPressedInternal()
     const bool has_AI =
         (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ||
          RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
-         RaceManager::get()->isSoccerMode() ?
+         RaceManager::get()->isSoccerMode() ||
+         RaceManager::get()->isTABMode() ?
          m_track->hasNavMesh() && (max_arena_players - local_players) > 0 :
          RaceManager::get()->hasAI());
 

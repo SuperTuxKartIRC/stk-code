@@ -77,6 +77,30 @@ public:
                 m_prev_value = 1;
                 break;
             }
+            case RaceManager::MINOR_MODE_TAB_POINTS_TEAM:
+            {
+                m_prev_mode = 2;
+                m_prev_value = 2;
+                break;
+            }
+            case RaceManager::MINOR_MODE_TAB_POINTS_PLAYER:
+            {
+                m_prev_mode = 2;
+                m_prev_value = 3;
+                break;
+            }
+            case RaceManager::MINOR_MODE_TAB_ALL_POINTS_PLAYER:
+            {
+                m_prev_mode = 2;
+                m_prev_value = 4;
+                break;
+            }
+            case RaceManager::MINOR_MODE_TAB_LIFE:
+            {
+                m_prev_mode = 2;
+                m_prev_value = 5;
+                break;
+            }
             case RaceManager::MINOR_MODE_SOCCER:
             {
                 m_prev_mode = 3;

@@ -223,7 +223,8 @@ void World::init()
 
     // Shuffles the start transforms with playing 3-strikes or free for all battles.
     if ((RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ||
-         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL) &&
+         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL || 
+         RaceManager::get()->isTABMode()) &&
          !NetworkConfig::get()->isNetworking())
     {
         track->shuffleStartTransforms();
@@ -572,8 +573,9 @@ Controller* World::loadAIController(AbstractKart* kart)
     Controller *controller;
     int turn=0;
 
-    if(RaceManager::get()->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES
-        || RaceManager::get()->getMinorMode()==RaceManager::MINOR_MODE_FREE_FOR_ALL)
+    if(RaceManager::get()->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES || 
+       RaceManager::get()->getMinorMode()==RaceManager::MINOR_MODE_FREE_FOR_ALL ||
+       RaceManager::get()->isTABMode())
         turn=1;
     else if(RaceManager::get()->getMinorMode()==RaceManager::MINOR_MODE_SOCCER)
         turn=2;
@@ -1807,6 +1809,15 @@ void World::updateAchievementModeCounters(bool start)
             PlayerManager::increaseAchievement(start ? ACS::CTF_STARTED : ACS::CTF_FINISHED,1);
         else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
             PlayerManager::increaseAchievement(start ? ACS::FFA_STARTED : ACS::FFA_FINISHED,1);
+
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAB_POINTS_TEAM)
+            PlayerManager::increaseAchievement(start ? ACS::FFA_STARTED : ACS::FFA_FINISHED, 1);
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAB_POINTS_PLAYER)
+            PlayerManager::increaseAchievement(start ? ACS::FFA_STARTED : ACS::FFA_FINISHED, 1);
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAB_ALL_POINTS_PLAYER)
+            PlayerManager::increaseAchievement(start ? ACS::FFA_STARTED : ACS::FFA_FINISHED, 1);
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAB_LIFE)
+            PlayerManager::increaseAchievement(start ? ACS::FFA_STARTED : ACS::FFA_FINISHED, 1);
     }
     else // normal races
         PlayerManager::increaseAchievement(start ? ACS::NORMAL_STARTED : ACS::NORMAL_FINISHED,1);

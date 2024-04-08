@@ -1220,6 +1220,30 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
             RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_CAPTURE_THE_FLAG);
             break;
         }
+        case 6:
+        {
+            ServerConfig::m_server_mode = 9;
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TAB_POINTS_TEAM);
+            break;
+        }
+        case 7:
+        {
+            ServerConfig::m_server_mode = 9;
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TAB_POINTS_PLAYER);
+            break;
+        }
+        case 8:
+        {
+            ServerConfig::m_server_mode = 10;
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TAB_ALL_POINTS_PLAYER);
+            break;
+        }
+        case 9:
+        {
+            ServerConfig::m_server_mode = 11;
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TAB_LIFE);
+            break;
+        }
         default:
             Log::warn("main", "Invalid race mode '%d' - ignored.", n);
         }
