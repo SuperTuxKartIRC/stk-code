@@ -655,6 +655,10 @@ void ServerLobby::updateTracksForMode()
         }
         case RaceManager::MINOR_MODE_FREE_FOR_ALL:
         case RaceManager::MINOR_MODE_CAPTURE_THE_FLAG:
+        case RaceManager::MINOR_MODE_TAB_POINTS_TEAM:
+        case RaceManager::MINOR_MODE_TAB_POINTS_PLAYER:
+        case RaceManager::MINOR_MODE_TAB_ALL_POINTS_PLAYER:
+        case RaceManager::MINOR_MODE_TAB_LIFE:
         {
             auto it = m_available_kts.second.begin();
             while (it != m_available_kts.second.end())

@@ -43,6 +43,7 @@
 #include "modes/free_for_all.hpp"
 #include "modes/overworld.hpp"
 #include "modes/standard_race.hpp"
+#include "modes/team_arena_battle.hpp"
 #include "modes/tutorial_world.hpp"
 #include "modes/world.hpp"
 #include "modes/three_strikes_battle.hpp"
@@ -672,14 +673,8 @@ void RaceManager::startNextRace()
         else if (m_minor_mode == MINOR_MODE_CAPTURE_THE_FLAG)
             World::setWorld(new CaptureTheFlag());
 
-        else if (m_minor_mode == MINOR_MODE_TAB_POINTS_TEAM)
-            World::setWorld(new CaptureTheFlag());
-        else if (m_minor_mode == MINOR_MODE_TAB_POINTS_PLAYER)
-            World::setWorld(new CaptureTheFlag());
-        else if (m_minor_mode == MINOR_MODE_TAB_ALL_POINTS_PLAYER)
-            World::setWorld(new CaptureTheFlag());
-        else if (m_minor_mode == MINOR_MODE_TAB_LIFE)
-            World::setWorld(new CaptureTheFlag());
+        //else if (RaceManager::get()->isTABMode())
+        //    World::setWorld(new TeamArenaBattle());
     }
     else if(m_minor_mode==MINOR_MODE_SOCCER)
         World::setWorld(new SoccerWorld());

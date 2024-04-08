@@ -1109,6 +1109,11 @@ void Kart::setRaceResult()
         SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
         m_race_result = sw->getKartSoccerResult(this->getWorldKartId());
     }
+    else if (RaceManager::get()->isTABMode())
+    {
+        //SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
+        //m_race_result = sw->getKartSoccerResult(this->getWorldKartId());
+    }
     else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG)
     {
         // Easter egg mode only has one player, so always win
