@@ -530,10 +530,10 @@ void PowerupManager::computeWeightsForRace(int num_karts)
     case RaceManager::MINOR_MODE_3_STRIKES:             class_name="battle";   break;
     case RaceManager::MINOR_MODE_FREE_FOR_ALL:          class_name="battle";   break;
     case RaceManager::MINOR_MODE_CAPTURE_THE_FLAG:      class_name="battle";   break;
-    case RaceManager::MINOR_MODE_TAB_POINTS_TEAM:       class_name="battle";   break;
-    case RaceManager::MINOR_MODE_TAB_POINTS_PLAYER:     class_name="battle";   break;
-    case RaceManager::MINOR_MODE_TAB_ALL_POINTS_PLAYER: class_name="battle";   break;
-    case RaceManager::MINOR_MODE_TAB_LIFE:              class_name="battle";   break;
+    case RaceManager::MINOR_MODE_TAB_POINTS_TEAM:       class_name="teamsarena";   break;
+    case RaceManager::MINOR_MODE_TAB_POINTS_PLAYER:     class_name="teamsarena";   break;
+    case RaceManager::MINOR_MODE_TAB_ALL_POINTS_PLAYER: class_name="teamsarena";   break;
+    case RaceManager::MINOR_MODE_TAB_LIFE:              class_name="teamsarena";   break;
     case RaceManager::MINOR_MODE_TUTORIAL:              class_name="tutorial"; break;
     case RaceManager::MINOR_MODE_EASTER_EGG:            /* fall through */
     case RaceManager::MINOR_MODE_OVERWORLD:             
