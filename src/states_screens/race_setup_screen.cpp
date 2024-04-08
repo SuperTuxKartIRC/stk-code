@@ -43,6 +43,7 @@ const int CONFIG_CODE_EASTER    = 4;
 const int CONFIG_CODE_SOCCER    = 5;
 const int CONFIG_CODE_GHOST     = 6;
 const int CONFIG_CODE_LAP_TRIAL = 7;
+const int CONFIG_CODE_TAB_PT    = 8;
 
 using namespace GUIEngine;
 
@@ -115,10 +116,10 @@ void RaceSetupScreen::init()
     name4 += _("Hit others with weapons until they lose all their lives.");
     w2->addItem( name4, IDENT_STRIKES, RaceManager::getIconOf(RaceManager::MINOR_MODE_FREE_FOR_ALL));
 
-    irr::core::stringw name4 = irr::core::stringw(_("Battle")) + L"\n";
+    irr::core::stringw name8 = irr::core::stringw(_("Battle")) + L"\n";
     //FIXME: avoid duplicating descriptions from the help menu!
     name4 += _("Hit other players' teams with weapons to score points.");
-    w2->addItem(name4, IDENT_TEAM_PP, RaceManager::getIconOf(RaceManager::MINOR_MODE_TAB_POINTS_TEAM));
+    w2->addItem(name4, IDENT_TEAM_PT, RaceManager::getIconOf(RaceManager::MINOR_MODE_TAB_POINTS_TEAM));
 
     irr::core::stringw name5 = irr::core::stringw(
         RaceManager::getNameOf(RaceManager::MINOR_MODE_SOCCER)) + L"\n";
@@ -240,6 +241,12 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name,
         {
             RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
             UserConfigParams::m_game_mode = CONFIG_CODE_3STRIKES;
+            ArenasScreen::getInstance()->push();
+        }
+        else if (selectedMode == IDENT_TEAM_PT)
+        {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TAB_POINTS_TEAM);
+            UserConfigParams::m_game_mode = CONFIG_CODE_TAB_PT;
             ArenasScreen::getInstance()->push();
         }
         else if (selectedMode == IDENT_EASTER)
