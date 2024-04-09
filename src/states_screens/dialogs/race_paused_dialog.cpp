@@ -411,6 +411,16 @@ void RacePausedDialog::beforeAddingWidgets()
     if (index != -1)
         choice_ribbon->setItemVisible(index, !showSetupNewRace);
 
+
+    std::unordered_map<KartTeam, std::wstring> teamSymbols = {
+     {KART_TEAM_RED, L"\U0001F7E5"}, // Red
+     {KART_TEAM_BLUE, L"\U0001F7E6"}, // Blue
+     {KART_TEAM_GREEN, L"\U0001F7E7"}, // Green
+     {KART_TEAM_ORANGE, L"\U0001F7E8"}, // Orange
+     // Ajoutez les autres équipes avec leurs symboles respectifs
+    };
+
+
     // Disable in game menu to avoid timer desync if not racing in network
     // game
     if (NetworkConfig::get()->isNetworking() &&
@@ -443,25 +453,24 @@ void RacePausedDialog::beforeAddingWidgets()
             }
             id++;
         }
-        if (m_target_team == KART_TEAM_RED)
+
+
+        auto widgetTeam = getWidget("team");
+        auto widgetTeamSpace = getWidget("team_space");
+
+        // Vérifiez si l'équipe cible a un symbole associé
+        if (teamSymbols.find(m_target_team) != teamSymbols.end())
         {
-            getWidget("team")->setVisible(true);
-            getWidget("team")->m_properties[GUIEngine::PROP_WIDTH] = "7%";
-            getWidget("team_space")->m_properties[GUIEngine::PROP_WIDTH] = "1%";
-            getWidget("team")->setText(StringUtils::utf32ToWide({0x1f7e5}));
-        }
-        else if (m_target_team == KART_TEAM_BLUE)
-        {
-            getWidget("team")->setVisible(true);
-            getWidget("team")->m_properties[GUIEngine::PROP_WIDTH] = "7%";
-            getWidget("team_space")->m_properties[GUIEngine::PROP_WIDTH] = "1%";
-            getWidget("team")->setText(StringUtils::utf32ToWide({0x1f7e6}));
+            widgetTeam->setVisible(true);
+            widgetTeam->m_properties[GUIEngine::PROP_WIDTH] = "7%";
+            widgetTeamSpace->m_properties[GUIEngine::PROP_WIDTH] = "1%";
+            widgetTeam->setText(teamSymbols[m_target_team].c_str());
         }
         else
         {
-            getWidget("team")->m_properties[GUIEngine::PROP_WIDTH] = "0%";
-            getWidget("team_space")->m_properties[GUIEngine::PROP_WIDTH] = "0%";
-            getWidget("team")->setVisible(false);
+            // Masquer le widget si aucune équipe n'est spécifiée ou si aucune icône n'est disponible
+            widgetTeam->setVisible(false);
+            widgetTeam->setText(L"");
         }
         LayoutManager::calculateLayout(m_widgets, this);
         m_text_box = getWidget<TextBoxWidget>("chat");

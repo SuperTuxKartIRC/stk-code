@@ -691,14 +691,7 @@ void RaceGUI::drawGlobalMiniMap()
             {
                 KartTeam team = world->getKartTeam(kart->getWorldKartId());
                 
-                if (team == KART_TEAM_RED)
-                {
-                    color = video::SColor(255, 200, 0, 0);
-                }
-                else if (team == KART_TEAM_BLUE)
-                {
-                    color = video::SColor(255, 0, 0, 200);
-                }
+                color = World::getWorld()->rgbaColorKartTeamsColor(team);
             }
                                   
             video::SColor colors[4] = {color, color, color, color};

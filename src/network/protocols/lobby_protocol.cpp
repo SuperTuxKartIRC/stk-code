@@ -232,13 +232,13 @@ void LobbyProtocol::addLiveJoiningKart(int kart_id, const RemoteKartInfo& rki,
                                        int live_join_util_ticks) const
 {
     AbstractKart* k = World::getWorld()->getKart(kart_id);
+    float hue = World::getWorld()->getHueValueForTeam(rki.getKartTeam());
+
     k->changeKart(rki.getKartName(), rki.getHandicap(),
-        rki.getKartTeam() == KART_TEAM_RED ?
-        std::make_shared<GE::GERenderInfo>(1.0f) :
-        rki.getKartTeam() == KART_TEAM_BLUE ?
-        std::make_shared<GE::GERenderInfo>(0.66f) :
-        std::make_shared<GE::GERenderInfo>(rki.getDefaultKartColor()),
+        std::make_shared<GE::GERenderInfo>(hue),
         rki.getKartData());
+    // std::make_shared<GE::GERenderInfo>(rki.getDefaultKartColor())
+
     k->setLiveJoinKart(live_join_util_ticks);
     World::getWorld()->initTeamArrows(k);
     if (!k->getController()->isLocalPlayerController())

@@ -1428,18 +1428,11 @@ void ClientLobby::handleKartInfo(Event* event)
     core::stringw msg;
     if (RaceManager::get()->teamEnabled())
     {
-        if (w->getKartTeam(kart_id) == KART_TEAM_RED)
-        {
-            // I18N: Show when player join red team of the started game in
-            // network
-            msg = _("%s joined the red team.", player_name);
-        }
-        else
-        {
-            // I18N: Show when player join blue team of the started game in
-            // network
-            msg = _("%s joined the blue team.", player_name);
-        }
+        KartTeam kartTeam = w->getKartTeam(kart_id);
+        std::string teamColorName = World::getWorld()->getKartTeamsColorName(kartTeam);
+        // I18N: Show when player join blue team of the started game in
+        // network
+        msg = _("%s joined the %s team.", player_name, teamColorName.c_str());
     }
     else
     {
