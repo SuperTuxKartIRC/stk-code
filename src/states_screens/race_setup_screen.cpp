@@ -30,6 +30,7 @@
 #include "states_screens/easter_egg_screen.hpp"
 #include "states_screens/ghost_replay_selection.hpp"
 #include "states_screens/soccer_setup_screen.hpp"
+#include "states_screens/teams_setup_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/tracks_and_gp_screen.hpp"
 #include "utils/string_utils.hpp"
@@ -247,7 +248,7 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name,
         {
             RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TAB_POINTS_TEAM);
             UserConfigParams::m_game_mode = CONFIG_CODE_TAB_PT;
-            ArenasScreen::getInstance()->push();
+            TeamsSetupScreen::getInstance()->push();
         }
         else if (selectedMode == IDENT_EASTER)
         {
