@@ -314,14 +314,8 @@ void World::initTeamArrows(AbstractKart* k)
     if (!hasTeam() || GUIEngine::isNoGraphics())
         return;
 #ifndef SERVER_ONLY
-    //Loading the indicator textures
-    std::string red_path =
-            file_manager->getAsset(FileManager::GUI_ICON, "red_arrow.png");
-    std::string blue_path =
-            file_manager->getAsset(FileManager::GUI_ICON, "blue_arrow.png");
-
     // Assigning indicators
-    scene::ISceneNode *arrow_node = NULL;
+    scene::ISceneNode* arrow_node = NULL;
 
     KartModel* km = k->getKartModel();
     // Color of karts can be changed using shaders if the model supports
@@ -331,9 +325,12 @@ void World::initTeamArrows(AbstractKart* k)
     float arrow_pos_height = km->getHeight() + 0.5f;
     KartTeam team = getKartTeam(k->getWorldKartId());
 
+    std::string colorName = getKartTeamsColorName(team);
+    std::string arrowPath = file_manager->getAsset(FileManager::GUI_ICON, colorName + "_arrow.png");
+
     arrow_node = irr_driver->addBillboard(
-        core::dimension2d<irr::f32>(0.3f,0.3f),
-        team == KART_TEAM_BLUE ? blue_path : red_path,
+        core::dimension2d<irr::f32>(0.3f, 0.3f),
+        arrowPath,
         k->getNode());
 
     arrow_node->setPosition(core::vector3df(0, arrow_pos_height, 0));
@@ -1544,30 +1541,24 @@ unsigned int World::getNumberOfRescuePositions() const
     return Track::getCurrentTrack()->getNumberOfStartPositions();
 }   // getNumberOfRescuePositions
 
-//-----------------------------------------------------------------------------
 std::shared_ptr<AbstractKart> World::createKartWithTeam
-    (const std::string &kart_ident, int index, int local_player_id,
+(const std::string& kart_ident, int index, int local_player_id,
     int global_player_id, RaceManager::KartType kart_type,
     HandicapLevel handicap)
 {
-    int cur_red = getTeamNum(KART_TEAM_RED);
-    int cur_blue = getTeamNum(KART_TEAM_BLUE);
-    int pos_index = 0;
-    int position  = index + 1;
-    KartTeam team = KART_TEAM_BLUE;
+    KartTeam team = KART_TEAM_DEFAULT; // Par défaut
+    int position = index + 1;
+    int NUM_TEAMS = 2;
 
     if (kart_type == RaceManager::KT_AI)
     {
-        if (index < m_red_ai)
-            team = KART_TEAM_RED;
-        else
-            team = KART_TEAM_BLUE;
+        team = (KartTeam)(index % NUM_TEAMS); // Assigner l'équipe en fonction de l'index
         m_kart_team_map[index] = team;
     }
     else if (NetworkConfig::get()->isNetworking())
     {
-        m_kart_team_map[index] = RaceManager::get()->getKartInfo(index).getKartTeam();
         team = RaceManager::get()->getKartInfo(index).getKartTeam();
+        m_kart_team_map[index] = team;
     }
     else
     {
@@ -1586,32 +1577,17 @@ std::shared_ptr<AbstractKart> World::createKartWithTeam
             .getPlayerName();
     }
 
-    // Notice: In blender, please set 1,3,5,7... for blue starting position;
-    // 2,4,6,8... for red.
-
-    if (RaceManager::get()->isTABMode()) 
-    {
-        pos_index = index;
-    }
-    else 
-    {
-        if (team == KART_TEAM_BLUE)
-        {
-            pos_index = 1 + 2 * cur_blue;
-        }
-        else
-        {
-            pos_index = 2 + 2 * cur_red;
-        }
-    }
+    // Déterminez la position de départ en fonction de l'équipe
+    int pos_index = index+1; // getStartPositionIndexForTeam(team); // Don't exist 
 
     btTransform init_pos = getStartTransform(pos_index - 1);
     m_kart_position_map[index] = (unsigned)(pos_index - 1);
 
-    std::shared_ptr<GE::GERenderInfo> ri = std::make_shared<GE::GERenderInfo>();
-    ri = (team == KART_TEAM_BLUE ? std::make_shared<GE::GERenderInfo>(0.66f) :
-        std::make_shared<GE::GERenderInfo>(1.0f));
+    // Déterminez le rendu en fonction de l'équipe
+    float hueValue = getHueValueForTeam(team);
+    std::shared_ptr<GE::GERenderInfo> ri = std::make_shared<GE::GERenderInfo>(hueValue);
 
+    // Créez le kart en fonction du type
     std::shared_ptr<AbstractKart> new_kart;
     if (RewindManager::get()->isEnabled())
     {
@@ -1627,13 +1603,14 @@ std::shared_ptr<AbstractKart> World::createKartWithTeam
     }
 
     new_kart->init(RaceManager::get()->getKartType(index));
-    Controller *controller = NULL;
+    Controller* controller = nullptr;
 
-    switch(kart_type)
+    // Affectez le contrôleur en fonction du type de kart
+    switch (kart_type)
     {
     case RaceManager::KT_PLAYER:
         controller = new LocalPlayerController(new_kart.get(), local_player_id, handicap);
-        m_num_players ++;
+        m_num_players++;
         break;
     case RaceManager::KT_NETWORK_PLAYER:
         controller = new NetworkPlayerController(new_kart.get());
@@ -1653,7 +1630,8 @@ std::shared_ptr<AbstractKart> World::createKartWithTeam
     new_kart->setController(controller);
 
     return new_kart;
-}   // createKartWithTeam
+}
+
 
 //-----------------------------------------------------------------------------
 int World::getTeamNum(KartTeam team) const
@@ -1682,9 +1660,13 @@ KartTeam World::getKartTeam(unsigned int kart_id) const
 //-----------------------------------------------------------------------------
 void World::setAITeam()
 {
-    m_red_ai  = RaceManager::get()->getNumberOfRedAIKarts();
-    m_blue_ai = RaceManager::get()->getNumberOfBlueAIKarts();
+    //m_red_ai  = RaceManager::get()->getNumberOfRedAIKarts();
+    //m_blue_ai = RaceManager::get()->getNumberOfBlueAIKarts();
 
+    int total_teams = getNumTeam(); // RaceManager::get()->getTotalNumberOfTeams();
+    int total_ai = RaceManager::get()->getNumberOfAIKarts();
+
+    int ai_count = 0;
     for (int i = 0; i < (int)RaceManager::get()->getNumLocalPlayers(); i++)
     {
         KartTeam team = RaceManager::get()->getKartInfo(i).getKartTeam();
@@ -1692,14 +1674,21 @@ void World::setAITeam()
         // Happen in profiling mode
         if (team == KART_TEAM_NONE)
         {
-            RaceManager::get()->setKartTeam(i, KART_TEAM_BLUE);
-            team = KART_TEAM_BLUE;
+            if (RaceManager::get()->isTABMode())
+            {
+                team = static_cast<KartTeam>(ai_count % total_teams);
+                ai_count++;
+            }
+            else 
+                team = KART_TEAM_BLUE;
+
+            RaceManager::get()->setKartTeam(i, team);
             continue; //FIXME, this is illogical
         }
     }
 
-    Log::debug("World", "Blue AI: %d red AI: %d", m_blue_ai, m_red_ai);
-
+    // Log::debug("World", "Blue AI: %d red AI: %d", m_blue_ai, m_red_ai);
+    Log::debug("World", "AI assignment completed.");
 }   // setAITeam
 
 // As a class name can't be skipped with "using", we use a preprocessor macro
@@ -1834,3 +1823,78 @@ void World::updateAchievementModeCounters(bool start)
         PlayerManager::increaseAchievement(start ? ACS::WITH_GHOST_STARTED : ACS::WITH_GHOST_FINISHED,1);
 } // updateAchievementModeCounters
 #undef ACS
+
+//-----------------------------------------------------------------------------
+float World::getHueValueForTeam(KartTeam team) const
+{
+    switch (team)
+    {
+    case KART_TEAM_BLUE:
+        return 0.6667f;
+    case KART_TEAM_RED:
+        return 0.0f;
+    case KART_TEAM_GREEN:
+        return 0.3333f;
+    case KART_TEAM_ORANGE:
+        return 0.0833f; 
+    case KART_TEAM_YELLOW:
+        return 0.1667f;  
+    case KART_TEAM_PURPLE:
+        return 0.8333f; 
+    case KART_TEAM_PINK:
+        return 0.9444f; 
+    case KART_TEAM_TURQUOISE:
+        return 0.4722f;  
+    case KART_TEAM_DARK_BLUE:
+        return 0.6667f;  
+    case KART_TEAM_CYAN:
+        return 0.5f;    
+    case KART_TEAM_YELLOW_GREEN:
+        return 0.25f;  
+    case KART_TEAM_PINKY:
+        return 0.9722f;
+    case KART_TEAM_DEFAULT:
+        return 0.9722f; 
+    default:
+        return 0.0f;      
+    }
+}
+
+//-----------------------------------------------------------------------------
+video::SColor World::rgbaColorKartTeamsColor(KartTeam team)
+{
+    return team == KART_TEAM_BLUE ? video::SColor(255, 0, 0, 255) :
+        team == KART_TEAM_RED ? video::SColor(255, 255, 0, 0) :
+        team == KART_TEAM_GREEN ? video::SColor(255, 0, 255, 0) :
+        team == KART_TEAM_ORANGE ? video::SColor(255, 255, 165, 0) :
+        team == KART_TEAM_YELLOW ? video::SColor(255, 255, 255, 0) :
+        team == KART_TEAM_PURPLE ? video::SColor(255, 128, 0, 128) :
+        team == KART_TEAM_PINK ? video::SColor(255, 255, 192, 203) :
+        team == KART_TEAM_TURQUOISE ? video::SColor(255, 0, 206, 209) :
+        team == KART_TEAM_DARK_BLUE ? video::SColor(255, 0, 0, 139) :
+        team == KART_TEAM_CYAN ? video::SColor(255, 0, 255, 255) :
+        team == KART_TEAM_YELLOW_GREEN ? video::SColor(255, 128, 128, 0) :
+        team == KART_TEAM_PINKY ? video::SColor(255, 255, 182, 193) :
+        team == KART_TEAM_DEFAULT ? video::SColor(255, 255, 182, 193) :
+        video::SColor(255, 255, 182, 193);
+
+} // rgbaColorKartTeamsColor
+
+//-----------------------------------------------------------------------------
+std::string World::getKartTeamsColorName(KartTeam teamColorName)
+{
+    return teamColorName == KART_TEAM_BLUE ? "blue" :
+        teamColorName == KART_TEAM_RED ? "red" :
+        teamColorName == KART_TEAM_GREEN ? "green" :
+        teamColorName == KART_TEAM_ORANGE ? "orange" :
+        teamColorName == KART_TEAM_YELLOW ? "yellow" :
+        teamColorName == KART_TEAM_PURPLE ? "purple" :
+        teamColorName == KART_TEAM_PINK ? "pink" :
+        teamColorName == KART_TEAM_TURQUOISE ? "turquoise" :
+        teamColorName == KART_TEAM_DARK_BLUE ? "dark_blue" :
+        teamColorName == KART_TEAM_CYAN ? "cyan" :
+        teamColorName == KART_TEAM_YELLOW_GREEN ? "" :
+        teamColorName == KART_TEAM_PINKY ? "pinky" :
+        teamColorName == KART_TEAM_DEFAULT ? "pinky" :
+        "pinky";
+}

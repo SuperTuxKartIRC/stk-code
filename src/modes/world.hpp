@@ -108,6 +108,7 @@ protected:
     /* Team related variables. */
     int m_red_ai;
     int m_blue_ai;
+    int m_number_teams;
     std::map<int, KartTeam> m_kart_team_map;
     std::map<int, unsigned int> m_kart_position_map;
 
@@ -400,6 +401,10 @@ public:
     // ------------------------------------------------------------------------
     int getTeamNum(KartTeam team) const;
     // ------------------------------------------------------------------------
+    int getNumTeam() const { return m_number_teams; }
+    // ------------------------------------------------------------------------
+    int setNumTeam() const { return m_number_teams; }
+    // ------------------------------------------------------------------------
     /** Set the network mode (true if networked) */
     void setNetworkWorld(bool is_networked) { m_is_network_world = is_networked; }
     // ------------------------------------------------------------------------
@@ -418,6 +423,12 @@ public:
     }
     // ------------------------------------------------------------------------
     virtual bool isGoalPhase() const { return false; }
+
+    float getHueValueForTeam(KartTeam team) const;
+    // ------------------------------------------------------------------------
+    video::SColor rgbaColorKartTeamsColor(KartTeam team);
+    // ------------------------------------------------------------------------
+    std::string getKartTeamsColorName(KartTeam teamColorName);
 };   // World
 
 #endif
