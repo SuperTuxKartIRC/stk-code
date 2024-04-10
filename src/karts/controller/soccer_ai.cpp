@@ -65,6 +65,8 @@ SoccerAI::SoccerAI(AbstractKart *kart)
     m_opp_team = (m_cur_team == KART_TEAM_BLUE ?
         KART_TEAM_RED : KART_TEAM_BLUE);
 
+    World::getWorld()->getTeamsInGame()[1];
+
     // Don't call our own setControllerName, since this will add a
     // billboard showing 'AIBaseController' to the kart.
     Controller::setControllerName("SoccerAI");
