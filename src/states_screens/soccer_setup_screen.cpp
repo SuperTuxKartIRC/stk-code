@@ -31,6 +31,7 @@
 #include "io/file_manager.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
+#include "modes/world.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "states_screens/arenas_screen.hpp"
 #include "states_screens/state_manager.hpp"
@@ -49,6 +50,8 @@ using namespace GUIEngine;
 
 SoccerSetupScreen::SoccerSetupScreen() : Screen("soccer_setup.stkgui")
 {
+    World::getWorld()->setTeamsInGame(KART_TEAM_GREEN);
+    World::getWorld()->setTeamsInGame(KART_TEAM_CYAN);
 }
 
 // -----------------------------------------------------------------------------
@@ -95,14 +98,14 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name,
     {
         if (m_kart_view_info.size() == 1)
         {
-            changeTeam(0, KART_TEAM_RED);
+            changeTeam(0, World::getWorld()->getTeamsInGame()[0]);
         }
     }
     else if (name == "blue_team")
     {
         if (m_kart_view_info.size() == 1)
         {
-            changeTeam(0, KART_TEAM_BLUE);
+            changeTeam(0, World::getWorld()->getTeamsInGame()[1]);
         }
     }
 }   // eventCallback
@@ -145,14 +148,15 @@ void SoccerSetupScreen::beforeAddingWidget()
 
         int single_team  = UserConfigParams::m_soccer_default_team;
         info.team = (nb_players == 1 ? (KartTeam)single_team :
-            (i&1 ? KART_TEAM_BLUE : KART_TEAM_RED));
+            (i&1 ? World::getWorld()->getTeamsInGame()[1] : World::getWorld()->getTeamsInGame()[0]));
 
         // addModel requires loading the RenderInfo first
         info.support_colorization = kart_model.supportColorization();
         if (info.support_colorization)
         {
             kart_view->getModelViewRenderInfo()->setHue
-                (info.team == KART_TEAM_BLUE ? 0.66f : 1.0f);
+                (info.team == World::getWorld()->getTeamsInGame()[0] ? World::getWorld()->getHueValueForTeam(World::getWorld()->getTeamsInGame()[0])
+                    : World::getWorld()->getHueValueForTeam(World::getWorld()->getTeamsInGame()[1]));
         }
 
         core::matrix4 model_location;
@@ -251,7 +255,8 @@ void SoccerSetupScreen::changeTeam(int player_id, KartTeam team)
     // Change the kart color
     if (m_kart_view_info[player_id].support_colorization)
     {
-        const float hue = team == KART_TEAM_RED ? 1.0f : 0.66f;
+        const float hue = team == World::getWorld()->getTeamsInGame()[0] ? World::getWorld()->getHueValueForTeam(World::getWorld()->getTeamsInGame()[0])
+                                : World::getWorld()->getHueValueForTeam(World::getWorld()->getTeamsInGame()[1]);
         m_kart_view_info[player_id].view->getModelViewRenderInfo()
             ->setHue(hue);
     }
@@ -297,7 +302,7 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
             bubble->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
         {
             if (m_kart_view_info[playerId].confirmed == false)
-                changeTeam(playerId, KART_TEAM_RED);
+                changeTeam(playerId, World::getWorld()->getTeamsInGame()[0]);
 
             return EVENT_BLOCK;
         }
@@ -307,7 +312,7 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
             bubble->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
         {
             if (m_kart_view_info[playerId].confirmed == false)
-                changeTeam(playerId, KART_TEAM_BLUE);
+                changeTeam(playerId, World::getWorld()->getTeamsInGame()[1]);
 
             return EVENT_BLOCK;
         }

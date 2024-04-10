@@ -694,7 +694,7 @@ void RaceResultGUI::displayCTFResults()
     {
         AbstractKart* kart = ctf->getKartAtPosition(i + 1);
         unsigned kart_id = kart->getWorldKartId();
-        if (ctf->getKartTeam(kart_id) != KART_TEAM_RED)
+        if (ctf->getKartTeam(kart_id) != World::getWorld()->getTeamsInGame()[0])
             continue;
         result_text = kart->getController()->getName();
         if (RaceManager::get()->getKartGlobalPlayerId(kart_id) > -1)
@@ -742,7 +742,7 @@ void RaceResultGUI::displayCTFResults()
     {
         AbstractKart* kart = ctf->getKartAtPosition(i + 1);
         unsigned kart_id = kart->getWorldKartId();
-        if (ctf->getKartTeam(kart_id) != KART_TEAM_BLUE)
+        if (ctf->getKartTeam(kart_id) != World::getWorld()->getTeamsInGame()[1])
             continue;
         result_text = kart->getController()->getName();
         if (RaceManager::get()->getKartGlobalPlayerId(kart_id) > -1)
@@ -1518,8 +1518,8 @@ void RaceResultGUI::unload()
         RowInfo *ri = &(m_all_row_infos[0]);
         int current_y = (int)ri->m_y_pos;
         SoccerWorld* sw = (SoccerWorld*)World::getWorld();
-        const int red_score = sw->getScore(KART_TEAM_RED);
-        const int blue_score = sw->getScore(KART_TEAM_BLUE);
+        const int red_score = sw->getScore(World::getWorld()->getTeamsInGame()[0]);
+        const int blue_score = sw->getScore(World::getWorld()->getTeamsInGame()[1]);
 
         GUIEngine::Widget *table_area = getWidget("result-table");
         int height = table_area->m_h + table_area->m_y;
@@ -1583,7 +1583,7 @@ void RaceResultGUI::unload()
         //The red scorers:
         current_y += rect.Height / 2 + rect.Height / 4;
         font = GUIEngine::getSmallFont();
-        std::vector<SoccerWorld::ScorerData> scorers = sw->getScorers(KART_TEAM_RED);
+        std::vector<SoccerWorld::ScorerData> scorers = sw->getScorers(World::getWorld()->getTeamsInGame()[0]);
 
         // Maximum 10 scorers displayed in result screen
         while (scorers.size() > 10)
@@ -1648,7 +1648,7 @@ void RaceResultGUI::unload()
         //The blue scorers:
         current_y = prev_y;
         current_x += UserConfigParams::m_width / 2;
-        scorers = sw->getScorers(KART_TEAM_BLUE);
+        scorers = sw->getScorers(World::getWorld()->getTeamsInGame()[1]);
 
         while (scorers.size() > 10)
         {

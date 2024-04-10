@@ -1292,8 +1292,8 @@ void RaceGUI::drawLap(const AbstractKart* kart,
 
     if (ctf || sw)
     {
-        int red_score = ctf ? ctf->getRedScore() : sw->getScore(KART_TEAM_RED);
-        int blue_score = ctf ? ctf->getBlueScore() : sw->getScore(KART_TEAM_BLUE);
+        int red_score = ctf ? ctf->getRedScore() : sw->getScore(World::getWorld()->getTeamsInGame()[0]);
+        int blue_score = ctf ? ctf->getBlueScore() : sw->getScore(World::getWorld()->getTeamsInGame()[1]);
         gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
         font->setBlackBorder(true);
         font->setScale(1.0f);

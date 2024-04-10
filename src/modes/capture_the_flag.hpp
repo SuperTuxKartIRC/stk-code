@@ -103,8 +103,8 @@ public:
         bool red_win = m_red_scores > m_blue_scores;
         KartTeam team = getKartTeam(kart_id);
 
-        if ((red_win && team == KART_TEAM_RED) ||
-            (!red_win && team == KART_TEAM_BLUE))
+        if ((red_win && team == World::getWorld()->getTeamsInGame()[0]) ||
+            (!red_win && team == World::getWorld()->getTeamsInGame()[1]))
             return true;
         else
             return false;

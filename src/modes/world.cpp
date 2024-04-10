@@ -170,6 +170,8 @@ void World::init()
     if (RaceManager::get()->hasGhostKarts())
         gk = ReplayPlay::get()->getNumGhostKart();
 
+    m_teams_in_game.reserve(KART_TEAM_DEFAULT);
+
     // Create the race gui before anything else is attached to the scene node
     // (which happens when the track is loaded). This allows the race gui to
     // do any rendering on texture. Note that this function can NOT be called

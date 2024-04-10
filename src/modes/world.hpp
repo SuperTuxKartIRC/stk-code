@@ -110,7 +110,7 @@ protected:
     int m_red_ai;
     int m_blue_ai;
     int m_number_teams;
-    std::vector<KartTeam> m_teams_in_game; // TODO : Correct ?? // [KART_TEAM_DEFAULT]
+    std::vector<KartTeam> m_teams_in_game; // TODO : Correct ?? // [KART_TEAM_DEFAULT] // (5, 0)
     std::map<int, KartTeam> m_kart_team_map;
     std::map<int, unsigned int> m_kart_position_map;
 
@@ -410,6 +410,8 @@ public:
     std::vector<KartTeam> getTeamsInGame() const { return m_teams_in_game; }
     // ------------------------------------------------------------------------
     void setTeamsInGame(KartTeam team) { m_teams_in_game.push_back(team); }
+    // ------------------------------------------------------------------------
+    void setTeamsInGame(KartTeam team, int index) { m_teams_in_game[index] = team; }
     // ------------------------------------------------------------------------
     /** Set the network mode (true if networked) */
     void setNetworkWorld(bool is_networked) { m_is_network_world = is_networked; }
