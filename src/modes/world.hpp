@@ -30,7 +30,6 @@
 #include <map>
 #include <memory>
 #include <vector>
-#include <list>
 #include <stdexcept>
 
 #include "graphics/weather.hpp"
@@ -110,7 +109,7 @@ protected:
     int m_red_ai;
     int m_blue_ai;
     int m_number_teams;
-    std::vector<KartTeam> m_teams_in_game; // TODO : Correct ?? // [KART_TEAM_DEFAULT] // (5, 0)
+    std::vector<KartTeam> m_teams_in_game = { KART_TEAM_CYAN, KART_TEAM_PINK}; // TODO : Correct ?? // [KART_TEAM_DEFAULT] // (5, 0)
     std::map<int, KartTeam> m_kart_team_map;
     std::map<int, unsigned int> m_kart_position_map;
 

@@ -404,7 +404,7 @@ void TrackInfoScreen::setSoccerWidgets(bool has_AI)
             if (team == KART_TEAM_NONE)
                 num_blue_players++; // No team will be set to blue
             else
-                team == World::getWorld()->getTeamsInGame()[1] ? num_blue_players++ : num_red_players++;
+                team == RaceManager::get()->getTeamsInGame()[1] ? num_blue_players++ : num_red_players++;
         }
 
         const int max_num_ai = max_arena_players - local_players;
@@ -771,37 +771,37 @@ void TrackInfoScreen::soccerSpinnerUpdate(bool blue_spinner)
     unsigned num_blue = 0;
     for (unsigned i = 0; i < RaceManager::get()->getNumLocalPlayers(); i++)
     {
-        RaceManager::get()->getKartInfo(i).getKartTeam() == World::getWorld()->getTeamsInGame()[0] ?
+        RaceManager::get()->getKartInfo(i).getKartTeam() == RaceManager::get()->getTeamsInGame()[0] ?
             num_red++ : num_blue++;
     }
     if (num_red == 0)
-        all_team = World::getWorld()->getTeamsInGame()[1];
+        all_team = RaceManager::get()->getTeamsInGame()[1];
     else if (num_blue == 0)
-        all_team = World::getWorld()->getTeamsInGame()[0];
+        all_team = RaceManager::get()->getTeamsInGame()[0];
 
     // Need at least 1 kart at each side to avoid soccer ai crash,
     // if there is any ai
     if (blue_spinner)
     {
-        if (all_team == World::getWorld()->getTeamsInGame()[1] &&
+        if (all_team == RaceManager::get()->getTeamsInGame()[1] &&
             (m_ai_blue_spinner->getValue() == 0 || m_ai_kart_spinner->getValue() == 0))
         {
             if (m_ai_kart_spinner->getValue() == 0)
                 m_ai_kart_spinner->setValue(1);
         }
-        if (all_team == World::getWorld()->getTeamsInGame()[0] && m_ai_blue_spinner->getValue() == 0 &&
+        if (all_team == RaceManager::get()->getTeamsInGame()[0] && m_ai_blue_spinner->getValue() == 0 &&
             m_ai_kart_spinner->getValue() != 0)
             m_ai_blue_spinner->setValue(1);
     }
     else
     {
-        if (all_team == World::getWorld()->getTeamsInGame()[0] &&
+        if (all_team == RaceManager::get()->getTeamsInGame()[0] &&
             (m_ai_kart_spinner->getValue() == 0 || m_ai_blue_spinner->getValue() == 0))
         {
             if (m_ai_blue_spinner->getValue() == 0)
                 m_ai_blue_spinner->setValue(1);
         }
-        if (all_team == World::getWorld()->getTeamsInGame()[1] && m_ai_kart_spinner->getValue() == 0 &&
+        if (all_team == RaceManager::get()->getTeamsInGame()[1] && m_ai_kart_spinner->getValue() == 0 &&
             m_ai_blue_spinner->getValue() != 0)
             m_ai_kart_spinner->setValue(1);
     }

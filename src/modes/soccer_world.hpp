@@ -166,12 +166,12 @@ public:
     // ------------------------------------------------------------------------
     int getScore(KartTeam team) const
     {
-        return (int)(team == KART_TEAM_BLUE ? m_blue_scorers.size()
+        return (int)(team == RaceManager::get()->getTeamsInGame()[1] ? m_blue_scorers.size()
                                               : m_red_scorers.size());
     }
     // ------------------------------------------------------------------------
     const std::vector<ScorerData>& getScorers(KartTeam team) const
-       { return (team == KART_TEAM_BLUE ? m_blue_scorers : m_red_scorers); }
+       { return (team == RaceManager::get()->getTeamsInGame()[1] ? m_blue_scorers : m_red_scorers); }
     // ------------------------------------------------------------------------
     int getBallNode() const;
     // ------------------------------------------------------------------------
@@ -199,7 +199,7 @@ public:
     {
         // Only AI call this function, so each team should have at least a kart
         assert(m_blue_kdm.size() > 0 && m_red_kdm.size() > 0);
-        return (team == KART_TEAM_BLUE ? m_blue_kdm[0].m_kart_id :
+        return (team == RaceManager::get()->getTeamsInGame()[1] ? m_blue_kdm[0].m_kart_id :
             m_red_kdm[0].m_kart_id);
     }
     // ------------------------------------------------------------------------

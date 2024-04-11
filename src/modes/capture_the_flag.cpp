@@ -334,7 +334,7 @@ void CaptureTheFlag::update(int ticks)
             g_capture_length)
         {
             uint8_t kart_id = (uint8_t)k->getWorldKartId();
-            if (getKartTeam(kart_id) == World::getWorld()->getTeamsInGame()[0])
+            if (getKartTeam(kart_id) == RaceManager::get()->getTeamsInGame()[0])
             {
                 if (!m_red_flag->isInBase())
                 {
@@ -354,7 +354,7 @@ void CaptureTheFlag::update(int ticks)
             g_capture_length)
         {
             uint8_t kart_id = (uint8_t)k->getWorldKartId();
-            if (getKartTeam(kart_id) == World::getWorld()->getTeamsInGame()[1])
+            if (getKartTeam(kart_id) == RaceManager::get()->getTeamsInGame()[1])
             {
                 if (!m_blue_flag->isInBase())
                 {
@@ -465,7 +465,7 @@ bool CaptureTheFlag::getDroppedFlagTrans(const btTransform& kt,
 // ----------------------------------------------------------------------------
 video::SColor CaptureTheFlag::getColor(unsigned int kart_id) const
 {
-    return getKartTeam(kart_id) == World::getWorld()->getTeamsInGame()[0] ?
+    return getKartTeam(kart_id) == RaceManager::get()->getTeamsInGame()[0] ?
         video::SColor(255, 255, 0, 0) : video::SColor(255, 0, 0, 255);
 }   // getColor
 

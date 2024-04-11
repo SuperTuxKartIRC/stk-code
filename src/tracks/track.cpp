@@ -747,7 +747,7 @@ void Track::loadArenaGraph(const XMLNode &node)
         {
             if (!RaceManager::get()->getKartInfo(i).isNetworkPlayer() &&
                 RaceManager::get()->getKartInfo(i).getKartTeam() ==
-                KART_TEAM_BLUE)
+                RaceManager::get()->getTeamsInGame()[1])
             {
                 m_minimap_invert_x_z = true;
                 break;

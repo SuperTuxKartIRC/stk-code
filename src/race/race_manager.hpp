@@ -974,6 +974,16 @@ public:
             m_minor_mode == MINOR_MODE_FREE_FOR_ALL || 
             RaceManager::get()->isTABMode();
     }
+
+    std::vector<KartTeam> m_teams_in_game = { KART_TEAM_RED, KART_TEAM_BLUE }; // TODO : Correct ?? // KART_TEAM_CYAN, KART_TEAM_PINK
+
+    // ------------------------------------------------------------------------
+    std::vector<KartTeam> getTeamsInGame() const { return m_teams_in_game; }
+    // ------------------------------------------------------------------------
+    void setTeamsInGame(KartTeam team) { m_teams_in_game.push_back(team); }
+    // ------------------------------------------------------------------------
+    void setTeamsInGame(KartTeam team, int index) { m_teams_in_game[index] = team; }
+
 };   // RaceManager
 
 #endif
