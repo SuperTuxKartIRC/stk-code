@@ -880,29 +880,33 @@ void ServerLobby::handleChat(Event* event)
 //-----------------------------------------------------------------------------
 void ServerLobby::changeTeam(Event* event)
 {
-    if (!ServerConfig::m_team_choosing ||
-        !RaceManager::get()->teamEnabled())
+    if (!ServerConfig::m_team_choosing || !RaceManager::get()->teamEnabled())
         return;
-    if (!checkDataSize(event, 1)) return;
+
+    if (!checkDataSize(event, 1))
+        return;
+
     NetworkString& data = event->data();
     uint8_t local_id = data.getUInt8();
     auto& player = event->getPeer()->getPlayerProfiles().at(local_id);
-    auto red_blue = STKHost::get()->getAllPlayersTeamInfo();
-    // At most 7 players on each team (for live join)
-    if (player->getTeam() == KART_TEAM_BLUE)
+
+    auto team_counts = STKHost::get()->getAllPlayersTeamInfo();
+
+    // Vérifier le nombre maximum de joueurs dans chaque équipe
+    for (const auto& pair : team_counts)
     {
-        if (red_blue.first >= 7)
-            return;
-        player->setTeam(KART_TEAM_RED);
+        if (pair.second >= 7)
+            return; // Si une équipe a déjà 7 joueurs, ne changez pas l'équipe
     }
-    else
-    {
-        if (red_blue.second >= 7)
-            return;
-        player->setTeam(KART_TEAM_BLUE);
-    }
+
+    // Basculer entre les équipes
+    KartTeam team = player->getTeam();
+    int max_num_teams = 12; // Modifier le nombre d'équipes si nécessaire
+    team = static_cast<KartTeam>((static_cast<int>(team) + 1) % max_num_teams);
+
+    player->setTeam(team);
     updatePlayerList();
-}   // changeTeam
+}
 
 //-----------------------------------------------------------------------------
 void ServerLobby::kickHost(Event* event)
@@ -2483,12 +2487,18 @@ void ServerLobby::startSelection(const Event *event)
     }
 
 
-    if (!ServerConfig::m_owner_less && ServerConfig::m_team_choosing &&
-        RaceManager::get()->teamEnabled())
+    if (!ServerConfig::m_owner_less && ServerConfig::m_team_choosing && RaceManager::get()->teamEnabled())
     {
-        auto red_blue = STKHost::get()->getAllPlayersTeamInfo();
-        if ((red_blue.first == 0 || red_blue.second == 0) &&
-            red_blue.first + red_blue.second != 1)
+        auto team_counts = STKHost::get()->getAllPlayersTeamInfo();
+
+        // Vérifier si une équipe n'a pas de joueur ou s'il y a plus d'une équipe sans joueur
+        int empty_teams = 0;
+        for (const auto& pair : team_counts)
+        {
+            if (pair.second == 0)
+                empty_teams++;
+        }
+        if (empty_teams != 1)
         {
             Log::warn("ServerLobby", "Bad team choosing.");
             if (event)
@@ -3763,12 +3773,11 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
         country_code = ipv62Country(peer->getAddress());
 #endif
 
-    auto red_blue = STKHost::get()->getAllPlayersTeamInfo();
+    auto team_counts = STKHost::get()->getAllPlayersTeamInfo();
     for (unsigned i = 0; i < player_count; i++)
     {
         core::stringw name;
         data.decodeStringW(&name);
-        // 30 to make it consistent with stk-addons max user name length
         if (name.empty())
             name = L"unnamed";
         else if (name.size() > 30)
@@ -3777,25 +3786,27 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
         HandicapLevel handicap = (HandicapLevel)data.getUInt8();
         auto player = std::make_shared<NetworkPlayerProfile>
             (peer, i == 0 && !online_name.empty() && !peer->isAIPeer() ?
-            online_name : name,
-            peer->getHostId(), default_kart_color, i == 0 ? online_id : 0,
-            handicap, (uint8_t)i, KART_TEAM_NONE,
-            country_code);
+                online_name : name,
+                peer->getHostId(), default_kart_color, i == 0 ? online_id : 0,
+                handicap, (uint8_t)i, KART_TEAM_NONE,
+                country_code);
+
+        // Affecter les équipes aux joueurs
         if (ServerConfig::m_team_choosing)
         {
             KartTeam cur_team = KART_TEAM_NONE;
-            if (red_blue.first > red_blue.second)
+            for (const auto& pair : team_counts)
             {
-                cur_team = KART_TEAM_BLUE;
-                red_blue.second++;
-            }
-            else
-            {
-                cur_team = KART_TEAM_RED;
-                red_blue.first++;
+                if (pair.second < 7)
+                {
+                    cur_team = pair.first;
+                    break;
+                }
             }
             player->setTeam(cur_team);
+            team_counts[cur_team]++;
         }
+
         peer->addPlayer(player);
     }
 

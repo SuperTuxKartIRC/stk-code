@@ -1507,21 +1507,20 @@ void STKHost::initClientNetwork(ENetEvent& event, Network* new_network)
 }   // initClientNetwork
 
 // ----------------------------------------------------------------------------
-std::pair<int, int> STKHost::getAllPlayersTeamInfo() const
+std::unordered_map<KartTeam, int> STKHost::getAllPlayersTeamInfo() const
 {
-    int team_counts[12] = { 0 }; // Tableau pour stocker le nombre de joueurs dans chaque équipe
+    std::unordered_map<KartTeam, int> team_counts;
 
     auto pp = getAllPlayerProfiles();
     for (auto& player : pp)
     {
         KartTeam team = player->getTeam();
-        if (team >= 0 && team < 12) // Vérifiez si l'équipe est valide
+        if (team >= 0 && team < 12)
             team_counts[team]++;
     }
 
-    // Retournez le nombre de joueurs dans chaque équipe
-    return std::make_pair(team_counts[KART_TEAM_RED], team_counts[KART_TEAM_BLUE]);
-}   // getAllPlayersTeamInfo
+    return team_counts;
+}
 
 // ----------------------------------------------------------------------------
 /** Get the players for starting a new game.

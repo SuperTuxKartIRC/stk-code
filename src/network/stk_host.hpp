@@ -22,6 +22,7 @@
 #ifndef STK_HOST_HPP
 #define STK_HOST_HPP
 
+#include "network/remote_kart_info.hpp"
 #include "utils/stk_process.hpp"
 #include "utils/synchronised.hpp"
 #include "utils/time.hpp"
@@ -46,6 +47,7 @@
 #include <thread>
 #include <tuple>
 #include <vector>
+#include <unordered_map>
 
 class BareNetworkString;
 class GameSetup;
@@ -367,7 +369,7 @@ public:
             (int64_t)StkTime::getMonoTimeMs() - (int64_t)ticks);
     }
     // ------------------------------------------------------------------------
-    std::pair<int, int> getAllPlayersTeamInfo() const;
+    std::unordered_map<KartTeam, int>  getAllPlayersTeamInfo() const;
     // ------------------------------------------------------------------------
     /* Return upload speed in bytes per second. */
     unsigned getUploadSpeed() const           { return m_upload_speed.load(); }
