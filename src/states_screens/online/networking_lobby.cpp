@@ -752,11 +752,9 @@ void NetworkingLobby::updatePlayerPings()
             m_player_list->renameItem(id, name_with_ping, p.second.m_icon_id);
             // Don't show chosen team color for spectator
             if (p.second.isSpectator())
-                m_player_list->markItemRed(id, false/*red*/);
-            else if (p.second.m_kart_team == KART_TEAM_RED)
-                m_player_list->markItemRed(id);
-            else if (p.second.m_kart_team == KART_TEAM_BLUE)
-                m_player_list->markItemBlue(id);
+                m_player_list->markItemTeamColor(id, p.second.m_kart_team, false);
+            else 
+                m_player_list->markItemTeamColor(id, p.second.m_kart_team, true);
         }
     }
 }   // updatePlayerPings

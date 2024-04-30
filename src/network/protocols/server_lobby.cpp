@@ -5225,71 +5225,74 @@ void ServerLobby::handlePlayerDisconnection() const
         return;
     }
 
-    int red_count = 0;
-    int blue_count = 0;
+    std::unordered_map<KartTeam, int> teamCounts; // To store the number of players in each team
+
     unsigned total = 0;
     for (unsigned i = 0; i < RaceManager::get()->getNumPlayers(); i++)
     {
         RemoteKartInfo& rki = RaceManager::get()->getKartInfo(i);
         if (rki.isReserved())
             continue;
+
         bool disconnected = rki.disconnected();
-        if (RaceManager::get()->getKartInfo(i).getKartTeam() == KART_TEAM_RED &&
-            !disconnected)
-            red_count++;
-        else if (RaceManager::get()->getKartInfo(i).getKartTeam() ==
-            KART_TEAM_BLUE && !disconnected)
-            blue_count++;
+        KartTeam team = RaceManager::get()->getKartInfo(i).getKartTeam();
 
         if (!disconnected)
         {
             total++;
-            continue;
         }
         else
-            rki.makeReserved();
-
-        AbstractKart* k = World::getWorld()->getKart(i);
-        if (!k->isEliminated() && !k->hasFinishedRace())
         {
-            CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>
-                (World::getWorld());
-            if (ctf)
-                ctf->loseFlagForKart(k->getWorldKartId());
-
-            World::getWorld()->eliminateKart(i,
-                false/*notify_of_elimination*/);
-            if (ServerConfig::m_ranked)
+            rki.makeReserved();
+            AbstractKart* k = World::getWorld()->getKart(i);
+            if (!k->isEliminated() && !k->hasFinishedRace())
             {
-                // Handle disconnection earlier to prevent cheating by joining
-                // another ranked server
-                // Real score will be submitted later in computeNewRankings
-                const uint32_t id =
-                    RaceManager::get()->getKartInfo(i).getOnlineId();
-                unsigned num_races = m_num_ranked_races.at(id);
-                uint64_t disconnects = m_num_ranked_disconnects.at(id) << 1;
-                auto request = std::make_shared<SubmitRankingRequest>
-                    (id, m_scores.at(id) - 200.0, m_max_scores.at(id),
-                    ++num_races, m_raw_scores.at(id) - 200.0,
-                    m_rating_deviations.at(id), ++disconnects,
-                    RaceManager::get()->getKartInfo(i).getCountryCode());
-                NetworkConfig::get()->setUserDetails(request,
-                    "submit-ranking");
-                request->queue();
+                CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
+                if (ctf)
+                    ctf->loseFlagForKart(k->getWorldKartId());
+
+                World::getWorld()->eliminateKart(i, false /*notify_of_elimination*/);
+                if (ServerConfig::m_ranked)
+                {
+                    // Handle disconnection earlier to prevent cheating by joining another ranked server
+                    // Real score will be submitted later in computeNewRankings
+                    const uint32_t id = RaceManager::get()->getKartInfo(i).getOnlineId();
+                    unsigned num_races = m_num_ranked_races.at(id);
+                    uint64_t disconnects = m_num_ranked_disconnects.at(id) << 1;
+                    auto request = std::make_shared<SubmitRankingRequest>(
+                        id, m_scores.at(id) - 200.0, m_max_scores.at(id), ++num_races,
+                        m_raw_scores.at(id) - 200.0, m_rating_deviations.at(id), ++disconnects,
+                        RaceManager::get()->getKartInfo(i).getCountryCode());
+                    NetworkConfig::get()->setUserDetails(request, "submit-ranking");
+                    request->queue();
+                }
+                k->setPosition(World::getWorld()->getCurrentNumKarts() + 1);
+                k->finishedRace(World::getWorld()->getTime(), true /*from_server*/);
             }
-            k->setPosition(
-                World::getWorld()->getCurrentNumKarts() + 1);
-            k->finishedRace(World::getWorld()->getTime(), true/*from_server*/);
         }
+
+        // Count the number of players in each team
+        if (!disconnected)
+            teamCounts[team]++;
     }
 
-    // If live players is enabled, don't end the game if unfair team
+    // If live players are activated and the total number of players is not equal to 1
+    // and the world has teams and one of the teams has zero players
     if (!ServerConfig::m_live_players &&
-        total != 1 && World::getWorld()->hasTeam() &&
-        (red_count == 0 || blue_count == 0))
-        World::getWorld()->setUnfairTeam(true);
-
-}   // handlePlayerDisconnection
+        total != 1 && World::getWorld()->hasTeam())
+    {
+        bool hasUnfairTeam = false;
+        for (const auto& pair : teamCounts)
+        {
+            if (pair.second == 0)
+            {
+                hasUnfairTeam = true;
+                break;
+            }
+        }
+        World::getWorld()->setUnfairTeam(hasUnfairTeam);
+    }
+} // handlePlayerDisconnection
 
 void ServerLobby::addLiveJoinPlaceholder(
     std::vector<std::shared_ptr<NetworkPlayerProfile>>& players) const

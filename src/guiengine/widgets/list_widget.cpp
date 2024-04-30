@@ -29,6 +29,7 @@
 #include <IGUIFontBitmap.h>
 
 #include <sstream>
+#include <network/remote_kart_info.hpp>
 
 using namespace GUIEngine;
 using namespace irr::core;
@@ -499,10 +500,22 @@ void ListWidget::markItemTeamColor(const int id, int team, bool highlight)
     // TODO : Utiliser la méthode qui fait ça
     std::string colorPrefix;
 
-    if (team == 1) // KART_TEAM_RED
-        colorPrefix = "red";
-    else if (team == 2) // KART_TEAM_BLUE
-        colorPrefix = "blue";
+    colorPrefix = team == KART_TEAM_BLUE ? "blue" :
+        team == KART_TEAM_RED ? "red" :
+        team == KART_TEAM_GREEN ? "green" :
+        team == KART_TEAM_ORANGE ? "orange" :
+        team == KART_TEAM_YELLOW ? "yellow" :
+        team == KART_TEAM_PURPLE ? "purple" :
+        team == KART_TEAM_PINK ? "pink" :
+        team == KART_TEAM_TURQUOISE ? "turquoise" :
+        team == KART_TEAM_DARK_BLUE ? "dark_blue" :
+        team == KART_TEAM_CYAN ? "cyan" :
+        team == KART_TEAM_YELLOW_GREEN ? "" :
+        team == KART_TEAM_PINKY ? "pinky" :
+        team == KART_TEAM_DEFAULT ? "pinky" :
+        "pinky";
+
+
     // Add additional conditions for other
 
     if (!colorPrefix.empty())
