@@ -960,11 +960,9 @@ void NetworkingLobby::updatePlayers()
             player.m_icon_id);
         // Don't show chosen team color for spectator
         if (player.isSpectator())
-            m_player_list->markItemRed(i, false/*red*/);
-        else if (cur_team == KART_TEAM_RED)
-            m_player_list->markItemRed(i);
-        else if (cur_team == KART_TEAM_BLUE)
-            m_player_list->markItemBlue(i);
+            m_player_list->markItemTeamColor(i, cur_team, false);
+        else 
+            m_player_list->markItemTeamColor(i, cur_team, true);
         m_player_names[internal_name] = player;
     }
     updatePlayerPings();

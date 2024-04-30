@@ -240,6 +240,7 @@ namespace GUIEngine
           */
         void markItemRed(const int id, bool red=true);
         void markItemBlue(const int id, bool blue=true);
+        void markItemTeamColor(const int id, int team, bool highlight);
         void emphasisItem(const int id, bool enable=true);
         
         /**

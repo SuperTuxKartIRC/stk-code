@@ -1928,32 +1928,43 @@ std::vector<std::shared_ptr<NetworkPlayerProfile> >
     return players;
 }   // getLivePlayers
 
-//-----------------------------------------------------------------------------
-/** Decide where to put the live join player depends on his team and game mode.
- */
 int ServerLobby::getReservedId(std::shared_ptr<NetworkPlayerProfile>& p,
-                               unsigned local_id) const
+    unsigned local_id) const
 {
     const bool is_ffa =
         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL;
-    int red_count = 0;
-    int blue_count = 0;
+
+    std::unordered_map<KartTeam, int> teamCounts;
+
+    // Compter le nombre de joueurs dans chaque équipe
     for (unsigned i = 0; i < RaceManager::get()->getNumPlayers(); i++)
     {
         RemoteKartInfo& rki = RaceManager::get()->getKartInfo(i);
         if (rki.isReserved())
             continue;
         bool disconnected = rki.disconnected();
-        if (RaceManager::get()->getKartInfo(i).getKartTeam() == KART_TEAM_RED &&
-            !disconnected)
-            red_count++;
-        else if (RaceManager::get()->getKartInfo(i).getKartTeam() ==
-            KART_TEAM_BLUE && !disconnected)
-            blue_count++;
+        KartTeam kartTeam = rki.getKartTeam();
+        int MAX_TEAMS = 4;
+        if (!disconnected && kartTeam >= 0 && kartTeam < MAX_TEAMS)
+        {
+            // Incrémentez le nombre de joueurs dans cette équipe
+            teamCounts[kartTeam]++;
+        }
     }
-    KartTeam target_team = red_count > blue_count ? KART_TEAM_BLUE :
-        KART_TEAM_RED;
 
+    // Déterminez l'équipe cible pour le nouveau joueur réservé
+    KartTeam target_team = KART_TEAM_NONE;
+    int minPlayerCount = std::numeric_limits<int>::max();
+    for (const auto& pair : teamCounts)
+    {
+        if (pair.second < minPlayerCount)
+        {
+            minPlayerCount = pair.second;
+            target_team = pair.first;
+        }
+    }
+
+    // Parcourez les joueurs pour trouver une place pour le nouveau joueur réservé
     for (unsigned i = 0; i < RaceManager::get()->getNumPlayers(); i++)
     {
         RemoteKartInfo& rki = RaceManager::get()->getKartInfo(i);
@@ -1961,35 +1972,14 @@ int ServerLobby::getReservedId(std::shared_ptr<NetworkPlayerProfile>& p,
             rki.getNetworkPlayerProfile().lock();
         if (!player)
         {
-            if (is_ffa)
-            {
-                rki.copyFrom(p, local_id);
-                return i;
-            }
-            if (ServerConfig::m_team_choosing)
-            {
-                if ((p->getTeam() == KART_TEAM_RED &&
-                    rki.getKartTeam() == KART_TEAM_RED) ||
-                    (p->getTeam() == KART_TEAM_BLUE &&
-                    rki.getKartTeam() == KART_TEAM_BLUE))
-                {
-                    rki.copyFrom(p, local_id);
-                    return i;
-                }
-            }
-            else
-            {
-                if (rki.getKartTeam() == target_team)
-                {
-                    p->setTeam(target_team);
-                    rki.copyFrom(p, local_id);
-                    return i;
-                }
-            }
+            // Placez le joueur réservé dans l'emplacement vide
+            rki.copyFrom(p, local_id);
+            return i;
         }
     }
+
     return -1;
-}   // getReservedId
+}
 
 //-----------------------------------------------------------------------------
 /** Finally put the kart in the world and inform client the current world
@@ -5301,16 +5291,16 @@ void ServerLobby::handlePlayerDisconnection() const
 
 }   // handlePlayerDisconnection
 
-//-----------------------------------------------------------------------------
-/** Add reserved players for live join later if required.
- */
 void ServerLobby::addLiveJoinPlaceholder(
-    std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const
+    std::vector<std::shared_ptr<NetworkPlayerProfile>>& players) const
 {
     if (!ServerConfig::m_live_players || !RaceManager::get()->supportsLiveJoining())
         return;
+
+    // Vérifiez le mode de jeu mineur
     if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
     {
+        // Mode free-for-all
         Track* t = track_manager->getTrack(m_game_setup->getCurrentTrack());
         assert(t);
         int max_players = std::min((int)ServerConfig::m_server_max_players,
@@ -5319,36 +5309,39 @@ void ServerLobby::addLiveJoinPlaceholder(
         assert(add_size >= 0);
         for (int i = 0; i < add_size; i++)
         {
-            players.push_back(
-                NetworkPlayerProfile::getReservedProfile(KART_TEAM_NONE));
+            players.push_back(NetworkPlayerProfile::getReservedProfile(KART_TEAM_NONE));
         }
     }
     else
     {
-        // CTF or soccer, reserve at most 7 players on each team
-        int red_count = 0;
-        int blue_count = 0;
-        for (unsigned i = 0; i < players.size(); i++)
+        // Mode CTF ou soccer
+        std::unordered_map<KartTeam, int> teamCounts;
+        const int MAX_TEAMS = 4;
+
+        // Compter le nombre de joueurs dans chaque équipe
+        for (const auto& player : players)
         {
-            if (players[i]->getTeam() == KART_TEAM_RED)
-                red_count++;
-            else
-                blue_count++;
+            KartTeam team = player->getTeam();
+            // Vérifiez si l'équipe est valide
+            if (team >= 0 && team < MAX_TEAMS)
+            {
+                // Incrémentez le nombre de joueurs dans cette équipe
+                teamCounts[team]++;
+            }
         }
-        red_count = red_count >= 7 ? 0 : 7 - red_count;
-        blue_count = blue_count >= 7 ? 0 : 7 - blue_count;
-        for (int i = 0; i < red_count; i++)
+
+        // Réservez au plus 7 joueurs dans chaque équipe
+        for (const auto& pair : teamCounts)
         {
-            players.push_back(
-                NetworkPlayerProfile::getReservedProfile(KART_TEAM_RED));
-        }
-        for (int i = 0; i < blue_count; i++)
-        {
-            players.push_back(
-                NetworkPlayerProfile::getReservedProfile(KART_TEAM_BLUE));
+            int remainingSpots = std::max(0, 7 - pair.second);
+            for (int i = 0; i < remainingSpots; ++i)
+            {
+                players.push_back(NetworkPlayerProfile::getReservedProfile(pair.first));
+            }
         }
     }
-}   // addLiveJoinPlaceholder
+}
+
 
 //-----------------------------------------------------------------------------
 void ServerLobby::setPlayerKarts(const NetworkString& ns, STKPeer* peer) const

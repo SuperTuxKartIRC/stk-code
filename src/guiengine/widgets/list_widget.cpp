@@ -447,7 +447,7 @@ void ListWidget::elementRemoved()
 
 // -----------------------------------------------------------------------------
 
-void ListWidget::markItemRed(const int id, bool red)
+void ListWidget::markItemRed(const int id, bool red) // TODO : À SUPPRIMER 
 {
     // May only be called AFTER this widget has been add()ed
     assert(m_element != NULL);
@@ -468,7 +468,7 @@ void ListWidget::markItemRed(const int id, bool red)
 
 // -----------------------------------------------------------------------------
 
-void ListWidget::markItemBlue(const int id, bool blue)
+void ListWidget::markItemBlue(const int id, bool blue) // TODO : À SUPPRIMER 
 {
     // May only be called AFTER this widget has been add()ed
     assert(m_element != NULL);
@@ -484,6 +484,39 @@ void ListWidget::markItemBlue(const int id, bool blue)
     {
         irritem->setItemOverrideColor( id, EGUI_LBC_TEXT,           GUIEngine::getSkin()->getColor("text::neutral"));
         irritem->setItemOverrideColor( id, EGUI_LBC_TEXT_HIGHLIGHT, GUIEngine::getSkin()->getColor("text::focused"));
+    }
+}
+
+// -----------------------------------------------------------------------------
+
+void ListWidget::markItemTeamColor(const int id, int team, bool highlight)
+{
+    // May only be called AFTER this widget has been add()ed
+    assert(m_element != NULL);
+
+    CGUISTKListBox* irritem = getIrrlichtElement<CGUISTKListBox>();
+
+    // TODO : Utiliser la méthode qui fait ça
+    std::string colorPrefix;
+
+    if (team == 1) // KART_TEAM_RED
+        colorPrefix = "red";
+    else if (team == 2) // KART_TEAM_BLUE
+        colorPrefix = "blue";
+    // Add additional conditions for other
+
+    if (!colorPrefix.empty())
+    {
+        std::string neutralColor = "list_" + colorPrefix + "::neutral";
+        std::string focusedColor = "list_" + colorPrefix + "::focused";
+        if (!highlight)
+        {
+            neutralColor = "text::neutral";
+            focusedColor = "text::focused";
+        }
+
+        irritem->setItemOverrideColor(id, EGUI_LBC_TEXT, GUIEngine::getSkin()->getColor(neutralColor.c_str()));
+        irritem->setItemOverrideColor(id, EGUI_LBC_TEXT_HIGHLIGHT, GUIEngine::getSkin()->getColor(focusedColor.c_str()));
     }
 }
 
