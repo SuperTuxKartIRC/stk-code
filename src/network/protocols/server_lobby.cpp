@@ -1,4 +1,4 @@
-//
+ï»¿//
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2013-2015 SuperTuxKart-Team
 //
@@ -63,6 +63,7 @@
 #include <fstream>
 #include <iostream>
 #include <iterator>
+#include <unordered_map>
 
 int ServerLobby::m_fixed_laps = -1;
 // ========================================================================
@@ -825,13 +826,37 @@ void ServerLobby::handleChat(Event* event)
     if (event->data().size() > 0)
         target_team = (KartTeam)event->data().getUInt8();
 
+
+    // DÃ©claration d'une table de correspondance entre les Ã©quipes et les emojis d'animaux
+    std::unordered_map<int8_t, irr::core::stringw> animalEmojiMap = {
+        {KART_TEAM_RED, L"\U0001F99E"},              // Red team - Homard ðŸ¦ž
+        {KART_TEAM_BLUE, L"\U0001F40B"},             // Blue team - Baleine ðŸ‹
+        {KART_TEAM_GREEN, L"\U0001F422"},            // Green team - Tortue ðŸ¢
+        {KART_TEAM_ORANGE, L"\U0001F405"},           // Orange team - Tigre ðŸ…
+        {KART_TEAM_YELLOW, L"\U0001F424"},           // Yellow team - Poussin (bÃ©bÃ© poulet) ðŸ¤
+        {KART_TEAM_PURPLE, L"\U0001F984"},           // Purple team - Licorne ðŸ¦„
+        {KART_TEAM_PINK, L"\U0001F9A9"},             // Pink team - Flamant rose ðŸ¦©
+        {KART_TEAM_TURQUOISE, L"\U0001F409"},        // Turquoise team - Dragon ðŸ‰
+        {KART_TEAM_DARK_BLUE, L"\U0001F433"},        // Dark blue team - Requin ðŸ¦“
+        {KART_TEAM_CYAN, L"\U0001F41F"},             // Cyan team - Poisson ðŸŸ
+        {KART_TEAM_YELLOW_GREEN, L"\U0001F996"},     // Yellow-green team - Dinosaure ðŸ¦–
+        {KART_TEAM_PINKY, L"\U0001F437"},            // Pinky team - Cochon ðŸ·
+        {KART_TEAM_DEFAULT, L""}                     // Default case
+    };
+
+
     if (message.size() > 0)
     {
-        // Red or blue square emoji
-        if (target_team == KART_TEAM_RED)
-            message = StringUtils::utf32ToWide({0x1f7e5, 0x20}) + message;
-        else if (target_team == KART_TEAM_BLUE)
-            message = StringUtils::utf32ToWide({0x1f7e6, 0x20}) + message;
+        // Mise Ã  jour du code pour utiliser les emojis d'animaux correspondant Ã  chaque Ã©quipe
+        auto it = animalEmojiMap.find(target_team);
+        if (it != animalEmojiMap.end()) {
+            // Ajouter l'emoji Ã  message si l'Ã©quipe est trouvÃ©e dans la table de correspondance
+            message = it->second + message;
+        }
+        else {
+            // Si l'Ã©quipe n'est pas trouvÃ©e dans la table de correspondance, ajouter l'emoji par dÃ©faut
+            message = StringUtils::utf32ToWide({ 0x1f7e5, 0x20 }) + message; // Utilisation de l'emoji de carrÃ© rouge
+        }
 
         NetworkString* chat = getNetworkString();
         chat->setSynchronous(true);
@@ -892,16 +917,16 @@ void ServerLobby::changeTeam(Event* event)
 
     auto team_counts = STKHost::get()->getAllPlayersTeamInfo();
 
-    // Vérifier le nombre maximum de joueurs dans chaque équipe
+    // VÃ©rifier le nombre maximum de joueurs dans chaque Ã©quipe
     for (const auto& pair : team_counts)
     {
         if (pair.second >= 7)
-            return; // Si une équipe a déjà 7 joueurs, ne changez pas l'équipe
+            return; // Si une Ã©quipe a dÃ©jÃ  7 joueurs, ne changez pas l'Ã©quipe
     }
 
-    // Basculer entre les équipes
+    // Basculer entre les Ã©quipes
     KartTeam team = player->getTeam();
-    int max_num_teams = 12; // Modifier le nombre d'équipes si nécessaire
+    int max_num_teams = 12; // Modifier le nombre d'Ã©quipes si nÃ©cessaire
     team = static_cast<KartTeam>((static_cast<int>(team) + 1) % max_num_teams);
 
     player->setTeam(team);
@@ -1936,7 +1961,7 @@ int ServerLobby::getReservedId(std::shared_ptr<NetworkPlayerProfile>& p,
 
     std::unordered_map<KartTeam, int> teamCounts;
 
-    // Compter le nombre de joueurs dans chaque équipe
+    // Compter le nombre de joueurs dans chaque Ã©quipe
     for (unsigned i = 0; i < RaceManager::get()->getNumPlayers(); i++)
     {
         RemoteKartInfo& rki = RaceManager::get()->getKartInfo(i);
@@ -1947,12 +1972,12 @@ int ServerLobby::getReservedId(std::shared_ptr<NetworkPlayerProfile>& p,
         int MAX_TEAMS = 4;
         if (!disconnected && kartTeam >= 0 && kartTeam < MAX_TEAMS)
         {
-            // Incrémentez le nombre de joueurs dans cette équipe
+            // IncrÃ©mentez le nombre de joueurs dans cette Ã©quipe
             teamCounts[kartTeam]++;
         }
     }
 
-    // Déterminez l'équipe cible pour le nouveau joueur réservé
+    // DÃ©terminez l'Ã©quipe cible pour le nouveau joueur rÃ©servÃ©
     KartTeam target_team = KART_TEAM_NONE;
     int minPlayerCount = std::numeric_limits<int>::max();
     for (const auto& pair : teamCounts)
@@ -1964,7 +1989,7 @@ int ServerLobby::getReservedId(std::shared_ptr<NetworkPlayerProfile>& p,
         }
     }
 
-    // Parcourez les joueurs pour trouver une place pour le nouveau joueur réservé
+    // Parcourez les joueurs pour trouver une place pour le nouveau joueur rÃ©servÃ©
     for (unsigned i = 0; i < RaceManager::get()->getNumPlayers(); i++)
     {
         RemoteKartInfo& rki = RaceManager::get()->getKartInfo(i);
@@ -1972,7 +1997,7 @@ int ServerLobby::getReservedId(std::shared_ptr<NetworkPlayerProfile>& p,
             rki.getNetworkPlayerProfile().lock();
         if (!player)
         {
-            // Placez le joueur réservé dans l'emplacement vide
+            // Placez le joueur rÃ©servÃ© dans l'emplacement vide
             rki.copyFrom(p, local_id);
             return i;
         }
@@ -2481,7 +2506,7 @@ void ServerLobby::startSelection(const Event *event)
     {
         auto team_counts = STKHost::get()->getAllPlayersTeamInfo();
 
-        // Vérifier si une équipe n'a pas de joueur ou s'il y a plus d'une équipe sans joueur
+        // VÃ©rifier si une Ã©quipe n'a pas de joueur ou s'il y a plus d'une Ã©quipe sans joueur
         int empty_teams = 0;
         for (const auto& pair : team_counts)
         {
@@ -3781,7 +3806,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
                 handicap, (uint8_t)i, KART_TEAM_NONE,
                 country_code);
 
-        // Affecter les équipes aux joueurs
+        // Affecter les Ã©quipes aux joueurs
         if (ServerConfig::m_team_choosing)
         {
             KartTeam cur_team = KART_TEAM_NONE;
@@ -5300,7 +5325,7 @@ void ServerLobby::addLiveJoinPlaceholder(
     if (!ServerConfig::m_live_players || !RaceManager::get()->supportsLiveJoining())
         return;
 
-    // Vérifiez le mode de jeu mineur
+    // VÃ©rifiez le mode de jeu mineur
     if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
     {
         // Mode free-for-all
@@ -5321,19 +5346,19 @@ void ServerLobby::addLiveJoinPlaceholder(
         std::unordered_map<KartTeam, int> teamCounts;
         const int MAX_TEAMS = 4;
 
-        // Compter le nombre de joueurs dans chaque équipe
+        // Compter le nombre de joueurs dans chaque Ã©quipe
         for (const auto& player : players)
         {
             KartTeam team = player->getTeam();
-            // Vérifiez si l'équipe est valide
+            // VÃ©rifiez si l'Ã©quipe est valide
             if (team >= 0 && team < MAX_TEAMS)
             {
-                // Incrémentez le nombre de joueurs dans cette équipe
+                // IncrÃ©mentez le nombre de joueurs dans cette Ã©quipe
                 teamCounts[team]++;
             }
         }
 
-        // Réservez au plus 7 joueurs dans chaque équipe
+        // RÃ©servez au plus 7 joueurs dans chaque Ã©quipe
         for (const auto& pair : teamCounts)
         {
             int remainingSpots = std::max(0, 7 - pair.second);
