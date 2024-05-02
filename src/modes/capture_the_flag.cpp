@@ -465,7 +465,7 @@ bool CaptureTheFlag::getDroppedFlagTrans(const btTransform& kt,
 // ----------------------------------------------------------------------------
 video::SColor CaptureTheFlag::getColor(unsigned int kart_id) const
 {
-    return getKartTeam(kart_id) == RaceManager::get()->getTeamsInGame()[0] ?
+    return getKartTeam(kart_id) == RaceManager::get()->getTeamsInGame()[1] ?
         video::SColor(255, 255, 0, 0) : video::SColor(255, 0, 0, 255);
 }   // getColor
 

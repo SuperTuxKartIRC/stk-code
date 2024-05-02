@@ -778,8 +778,8 @@ bool SoccerWorld::getKartSoccerResult(unsigned int kart_id) const
     bool red_win = m_red_scorers.size() > m_blue_scorers.size();
     KartTeam team = getKartTeam(kart_id);
 
-    if ((red_win && team == RaceManager::get()->getTeamsInGame()[1]) ||
-        (!red_win && team == RaceManager::get()->getTeamsInGame()[0]))
+    if ((red_win && team == RaceManager::get()->getTeamsInGame()[0]) ||
+        (!red_win && team == RaceManager::get()->getTeamsInGame()[1]))
         return true;
     else
         return false;
@@ -888,7 +888,7 @@ void SoccerWorld::updateAIData()
             m_karts[i]->getController()->isPlayerController())
             continue;
 
-        if (getKartTeam(m_karts[i]->getWorldKartId()) == RaceManager::get()->getTeamsInGame()[1])
+        if (getKartTeam(m_karts[i]->getWorldKartId()) == RaceManager::get()->getTeamsInGame()[0])
         {
             Vec3 rd = m_karts[i]->getXYZ() - getBallPosition();
             m_red_kdm.push_back(KartDistanceMap(i, rd.length_2d()));
@@ -911,7 +911,7 @@ void SoccerWorld::updateAIData()
 //-----------------------------------------------------------------------------
 int SoccerWorld::getAttacker(KartTeam team) const
 {
-    if (team == RaceManager::get()->getTeamsInGame()[0] && m_blue_kdm.size() > 1)
+    if (team == RaceManager::get()->getTeamsInGame()[1] && m_blue_kdm.size() > 1)
     {
         for (unsigned int i = 1; i < m_blue_kdm.size(); i++)
         {
@@ -922,7 +922,7 @@ int SoccerWorld::getAttacker(KartTeam team) const
             return m_blue_kdm[i].m_kart_id;
         }
     }
-    else if (team == RaceManager::get()->getTeamsInGame()[1] && m_red_kdm.size() > 1)
+    else if (team == RaceManager::get()->getTeamsInGame()[0] && m_red_kdm.size() > 1)
     {
         for (unsigned int i = 1; i < m_red_kdm.size(); i++)
         {
@@ -1054,7 +1054,7 @@ void SoccerWorld::enterRaceOverState()
             "Blue goal: %d, Blue own goal: %d", red_goal, red_own_goal,
             blue_goal, blue_own_goal);
 
-        if (getScore(RaceManager::get()->getTeamsInGame()[0]) >= m_goal_target)
+        if (getScore(RaceManager::get()->getTeamsInGame()[1]) >= m_goal_target)
             Log::verbose("Soccer AI profiling", "Blue team wins");
         else
             Log::verbose("Soccer AI profiling", "Red team wins");
@@ -1181,7 +1181,7 @@ void SoccerWorld::getKartsDisplayInfo(
         RaceGUIBase::KartIconDisplayInfo& rank_info = (*info)[i];
         rank_info.lap = -1;
         rank_info.m_outlined_font = true;
-        rank_info.m_color = getKartTeam(i) == RaceManager::get()->getTeamsInGame()[0] ?
+        rank_info.m_color = getKartTeam(i) == RaceManager::get()->getTeamsInGame()[1] ?
             video::SColor(255, 255, 0, 0) : video::SColor(255, 0, 0, 255);
         rank_info.m_text = getKart(i)->getController()->getName();
         if (RaceManager::get()->getKartGlobalPlayerId(i) > -1)
