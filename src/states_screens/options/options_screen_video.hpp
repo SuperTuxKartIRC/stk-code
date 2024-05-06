@@ -53,35 +53,6 @@ struct ScaleRttsCustomPreset
     float value;
 };
 
-struct Resolution
-{
-    int width; 
-    int height;
-    bool fullscreen;
-
-    Resolution()
-    {
-        width = 0;
-        height = 0;
-    }
-
-    Resolution(int w, int h)
-    {
-        width = w;
-        height = h;
-    }
-
-    bool operator< (Resolution r) const
-    {
-        return width < r.width || (width == r.width && height < r.height);
-    }
-
-    float getRatio() const
-    {
-        return (float) width / height;
-    }
-};
-
 /**
   * \brief Graphics options screen
   * \ingroup states_screens
@@ -89,7 +60,6 @@ struct Resolution
 class OptionsScreenVideo : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OptionsScreenVideo>
 {
 private:
-    static bool m_fullscreen_checkbox_focus;
     bool m_prev_adv_pipline;
     int m_prev_img_quality;
     OptionsScreenVideo();
@@ -97,12 +67,11 @@ private:
     std::vector<GFXPreset> m_presets;
     std::vector<BlurPreset> m_blur_presets;
     std::vector<ScaleRttsCustomPreset> m_scale_rtts_custom_presets;
-    std::vector<Resolution> m_resolutions;
 
     void updateTooltip();
     void updateBlurTooltip();
-    void updateResolutionsList();
     void initPresets();
+    void startBenchmark();
     static void onScrollResolutionsList(void* data);
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenVideo>;
@@ -124,6 +93,8 @@ public:
     virtual void unloaded() OVERRIDE;
 
     virtual bool onEscapePressed() OVERRIDE;
+
+    virtual void onResize() OVERRIDE;
 
     void         updateGfxSlider();
     void         updateBlurSlider();

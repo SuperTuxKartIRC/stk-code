@@ -206,8 +206,12 @@ private:
     void addGPProgressWidget(GUIEngine::Widget* widget);
     void displayGPProgress();
     void displayPostRaceInfo();
+    int  displayHighscores(int x, int y);
+    int  displayLapDifficulty(int x, int y);
+    int  displayChallengeInfo(int x, int y);
     void displayCTFResults();
     void displaySoccerResults();
+    void drawTeamScorers(KartTeam team, int x, int y, int height);
     void displayScreenShots();
 
     int  getFontHeight () const;
@@ -270,6 +274,7 @@ public:
 
     virtual void onConfirm() OVERRIDE;
     void cleanupGPProgress();
+    virtual void onResize() OVERRIDE;
 };   // RaceResultGUI
 
 #endif
