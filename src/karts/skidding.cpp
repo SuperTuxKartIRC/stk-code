@@ -196,7 +196,10 @@ float Skidding::updateSteering(float steer, int ticks)
 
     // A visual rotation outside of [-1, 1] bounds leads to severe graphical errors
     // This allows the "reduce-turn-max" parameter for skidding to be set arbitrarily.
-    m_visual_rotation = std::min(1.0f, std::max(-1.0f, m_visual_rotation));
+    if (m_visual_rotation > 1.0f)
+        m_visual_rotation = 1.0f;
+    if (m_visual_rotation < -1.0f)
+        m_visual_rotation = -1.0f;
 
     return steer_result;
 }   // updateSteering

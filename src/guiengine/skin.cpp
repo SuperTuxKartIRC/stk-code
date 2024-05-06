@@ -25,12 +25,20 @@
 #include "config/user_config.hpp"
 #include "graphics/2dutils.hpp"
 #include "graphics/central_settings.hpp"
+#include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/screen_keyboard.hpp"
-#include "guiengine/widgets.hpp"
+#include "guiengine/widgets/bubble_widget.hpp"
+#include "guiengine/widgets/check_box_widget.hpp"
+#include "guiengine/widgets/list_widget.hpp"
+#include "guiengine/widgets/model_view_widget.hpp"
+#include "guiengine/widgets/progress_bar_widget.hpp"
+#include "guiengine/widgets/rating_bar_widget.hpp"
+#include "guiengine/widgets/ribbon_widget.hpp"
+#include "guiengine/widgets/spinner_widget.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/log.hpp"
@@ -1176,7 +1184,8 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
 
         core::recti source_area = core::recti(0, 0, texture_w, texture_h);
 
-        float scale = (float)irr_driver->getActualScreenSize().Height / 1080.0f;
+        float scale = (float)std::min(irr_driver->getActualScreenSize().Height / 1080.0f, 
+                                    irr_driver->getActualScreenSize().Width / 1350.0f);
         int size = (int)((90.0f + grow) * scale);
         const core::recti rect2(glow_center_x - size,
                                 glow_center_y - size / 2,
@@ -1495,7 +1504,8 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
 
                 core::recti source_area(0, 0, texture_w, texture_h);
 
-                float scale = (float)irr_driver->getActualScreenSize().Height / 1080.0f;
+                float scale = (float)std::min(irr_driver->getActualScreenSize().Height / 1080.0f, 
+                                            irr_driver->getActualScreenSize().Width / 1350.0f);
                 int size = (int)((90.0f + grow) * scale);
                 const core::recti rect2(glow_center_x - size,
                                         glow_center_y - size / 2,
@@ -1871,7 +1881,8 @@ void Skin::drawIconButton(const core::recti &rect, Widget* widget,
 
         core::recti source_area = core::recti(0, 0, texture_w, texture_h);
 
-        float scale = (float)irr_driver->getActualScreenSize().Height / 1080.0f;
+        float scale = (float)std::min(irr_driver->getActualScreenSize().Height / 1080.0f, 
+                                    irr_driver->getActualScreenSize().Width / 1350.0f);
         int size = (int)((90.0f + grow) * scale);
         const core::recti rect2(glow_center_x - size,
                                 glow_center_y - size / 2,
@@ -2918,7 +2929,15 @@ u32 Skin::getIcon (EGUI_DEFAULT_ICON icon) const
 
 s32 Skin::getSize (EGUI_DEFAULT_SIZE texture_size) const
 {
-    return m_fallback_skin->getSize(texture_size);
+    switch(texture_size)
+    {
+        // TODO : make this depend on the text-size parameter and/or skin
+        // and perhaps rename it
+        case EGDS_TEXT_DISTANCE_X:
+            return 10;
+        default:
+            return m_fallback_skin->getSize(texture_size);
+    }
 }
 
 // -----------------------------------------------------------------------------

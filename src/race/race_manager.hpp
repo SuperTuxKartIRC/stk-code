@@ -34,6 +34,7 @@
 #include "network/remote_kart_info.hpp"
 #include "race/grand_prix_data.hpp"
 #include "utils/vec3.hpp"
+#include "utils/types.hpp"
 
 class Kart;
 class NetworkString;
@@ -317,7 +318,8 @@ private:
     std::vector<int>                 m_num_laps;
 
     /** Whether a track should be reversed */
-    std::vector<bool>                m_reverse_track;
+    // This is uint8_t instead of bool because of GitHub issue #5053
+    std::vector<uint8_t>                m_reverse_track;
 
     /** The list of default AI karts to use. This is from the command line. */
     std::vector<std::string>         m_default_ai_list;
@@ -365,12 +367,12 @@ private:
 
     /** Determines if saved GP should be continued or not*/
     bool m_continue_saved_gp;
-
     bool m_is_recording_race;
-
     bool m_has_ghost_karts;
-
     bool m_watching_replay;
+    bool m_benchmarking;
+    bool m_scheduled_benchmark;
+
 public:
     // ----------------------------------------------------------------------------------------
     static RaceManager* get();
@@ -439,6 +441,8 @@ public:
     void setNumPlayers(int players, int local_players=-1);
     void setDefaultAIKartList(const std::vector<std::string> &ai_list);
     void computeRandomKartList();
+    void setBenchmarking(bool benchmark);
+    void scheduleBenchmark();
 
     // ----------------------------------------------------------------------------------------
     bool hasTimeTarget() const { return m_time_target > 0.0f; }
@@ -871,6 +875,16 @@ public:
     {
         return m_watching_replay;
     }   // isWatchingReplay
+    // ----------------------------------------------------------------------------------------
+    bool isBenchmarking() const
+    {
+        return m_benchmarking;
+    }   // isBenchmarking
+    // ----------------------------------------------------------------------------------------
+    bool isBenchmarkScheduled() const
+    {
+        return m_scheduled_benchmark;
+    }   // isBenchmarkSchedule
     // ----------------------------------------------------------------------------------------
     void addSpareTireKart(const std::string& name)
     {
