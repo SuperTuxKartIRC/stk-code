@@ -269,7 +269,7 @@ void RaceResultGUI::enableAllButtons()
         right->setVisible(true);
         operations->select("right", PLAYER_ID_GAME_MASTER);
         middle->setLabel(_("Save the test results"));
-        middle->setImage("gui/icons/blue_arrow.png");
+        middle->setImage("gui/icons/save.png");
         middle->setVisible(true);
         left->setLabel(_("Back to main menu"));
         left->setImage("gui/icons/back.png");
@@ -1267,6 +1267,10 @@ void RaceResultGUI::renderGlobal(float dt)
     {
         displayCTFResults();
     }
+    else if (RaceManager::get()->isBenchmarking())
+    {
+        displayBenchmarkSummary();
+    }
     else
     {
         for (unsigned int i = 0; i < m_all_row_infos.size(); i++)
@@ -1358,7 +1362,7 @@ void RaceResultGUI::determineGPLayout()
         // In case of FTL mode: ignore the leader
         if (rank < 0) continue;
         old_rank[kart_id] = rank;
-        const AbstractKart *kart = World::getWorld()->getKart(kart_id);
+        const Kart*kart = World::getWorld()->getKart(kart_id);
         RowInfo *ri = &(m_all_row_infos[rank]);
         ri->m_kart_icon =
             kart->getKartProperties()->getIconMaterial()->getTexture();
@@ -2162,7 +2166,7 @@ int RaceResultGUI::displayChallengeInfo(int x, int y)
     video::SColor win_color = video::SColor(255, 0, 255, 0);
     video::SColor lose_color = video::SColor(255, 255, 0, 0);
     video::SColor special_color = video::SColor(255, 0, 255, 255);
-    AbstractKart* kart = World::getWorld()->getPlayerKart(0);
+    Kart* kart = World::getWorld()->getPlayerKart(0);
     bool lose_all = false;
     bool position_passed = false;
     bool time_passed = false;
@@ -2281,6 +2285,57 @@ void RaceResultGUI::displayScreenShots()
         n_sshot++;
     }
 } // displayScreenShots
+
+//-----------------------------------------------------------------------------
+void RaceResultGUI::displayBenchmarkSummary()
+{
+#ifndef SERVER_ONLY
+    assert(RaceManager::get()->isBenchmarking());
+
+    // Draw the title
+    static video::SColor white_color = video::SColor(255, 255, 255, 255);
+    gui::IGUIFont* font = GUIEngine::getTitleFont();
+    int current_x = UserConfigParams::m_width / 2;
+    RowInfo *ri = &(m_all_row_infos[0]);
+    int current_y = (int)ri->m_y_pos;
+
+    core::stringw title_text = _("Performance Test Results");
+
+    core::rect<s32> pos(current_x, current_y, current_x, current_y);
+    font->draw(title_text.c_str(), pos, white_color, true, true);
+
+    // Draw the results
+    core::dimension2du rect = font->getDimension(title_text.c_str());
+    current_y += rect.Height;
+    current_x /= 2;
+    font = GUIEngine::getFont();
+    rect = font->getDimension(title_text.c_str());
+
+    core::stringw info_text[5];
+    core::stringw value = StringUtils::toWString(
+        StringUtils::timeToString(float(profiler.getTotalFrametime())/1000000.0f, 2, true));
+    info_text[0] = _("Test duration: %s",     value);
+    value = StringUtils::toWString(profiler.getTotalFrames());
+    info_text[1] = _("Number of frames: %s",  value);
+    value = StringUtils::toWString(profiler.getFPSMetricsLow());
+    info_text[2] = _("Steady FPS: %s",        value);
+    value = StringUtils::toWString(profiler.getFPSMetricsMid());
+    info_text[3] = _("Mostly Stable FPS: %s", value); // TODO - better name
+    value = StringUtils::toWString(profiler.getFPSMetricsHigh());
+    info_text[4] = _("Typical FPS: %s",       value);
+
+    for (int i=0; i<5; i++)
+    {
+        pos = core::rect<s32>(current_x, current_y, current_x, current_y);
+        font->draw(info_text[i].c_str(), pos, white_color, true, false);
+        current_y += (5 * rect.Height) / 4;       
+    }
+    // TODO : Draw info on the settings
+    // * resolution
+    // * Render scale
+    // * graphics settings
+#endif
+} // displayBenchmarkSummary
 
 // ----------------------------------------------------------------------------
 int RaceResultGUI::getFontHeight() const
