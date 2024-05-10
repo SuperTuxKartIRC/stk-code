@@ -1684,7 +1684,7 @@ void World::setAITeam()
                 ai_count++;
             }
             else 
-                team = KART_TEAM_BLUE;
+                team = RaceManager::get()->getTeamsInGame()[1];
 
             RaceManager::get()->setKartTeam(i, team);
             continue; //FIXME, this is illogical

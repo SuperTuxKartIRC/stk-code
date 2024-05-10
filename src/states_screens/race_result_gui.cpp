@@ -749,7 +749,7 @@ void RaceResultGUI::displayCTFResults()
     {
         AbstractKart* kart = ctf->getKartAtPosition(i + 1);
         unsigned kart_id = kart->getWorldKartId();
-        if (ctf->getKartTeam(kart_id) != KART_TEAM_RED)
+        if (ctf->getKartTeam(kart_id) != RaceManager::get()->getTeamsInGame()[0])
             continue;
         result_text = kart->getController()->getName();
         if (RaceManager::get()->getKartGlobalPlayerId(kart_id) > -1)
@@ -797,7 +797,7 @@ void RaceResultGUI::displayCTFResults()
     {
         AbstractKart* kart = ctf->getKartAtPosition(i + 1);
         unsigned kart_id = kart->getWorldKartId();
-        if (ctf->getKartTeam(kart_id) != KART_TEAM_BLUE)
+        if (ctf->getKartTeam(kart_id) != RaceManager::get()->getTeamsInGame()[1])
             continue;
         result_text = kart->getController()->getName();
         if (RaceManager::get()->getKartGlobalPlayerId(kart_id) > -1)

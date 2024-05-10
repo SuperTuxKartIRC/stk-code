@@ -774,9 +774,9 @@ void TrackInfoScreen::soccerSpinnerUpdate(bool blue_spinner)
             num_red++ : num_blue++;
     }
     if (num_red == 0)
-        all_team = RaceManager::get()->getTeamsInGame()[0];
-    else if (num_blue == 0)
         all_team = RaceManager::get()->getTeamsInGame()[1];
+    else if (num_blue == 0)
+        all_team = RaceManager::get()->getTeamsInGame()[0];
 
     // Need at least 1 kart at each side to avoid soccer ai crash,
     // if there is any ai
@@ -788,13 +788,13 @@ void TrackInfoScreen::soccerSpinnerUpdate(bool blue_spinner)
             if (m_ai_kart_spinner->getValue() == 0)
                 m_ai_kart_spinner->setValue(1);
         }
-        if (all_team == RaceManager::get()->getTeamsInGame()[1] && m_ai_blue_spinner->getValue() == 0 &&
+        if (all_team == RaceManager::get()->getTeamsInGame()[0] && m_ai_blue_spinner->getValue() == 0 &&
             m_ai_kart_spinner->getValue() != 0)
             m_ai_blue_spinner->setValue(1);
     }
     else
     {
-        if (all_team == RaceManager::get()->getTeamsInGame()[1] &&
+        if (all_team == RaceManager::get()->getTeamsInGame()[0] &&
             (m_ai_kart_spinner->getValue() == 0 || m_ai_blue_spinner->getValue() == 0))
         {
             if (m_ai_blue_spinner->getValue() == 0)

@@ -148,15 +148,15 @@ void SoccerSetupScreen::beforeAddingWidget()
 
         int single_team  = UserConfigParams::m_soccer_default_team;
         info.team = (nb_players == 1 ? (KartTeam)single_team :
-            (i&1 ? RaceManager::get()->getTeamsInGame()[0] : RaceManager::get()->getTeamsInGame()[1]));
+            (i&1 ? RaceManager::get()->getTeamsInGame()[1] : RaceManager::get()->getTeamsInGame()[0]));
 
         // addModel requires loading the RenderInfo first
         info.support_colorization = kart_model.supportColorization();
         if (info.support_colorization)
         {
             kart_view->getModelViewRenderInfo()->setHue
-                (info.team == RaceManager::get()->getTeamsInGame()[0] ? World::getWorld()->getHueValueForTeam(RaceManager::get()->getTeamsInGame()[0])
-                    : World::getWorld()->getHueValueForTeam(RaceManager::get()->getTeamsInGame()[1]));
+                (info.team == RaceManager::get()->getTeamsInGame()[1] ? World::getWorld()->getHueValueForTeam(RaceManager::get()->getTeamsInGame()[1])
+                    : World::getWorld()->getHueValueForTeam(RaceManager::get()->getTeamsInGame()[0]));
         }
 
         core::matrix4 model_location;

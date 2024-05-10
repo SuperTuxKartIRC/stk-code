@@ -862,12 +862,12 @@ bool SoccerWorld::isCorrectGoal(unsigned int kart_id, bool first_goal) const
     KartTeam team = getKartTeam(kart_id);
     if (first_goal)
     {
-        if (team == RaceManager::get()->getTeamsInGame()[1])
+        if (team == RaceManager::get()->getTeamsInGame()[0])
             return true;
     }
     else if (!first_goal)
     {
-        if (team == RaceManager::get()->getTeamsInGame()[0])
+        if (team == RaceManager::get()->getTeamsInGame()[1])
             return true;
     }
     return false;
@@ -1181,7 +1181,7 @@ void SoccerWorld::getKartsDisplayInfo(
         RaceGUIBase::KartIconDisplayInfo& rank_info = (*info)[i];
         rank_info.lap = -1;
         rank_info.m_outlined_font = true;
-        rank_info.m_color = getKartTeam(i) == RaceManager::get()->getTeamsInGame()[1] ?
+        rank_info.m_color = getKartTeam(i) == RaceManager::get()->getTeamsInGame()[0] ?
             video::SColor(255, 255, 0, 0) : video::SColor(255, 0, 0, 255);
         rank_info.m_text = getKart(i)->getController()->getName();
         if (RaceManager::get()->getKartGlobalPlayerId(i) > -1)
