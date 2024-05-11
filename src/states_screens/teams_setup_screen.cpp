@@ -521,7 +521,7 @@ void TeamsSetupScreen::prepareGame()
 const float TeamsSetupScreen::getHueColor(KartTeam teamColor)
 {
     return teamColor == KART_TEAM_RED ? 0.01f :
-        teamColor == KART_TEAM_BLUE ? 0.6f :
+        teamColor == KART_TEAM_BLUE ? 0.6f :// 0.5556f
         teamColor == KART_TEAM_GREEN ? 0.33f :
         teamColor == KART_TEAM_ORANGE ? 0.065f :
         //teamColor == KART_TEAM_PURPLE ? 0.75f :
