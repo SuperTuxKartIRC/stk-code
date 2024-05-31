@@ -1,20 +1,3 @@
-//  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013-2015 Lionel Fuentes
-//
-//  This program is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU General Public License
-//  as published by the Free Software Foundation; either version 3
-//  of the License, or (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
 #include "states_screens/soccer_setup_screen.hpp"
 
 #include "audio/sfx_manager.hpp"
@@ -62,27 +45,27 @@ void SoccerSetupScreen::loadedFromFile()
 
 // ----------------------------------------------------------------------------
 void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name,
-                                      const int playerID)
+    const int playerID)
 {
-    if(m_schedule_continue)
+    if (m_schedule_continue)
         return;
 
-    if(name == "continue")
+    if (name == "continue")
     {
         int nb_players = (int)m_kart_view_info.size();
 
-        if(!areAllKartsConfirmed())
+        if (!areAllKartsConfirmed())
         {
-            for(int i=0 ; i < nb_players ; i++)
+            for (int i = 0; i < nb_players; i++)
             {
                 if (!m_kart_view_info[i].confirmed)
                 {
                     m_kart_view_info[i].confirmed = true;
-                    m_kart_view_info[i].view->setRotateTo( KART_CONFIRMATION_TARGET_ANGLE, KART_CONFIRMATION_ROTATION_SPEED );
+                    m_kart_view_info[i].view->setRotateTo(KART_CONFIRMATION_TARGET_ANGLE, KART_CONFIRMATION_ROTATION_SPEED);
                     m_kart_view_info[i].view->setBadge(OK_BADGE);
                 }
             }
-            SFXManager::get()->quickSound( "wee" );
+            SFXManager::get()->quickSound("wee");
             m_schedule_continue = true;
         }
         else
@@ -116,6 +99,9 @@ void SoccerSetupScreen::beforeAddingWidget()
     bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 &&
         irr_driver->getDevice()->supportsTouchDevice()) ||
         UserConfigParams::m_multitouch_active > 1;
+
+    RaceManager::get()->setTeamsInGame(2);
+
     if (multitouch_enabled)
     {
         Widget* team = getWidget<Widget>("choose_team");
@@ -126,16 +112,16 @@ void SoccerSetupScreen::beforeAddingWidget()
 
     // Add the 3D views for the karts
     int nb_players = RaceManager::get()->getNumPlayers();
-    for(int i=0 ; i < nb_players ; i++)
+    for (int i = 0; i < nb_players; i++)
     {
-        const RemoteKartInfo&   kart_info   = RaceManager::get()->getKartInfo(i);
-        const std::string&      kart_name   = kart_info.getKartName();
+        const RemoteKartInfo& kart_info = RaceManager::get()->getKartInfo(i);
+        const std::string& kart_name = kart_info.getKartName();
 
-        const KartProperties*   props       = kart_properties_manager->getKart(kart_name);
-        const KartModel&        kart_model  = props->getMasterKartModel();
+        const KartProperties* props = kart_properties_manager->getKart(kart_name);
+        const KartModel& kart_model = props->getMasterKartModel();
 
         // Add the view
-        ModelViewWidget*    kart_view = new ModelViewWidget();
+        ModelViewWidget* kart_view = new ModelViewWidget();
         // These values will be overriden by updateKartViewsLayout() anyway
         kart_view->m_x = 0;
         kart_view->m_y = 0;
@@ -146,17 +132,19 @@ void SoccerSetupScreen::beforeAddingWidget()
         // Record info about it for further update
         KartViewInfo info;
 
-        int single_team  = UserConfigParams::m_soccer_default_team;
+        int team_default = RaceManager::get()->getTeamsInGame()[0];
+
+        int single_team = RaceManager::get()->getTeamsInGame()[UserConfigParams::m_soccer_default_team -1];
         info.team = (nb_players == 1 ? (KartTeam)single_team :
-            (i&1 ? RaceManager::get()->getTeamsInGame()[1] : RaceManager::get()->getTeamsInGame()[0]));
+            (i & 1 ? RaceManager::get()->getTeamsInGame()[1] : RaceManager::get()->getTeamsInGame()[0]));
 
         // addModel requires loading the RenderInfo first
         info.support_colorization = kart_model.supportColorization();
         if (info.support_colorization)
         {
             kart_view->getModelViewRenderInfo()->setHue
-                (info.team == RaceManager::get()->getTeamsInGame()[1] ? World::getWorld()->getHueValueForTeam(RaceManager::get()->getTeamsInGame()[1])
-                    : World::getWorld()->getHueValueForTeam(RaceManager::get()->getTeamsInGame()[0]));
+            (info.team == RaceManager::get()->getTeamsInGame()[1] ? World::getWorld()->getHueValueForTeam(RaceManager::get()->getTeamsInGame()[1])
+                : World::getWorld()->getHueValueForTeam(RaceManager::get()->getTeamsInGame()[0]));
         }
 
         core::matrix4 model_location;
@@ -189,13 +177,13 @@ void SoccerSetupScreen::beforeAddingWidget()
                 obj.m_bone_name);
         }
 
-        kart_view->setRotateContinuously( KART_CONTINUOUS_ROTATION_SPEED );
+        kart_view->setRotateContinuously(KART_CONTINUOUS_ROTATION_SPEED);
         kart_view->update(0);
 
         central_div->getChildren().push_back(kart_view);
 
-        info.view  = kart_view;
-        info.confirmed  = false;
+        info.view = kart_view;
+        info.confirmed = false;
         m_kart_view_info.push_back(info);
         RaceManager::get()->setKartTeam(i, info.team);
     }
@@ -233,10 +221,10 @@ void SoccerSetupScreen::tearDown()
     input_manager->getDeviceManager()->mapFireToSelect(false);
 
     // Remove all ModelViewWidgets we created manually
-    PtrVector<Widget>&  children = central_div->getChildren();
-    for(int i = children.size()-1 ; i >= 0 ; i--)
+    PtrVector<Widget>& children = central_div->getChildren();
+    for (int i = children.size() - 1; i >= 0; i--)
     {
-        if(children[i].getType() == WTYPE_MODEL_VIEW)
+        if (children[i].getType() == WTYPE_MODEL_VIEW)
             children.erase(i);
     }
     m_kart_view_info.clear();
@@ -244,53 +232,39 @@ void SoccerSetupScreen::tearDown()
     Screen::tearDown();
 }   // tearDown
 
-void SoccerSetupScreen::changeTeam(int player_id, KartTeam team)
+void SoccerSetupScreen::changeTeam(int player_index, KartTeam new_team)
 {
-    if (team == KART_TEAM_NONE)
-        return;
+    m_kart_view_info[player_index].team = new_team;
 
-    if (team == m_kart_view_info[player_id].team)
-        return;
+    KartViewInfo& view_info = m_kart_view_info[player_index];
+    view_info.team = new_team;
 
-    // Change the kart color
-    if (m_kart_view_info[player_id].support_colorization)
+    if (view_info.support_colorization)
     {
-        const float hue = team == RaceManager::get()->getTeamsInGame()[0] ? World::getWorld()->getHueValueForTeam(RaceManager::get()->getTeamsInGame()[0])
-                                : World::getWorld()->getHueValueForTeam(RaceManager::get()->getTeamsInGame()[1]);
-        m_kart_view_info[player_id].view->getModelViewRenderInfo()
-            ->setHue(hue);
+        view_info.view->getModelViewRenderInfo()->setHue
+        (new_team == RaceManager::get()->getTeamsInGame()[1] ? World::getWorld()->getHueValueForTeam(RaceManager::get()->getTeamsInGame()[1])
+            : World::getWorld()->getHueValueForTeam(RaceManager::get()->getTeamsInGame()[0]));
     }
 
-    for (unsigned int i = 0; i < m_kart_view_info.size(); i++)
-    {
-        m_kart_view_info[i].view->unsetBadge(BAD_BADGE);
-    }
-
-    if (m_kart_view_info.size() == 1)
-    {
-        UserConfigParams::m_soccer_default_team = (int)team;
-    }
-
-    RaceManager::get()->setKartTeam(player_id, team);
-    m_kart_view_info[player_id].team = team;
+    RaceManager::get()->setKartTeam(player_index, new_team);
     updateKartViewsLayout();
 }
 
 // -----------------------------------------------------------------------------
 GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action,
-                                                             int deviceID,
-                                                             const unsigned int value,
-                                                             Input::InputType type,
-                                                             int playerId)
+    int deviceID,
+    const unsigned int value,
+    Input::InputType type,
+    int playerId)
 {
-    if(m_schedule_continue)
+    if (m_schedule_continue)
         return EVENT_BLOCK;
-        
-    const bool pressed_down = value > Input::MAX_VALUE*2/3;
-    
+
+    const bool pressed_down = value > Input::MAX_VALUE * 2 / 3;
+
     if (!pressed_down)
         return EVENT_BLOCK;
-    
+
 
     ButtonWidget* bt_continue = getWidget<ButtonWidget>("continue");
     BubbleWidget* bubble = getWidget<BubbleWidget>("choose_team");
@@ -339,11 +313,11 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
             // Confirm team selection
             m_kart_view_info[playerId].confirmed = true;
             m_kart_view_info[playerId].view->setRotateTo(
-                                            KART_CONFIRMATION_TARGET_ANGLE,
-                                            KART_CONFIRMATION_ROTATION_SPEED);
+                KART_CONFIRMATION_TARGET_ANGLE,
+                KART_CONFIRMATION_ROTATION_SPEED);
             m_kart_view_info[playerId].view->setBadge(OK_BADGE);
             m_kart_view_info[playerId].view->unsetBadge(BAD_BADGE);
-            SFXManager::get()->quickSound( "wee" );
+            SFXManager::get()->quickSound("wee");
         }
 
         if (areAllKartsConfirmed())
@@ -359,8 +333,8 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
         {
             return EVENT_LET;
         }
-        
-        if ((!m_kart_view_info[playerId].confirmed) && 
+
+        if ((!m_kart_view_info[playerId].confirmed) &&
             (playerId == PLAYER_ID_GAME_MASTER))
         {
             return EVENT_LET;
@@ -371,7 +345,7 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
             // Un-confirm team selection
             m_kart_view_info[playerId].confirmed = false;
             m_kart_view_info[playerId].view->setRotateContinuously(
-                                                KART_CONTINUOUS_ROTATION_SPEED);
+                KART_CONTINUOUS_ROTATION_SPEED);
             m_kart_view_info[playerId].view->unsetBadge(OK_BADGE);
 
             for (unsigned int i = 0; i < m_kart_view_info.size(); i++)
@@ -394,9 +368,9 @@ void SoccerSetupScreen::onUpdate(float delta)
 {
     int nb_players = (int)m_kart_view_info.size();
 
-    if(m_schedule_continue)
+    if (m_schedule_continue)
     {
-        for(int i=0 ; i < nb_players ; i++)
+        for (int i = 0; i < nb_players; i++)
         {
             if (m_kart_view_info[i].view->isRotating() == true)
                 return;
@@ -407,14 +381,15 @@ void SoccerSetupScreen::onUpdate(float delta)
     }
 }   // onUpdate
 
+
 // ----------------------------------------------------------------------------
 bool SoccerSetupScreen::areAllKartsConfirmed() const
 {
     bool all_confirmed = true;
     int nb_players = (int)m_kart_view_info.size();
-    for(int i=0 ; i < nb_players ; i++)
+    for (int i = 0; i < nb_players; i++)
     {
-        if(!m_kart_view_info[i].confirmed)
+        if (!m_kart_view_info[i].confirmed)
         {
             all_confirmed = false;
             break;
@@ -428,9 +403,9 @@ int SoccerSetupScreen::getNumConfirmedKarts()
 {
     int confirmed_karts = 0;
     int nb_players = (int)m_kart_view_info.size();
-    for(int i=0 ; i < nb_players ; i++)
+    for (int i = 0; i < nb_players; i++)
     {
-        if(m_kart_view_info[i].confirmed == true)
+        if (m_kart_view_info[i].confirmed == true)
             confirmed_karts++;
     }
     return confirmed_karts;
@@ -444,49 +419,70 @@ void SoccerSetupScreen::updateKartViewsLayout()
     // Compute/get some dimensions
     const int nb_columns = 2;   // two karts maximum per column
     const int kart_area_width = (int)((central_div->m_w) / 2 * 0.8f); // size of one half of the screen with some margin
-    const int kart_view_size = kart_area_width/nb_columns;  // Size (width and height) of a kart view
-    const int center_x = central_div->m_x + central_div->m_w/2;
-    const int center_y = central_div->m_y + central_div->m_h/2;
+    const int kart_view_size = kart_area_width / nb_columns;  // Size (width and height) of a kart view
+    const int center_x = central_div->m_x + central_div->m_w / 2;
+    const int center_y = central_div->m_y + central_div->m_h / 2;
+
+    // Get the teams
+    const std::vector<KartTeam>& teams = RaceManager::get()->getTeamsInGame();
+    const int num_teams = teams.size();
+
+    // Ensure there are exactly 2 teams
+    if (num_teams != 2) {
+        Log::error("SoccerSetupScreen", "Expected exactly 2 teams, but got %d teams", num_teams);
+        return;
+    }
 
     // Count the number of karts per team
     int nb_players = (int)m_kart_view_info.size();
-    int nb_karts_per_team[2] = {0,0};
-    for(int i=0 ; i < nb_players ; i++)
+    std::map<KartTeam, int> nb_karts_per_team;
+    for (KartTeam team : teams) {
+        nb_karts_per_team[team] = 0;
+    }
+    for (int i = 0; i < nb_players; i++) {
         nb_karts_per_team[m_kart_view_info[i].team]++;
+    }
 
     // - number of rows displayed for each team = ceil(nb_karts_per_team[i] / nb_columns)
-    const int nb_rows_per_team[2] = { (nb_karts_per_team[0] + nb_columns - 1) / nb_columns,
-                                      (nb_karts_per_team[1] + nb_columns - 1) / nb_columns};
-    // - where to start vertically
-    const int start_y[2] = {center_y - nb_rows_per_team[0] * kart_view_size / 2,
-                            center_y - nb_rows_per_team[1] * kart_view_size / 2};
+    std::map<KartTeam, int> nb_rows_per_team;
+    std::map<KartTeam, int> start_y;
+    std::map<KartTeam, int> center_x_per_team;
+
+    for (KartTeam team : teams) {
+        nb_rows_per_team[team] = (nb_karts_per_team[team] + nb_columns - 1) / nb_columns;
+        start_y[team] = center_y - nb_rows_per_team[team] * kart_view_size / 2;
+    }
+
     // - center of each half-screen
-    const int center_x_per_team[2] = {  ( central_div->m_x                  + center_x ) / 2,
-                                        ( central_div->m_x+central_div->m_w + center_x ) / 2,
-                                     };
+    center_x_per_team[teams[0]] = (central_div->m_x + center_x) / 2;
+    center_x_per_team[teams[1]] = (central_div->m_x + central_div->m_w + center_x) / 2;
 
     // Update the layout of the 3D views for the karts
-    int cur_kart_per_team[2] = {0,0};   // counters
-    for(int i=0 ; i < nb_players ; i++)
+    std::map<KartTeam, int> cur_kart_per_team;
+    for (KartTeam team : teams) {
+        cur_kart_per_team[team] = 0;
+    }
+
+    for (int i = 0; i < nb_players; i++)
     {
         const KartViewInfo& view_info = m_kart_view_info[i];
-        const KartTeam    team = view_info.team;
+        const KartTeam team = view_info.team;
 
         // Compute the position
         const int cur_row = cur_kart_per_team[team] / nb_columns;
-        const int pos_y = start_y[team] + cur_row*kart_view_size;
+        const int pos_y = start_y[team] + cur_row * kart_view_size;
 
         const int cur_col = cur_kart_per_team[team] % nb_columns;
-        int nb_karts_in_this_row = (nb_karts_per_team[team] - cur_row*nb_columns) % nb_columns;
-        if(nb_karts_in_this_row == 0 || nb_karts_per_team[team] > 1)
+        int nb_karts_in_this_row = (nb_karts_per_team[team] - cur_row * nb_columns) % nb_columns;
+        if (nb_karts_in_this_row == 0 || nb_karts_per_team[team] > 1)
             nb_karts_in_this_row = nb_columns;  // TODO: not sure of the computation here...
-        const int pos_x = center_x_per_team[team] + cur_col*kart_view_size - nb_karts_in_this_row*kart_view_size/2;
+        const int pos_x = center_x_per_team[team] + cur_col * kart_view_size - nb_karts_in_this_row * kart_view_size / 2;
         cur_kart_per_team[team]++;
 
         // Move the view
         view_info.view->move(pos_x, pos_y, kart_view_size, kart_view_size);
     }
-}   // updateKartViewsLayout
+}
 
 // -----------------------------------------------------------------------------
 bool SoccerSetupScreen::onEscapePressed()
