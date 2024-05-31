@@ -78,6 +78,7 @@ extern "C" {
   #define s32 int32_t
   #define Event libnx_Event
   #include <switch/services/applet.h>
+#include <unordered_set>
   #undef Event
   #undef u64
   #undef u32
@@ -1361,3 +1362,40 @@ void RaceManager::scheduleBenchmark()
 {
     m_scheduled_benchmark = true;
 }   // scheduleBenchmark
+
+//---------------------------------------------------------------------------------------------
+bool RaceManager::isValidTeamCombination(KartTeam new_team) {
+    for (const auto& team : m_teams_in_game) {
+        if ((new_team == KART_TEAM_YELLOW_GREEN && team == KART_TEAM_GREEN) ||
+            (new_team == KART_TEAM_GREEN && team == KART_TEAM_YELLOW_GREEN) ||
+            (new_team == KART_TEAM_PINKY && team == KART_TEAM_RED) ||
+            (new_team == KART_TEAM_RED && team == KART_TEAM_PINKY) ||
+            (new_team == KART_TEAM_TURQUOISE && team == KART_TEAM_CYAN) ||
+            (new_team == KART_TEAM_CYAN && team == KART_TEAM_TURQUOISE)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+//---------------------------------------------------------------------------------------------
+void RaceManager::setTeamsInGame(int number_team)
+{
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, KART_TEAM_LAST);
+
+    m_teams_in_game.clear();
+    m_teams_in_game.reserve(number_team);
+
+    while (m_teams_in_game.size() < number_team) {
+        int team_nb = dis(gen);
+        KartTeam new_team = static_cast<KartTeam>(team_nb);
+
+        // Check if the team is already in m_teams_in_game and if the combination is valid
+        if (std::find(m_teams_in_game.begin(), m_teams_in_game.end(), new_team) == m_teams_in_game.end() &&
+            isValidTeamCombination(new_team)) {
+            m_teams_in_game.push_back(new_team);
+        }
+    }
+}

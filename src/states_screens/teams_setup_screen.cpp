@@ -125,6 +125,9 @@ void TeamsSetupScreen::beforeAddingWidget()
     bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 &&
         irr_driver->getDevice()->supportsTouchDevice()) ||
         UserConfigParams::m_multitouch_active > 1;
+
+    RaceManager::get()->setTeamsInGame(4);
+
     if (multitouch_enabled)
     {
         Widget* team = getWidget<Widget>("choose_team");

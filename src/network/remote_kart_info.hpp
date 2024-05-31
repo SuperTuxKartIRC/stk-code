@@ -46,6 +46,7 @@ enum KartTeam : int8_t
     KART_TEAM_CYAN           = 9,
     KART_TEAM_YELLOW_GREEN   = 10,
     KART_TEAM_PINKY          = 11,
+    KART_TEAM_LAST           = KART_TEAM_PINKY, 
     KART_TEAM_DEFAULT        = 12
 };
 

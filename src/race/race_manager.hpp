@@ -994,10 +994,15 @@ public:
     // ------------------------------------------------------------------------
     std::vector<KartTeam> getTeamsInGame() const { return m_teams_in_game; }
     // ------------------------------------------------------------------------
+    void setTeamsInGame(int number_team);
+    // ------------------------------------------------------------------------
     void setTeamsInGame(KartTeam team) { m_teams_in_game.push_back(team); }
     // ------------------------------------------------------------------------
     void setTeamsInGame(KartTeam team, int index) { m_teams_in_game[index] = team; }
 
+private:
+    // ------------------------------------------------------------------------
+    bool isValidTeamCombination(KartTeam new_team);
 };   // RaceManager
 
 #endif
