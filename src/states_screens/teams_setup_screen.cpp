@@ -34,6 +34,7 @@
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "modes/world.hpp"
 #include "states_screens/arenas_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
@@ -96,25 +97,25 @@ void TeamsSetupScreen::eventCallback(Widget* widget, const std::string& name,
     else if (name == "team_1")
     {
         if (m_kart_view_info.size() == 1) {
-            changeTeam(0, KART_TEAM_RED);
+            changeTeam(0, RaceManager::get()->getTeamsInGame()[1]);
         }
     }
     else if (name == "team_2")
     {
         if (m_kart_view_info.size() == 1) {
-            changeTeam(0, KART_TEAM_BLUE);
+            changeTeam(0, RaceManager::get()->getTeamsInGame()[2]);
         }
     }
     else if (name == "team_3")
     {
         if (m_kart_view_info.size() == 1) {
-            changeTeam(0, KART_TEAM_GREEN);
+            changeTeam(0, RaceManager::get()->getTeamsInGame()[3]);
         }
     }
     else if (name == "team_4")
     {
         if (m_kart_view_info.size() == 1) {
-            changeTeam(0, KART_TEAM_ORANGE);
+            changeTeam(0, RaceManager::get()->getTeamsInGame()[4]);
         }
     }
 }   // eventCallback
@@ -127,6 +128,10 @@ void TeamsSetupScreen::beforeAddingWidget()
         UserConfigParams::m_multitouch_active > 1;
 
     RaceManager::get()->setTeamsInGame(4);
+    RaceManager::get()->getTeamsInGame()[0] = KART_TEAM_RED;
+    RaceManager::get()->getTeamsInGame()[1] = KART_TEAM_BLUE;
+    RaceManager::get()->getTeamsInGame()[2] = KART_TEAM_GREEN;
+    RaceManager::get()->getTeamsInGame()[3] = KART_TEAM_ORANGE;
 
     if (multitouch_enabled)
     {
@@ -166,7 +171,7 @@ void TeamsSetupScreen::beforeAddingWidget()
         if (info.support_colorization)
         {
             kart_view->getModelViewRenderInfo()->setHue
-            (getHueColor(info.teams));
+            (World::getWorld()->getHueValueForTeam(info.teams));
         }
 
         core::matrix4 model_location;
@@ -266,7 +271,7 @@ void TeamsSetupScreen::changeTeam(int player_id, KartTeam teams)
     if (m_kart_view_info[player_id].support_colorization)
     {
         m_kart_view_info[player_id].view->getModelViewRenderInfo()
-            ->setHue(getHueColor(teams));
+            ->setHue(World::getWorld()->getHueValueForTeam(teams));
     }
 
     for (unsigned int i = 0; i < m_kart_view_info.size(); i++)
@@ -417,17 +422,12 @@ void TeamsSetupScreen::onUpdate(float delta)
 // ----------------------------------------------------------------------------
 bool TeamsSetupScreen::areAllKartsConfirmed() const
 {
-    bool all_confirmed = true;
-    int nb_players = (int)m_kart_view_info.size();
-    for (int i = 0; i < nb_players; i++)
+    for (unsigned int i = 0; i < m_kart_view_info.size(); i++)
     {
         if (!m_kart_view_info[i].confirmed)
-        {
-            all_confirmed = false;
-            break;
-        }
+            return false;
     }
-    return all_confirmed;
+    return true;
 }   // areAllKartsConfirmed
 
 // -----------------------------------------------------------------------------
@@ -507,7 +507,6 @@ void TeamsSetupScreen::updateKartViewsLayout()
     }
 }   // updateKartViewsLayout
 
-
 // -----------------------------------------------------------------------------
 bool TeamsSetupScreen::onEscapePressed()
 {
@@ -521,22 +520,7 @@ void TeamsSetupScreen::prepareGame()
     input_manager->setMasterPlayerOnly(true);
 }   // prepareGame
 
-const float TeamsSetupScreen::getHueColor(KartTeam teamColor)
-{
-    return teamColor == KART_TEAM_RED ? 0.01f :
-        teamColor == KART_TEAM_BLUE ? 0.6f :// 0.5556f
-        teamColor == KART_TEAM_GREEN ? 0.33f :
-        teamColor == KART_TEAM_ORANGE ? 0.065f :
-        //teamColor == KART_TEAM_PURPLE ? 0.75f :
-        //teamColor == KART_TEAM_PINK ? 0.95f :
-        //teamColor == KART_TEAM_YELLOW ? 0.16f :
-        //teamColor == KART_TEAM_TURQUOISE ? 0.45f :
-        //teamColor == KART_TEAM_DARK_BLUE ? 0.66f :
-        //teamColor == KART_TEAM_CYAN ? 0.5f :
-        //teamColor == KART_TEAM_DEFAULT ? 0.99f :
-        0.99f;
-}
-
+// -----------------------------------------------------------------------------
 void TeamsSetupScreen::changeTeamByDirection(int player_id, int direction)
 {
     KartTeam teams = m_kart_view_info[player_id].teams;
@@ -546,13 +530,13 @@ void TeamsSetupScreen::changeTeamByDirection(int player_id, int direction)
     {
         teams = static_cast<KartTeam>((static_cast<int>(teams) - 1) % 4);
         if (teams < 0)
-            teams = KART_TEAM_ORANGE;
+            teams = RaceManager::get()->getTeamsInGame()[4];
     }
     else if (direction == 1) // PA_MENU_RIGHT
     {
         teams = static_cast<KartTeam>((static_cast<int>(teams) + 1) % 4);
         if (teams == KART_TEAM_NONE)
-            teams = KART_TEAM_RED;
+            teams = RaceManager::get()->getTeamsInGame()[1];
     }
 
     // UserConfigParams::m_default_team_teams = (int)teams;

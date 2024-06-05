@@ -85,7 +85,6 @@ private:
     void updateKartViewsLayout();
     void changeTeam(int player_id, KartTeam teams);
     void prepareGame();
-    const float getHueColor(KartTeam teamss);
     void changeTeamByDirection(int player_id, int direction);
     int m_teamSelection = 1;
 };
