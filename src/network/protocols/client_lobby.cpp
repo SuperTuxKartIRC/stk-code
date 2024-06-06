@@ -901,7 +901,7 @@ void ClientLobby::handleBadTeam()
     SFXManager::get()->quickSound("anvil");
     //I18N: Display when all players are in red or blue team, which the race
     //will not be allowed to start
-    core::stringw msg = _("All players joined red or blue team.");
+    core::stringw msg = _("All the players have joined one of the teams.");
     MessageQueue::add(MessageQueue::MT_ERROR, msg);
 }   // handleBadTeam
 
@@ -1431,7 +1431,7 @@ void ClientLobby::handleKartInfo(Event* event)
     {
         KartTeam kartTeam = w->getKartTeam(kart_id);
         std::string teamColorName = World::getWorld()->getKartTeamsColorName(kartTeam);
-        // I18N: Show when player join blue team of the started game in
+        // I18N: Show when player join team of the started game in
         // network
         msg = _("%s joined the %s team.", player_name, teamColorName.c_str());
     }

@@ -3860,11 +3860,11 @@ msgstr "Type de jeu de Soccer : %s"
 msgid "Grand prix progress: %d / %d"
 msgstr "Progression du Grand Prix : %d / %d"
 
-#. I18N: Display when all players are in red or blue team, which the race
+#. I18N: Display when all players are in the same team, which the race
 #. will not be allowed to start
 #: src/network/protocols/client_lobby.cpp:903
-msgid "All players joined red or blue team."
-msgstr "Tous les joueurs ont rejoint l'équipe rouge ou bleu."
+msgid "All the players have joined one of the teams."
+msgstr "Tous les joueurs ont rejoint l'une des équipes."
 
 #. I18N: Display when a player is allow to control the server
 #: src/network/protocols/client_lobby.cpp:923

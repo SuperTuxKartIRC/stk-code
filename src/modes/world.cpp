@@ -1551,7 +1551,7 @@ std::shared_ptr<AbstractKart> World::createKartWithTeam
     }
 
     // Déterminez la position de départ en fonction de l'équipe
-    int pos_index = index+1; // getStartPositionIndexForTeam(team); // Don't exist 
+    int pos_index = index+1;
 
     btTransform init_pos = getStartTransform(pos_index - 1);
     m_kart_position_map[index] = (unsigned)(pos_index - 1);
@@ -1633,9 +1633,6 @@ KartTeam World::getKartTeam(unsigned int kart_id) const
 //-----------------------------------------------------------------------------
 void World::setAITeam()
 {
-    //m_red_ai  = RaceManager::get()->getNumberOfRedAIKarts();
-    //m_blue_ai = RaceManager::get()->getNumberOfBlueAIKarts();
-
     int total_teams = getNumTeam(); // RaceManager::get()->getTotalNumberOfTeams();
     int total_ai = RaceManager::get()->getNumberOfAIKarts();
 

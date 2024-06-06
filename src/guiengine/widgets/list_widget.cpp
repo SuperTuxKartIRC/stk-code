@@ -485,7 +485,6 @@ void ListWidget::markItemTeamColor(const int id, int team, bool highlight)
 
     CGUISTKListBox* irritem = getIrrlichtElement<CGUISTKListBox>();
 
-    // TODO : Utiliser la méthode qui fait ça
     std::string colorPrefix;
 
     colorPrefix = team == KART_TEAM_BLUE ? "blue" :
