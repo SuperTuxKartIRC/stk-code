@@ -899,7 +899,7 @@ void ClientLobby::updatePlayerList(Event* event)
 void ClientLobby::handleBadTeam()
 {
     SFXManager::get()->quickSound("anvil");
-    //I18N: Display when all players are in red or blue team, which the race
+    //I18N: Display when all players are in the first or the second team, which the race
     //will not be allowed to start
     core::stringw msg = _("All the players have joined one of the teams.");
     MessageQueue::add(MessageQueue::MT_ERROR, msg);

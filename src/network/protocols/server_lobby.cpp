@@ -827,35 +827,35 @@ void ServerLobby::handleChat(Event* event)
         target_team = (KartTeam)event->data().getUInt8();
 
 
-    // Déclaration d'une table de correspondance entre les équipes et les emojis d'animaux
+    // Declaration of a correspondence table between teams and animal emojis
     std::unordered_map<int8_t, irr::core::stringw> animalEmojiMap = {
-        {KART_TEAM_RED, L"\U0001F99E"},              // Red team - Homard 🦞
-        {KART_TEAM_BLUE, L"\U0001F40B"},             // Blue team - Baleine 🐋
-        {KART_TEAM_GREEN, L"\U0001F422"},            // Green team - Tortue 🐢
-        {KART_TEAM_ORANGE, L"\U0001F405"},           // Orange team - Tigre 🐅
-        {KART_TEAM_YELLOW, L"\U0001F424"},           // Yellow team - Poussin (bébé poulet) 🐤
-        {KART_TEAM_PURPLE, L"\U0001F984"},           // Purple team - Licorne 🦄
-        {KART_TEAM_PINK, L"\U0001F9A9"},             // Pink team - Flamant rose 🦩
+        {KART_TEAM_RED, L"\U0001F99E"},              // Red team - Lobster 🦞
+        {KART_TEAM_BLUE, L"\U0001F40B"},             // Blue team - Whale 🐋
+        {KART_TEAM_GREEN, L"\U0001F422"},            // Green team - Turtle 🐢
+        {KART_TEAM_ORANGE, L"\U0001F405"},           // Orange team - Tiger 🐅
+        {KART_TEAM_YELLOW, L"\U0001F424"},           // Yellow team - Poussin (baby chicken) 🐤
+        {KART_TEAM_PURPLE, L"\U0001F984"},           // Purple team - Unicorn 🦄 
+        {KART_TEAM_PINK, L"\U0001F9A9"},             // Pink team - Pink flamingo 🦩
         {KART_TEAM_TURQUOISE, L"\U0001F409"},        // Turquoise team - Dragon 🐉
-        {KART_TEAM_DARK_BLUE, L"\U0001F433"},        // Dark blue team - Requin 🦓
-        {KART_TEAM_CYAN, L"\U0001F41F"},             // Cyan team - Poisson 🐟
-        {KART_TEAM_YELLOW_GREEN, L"\U0001F996"},     // Yellow-green team - Dinosaure 🦖
-        {KART_TEAM_PINKY, L"\U0001F437"},            // Pinky team - Cochon 🐷
+        {KART_TEAM_DARK_BLUE, L"\U0001F433"},        // Dark blue team - Shark 🦓
+        {KART_TEAM_CYAN, L"\U0001F41F"},             // Cyan team - Fish 🐟
+        {KART_TEAM_YELLOW_GREEN, L"\U0001F996"},     // Yellow-green team - Dinosaur 🦖
+        {KART_TEAM_PINKY, L"\U0001F437"},            // Pinky team - Pig 🐷
         {KART_TEAM_DEFAULT, L""}                     // Default case
     };
 
 
     if (message.size() > 0)
     {
-        // Mise à jour du code pour utiliser les emojis d'animaux correspondant à chaque équipe
+        // Code updated to use animal emojis for each team
         auto it = animalEmojiMap.find(target_team);
         if (it != animalEmojiMap.end()) {
-            // Ajouter l'emoji à message si l'équipe est trouvée dans la table de correspondance
+            // Add emoji to message if team is found in matching table
             message = it->second + message;
         }
         else {
-            // Si l'équipe n'est pas trouvée dans la table de correspondance, ajouter l'emoji par défaut
-            message = StringUtils::utf32ToWide({ 0x1f7e5, 0x20 }) + message; // Utilisation de l'emoji de carré rouge
+            // If the team is not found in the correspondence table, add the default emoji
+            message = StringUtils::utf32ToWide({ 0x1f7e5, 0x20 }) + message; // Using the red square emoji
         }
 
         NetworkString* chat = getNetworkString();
@@ -917,16 +917,16 @@ void ServerLobby::changeTeam(Event* event)
 
     auto team_counts = STKHost::get()->getAllPlayersTeamInfo();
 
-    // Vérifier le nombre maximum de joueurs dans chaque équipe
+    // Check the maximum number of players in each team
     for (const auto& pair : team_counts)
     {
         if (pair.second >= 7)
-            return; // Si une équipe a déjà 7 joueurs, ne changez pas l'équipe
+            return; // If a team already has 7 players, do not change the team.
     }
 
-    // Basculer entre les équipes
+    // Switching between teams
     KartTeam team = player->getTeam();
-    int max_num_teams = 12; // Modifier le nombre d'équipes si nécessaire
+    int max_num_teams = 12; // Modify the number of teams if necessary
     team = static_cast<KartTeam>((static_cast<int>(team) + 1) % max_num_teams);
 
     player->setTeam(team);
@@ -1961,7 +1961,7 @@ int ServerLobby::getReservedId(std::shared_ptr<NetworkPlayerProfile>& p,
 
     std::unordered_map<KartTeam, int> teamCounts;
 
-    // Compter le nombre de joueurs dans chaque équipe
+    // Count the number of players in each team
     for (unsigned i = 0; i < RaceManager::get()->getNumPlayers(); i++)
     {
         RemoteKartInfo& rki = RaceManager::get()->getKartInfo(i);
@@ -1972,12 +1972,11 @@ int ServerLobby::getReservedId(std::shared_ptr<NetworkPlayerProfile>& p,
         int MAX_TEAMS = 4;
         if (!disconnected && kartTeam >= 0 && kartTeam < MAX_TEAMS)
         {
-            // Incrémentez le nombre de joueurs dans cette équipe
             teamCounts[kartTeam]++;
         }
     }
 
-    // Déterminez l'équipe cible pour le nouveau joueur réservé
+    // Determine the target team for the new reserved player
     KartTeam target_team = KART_TEAM_NONE;
     int minPlayerCount = std::numeric_limits<int>::max();
     for (const auto& pair : teamCounts)
@@ -1989,7 +1988,7 @@ int ServerLobby::getReservedId(std::shared_ptr<NetworkPlayerProfile>& p,
         }
     }
 
-    // Parcourez les joueurs pour trouver une place pour le nouveau joueur réservé
+    // Scroll through the players to find a place for the new reserved player
     for (unsigned i = 0; i < RaceManager::get()->getNumPlayers(); i++)
     {
         RemoteKartInfo& rki = RaceManager::get()->getKartInfo(i);
@@ -1997,7 +1996,7 @@ int ServerLobby::getReservedId(std::shared_ptr<NetworkPlayerProfile>& p,
             rki.getNetworkPlayerProfile().lock();
         if (!player)
         {
-            // Placez le joueur réservé dans l'emplacement vide
+            // Place the reserved player in the empty slot
             rki.copyFrom(p, local_id);
             return i;
         }
@@ -2506,7 +2505,7 @@ void ServerLobby::startSelection(const Event *event)
     {
         auto team_counts = STKHost::get()->getAllPlayersTeamInfo();
 
-        // Vérifier si une équipe n'a pas de joueur ou s'il y a plus d'une équipe sans joueur
+        // Check if a team has no player or if there is more than one team without a player
         int empty_teams = 0;
         for (const auto& pair : team_counts)
         {
@@ -3806,7 +3805,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
                 handicap, (uint8_t)i, KART_TEAM_NONE,
                 country_code);
 
-        // Affecter les équipes aux joueurs
+        // Assign teams to players
         if (ServerConfig::m_team_choosing)
         {
             KartTeam cur_team = KART_TEAM_NONE;
@@ -5315,7 +5314,7 @@ void ServerLobby::addLiveJoinPlaceholder(
     if (!ServerConfig::m_live_players || !RaceManager::get()->supportsLiveJoining())
         return;
 
-    // Vérifiez le mode de jeu mineur
+    // Check the minor game mode
     if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
     {
         // Mode free-for-all
@@ -5332,23 +5331,23 @@ void ServerLobby::addLiveJoinPlaceholder(
     }
     else
     {
-        // Mode CTF ou soccer
+        // Mode CTF or soccer
         std::unordered_map<KartTeam, int> teamCounts;
         const int MAX_TEAMS = 4;
 
-        // Compter le nombre de joueurs dans chaque équipe
+        // Count the number of players in each team
         for (const auto& player : players)
         {
             KartTeam team = player->getTeam();
             // Vérifiez si l'équipe est valide
             if (team >= 0 && team < MAX_TEAMS)
             {
-                // Incrémentez le nombre de joueurs dans cette équipe
+                // Increment the number of players in this team
                 teamCounts[team]++;
             }
         }
 
-        // Réservez au plus 7 joueurs dans chaque équipe
+        // Reserve no more than 7 players for each team
         for (const auto& pair : teamCounts)
         {
             int remainingSpots = std::max(0, 7 - pair.second);
