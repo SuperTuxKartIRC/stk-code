@@ -5339,7 +5339,7 @@ void ServerLobby::addLiveJoinPlaceholder(
         for (const auto& player : players)
         {
             KartTeam team = player->getTeam();
-            // Vérifiez si l'équipe est valide
+            // Check if the team is valid
             if (team >= 0 && team < MAX_TEAMS)
             {
                 // Increment the number of players in this team

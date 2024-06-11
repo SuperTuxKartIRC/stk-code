@@ -1,4 +1,4 @@
-//  SuperTuxKart - a fun racing game with go-kart
+ï»¿//  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2010-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
@@ -436,11 +436,19 @@ void RacePausedDialog::beforeAddingWidgets()
 
 
     std::unordered_map<KartTeam, std::wstring> teamSymbols = {
-     {KART_TEAM_RED, L"\U0001F7E5"}, // Red
-     {KART_TEAM_BLUE, L"\U0001F7E6"}, // Blue
-     {KART_TEAM_GREEN, L"\U0001F7E7"}, // Green
-     {KART_TEAM_ORANGE, L"\U0001F7E8"}, // Orange
-     // Ajoutez les autres équipes avec leurs symboles respectifs
+        {KART_TEAM_RED, L"\U0001F99E"},              // Red team - Lobster ðŸ¦ž
+        {KART_TEAM_BLUE, L"\U0001F40B"},             // Blue team - Whale ðŸ‹
+        {KART_TEAM_GREEN, L"\U0001F422"},            // Green team - Turtle ðŸ¢
+        {KART_TEAM_ORANGE, L"\U0001F405"},           // Orange team - Tiger ðŸ…
+        {KART_TEAM_YELLOW, L"\U0001F424"},           // Yellow team - Poussin (baby chicken) ðŸ¤
+        {KART_TEAM_PURPLE, L"\U0001F984"},           // Purple team - Unicorn ðŸ¦„ 
+        {KART_TEAM_PINK, L"\U0001F9A9"},             // Pink team - Pink flamingo ðŸ¦©
+        {KART_TEAM_TURQUOISE, L"\U0001F409"},        // Turquoise team - Dragon ðŸ‰
+        {KART_TEAM_DARK_BLUE, L"\U0001F433"},        // Dark blue team - Shark ðŸ¦“
+        {KART_TEAM_CYAN, L"\U0001F41F"},             // Cyan team - Fish ðŸŸ
+        {KART_TEAM_YELLOW_GREEN, L"\U0001F996"},     // Yellow-green team - Dinosaur ðŸ¦–
+        {KART_TEAM_PINKY, L"\U0001F437"},            // Pinky team - Pig ðŸ·
+        {KART_TEAM_DEFAULT, L""}                     // Default case
     };
 
 
@@ -481,7 +489,7 @@ void RacePausedDialog::beforeAddingWidgets()
         auto widgetTeam = getWidget("team");
         auto widgetTeamSpace = getWidget("team_space");
 
-        // Vérifiez si l'équipe cible a un symbole associé
+        // Check whether the target team has an associated symbol
         if (teamSymbols.find(m_target_team) != teamSymbols.end())
         {
             widgetTeam->setVisible(true);
@@ -491,7 +499,7 @@ void RacePausedDialog::beforeAddingWidgets()
         }
         else
         {
-            // Masquer le widget si aucune équipe n'est spécifiée ou si aucune icône n'est disponible
+            // Hide widget if no team is specified or if no icon is available
             widgetTeam->setVisible(false);
             widgetTeam->setText(L"");
         }

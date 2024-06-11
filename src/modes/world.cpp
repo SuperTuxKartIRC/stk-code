@@ -1519,13 +1519,13 @@ std::shared_ptr<AbstractKart> World::createKartWithTeam
     int global_player_id, RaceManager::KartType kart_type,
     HandicapLevel handicap)
 {
-    KartTeam team = KART_TEAM_DEFAULT; // Par défaut
+    KartTeam team = KART_TEAM_DEFAULT; // By default
     int position = index + 1;
     int NUM_TEAMS = 2;
 
     if (kart_type == RaceManager::KT_AI)
     {
-        team = (KartTeam)(index % NUM_TEAMS); // Assigner l'équipe en fonction de l'index
+        team = (KartTeam)(index % NUM_TEAMS); // Assign team according to index
         m_kart_team_map[index] = team;
     }
     else if (NetworkConfig::get()->isNetworking())
@@ -1550,17 +1550,17 @@ std::shared_ptr<AbstractKart> World::createKartWithTeam
             .getPlayerName();
     }
 
-    // Déterminez la position de départ en fonction de l'équipe
+    // Determine the starting position for the team
     int pos_index = index+1;
 
     btTransform init_pos = getStartTransform(pos_index - 1);
     m_kart_position_map[index] = (unsigned)(pos_index - 1);
 
-    // Déterminez le rendu en fonction de l'équipe
+    // Determine the rendering according to the team
     float hueValue = getHueValueForTeam(team);
     std::shared_ptr<GE::GERenderInfo> ri = std::make_shared<GE::GERenderInfo>(hueValue);
 
-    // Créez le kart en fonction du type
+    // Create the kart according to the type
     std::shared_ptr<AbstractKart> new_kart;
     if (RewindManager::get()->isEnabled())
     {
@@ -1578,7 +1578,7 @@ std::shared_ptr<AbstractKart> World::createKartWithTeam
     new_kart->init(RaceManager::get()->getKartType(index));
     Controller* controller = nullptr;
 
-    // Affectez le contrôleur en fonction du type de kart
+    // Assign the controller according to kart type
     switch (kart_type)
     {
     case RaceManager::KT_PLAYER:
