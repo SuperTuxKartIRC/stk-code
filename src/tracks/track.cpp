@@ -738,7 +738,7 @@ void Track::startMusic() const
  */
 void Track::loadArenaGraph(const XMLNode &node)
 {
-    // Determine if rotate minimap is needed for soccer mode (for blue team)
+    // Determine if rotate minimap is needed for soccer mode (for second team)
     // Only need to test local player
     if (RaceManager::get()->isSoccerMode())
     {

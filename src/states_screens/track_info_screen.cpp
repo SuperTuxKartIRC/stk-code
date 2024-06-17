@@ -69,9 +69,9 @@ void TrackInfoScreen::loadedFromFile()
 {
     m_target_type_spinner   = getWidget<SpinnerWidget>("target-type-spinner");
     m_target_type_label     = getWidget <LabelWidget>("target-type-text");
-    m_ai_blue_spinner       = getWidget<SpinnerWidget>("ai-blue-spinner");
-    m_ai_blue_label         = getWidget <LabelWidget>("ai-blue-text");
-    m_ai_blue_div           = getWidget<Widget>("ai-blue-div");
+    m_ai_team2_spinner       = getWidget<SpinnerWidget>("ai-team2-spinner");
+    m_ai_team2_label         = getWidget <LabelWidget>("ai-team2-text");
+    m_ai_team2_div           = getWidget<Widget>("ai-team2-div");
     m_target_type_div       = getWidget<Widget>("target-type-div");
     m_target_value_spinner  = getWidget<SpinnerWidget>("target-value-spinner");
     m_target_value_label    = getWidget<LabelWidget>("target-value-text");
@@ -123,8 +123,8 @@ void TrackInfoScreen::beforeAddingWidget()
 
     m_target_type_div->setCollapsed(!m_is_soccer && !m_show_ffa_spinner, this);
 
-    // show 'Number of blue team AI karts' if soccer
-    m_ai_blue_div->setCollapsed(!(RaceManager::get()->isSoccerMode()), this);
+    // show 'Number of second team AI karts' if soccer
+    m_ai_team2_div->setCollapsed(!(RaceManager::get()->isSoccerMode()), this);
 } // beforeAddingWidget
 
 // ----------------------------------------------------------------------------
@@ -178,9 +178,9 @@ void TrackInfoScreen::init()
     m_target_value_spinner->setVisible(false);
     m_target_value_label->setVisible(false);
 
-    m_ai_blue_spinner->setVisible(false);
-    m_ai_blue_label->setVisible(false);
-    m_ai_blue_label->setActive(false);
+    m_ai_team2_spinner->setVisible(false);
+    m_ai_team2_label->setVisible(false);
+    m_ai_team2_label->setActive(false);
 
     // Number of AIs
     // -------------
@@ -215,7 +215,7 @@ void TrackInfoScreen::init()
         if( RaceManager::get()->isBattleMode() || m_is_soccer)
         {
             m_ai_kart_spinner->setMax(max_arena_players - local_players);
-            m_ai_blue_spinner->setMax(max_arena_players - local_players);
+            m_ai_team2_spinner->setMax(max_arena_players - local_players);
         }
         else
             m_ai_kart_spinner->setMax(stk_config->m_max_karts - local_players);
@@ -236,7 +236,7 @@ void TrackInfoScreen::init()
         else
         {
             m_ai_kart_spinner->setMin(0);
-            m_ai_blue_spinner->setMin(0);
+            m_ai_team2_spinner->setMin(0);
         }
     }   // has_AI
     else
@@ -385,63 +385,63 @@ void TrackInfoScreen::setSoccerWidgets(bool has_AI)
     {
         const int max_arena_players = m_track->getMaxArenaPlayers();
         const int local_players     = RaceManager::get()->getNumLocalPlayers();
-        // Set up the spinners for the number of red and blue AIs
-        m_ai_blue_spinner->setVisible(true);
-        m_ai_blue_label->setVisible(true);
-        m_ai_blue_spinner->setActive(true);
+        // Set up the spinners for the number of first team and second team AIs (ex: blue and red)
+        m_ai_team2_spinner->setVisible(true);
+        m_ai_team2_label->setVisible(true);
+        m_ai_team2_spinner->setActive(true);
         m_ai_kart_label->setText(_("Number of red team AI karts"), false);
-        m_ai_kart_spinner->setValue(UserConfigParams::m_soccer_red_ai_num);
-        m_ai_blue_spinner->setValue(UserConfigParams::m_soccer_blue_ai_num);
+        m_ai_kart_spinner->setValue(UserConfigParams::m_soccer_team1_ai_num);
+        m_ai_team2_spinner->setValue(UserConfigParams::m_soccer_team2_ai_num);
 
         // Check if there's any local players in both team
-        int num_blue_players = 0, num_red_players = 0;
+        int num_team2_players = 0, num_team1_players = 0;
     
         for (int i = 0; i < local_players; i++)
         {
             KartTeam team = RaceManager::get()->getKartInfo(i).getKartTeam();
             // Happens in profiling mode
             if (team == KART_TEAM_NONE)
-                num_blue_players++; // No team will be set to blue
+                num_team2_players++; // No team will be set to second team (ex: blue)
             else
-                team == RaceManager::get()->getTeamsInGame()[1] ? num_blue_players++ : num_red_players++;
+                team == RaceManager::get()->getTeamsInGame()[1] ? num_team2_players++ : num_team1_players++;
         }
 
         const int max_num_ai = max_arena_players - local_players;
         // Make sure each team has at least 1 (ai + player)
-        bool reuse_ai = ((num_blue_players + UserConfigParams::m_soccer_blue_ai_num) > 0) &&
-                        ((num_red_players  + UserConfigParams::m_soccer_red_ai_num ) > 0) &&
-                        ((UserConfigParams::m_soccer_red_ai_num + UserConfigParams::m_soccer_blue_ai_num) <= max_num_ai);
+        bool reuse_ai = ((num_team2_players + UserConfigParams::m_soccer_team2_ai_num) > 0) &&
+                        ((num_team1_players + UserConfigParams::m_soccer_team1_ai_num ) > 0) &&
+                        ((UserConfigParams::m_soccer_team1_ai_num + UserConfigParams::m_soccer_team2_ai_num) <= max_num_ai);
 
         // Try the saved values.
         // If they can't be used, use default balanced values
         if (!reuse_ai)
         {
-            const int additional_blue = num_red_players - num_blue_players;
-            int num_blue_ai = (max_num_ai - additional_blue) / 2 + additional_blue;
-            int num_red_ai  = (max_num_ai - additional_blue) / 2;
+            const int additional_team2 = num_team1_players - num_team2_players;
+            int num_team2_ai = (max_num_ai - additional_team2) / 2 + additional_team2;
+            int num_team1_ai  = (max_num_ai - additional_team2) / 2;
 
-            if ((max_num_ai + additional_blue)%2 == 1)
-                additional_blue < 0 ? num_red_ai++ : num_blue_ai++;
+            if ((max_num_ai + additional_team2)%2 == 1)
+                additional_team2 < 0 ? num_team1_ai++ : num_team2_ai++;
 
-            UserConfigParams::m_soccer_red_ai_num  = num_red_ai;
-            UserConfigParams::m_soccer_blue_ai_num = num_blue_ai;
-            m_ai_kart_spinner->setValue(UserConfigParams::m_soccer_red_ai_num);
-            m_ai_blue_spinner->setValue(UserConfigParams::m_soccer_blue_ai_num);
+            UserConfigParams::m_soccer_team1_ai_num  = num_team1_ai;
+            UserConfigParams::m_soccer_team2_ai_num = num_team2_ai;
+            m_ai_kart_spinner->setValue(UserConfigParams::m_soccer_team1_ai_num);
+            m_ai_team2_spinner->setValue(UserConfigParams::m_soccer_team2_ai_num);
         }
 
         if(  local_players == 1
            && !UserConfigParams::m_artist_debug_mode)
         {
-            if(num_blue_players == 0)
-                m_ai_blue_spinner->setMin(1);
-            if(num_red_players == 0)
+            if(num_team2_players == 0)
+                m_ai_team2_spinner->setMin(1);
+            if(num_team1_players == 0)
                 m_ai_kart_spinner->setMin(1);
         }
 
-        if(num_blue_players == 0 && !UserConfigParams::m_artist_debug_mode)
+        if(num_team2_players == 0 && !UserConfigParams::m_artist_debug_mode)
             m_ai_kart_spinner->setMax(max_arena_players - local_players - 1);
-        if(num_red_players == 0 && !UserConfigParams::m_artist_debug_mode)
-            m_ai_blue_spinner->setMax(max_arena_players - local_players - 1);
+        if(num_team1_players == 0 && !UserConfigParams::m_artist_debug_mode)
+            m_ai_team2_spinner->setMax(max_arena_players - local_players - 1);
     }
 } // setSoccerWidgets
 
@@ -590,7 +590,7 @@ void TrackInfoScreen::onEnterPressedInternal()
         num_ai = m_ai_kart_spinner->getValue();
         
         if (m_is_soccer) // Soccer mode
-            num_ai += m_ai_blue_spinner->getValue();
+            num_ai += m_ai_team2_spinner->getValue();
     }
 
     const int selected_target_type = m_target_type_spinner->getValue();
@@ -631,7 +631,7 @@ void TrackInfoScreen::onEnterPressedInternal()
     if (m_is_soccer)
     {
         RaceManager::get()->setNumRedAI(m_ai_kart_spinner->getValue());
-        RaceManager::get()->setNumBlueAI(m_ai_blue_spinner->getValue());
+        RaceManager::get()->setNumBlueAI(m_ai_team2_spinner->getValue());
     }
     RaceManager::get()->startSingleRace(m_track->getIdent(), num_laps, false);
 }   // onEnterPressedInternal
@@ -734,7 +734,7 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
     {
         if (m_is_soccer) // Soccer mode
         {            
-            soccerSpinnerUpdate(false /* blue spinner */);            
+            soccerSpinnerUpdate(false /* second team spinner (ex: blue) */);            
         }
         else // Other modes
         {
@@ -744,69 +744,69 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
             updateHighScores();
         }
     }
-    else if (name == "ai-blue-spinner" && m_is_soccer)
+    else if (name == "ai-team2-spinner" && m_is_soccer)
     {
-        soccerSpinnerUpdate(true /* blue spinner */);  
+        soccerSpinnerUpdate(true /* second team spinner (ex: blue) */);  
     }
 }   // eventCallback
 
-void TrackInfoScreen::soccerSpinnerUpdate(bool blue_spinner)
+void TrackInfoScreen::soccerSpinnerUpdate(bool team2_spinner)
 {
     const int max_arena_players = m_track->getMaxArenaPlayers();
     const int local_players = RaceManager::get()->getNumLocalPlayers();
     const int num_ai = max_arena_players - local_players;
 
     // Reduce the value of the other spinner if going over the max total num of AI
-    if(m_ai_kart_spinner->getValue() + m_ai_blue_spinner->getValue() > num_ai)
+    if(m_ai_kart_spinner->getValue() + m_ai_team2_spinner->getValue() > num_ai)
     {
-        if (blue_spinner)
-            m_ai_kart_spinner->setValue(num_ai - m_ai_blue_spinner->getValue());
+        if (team2_spinner)
+            m_ai_kart_spinner->setValue(num_ai - m_ai_team2_spinner->getValue());
         else
-            m_ai_blue_spinner->setValue(num_ai - m_ai_kart_spinner->getValue());
+            m_ai_team2_spinner->setValue(num_ai - m_ai_kart_spinner->getValue());
     }
 
     KartTeam all_team = KART_TEAM_NONE;
     unsigned num_red = 0;
-    unsigned num_blue = 0;
+    unsigned num_team2 = 0;
     for (unsigned i = 0; i < RaceManager::get()->getNumLocalPlayers(); i++)
     {
         RaceManager::get()->getKartInfo(i).getKartTeam() == RaceManager::get()->getTeamsInGame()[0] ?
-            num_red++ : num_blue++;
+            num_red++ : num_team2++;
     }
     if (num_red == 0)
         all_team = RaceManager::get()->getTeamsInGame()[1];
-    else if (num_blue == 0)
+    else if (num_team2 == 0)
         all_team = RaceManager::get()->getTeamsInGame()[0];
 
     // Need at least 1 kart at each side to avoid soccer ai crash,
     // if there is any ai
-    if (blue_spinner)
+    if (team2_spinner)
     {
         if (all_team == RaceManager::get()->getTeamsInGame()[1] &&
-            (m_ai_blue_spinner->getValue() == 0 || m_ai_kart_spinner->getValue() == 0))
+            (m_ai_team2_spinner->getValue() == 0 || m_ai_kart_spinner->getValue() == 0))
         {
             if (m_ai_kart_spinner->getValue() == 0)
                 m_ai_kart_spinner->setValue(1);
         }
-        if (all_team == RaceManager::get()->getTeamsInGame()[0] && m_ai_blue_spinner->getValue() == 0 &&
+        if (all_team == RaceManager::get()->getTeamsInGame()[0] && m_ai_team2_spinner->getValue() == 0 &&
             m_ai_kart_spinner->getValue() != 0)
-            m_ai_blue_spinner->setValue(1);
+            m_ai_team2_spinner->setValue(1);
     }
     else
     {
         if (all_team == RaceManager::get()->getTeamsInGame()[0] &&
-            (m_ai_kart_spinner->getValue() == 0 || m_ai_blue_spinner->getValue() == 0))
+            (m_ai_kart_spinner->getValue() == 0 || m_ai_team2_spinner->getValue() == 0))
         {
-            if (m_ai_blue_spinner->getValue() == 0)
-                m_ai_blue_spinner->setValue(1);
+            if (m_ai_team2_spinner->getValue() == 0)
+                m_ai_team2_spinner->setValue(1);
         }
         if (all_team == RaceManager::get()->getTeamsInGame()[1] && m_ai_kart_spinner->getValue() == 0 &&
-            m_ai_blue_spinner->getValue() != 0)
+            m_ai_team2_spinner->getValue() != 0)
             m_ai_kart_spinner->setValue(1);
     }
 
-    UserConfigParams::m_soccer_red_ai_num  = m_ai_kart_spinner->getValue();
-    UserConfigParams::m_soccer_blue_ai_num = m_ai_blue_spinner->getValue();
+    UserConfigParams::m_soccer_team1_ai_num  = m_ai_kart_spinner->getValue();
+    UserConfigParams::m_soccer_team2_ai_num = m_ai_team2_spinner->getValue();
 
 
 } // soccerSpinnerUpdate
