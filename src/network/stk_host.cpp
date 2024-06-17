@@ -1515,7 +1515,7 @@ std::unordered_map<KartTeam, int> STKHost::getAllPlayersTeamInfo() const
     for (auto& player : pp)
     {
         KartTeam team = player->getTeam();
-        if (team >= 0 && team < 12)
+        if (team >= 0 && team <= KART_TEAM_LAST)
             team_counts[team]++;
     }
 

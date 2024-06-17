@@ -244,6 +244,10 @@ namespace ServerConfig
         "If owner-less is enabled and live-spectate is not enabled, than this "
         "option is always disabled."));
 
+    SERVER_CFG_PREFIX IntServerConfigParam m_max_nb_team
+        SERVER_CFG_DEFAULT(IntServerConfigParam(4, "max-nb-team",
+            "Max number of team game mode (soccer, CTF and TAB). "));
+
     SERVER_CFG_PREFIX BoolServerConfigParam m_strict_players
         SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "strict-players",
         "If strict-players is on, no duplicated online id or split screen "

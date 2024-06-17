@@ -1969,7 +1969,7 @@ int ServerLobby::getReservedId(std::shared_ptr<NetworkPlayerProfile>& p,
             continue;
         bool disconnected = rki.disconnected();
         KartTeam kartTeam = rki.getKartTeam();
-        int MAX_TEAMS = 4;
+        int MAX_TEAMS = ServerConfig::m_max_nb_team;
         if (!disconnected && kartTeam >= 0 && kartTeam < MAX_TEAMS)
         {
             teamCounts[kartTeam]++;
@@ -5333,7 +5333,7 @@ void ServerLobby::addLiveJoinPlaceholder(
     {
         // Mode CTF or soccer
         std::unordered_map<KartTeam, int> teamCounts;
-        const int MAX_TEAMS = 4;
+        const int MAX_TEAMS = ServerConfig::m_max_nb_team;
 
         // Count the number of players in each team
         for (const auto& player : players)
