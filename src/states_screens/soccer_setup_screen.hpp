@@ -21,7 +21,7 @@
 #include "guiengine/screen.hpp"
 #include "network/remote_kart_info.hpp"
 
-namespace GUIEngine { class Widget; class LabelWidget; class ModelViewWidget; }
+namespace GUIEngine { class Widget; class LabelWidget; class ModelViewWidget; class IconButtonWidget; }
 
 /**
   * \brief Screen with soccer setup options
@@ -48,6 +48,11 @@ class SoccerSetupScreen : public GUIEngine::Screen,
     AlignedArray<KartViewInfo>  m_kart_view_info;
 
     bool m_schedule_continue;
+
+    /** Icon button for the first team. */
+    GUIEngine::IconButtonWidget* m_icon_button_team1;
+    /** Icon button for the second team. */
+    GUIEngine::IconButtonWidget* m_icon_button_team2;
 
 public:
 

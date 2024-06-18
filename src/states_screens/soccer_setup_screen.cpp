@@ -33,14 +33,14 @@ using namespace GUIEngine;
 
 SoccerSetupScreen::SoccerSetupScreen() : Screen("soccer_setup.stkgui")
 {
-    //World::getWorld()->setTeamsInGame(KART_TEAM_GREEN);
-    //World::getWorld()->setTeamsInGame(KART_TEAM_CYAN);
 }
 
 // -----------------------------------------------------------------------------
 
 void SoccerSetupScreen::loadedFromFile()
 {
+    m_icon_button_team1 = getWidget<IconButtonWidget>("team1_team");
+    m_icon_button_team2 = getWidget<IconButtonWidget>("team2_team");
 }
 
 // ----------------------------------------------------------------------------
@@ -102,16 +102,28 @@ void SoccerSetupScreen::beforeAddingWidget()
 
     RaceManager::get()->setTeamsInGame(2);
 
+    //I18N: In soccer setup screen
+    core::stringw team1_name_W = (World::getWorld()->getKartTeamsColorName(RaceManager::get()->getTeamsInGame()[0])).c_str();
+    core::stringw team2_name_w = (World::getWorld()->getKartTeamsColorName(RaceManager::get()->getTeamsInGame()[1])).c_str();
+
+    // String versions
+    std::string team1_name = (World::getWorld()->getKartTeamsColorName(RaceManager::get()->getTeamsInGame()[0])).c_str();
+    std::string team2_name = (World::getWorld()->getKartTeamsColorName(RaceManager::get()->getTeamsInGame()[1])).c_str();
+
+    // Définir les images des boutons
+    m_icon_button_team1->setImage("gui/icons/soccer_ball_" + team1_name + ".png");
+    m_icon_button_team1->setText(team1_name_W);
+    m_icon_button_team2->setImage("gui/icons/soccer_ball_" + team2_name + ".png");
+    m_icon_button_team2->setText(team2_name_w);
+
     if (multitouch_enabled)
     {
         Widget* team = getWidget<Widget>("choose_team");
-        //I18N: In soccer setup screen
-        core::stringw team1_name = (World::getWorld()->getKartTeamsColorName(RaceManager::get()->getTeamsInGame()[0])).c_str();
-        core::stringw team2_name = (World::getWorld()->getKartTeamsColorName(RaceManager::get()->getTeamsInGame()[1])).c_str();
         // team->setText(_("Press team1_name or team2_name soccer icon to change team"));
 
+        // TODO : Check if it work
         std::wstringstream wss;
-        wss << L"Press " << team1_name.c_str() << L" or " << team2_name.c_str() << L" soccer icon to change team";
+        wss << L"Press " << team1_name_W.c_str() << L" or " << team2_name_w.c_str() << L" soccer icon to change team";
 
         core::stringw text(wss.str().c_str());
         team->setText(text.c_str());

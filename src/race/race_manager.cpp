@@ -1375,7 +1375,9 @@ bool RaceManager::isValidTeamCombination(KartTeam new_team) {
             (new_team == KART_TEAM_PURPLE && team == KART_TEAM_PINK) ||
             (new_team == KART_TEAM_PINK && team == KART_TEAM_PURPLE) ||
             (new_team == KART_TEAM_TURQUOISE && team == KART_TEAM_CYAN) ||
-            (new_team == KART_TEAM_CYAN && team == KART_TEAM_TURQUOISE)) {
+            (new_team == KART_TEAM_CYAN && team == KART_TEAM_TURQUOISE) ||
+            (new_team == KART_TEAM_CYAN && team == KART_TEAM_BLUE) ||
+            (new_team == KART_TEAM_BLUE && team == KART_TEAM_CYAN)) {
             return false;
         }
     }

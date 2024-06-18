@@ -1800,7 +1800,7 @@ float World::getHueValueForTeam(KartTeam team) const
     switch (team)
     {
     case KART_TEAM_BLUE:
-        return 0.6667f;
+        return 0.59f;
     case KART_TEAM_RED:
         return 1.0f;
     case KART_TEAM_GREEN:
