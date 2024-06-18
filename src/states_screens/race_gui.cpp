@@ -98,8 +98,8 @@ RaceGUI::RaceGUI()
     //createMarkerTexture();
 
     // Load icon textures for later reuse
-    m_red_team = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_red.png");
-    m_blue_team = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_blue.png");
+    m_team1 = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_" + World::getWorld()->getKartTeamsColorName(RaceManager::get()->getTeamsInGame()[0]) + ".png");
+    m_team2 = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_" + World::getWorld()->getKartTeamsColorName(RaceManager::get()->getTeamsInGame()[1]) + ".png");
     m_red_flag = irr_driver->getTexture(FileManager::GUI_ICON, "red_flag.png");
     m_blue_flag = irr_driver->getTexture(FileManager::GUI_ICON, "blue_flag.png");
     m_soccer_ball = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_normal.png");

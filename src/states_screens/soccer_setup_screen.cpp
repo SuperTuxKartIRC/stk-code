@@ -77,14 +77,14 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name,
     {
         StateManager::get()->escapePressed();
     }
-    else if (name == "red_team")
+    else if (name == "team1_team")
     {
         if (m_kart_view_info.size() == 1)
         {
             changeTeam(0, RaceManager::get()->getTeamsInGame()[0]);
         }
     }
-    else if (name == "blue_team")
+    else if (name == "team2_team")
     {
         if (m_kart_view_info.size() == 1)
         {
@@ -106,7 +106,16 @@ void SoccerSetupScreen::beforeAddingWidget()
     {
         Widget* team = getWidget<Widget>("choose_team");
         //I18N: In soccer setup screen
-        team->setText(_("Press red or blue soccer icon to change team"));
+        core::stringw team1_name = (World::getWorld()->getKartTeamsColorName(RaceManager::get()->getTeamsInGame()[0])).c_str();
+        core::stringw team2_name = (World::getWorld()->getKartTeamsColorName(RaceManager::get()->getTeamsInGame()[1])).c_str();
+        // team->setText(_("Press team1_name or team2_name soccer icon to change team"));
+
+        std::wstringstream wss;
+        wss << L"Press " << team1_name.c_str() << L" or " << team2_name.c_str() << L" soccer icon to change team";
+
+        core::stringw text(wss.str().c_str());
+        team->setText(text.c_str());
+
     }
     Widget* central_div = getWidget<Widget>("central_div");
 

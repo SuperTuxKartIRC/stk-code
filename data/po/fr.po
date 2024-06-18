@@ -2394,13 +2394,52 @@ msgstr "Utilise les boutons gauche/droite pour choisir ton équipe puis appuie s
 
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
-msgid "Red Team"
-msgstr "L'équipe des rouges"
+msgid "Team"
+msgstr "L'équipe"
 
-#. I18N: ./data/gui/screens/soccer_setup.stkgui
-#. I18N: In soccer setup screen
-msgid "Blue Team"
-msgstr "L'équipe des bleus"
+#. I18N: In world.cpp getKartTeamsColorName()
+msgid "rouge"
+msgstr "rouge"
+
+#. I18N: In world.cpp getKartTeamsColorName()
+msgid "blue"
+msgstr "bleu"
+
+#. I18N: In world.cpp getKartTeamsColorName()
+msgid "vert"
+msgstr "vert"
+
+#. I18N: In world.cpp getKartTeamsColorName()
+msgid "orange"
+msgstr "orange"
+
+#. I18N: In world.cpp getKartTeamsColorName()
+msgid "yellow"
+msgstr "jaune"
+
+#. I18N: In world.cpp getKartTeamsColorName()
+msgid "purple"
+msgstr "mauve"
+
+#. I18N: In world.cpp getKartTeamsColorName()
+msgid "pink"
+msgstr "rose"
+
+#. I18N: In world.cpp getKartTeamsColorName()
+msgid "dark blue"
+msgstr "bleu sombre"
+
+#. I18N: In world.cpp getKartTeamsColorName()
+msgid "cyan"
+msgstr "cyan"
+
+#. I18N: In world.cpp getKartTeamsColorName()
+msgid "yellow green"
+msgstr "jaune vert"
+
+#. I18N: In world.cpp getKartTeamsColorName()
+msgid "pinky"
+msgstr "rosâtre"
 
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
@@ -6185,13 +6224,10 @@ msgstr "Veux-tu vraiment interrompre le Grand Prix ?"
 
 #: src/states_screens/race_result_gui.cpp:636
 #: src/states_screens/race_result_gui.cpp:1529
-msgid "Red Team Wins"
-msgstr "Les Rouges l’emportent"
-
 #: src/states_screens/race_result_gui.cpp:638
 #: src/states_screens/race_result_gui.cpp:1533
-msgid "Blue Team Wins"
-msgstr "Les Bleus l’emportent"
+msgid "Team Wins"
+msgstr "L'équipe l’emportent"
 
 #: src/states_screens/race_result_gui.cpp:640
 #: src/states_screens/race_result_gui.cpp:1538

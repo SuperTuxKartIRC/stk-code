@@ -90,8 +90,8 @@ private:
 
     /** Icon textures (stored as variables to not look up
         their location on every frame) */
-    irr::video::ITexture *m_red_team;
-    irr::video::ITexture *m_blue_team;
+    irr::video::ITexture *m_team1;
+    irr::video::ITexture *m_team2;
     irr::video::ITexture *m_red_flag;
     irr::video::ITexture *m_blue_flag;
     irr::video::ITexture *m_soccer_ball;

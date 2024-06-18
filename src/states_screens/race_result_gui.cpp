@@ -687,10 +687,11 @@ void RaceResultGUI::displayCTFResults()
     GUIEngine::Widget* table_area = getWidget("result-table");
     int height = table_area->m_h + table_area->m_y;
 
-    if (red_score > blue_score)
-        result_text = _("Red Team Wins");
-    else if (blue_score > red_score)
-        result_text = _("Blue Team Wins");
+    std::string team_name = World::getWorld()->getKartTeamsColorName(RaceManager::get()->getTeamsInGame()[0]);
+    result_text += _(team_name.c_str());
+
+    if (red_score > blue_score || blue_score > red_score)
+        result_text = _("Team Wins");
     else
         result_text = _("It's a draw");
 
@@ -738,7 +739,7 @@ void RaceResultGUI::displayCTFResults()
     pos = core::rect<s32>(center_x, current_y, center_x, current_y);
     font->draw("-", pos, color, true, false);
 
-    // The red team player scores:
+    // The first team player scores:
     current_y += rect.Height / 2 + rect.Height / 4;
     font = GUIEngine::getSmallFont();
     irr::video::ITexture* kart_icon;
@@ -790,7 +791,7 @@ void RaceResultGUI::displayCTFResults()
         draw2DImage(kart_icon, dest_rect, source_rect, NULL, NULL, true);
     }
 
-    // The blue team player scores:
+    // The second team player scores:
     current_y = prev_y;
     current_x += UserConfigParams::m_width / 2;
     for (unsigned int i = 0; i < num_karts; i++)
@@ -1578,10 +1579,11 @@ void RaceResultGUI::displaySoccerResults()
     GUIEngine::Widget* table_area = getWidget("result-table");
     int height = table_area->m_h + table_area->m_y;
 
-    if (red_score > blue_score)
-        result_text = _("Red Team Wins");
-    else if (blue_score > red_score)
-        result_text = _("Blue Team Wins");
+    std::string team_name = World::getWorld()->getKartTeamsColorName(RaceManager::get()->getTeamsInGame()[0]);
+    result_text += _(team_name.c_str());
+
+    if (red_score > blue_score || blue_score > red_score)
+        result_text = _("Team Wins");
     else //Cannot really happen now. Only in time limited matches.
         result_text = _("It's a draw");
 
@@ -1635,7 +1637,7 @@ void RaceResultGUI::displaySoccerResults()
 //-----------------------------------------------------------------------------
 /** Displays the goal scorers for a team
  *  \param team The team for which to draw goal scorers
- *  \param x Left limit of the scorers lists (both blue and red)
+ *  \param x Left limit of the scorers lists (both second and first team)
  *  \param y Top limit of the scorers lists
  *  \param height Maximum y of the table area (??) */
 void RaceResultGUI::drawTeamScorers(KartTeam team, int x, int y, int height)

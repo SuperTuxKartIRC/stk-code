@@ -989,7 +989,7 @@ public:
             RaceManager::get()->isTABMode();
     }
 
-    std::vector<KartTeam> m_teams_in_game = { KART_TEAM_RED, KART_TEAM_BLUE }; // TODO : Correct ?? // KART_TEAM_CYAN, KART_TEAM_PINK
+    std::vector<KartTeam> m_teams_in_game = { KART_TEAM_RED, KART_TEAM_BLUE }; // TODO : For test : KART_TEAM_CYAN, KART_TEAM_PINK
 
     // ------------------------------------------------------------------------
     std::vector<KartTeam> getTeamsInGame() const { return m_teams_in_game; }
