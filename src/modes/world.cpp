@@ -1824,7 +1824,7 @@ float World::getHueValueForTeam(KartTeam team) const
     case KART_TEAM_PINKY:
         return 0.9722f;
     case KART_TEAM_DEFAULT:
-        return 0.9722f; 
+        return 0.0f; 
     default:
         return 0.0f;      
     }
@@ -1845,8 +1845,8 @@ video::SColor World::rgbaColorKartTeamsColor(KartTeam team)
         team == KART_TEAM_CYAN ? video::SColor(255, 0, 255, 255) :
         team == KART_TEAM_YELLOW_GREEN ? video::SColor(255, 128, 128, 0) :
         team == KART_TEAM_PINKY ? video::SColor(255, 255, 182, 193) :
-        team == KART_TEAM_DEFAULT ? video::SColor(255, 255, 182, 193) :
-        video::SColor(255, 255, 182, 193);
+        team == KART_TEAM_DEFAULT ? video::SColor(255, 255, 0, 0) :
+        video::SColor(255, 255, 0, 0);
 
 } // rgbaColorKartTeamsColor
 
@@ -1863,8 +1863,8 @@ std::string World::getKartTeamsColorName(KartTeam teamColorName)
         teamColorName == KART_TEAM_TURQUOISE ? "turquoise" :
         teamColorName == KART_TEAM_DARK_BLUE ? "dark_blue" :
         teamColorName == KART_TEAM_CYAN ? "cyan" :
-        teamColorName == KART_TEAM_YELLOW_GREEN ? "" :
+        teamColorName == KART_TEAM_YELLOW_GREEN ? "green_yellow" :
         teamColorName == KART_TEAM_PINKY ? "pinky" :
-        teamColorName == KART_TEAM_DEFAULT ? "pinky" :
-        "pinky";
+        teamColorName == KART_TEAM_DEFAULT ? "default" :
+        "default";
 }

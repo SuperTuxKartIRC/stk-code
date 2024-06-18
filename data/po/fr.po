@@ -2441,6 +2441,10 @@ msgstr "jaune vert"
 msgid "pinky"
 msgstr "rosâtre"
 
+#. I18N: In world.cpp getKartTeamsColorName()
+msgid "default"
+msgstr "défaut"
+
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
 #: src/states_screens/online/tracks_screen.cpp:541

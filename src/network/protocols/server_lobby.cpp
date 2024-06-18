@@ -926,8 +926,7 @@ void ServerLobby::changeTeam(Event* event)
 
     // Switching between teams
     KartTeam team = player->getTeam();
-    int max_num_teams = 12; // Modify the number of teams if necessary
-    team = static_cast<KartTeam>((static_cast<int>(team) + 1) % max_num_teams);
+    team = static_cast<KartTeam>((static_cast<int>(team) + 1) % KART_TEAM_LAST);
 
     player->setTeam(team);
     updatePlayerList();
