@@ -69,9 +69,9 @@ void TrackInfoScreen::loadedFromFile()
 {
     m_target_type_spinner   = getWidget<SpinnerWidget>("target-type-spinner");
     m_target_type_label     = getWidget <LabelWidget>("target-type-text");
-    m_ai_team2_spinner       = getWidget<SpinnerWidget>("ai-team2-spinner");
-    m_ai_team2_label         = getWidget <LabelWidget>("ai-team2-text");
-    m_ai_team2_div           = getWidget<Widget>("ai-team2-div");
+    m_ai_team2_spinner      = getWidget<SpinnerWidget>("ai-team2-spinner");
+    m_ai_team2_label        = getWidget <LabelWidget>("ai-team2-text");
+    m_ai_team2_div          = getWidget<Widget>("ai-team2-div");
     m_target_type_div       = getWidget<Widget>("target-type-div");
     m_target_value_spinner  = getWidget<SpinnerWidget>("target-value-spinner");
     m_target_value_label    = getWidget<LabelWidget>("target-value-text");
