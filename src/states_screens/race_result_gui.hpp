@@ -218,6 +218,8 @@ private:
     void displayCTFResults();
     void displaySoccerResults();
     void drawTeamScorers(KartTeam team, int x, int y, int height);
+    void displayTeamsArenaResults();
+    void displayTeamPlayers(KartTeam teams, int x, int y);
     void displayBenchmarkSummary();
     void displayScreenShots();
 
