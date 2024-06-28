@@ -37,6 +37,7 @@
 #include "input/keyboard_device.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/controller/battle_ai.hpp"
+#include "karts/controller/battle_team_ai.hpp"
 #include "karts/ghost_kart.hpp"
 #include "karts/controller/end_controller.hpp"
 #include "karts/controller/local_player_controller.hpp"
@@ -52,6 +53,9 @@
 #include "karts/kart_rewinder.hpp"
 #include "main_loop.hpp"
 #include "modes/overworld.hpp"
+#include "modes/tag_zombie_arena_battle.hpp"
+#include "modes/team_arena_battle.hpp"
+#include "modes/team_arena_battle_life.hpp"
 #include "network/child_loop.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/network_config.hpp"
@@ -220,9 +224,17 @@ void World::init()
     }
 
     // Shuffles the start transforms with playing 3-strikes or free for all battles.
-    if ((RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ||
-         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL) &&
-         !NetworkConfig::get()->isNetworking())
+    RaceManager::MinorRaceModeType mode = RaceManager::get()->getMinorMode();
+    if ((mode == RaceManager::MINOR_MODE_3_STRIKES ||
+         mode == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
+         mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM ||
+         mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER ||
+         mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER ||
+         mode == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE ||
+         mode == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE || //
+         mode == RaceManager::MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE || //
+         mode == RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE) &&
+        !NetworkConfig::get()->isNetworking())
     {
         track->shuffleStartTransforms();
     }
@@ -265,6 +277,29 @@ void World::init()
         new_kart->setBoostAI(RaceManager::get()->hasBoostedAI(i));
         m_karts.push_back(new_kart);
     }  // for i
+
+    std::vector<KartTeam> teamsGame;
+
+    for (const auto& pair : m_kart_team_map) {
+        KartTeam team = pair.second;
+        bool isDuplicate = false;
+
+        for (const KartTeam& existingTeam : teamsGame) {
+            if (team == existingTeam) {
+                isDuplicate = true;
+                break;
+            }
+        }
+
+        if (!isDuplicate) {
+            teamsGame.push_back(team);
+        }
+    }
+
+    if (RaceManager::get()->isTagzArenaBattleMode()) {
+        teamsGame.push_back(KART_TEAM_GREEN);
+    }
+    setTeamsInGame(teamsGame);
 
     main_loop->renderGUI(7050);
     // Load other custom models if needed
@@ -583,6 +618,14 @@ Controller* World::loadAIController(Kart* kart)
         turn=1;
     else if(RaceManager::get()->getMinorMode()==RaceManager::MINOR_MODE_SOCCER)
         turn=2;
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM       ||
+             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER     ||
+             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER ||
+             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE)
+        turn = 3;
+    else if (RaceManager::get()->isTagzArenaBattleMode())
+        turn = 4;
+
     // If different AIs should be used, adjust turn (or switch randomly
     // or dependent on difficulty)
     switch(turn)
@@ -600,6 +643,12 @@ Controller* World::loadAIController(Kart* kart)
             break;
         case 2:
             controller = new SoccerAI(kart);
+            break;
+        case 3:
+            controller = new BattleAI(kart);
+            break;
+        case 4:
+            controller = new BattleAI(kart);
             break;
         default:
             Log::warn("[World]", "Unknown AI, using default.");
@@ -1489,6 +1538,17 @@ void World::getDefaultCollectibles(int *collectible_type, int *amount )
     *amount = 0;
 }   // getDefaultCollectibles
 
+bool World::timerPower()
+{
+    return false;
+}
+
+void World::getItem(int* collectible_type, int* amount)
+{
+    *collectible_type = PowerupManager::POWERUP_NOTHING;
+    *amount = 0;
+}   // getItem
+
 //-----------------------------------------------------------------------------
 /** Pauses the music (and then pauses WorldStatus).
  */
@@ -1569,27 +1629,66 @@ std::shared_ptr<Kart> World::createKartWithTeam
     int position  = index + 1;
     KartTeam team = KART_TEAM_BLUE;
 
+
+
     if (kart_type == RaceManager::KT_AI)
-    {
-        if (index < m_red_ai)
+    { // TODO : TEAM Modification
+        if (RaceManager::get()->isTagzArenaBattleMode()) {
             team = KART_TEAM_RED;
-        else
-            team = KART_TEAM_BLUE;
-        m_kart_team_map[index] = team;
+            m_kart_team_map[index] = team;
+        }
+        else if (hasTeamPlus()) {
+            if (index < m_red_ai)
+                team = KART_TEAM_RED;
+            else if (index < m_red_ai + m_blue_ai)
+                team = KART_TEAM_BLUE;
+            else if (index < m_red_ai + m_blue_ai + m_green_ai)
+                team = KART_TEAM_GREEN;
+            else
+                team = KART_TEAM_ORANGE;
+            m_kart_team_map[index] = team;
+            //teamColor = RaceManager::get()->getTeamColor(team);
+            //m_kart_teams_color_map[index] = teamColor;
+
+        }
+        else {
+            if (index < m_red_ai)
+                team = KART_TEAM_RED;
+            else
+                team = KART_TEAM_BLUE;
+            m_kart_team_map[index] = team;
+        }
+        
+
+        
     }
     else if (NetworkConfig::get()->isNetworking())
     {
-        m_kart_team_map[index] = RaceManager::get()->getKartInfo(index).getKartTeam();
-        team = RaceManager::get()->getKartInfo(index).getKartTeam();
+        if (RaceManager::get()->isTagzArenaBattleMode()) {
+            team = KART_TEAM_RED;
+            m_kart_team_map[index] = team;
+        }
+        else {
+            m_kart_team_map[index] = RaceManager::get()->getKartInfo(index).getKartTeam();
+            team = RaceManager::get()->getKartInfo(index).getKartTeam();
+        }
+        
     }
     else
     {
-        int rm_id = index -
-            (RaceManager::get()->getNumberOfKarts() - RaceManager::get()->getNumPlayers());
+        if (RaceManager::get()->isTagzArenaBattleMode()) {
+            team = KART_TEAM_RED;
+            m_kart_team_map[index] = team;
+        }
+        else {
+            int rm_id = index -
+                (RaceManager::get()->getNumberOfKarts() - RaceManager::get()->getNumPlayers());
 
-        assert(rm_id >= 0);
-        team = RaceManager::get()->getKartInfo(rm_id).getKartTeam();
-        m_kart_team_map[index] = team;
+            assert(rm_id >= 0);
+            team = RaceManager::get()->getKartInfo(rm_id).getKartTeam();
+            m_kart_team_map[index] = team;
+        }
+        
     }
 
     core::stringw online_name;
@@ -1601,21 +1700,22 @@ std::shared_ptr<Kart> World::createKartWithTeam
 
     // Notice: In blender, please set 1,3,5,7... for blue starting position;
     // 2,4,6,8... for red.
-    if (team == KART_TEAM_BLUE)
-    {
-        pos_index = 1 + 2 * cur_blue;
+    if (getNumTeams() >= 3 || hasTeamPlus() == true || RaceManager::get()->isTagzArenaBattleMode()) {
+        pos_index = index +1;
     }
-    else
-    {
-        pos_index = 2 + 2 * cur_red;
+    else {
+        if (team == KART_TEAM_BLUE) pos_index = 1 + 2 * cur_blue;
+        else pos_index = 2 + 2 * cur_red;
     }
 
     btTransform init_pos = getStartTransform(pos_index - 1);
     m_kart_position_map[index] = (unsigned)(pos_index - 1);
 
     std::shared_ptr<GE::GERenderInfo> ri = std::make_shared<GE::GERenderInfo>();
-    ri = (team == KART_TEAM_BLUE ? std::make_shared<GE::GERenderInfo>(0.66f) :
-        std::make_shared<GE::GERenderInfo>(1.0f));
+    ri = team == KART_TEAM_BLUE ? std::make_shared<GE::GERenderInfo>(0.66f) :
+    ri = team == KART_TEAM_RED ? std::make_shared<GE::GERenderInfo>(1.0f) :
+    ri = team == KART_TEAM_GREEN ? std::make_shared<GE::GERenderInfo>(0.33f) :
+        std::make_shared<GE::GERenderInfo>(0.065f);
 
     std::shared_ptr<Kart> new_kart;
     if (RewindManager::get()->isEnabled())
@@ -1685,10 +1785,68 @@ KartTeam World::getKartTeam(unsigned int kart_id) const
 }   // getKartTeam
 
 //-----------------------------------------------------------------------------
+int World::getKartIdTeamIndex(unsigned int kart_id) const
+{
+    auto it = std::find(m_teamsInGame.begin(), m_teamsInGame.end(), getKartTeam(kart_id));
+
+    // Vérification si la valeur est trouvée et retour de l'index si c'est le cas
+    if (it != m_teamsInGame.end())
+        return std::distance(m_teamsInGame.begin(), it);
+    else
+        return -1;
+}   // getKartTeamIndex
+
+    //-------------------------------------------------------------------------
+int World::getTeamIndexValue(unsigned int team_index) const
+{
+    return m_teamsInGame[team_index];
+} // getTeamIndexValue
+
+//-----------------------------------------------------------------------------
+int World::getKartTeamIndex(unsigned int team_id) const
+{
+    auto it = std::find(m_teamsInGame.begin(), m_teamsInGame.end(), (KartTeam)team_id);
+
+    // Vérification si la valeur est trouvée et retour de l'index si c'est le cas
+    if (it != m_teamsInGame.end())
+        return std::distance(m_teamsInGame.begin(), it);
+    else
+        return -1;
+}   // getKartTeamIndex
+
+//-----------------------------------------------------------------------------
+int World::getKartTeamIndex(KartTeam team) const
+{
+    auto it = std::find(m_teamsInGame.begin(), m_teamsInGame.end(), team);
+
+    // Vérification si la valeur est trouvée et retour de l'index si c'est le cas
+    if (it != m_teamsInGame.end())
+        return std::distance(m_teamsInGame.begin(), it);
+    else
+        return -1;
+}   // getKartTeamIndex
+
+void World::changeKartTeam(unsigned int kart_id, const KartTeam& new_team) {
+    std::map<int, KartTeam>::iterator n =
+        m_kart_team_map.find(kart_id);
+
+    // Check if the kart with the specified ID is found
+    if (n != m_kart_team_map.end()) {
+        // Change the team of the kart
+        n->second = new_team;
+    }
+    else {
+        // Handle the case where the kart is not found
+    }
+}
+
+//-----------------------------------------------------------------------------
 void World::setAITeam()
 {
     m_red_ai  = RaceManager::get()->getNumberOfRedAIKarts();
     m_blue_ai = RaceManager::get()->getNumberOfBlueAIKarts();
+    m_green_ai = RaceManager::get()->getNumberOfGreenAIKarts();
+    m_orange_ai = RaceManager::get()->getNumberOfOrangeAIKarts();
 
     for (int i = 0; i < (int)RaceManager::get()->getNumLocalPlayers(); i++)
     {
@@ -1703,7 +1861,7 @@ void World::setAITeam()
         }
     }
 
-    Log::debug("World", "Blue AI: %d red AI: %d", m_blue_ai, m_red_ai);
+    Log::debug("World", "Blue AI: %d Red AI: %d Green AI: %d Orange AI: %d", m_blue_ai, m_red_ai, m_green_ai, m_orange_ai);
 
 }   // setAITeam
 
@@ -1799,6 +1957,26 @@ void World::updateAchievementDataEndRace()
                     PlayerManager::trackEvent(RaceManager::get()->getTrackName(), ACS::TR_EGG_HUNT_FINISHED_HARD);
             }
 
+            else if (RaceManager::get()->isTagzArenaBattleMode()) {
+                if (RaceManager::get()->getNumPlayers() > 4) {
+                    TagZombieArenaBattle* tagzab = (TagZombieArenaBattle*)World::getWorld();
+                    PlayerManager::increaseAchievement(ACS::TAG_ZOMBIE_ARENA_ALL_POINTS, tagzab->getKartPointsResult(i));
+                    PlayerManager::increaseAchievement(getKartTeam(i) == KART_TEAM_RED ? ACS::TAG_ZOMBIE_ARENA_SURVIVOR_POINTS : ACS::TAG_ZOMBIE_ARENA_ZOMBIE_POINTS, tagzab->getKartPointsResult(i));
+                }
+            }
+            
+            else if (RaceManager::get()->isTeamArenaBattleMode()) {
+                if (RaceManager::get()->getNumPlayers() >= 4) {
+                    std::vector<int>::iterator it = std::find(m_winning_teams.begin(), m_winning_teams.end(), getKartTeam(i));
+                    if (it != m_winning_teams.end()) {
+                        PlayerManager::increaseAchievement(ACS::TEAM_ARENA_WIN, 1);
+                        PlayerManager::increaseAchievement(getKartTeam(i) == KART_TEAM_RED ? ACS::TEAM_ARENA_RED_WIN :
+                            getKartTeam(i) == KART_TEAM_BLUE ? ACS::TEAM_ARENA_BLUE_WIN :
+                            getKartTeam(i) == KART_TEAM_GREEN ? ACS::TEAM_ARENA_GREEN_WIN : ACS::TEAM_ARENA_ORANGE_WIN, 1);
+                    }
+                }
+            }
+
             updateAchievementModeCounters(false /*start*/);
          } // if m_karts[i]->getController()->canGetAchievements()
     } // for i<kart_amount
@@ -1829,6 +2007,21 @@ void World::updateAchievementModeCounters(bool start)
             PlayerManager::increaseAchievement(start ? ACS::CTF_STARTED : ACS::CTF_FINISHED,1);
         else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
             PlayerManager::increaseAchievement(start ? ACS::FFA_STARTED : ACS::FFA_FINISHED,1);
+
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM)
+            PlayerManager::increaseAchievement(start ? ACS::TEAM_ARENA_POINTS_TEAM_STARTED : ACS::TEAM_ARENA_POINTS_TEAM_FINISHED, 1);
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER)
+            PlayerManager::increaseAchievement(start ? ACS::TEAM_ARENA_POINTS_PLAYER_STARTED : ACS::TEAM_ARENA_POINTS_PLAYER_FINISHED, 1);
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER)
+            PlayerManager::increaseAchievement(start ? ACS::TEAM_ARENA_ALL_POINTS_PLAYER_STARTED : ACS::TEAM_ARENA_ALL_POINTS_PLAYER_FINISHED, 1);
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE)
+            PlayerManager::increaseAchievement(start ? ACS::TEAM_ARENA_LIFE_STARTED : ACS::TEAM_ARENA_LIFE_FINISHED, 1);
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE)
+            PlayerManager::increaseAchievement(start ? ACS::TAG_ZOMBIE_ARENA_STARTED : ACS::TAG_ZOMBIE_ARENA_FINISHED, 1);
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE)
+            PlayerManager::increaseAchievement(start ? ACS::TAG_ZOMBIE_SURVIVOR_ARENA_STARTED : ACS::TAG_ZOMBIE_SURVIVOR_ARENA_FINISHED, 1);
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE)
+            PlayerManager::increaseAchievement(start ? ACS::TAG_ZOMBIE_LAST_SURVIVOR_ARENA_STARTED : ACS::TAG_ZOMBIE_LAST_SURVIVOR_ARENA_FINISHED, 1);
     }
     else // normal races
         PlayerManager::increaseAchievement(start ? ACS::NORMAL_STARTED : ACS::NORMAL_FINISHED,1);

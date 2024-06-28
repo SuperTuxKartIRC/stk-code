@@ -74,7 +74,7 @@ void KartWithStats::update(int ticks)
 /** Overloading setKartAnimation with a kind of listener function in order
  *  to gather statistics about rescues and explosions.
  */
-void KartWithStats::setKartAnimation(AbstractKartAnimation *ka)
+void KartWithStats::setKartAnimation(KartAnimation *ka)
 {
     bool is_new = !getKartAnimation() && !isInvulnerable() && !isShielded();
     Kart::setKartAnimation(ka);
@@ -82,8 +82,8 @@ void KartWithStats::setKartAnimation(AbstractKartAnimation *ka)
     if(!is_new) return;
 
     // We can't use a dynamic cast here, since this function is called from
-    // constructor of AbstractKartAnimation, which is the base class for all
-    // animations. So at this stage ka is only an AbstractKartAnimation, not
+    // constructor of KartAnimation, which is the base class for all
+    // animations. So at this stage ka is only an KartAnimation, not
     // any of the derived classes.
     if(ka && ka->getName()=="ExplosionAnimation")
     {
@@ -125,7 +125,8 @@ void KartWithStats::collectedItem(ItemState *item_state)
     case Item::ITEM_BUBBLEGUM:
         m_bubblegum_count++;
         break;
-    default        : break;
+    default        
+    : break;
     }   // switch TYPE
 
 }   // collectedItem

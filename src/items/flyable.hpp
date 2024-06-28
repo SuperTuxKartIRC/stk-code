@@ -36,7 +36,7 @@ namespace irr
 using namespace irr;
 
 class Kart;
-class AbstractKartAnimation;
+class KartAnimation;
 class HitEffect;
 class PhysicalObject;
 class SFXBase;
@@ -74,7 +74,7 @@ private:
 
     /** If the flyable is in a cannon, this is the pointer to the cannon
      *  animation. NULL otherwise. */
-    AbstractKartAnimation *m_animation;
+    KartAnimation *m_animation;
 
 protected:
     /** Kart which shot this flyable. */
@@ -196,7 +196,7 @@ public:
                               PowerupManager::PowerupType type);
     void                      updateGraphics(float dt) OVERRIDE;
     virtual bool              updateAndDelete(int ticks);
-    virtual void              setAnimation(AbstractKartAnimation *animation);
+    virtual void              setAnimation(KartAnimation *animation);
     virtual HitEffect*        getHitEffect() const;
     bool                      isOwnerImmunity(const Kart *kart_hit) const;
     virtual bool              hit(Kart* kart, PhysicalObject* obj=NULL);

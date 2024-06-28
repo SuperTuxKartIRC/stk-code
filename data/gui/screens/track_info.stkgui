@@ -10,12 +10,13 @@
             
            <!-- Left pane -->
             <div width="68%" height="100%" layout="vertical-row">
-                <box width="100%" height="49%" padding="10" layout="vertical-row">
-                    <label id="highscores" width="100%" text_align="center"/>
-                    <spacer width="1" height="1%"/>
-                    <list id="highscore_entries" x="0" y="0" width="100%" proportion="1"/>
-                </box><!-- Highscores box -->
-
+                <div width="100%" height="49%" layout="vertical-row" id="race-highscores-div">
+                     <box width="100%" height="100%" padding="10" layout="vertical-row" id="race-highscores-box">
+                             <label id="highscores" width="100%" text_align="center"/>
+                    	     <spacer width="1" height="1%"/>
+                    	     <list id="highscore_entries" x="0" y="0" width="100%" proportion="1"/>
+                     </box><!-- Highscores box -->
+                </div>
                 <spacer width="1" height="2%"/>
                 <!-- Race options box -->
                 <box width="100%" height="47%" layout="vertical-row" id="race-options-box">            
@@ -40,6 +41,28 @@
                     </div>
                     
                     <spacer width="1" height="1%"/>
+
+                    <div width="100%" height="fit" layout="horizontal-row" id="number-life-div">
+                        <div proportion="1" height="fit" layout="horizontal-row">
+                            <spinner id="lifes-value-spinner" width="100%" min_value="1" max_value="20" align="center"
+                                     wrap_around="true" />
+                        </div>
+                        <spacer width="3%"/>
+                        <label id="lifes-value-text" proportion="3" I18N="In the track info screen" text="Number of lifes" text_align="left" align="center"/>
+                    </div>
+
+                    <spacer width="1" height="1%"/>
+
+                    <div width="100%" height="fit" layout="horizontal-row" id="number-point-div">
+                        <div proportion="1" height="fit" layout="horizontal-row">
+                            <spinner id="points-value-spinner" width="100%" min_value="1" max_value="20" align="center"
+                                     wrap_around="true" />
+                        </div>
+                        <spacer width="3%"/>
+                        <label id="points-value-text" proportion="3" I18N="In the track info screen" text="Number of points to win" text_align="left" align="center"/>
+                    </div>
+                    
+                    <spacer width="1" height="1%"/>
                     
                     <div width="100%" height="fit" layout="horizontal-row" >
                         <div proportion="1" height="fit" layout="horizontal-row">
@@ -60,6 +83,27 @@
                         <spacer width="3%"/>
                         <label id="ai-blue-text" proportion="3" I18N="In the track info screen" text="Number of blue team AI karts" text_align="left" align="center"/>
                     </div>
+
+                    <div width="100%" height="fit" layout="horizontal-row" id="ai-team3-div">
+                        <div proportion="1" height="fit" layout="horizontal-row">
+                            <spinner id="ai-team3-spinner" width="100%" min_value="1" max_value="20" align="center"
+                                     wrap_around="true" />
+                        </div>
+
+                        <spacer width="3%"/>
+                        <label id="ai-team3-text" proportion="3" I18N="In the track info screen" text="Number of Team3 AI karts" text_align="left" align="center"/>
+                    </div>
+
+                    <div width="100%" height="fit" layout="horizontal-row" id="ai-team4-div">
+              
+			<div proportion="1" height="fit" layout="horizontal-row">
+                            <spinner id="ai-team4-spinner" width="100%" min_value="1" max_value="20" align="center"
+                                     wrap_around="true" />
+                        </div>
+
+                        <spacer width="3%"/>
+                        <label id="ai-team4-text" proportion="3" I18N="In the track info screen" text="Number of Team4 AI karts" text_align="left" align="center"/>
+                    </div>
                     
                     <spacer width="1" height="1%"/>
                     
@@ -72,7 +116,6 @@
                         <spacer width="3%"/>
                         <label id="option-text" proportion="3" I18N="In the track info screen" text_align="left" align="center"/>
                     </div>
-                   
                     <spacer width="1" height="1%"/>
                     
                     <div width="100%" height="fit" layout="horizontal-row" >
@@ -84,6 +127,15 @@
                         <spacer width="3%"/>
                         <label id="record-race-text" proportion="3" I18N="In the track info screen" text="Record the race for ghost replay" text_align="left" align="center"/>
                     </div>
+
+	            <div width="5%" height="fit" layout="horizontal-row">
+                         <icon-button id="powerup" icon_align="right" icon="gui/icons/gift.png"/>
+		         <icon-button id="nitro" icon_align="right" icon="gui/icons/nitro.png"/>
+		         <icon-button id="banana" icon_align="right" icon="gui/icons/banana.png"/>
+		         <icon-button id="powerup-selection" icon_align="right" icon="gui/icons/powerups_selection.png"/>
+		         <icon-button id="special-option" icon_align="right" icon="gui/icons/heart.png"/>
+                    </div>  
+			
                 </box><!-- Race options box -->
                 
                 <spacer width="1" height="2%"/>

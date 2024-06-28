@@ -5,6 +5,9 @@
 #include "modes/capture_the_flag.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/soccer_world.hpp"
+#include "modes/tag_zombie_arena_battle.hpp"
+#include "modes/team_arena_battle.hpp"
+#include "modes/team_arena_battle_life.hpp"
 #include "network/event.hpp"
 #include "network/game_setup.hpp"
 #include "network/network_config.hpp"
@@ -61,6 +64,9 @@ bool GameEventsProtocol::notifyEvent(Event* event)
     uint8_t type = data.getUInt8();
     CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
     FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
+    TeamArenaBattle* tab = dynamic_cast<TeamArenaBattle*>(World::getWorld());
+    TeamArenaBattlelife* tabl = dynamic_cast<TeamArenaBattlelife*>(World::getWorld());
+    TagZombieArenaBattle* tagzab = dynamic_cast<TagZombieArenaBattle*>(World::getWorld());
     SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
     LinearWorld* lw = dynamic_cast<LinearWorld*>(World::getWorld());
     switch (type)
@@ -83,9 +89,16 @@ bool GameEventsProtocol::notifyEvent(Event* event)
     }
     case GE_BATTLE_KART_SCORE:
     {
-        if (!ffa)
-            throw std::invalid_argument("No free-for-all world");
-        ffa->setKartScoreFromServer(data);
+        if (!ffa && !tab && !tabl && !tagzab)
+            throw std::invalid_argument("No free-for-all world, team-arena-battle world or tag-zombie-arena-battle world"); 
+        else if (ffa)
+            ffa->setKartScoreFromServer(data);
+        else if (tab)
+            tab->setKartScoreFromServer(data);
+        else if (tabl)
+            tabl->setKartLifeFromServer(data);
+        else if (tagzab)
+            tagzab->setKartsInfoFromServer(data);
         break;
     }
     case GE_CTF_SCORED:
@@ -144,6 +157,13 @@ bool GameEventsProtocol::notifyEvent(Event* event)
         if (NetworkConfig::get()->isClient())
             lw->updateCheckLinesClient(data);
         break;
+    }
+    case GE_SETUP_GAME: 
+    {
+        if (!tab )
+            throw std::invalid_argument("No team-arena-battle world");
+        else if (tab)
+            tab->setKartScoreFromServer(data);
     }
     default:
         Log::warn("GameEventsProtocol", "Unknown message type.");

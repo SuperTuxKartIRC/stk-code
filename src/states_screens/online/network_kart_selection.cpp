@@ -30,6 +30,7 @@
 #include "states_screens/state_manager.hpp"
 #include "states_screens/online/networking_lobby.hpp"
 #include "states_screens/online/tracks_screen.hpp"
+#include "states_screens/online/teams_screen.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -163,9 +164,22 @@ void NetworkKartSelectionScreen::allPlayersDone()
     input_manager->getDeviceManager()->setAssignMode(ASSIGN);
     auto cl = LobbyProtocol::get<ClientLobby>();
     if (!m_live_join && cl && cl->serverEnabledTrackVoting())
-    {
-        TracksScreen::getInstance()->setNetworkTracks();
-        TracksScreen::getInstance()->push();
+    { // TODO : Besoins de modification
+        if ((RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM ||
+            RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER ||
+            RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER ||
+            RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE) && 
+            RaceManager::get()->getTeamsSelectionEnabled())
+        {
+            TracksScreen::getInstance()->setNetworkTracks();
+            TracksScreen::getInstance()->push();
+            NetworkTeamsSetupScreen::getInstance()->push();
+        }
+        else
+        {
+            TracksScreen::getInstance()->setNetworkTracks();
+            TracksScreen::getInstance()->push();
+        }
     }
 }   // allPlayersDone
 

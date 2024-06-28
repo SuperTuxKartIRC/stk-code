@@ -56,7 +56,7 @@ public:
  *    new ExplosionAnimation(kart);
  *  The object does not need to be stored.
  */
-class AbstractKartAnimation: public NoCopy
+class KartAnimation: public NoCopy
 {
 private:
     /** Name of this animation, used for debug prints only. */
@@ -86,9 +86,9 @@ protected:
     float getMaximumHeight(const Vec3& up_vector, float height_remove);
 
 public:
-                 AbstractKartAnimation(Kart* kart,
+                 KartAnimation(Kart* kart,
                                        const std::string &name);
-    virtual     ~AbstractKartAnimation();
+    virtual     ~KartAnimation();
     virtual void update(int ticks);
     // ------------------------------------------------------------------------
     virtual void updateGraphics(float dt);
@@ -111,6 +111,6 @@ public:
      * for example the end or created ticks are the same. */
     virtual void restoreState(BareNetworkString* buffer)
                                                  { restoreBasicState(buffer); }
-};   // AbstractKartAnimation
+};   // KartAnimation
 
 #endif

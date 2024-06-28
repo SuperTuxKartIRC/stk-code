@@ -34,6 +34,7 @@
 #include "network/stk_host.hpp"
 #include "online/online_profile.hpp"
 #include "states_screens/state_manager.hpp"
+#include "states_screens/online/more_options_server_screen.hpp"
 #include "states_screens/online/networking_lobby.hpp"
 #include "utils/stk_process.hpp"
 #include "utils/string_utils.hpp"
@@ -82,6 +83,8 @@ void CreateServerScreen::loadedFromFile()
 
     m_options_widget = getWidget<RibbonWidget>("options");
     assert(m_options_widget != NULL);
+    m_more_options_widget = getWidget<ButtonWidget>("more_options");
+    assert(m_more_options_widget != NULL);
     m_game_mode_widget = getWidget<RibbonWidget>("gamemode");
     assert(m_game_mode_widget != NULL);
     m_create_widget = getWidget<IconButtonWidget>("create");
@@ -148,6 +151,27 @@ void CreateServerScreen::beforeAddingWidget()
 void CreateServerScreen::eventCallback(Widget* widget, const std::string& name,
                                        const int playerID)
 {
+    int esi = m_more_options_spinner->getValue();
+    if (esi == 0)
+        ServerConfig::m_server_mode = 7;
+    else if (esi == 1)
+        ServerConfig::m_server_mode = 8;
+    else if (esi == 2)
+        ServerConfig::m_server_mode = 9;
+    else if (esi == 3)
+        ServerConfig::m_server_mode = 10;
+    else if (esi == 4)
+        ServerConfig::m_server_mode = 11;
+    else if (esi == 5)
+        ServerConfig::m_server_mode = 12;
+    else if (esi == 6)
+        ServerConfig::m_server_mode = 13;
+    else if (esi == 7)
+        ServerConfig::m_server_mode = 14;
+    else if (esi == 8)
+        ServerConfig::m_server_mode = 15;
+
+
     if (name == m_options_widget->m_properties[PROP_ID])
     {
         const std::string& selection =
@@ -161,6 +185,11 @@ void CreateServerScreen::eventCallback(Widget* widget, const std::string& name,
         {
             createServer();
         }   // is create_widget
+    }
+    else if (name == m_more_options_widget->m_properties[PROP_ID])
+    {
+        RaceManager::get()->setMinorMode(m_more_options_spinner->getValue());
+        MoreOptionsServerScreen::getInstance()->push();
     }
     else if (name == m_game_mode_widget->m_properties[PROP_ID])
     {
@@ -177,6 +206,7 @@ void CreateServerScreen::eventCallback(Widget* widget, const std::string& name,
         const int selection =
             m_game_mode_widget->getSelection(PLAYER_ID_GAME_MASTER);
         updateMoreOption(selection);
+       
     }
     else if (name == m_back_widget->m_properties[PROP_ID])
     {
@@ -240,9 +270,15 @@ void CreateServerScreen::updateMoreOption(int game_mode)
             m_more_options_spinner->clearLabels();
             //I18N: In the create server screen for battle server
             m_more_options_spinner->addLabel(_("Free-For-All"));
-            //I18N: In the create server screen for battle server
             m_more_options_spinner->addLabel(_("Capture The Flag"));
-            m_more_options_spinner->setValue(m_prev_value);
+            m_more_options_spinner->addLabel(_("Team Points"));
+            m_more_options_spinner->addLabel(_("Player with most points"));
+            m_more_options_spinner->addLabel(_("All Player Points"));
+            m_more_options_spinner->addLabel(_("Last team standing"));
+            m_more_options_spinner->addLabel(_("Tag zombie"));
+            m_more_options_spinner->addLabel(_("Monster Arena Battle"));
+            m_more_options_spinner->addLabel(_("Murder Mystery"));
+            m_more_options_spinner->setValue(RaceManager::get()->getMinorModeTarget());
             break;
         }
         case 3:
@@ -289,6 +325,7 @@ void CreateServerScreen::onUpdate(float delta)
  */
 void CreateServerScreen::createServer()
 {
+
     const irr::core::stringw name = m_name_widget->getText().trim();
     const int max_players = m_max_players_widget->getValue();
     m_info_widget->setErrorColor();
@@ -390,21 +427,33 @@ void CreateServerScreen::createServer()
     if (m_more_options_spinner->isVisible())
     {
         int esi = m_more_options_spinner->getValue();
-        if (gamemode_widget->getSelection(PLAYER_ID_GAME_MASTER) ==
-            3/*is soccer*/)
+        if (gamemode_widget->getSelection(PLAYER_ID_GAME_MASTER) == 3/*is soccer*/)
         {
             if (esi == 0)
                 ServerConfig::m_soccer_goal_target = false;
             else
                 ServerConfig::m_soccer_goal_target = true;
         }
-        else if (gamemode_widget->getSelection(PLAYER_ID_GAME_MASTER) ==
-            2/*is battle*/)
+        else if (gamemode_widget->getSelection(PLAYER_ID_GAME_MASTER) == 2/*is battle*/)
         {
             if (esi == 0)
                 ServerConfig::m_server_mode = 7;
-            else
+            else if (esi == 1)
                 ServerConfig::m_server_mode = 8;
+            else if (esi == 2)
+                ServerConfig::m_server_mode = 9;
+            else if (esi == 3)
+                ServerConfig::m_server_mode = 10;
+            else if (esi == 4)
+                ServerConfig::m_server_mode = 11;
+            else if (esi == 5)
+                ServerConfig::m_server_mode = 12;
+            else if (esi == 6)
+                ServerConfig::m_server_mode = 13;
+            else if (esi == 7)
+                ServerConfig::m_server_mode = 14;
+            else if (esi == 8)
+                ServerConfig::m_server_mode = 15;
         }
         else
         {
@@ -440,6 +489,8 @@ void CreateServerScreen::createServer()
     ChildLoop* cl = new ChildLoop(clc);
     STKHost::create(cl);
     NetworkingLobby::getInstance()->setJoinedServer(server);
+
+
 #endif
 }   // createServer
 

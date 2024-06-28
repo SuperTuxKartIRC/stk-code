@@ -24,6 +24,7 @@ namespace GUIEngine
 {
     class IconButtonWidget; class LabelWidget; class RibbonWidget;
     class SpinnerWidget; class TextBoxWidget; class Widget;
+    class ButtonWidget;
 }
 
 /**
@@ -51,6 +52,7 @@ private:
 
     GUIEngine::RibbonWidget * m_game_mode_widget;
     GUIEngine::RibbonWidget * m_options_widget;
+    GUIEngine::ButtonWidget* m_more_options_widget;
     GUIEngine::IconButtonWidget * m_create_widget;
     GUIEngine::IconButtonWidget * m_cancel_widget;
     GUIEngine::IconButtonWidget * m_back_widget;

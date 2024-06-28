@@ -38,7 +38,7 @@
  *  \param kart Pointer to the kart that is animated, or NULL if the
  *         the animation is meant for a basket ball etc.
  */
-AbstractKartAnimation::AbstractKartAnimation(Kart* kart,
+KartAnimation::KartAnimation(Kart* kart,
                                              const std::string &name)
 {
     m_kart = kart;
@@ -53,7 +53,7 @@ AbstractKartAnimation::AbstractKartAnimation(Kart* kart,
     // printed
     if (kart && kart->getKartAnimation())
     {
-        AbstractKartAnimation* ka = kart->getKartAnimation();
+        KartAnimation* ka = kart->getKartAnimation();
         kart->setKartAnimation(NULL);
         delete ka;
     }
@@ -75,10 +75,10 @@ AbstractKartAnimation::AbstractKartAnimation(Kart* kart,
     }
     MiniGLM::compressbtTransform(m_created_transform,
         m_created_transform_compressed);
-}   // AbstractKartAnimation
+}   // KartAnimation
 
 // ----------------------------------------------------------------------------
-AbstractKartAnimation::~AbstractKartAnimation()
+KartAnimation::~KartAnimation()
 {
     // If m_end_ticks != int max, this object is deleted because the kart
     // is deleted (at the end of a race), which means that
@@ -99,12 +99,12 @@ AbstractKartAnimation::~AbstractKartAnimation()
         m_kart->getVehicle()->reset();
         Physics::get()->addKart(m_kart);
     }
-}   // ~AbstractKartAnimation
+}   // ~KartAnimation
 
 // ----------------------------------------------------------------------------
 /** In CTF mode call this to reset kart powerup when get hit.
  */
-void AbstractKartAnimation::resetPowerUp()
+void KartAnimation::resetPowerUp()
 {
     if (m_kart)
         m_kart->getPowerup()->reset();
@@ -118,7 +118,7 @@ void AbstractKartAnimation::resetPowerUp()
  *  members might be invalid.
  *  \param ticks Number of time steps - should be 1.
  */
-void AbstractKartAnimation::update(int ticks)
+void KartAnimation::update(int ticks)
 {
     // See if the timer expires, if so return the kart to normal game play
     World* w = World::getWorld();
@@ -134,7 +134,7 @@ void AbstractKartAnimation::update(int ticks)
 }   // update
 
 // ----------------------------------------------------------------------------
-void AbstractKartAnimation::updateGraphics(float dt)
+void KartAnimation::updateGraphics(float dt)
 {
     // Reset the wheels (and any other animation played for that kart)
     // This avoid the effect that some wheels might be way below the kart
@@ -146,7 +146,7 @@ void AbstractKartAnimation::updateGraphics(float dt)
 // ----------------------------------------------------------------------------
 /** Returns the current animation timer.
   */
-float AbstractKartAnimation::getAnimationTimer() const
+float KartAnimation::getAnimationTimer() const
 {
     World* w = World::getWorld();
     if (!w)
@@ -157,7 +157,7 @@ float AbstractKartAnimation::getAnimationTimer() const
 // ----------------------------------------------------------------------------
 /** Determine maximum rescue height with up-raycast
  */
-float AbstractKartAnimation::getMaximumHeight(const Vec3& up_vector,
+float KartAnimation::getMaximumHeight(const Vec3& up_vector,
                                               float height_remove)
 {
     float hit_dest = 9999999.9f;
@@ -179,7 +179,7 @@ float AbstractKartAnimation::getMaximumHeight(const Vec3& up_vector,
 }   // getMaximumHeight
 
 // ----------------------------------------------------------------------------
-void AbstractKartAnimation::saveState(BareNetworkString* buffer)
+void KartAnimation::saveState(BareNetworkString* buffer)
 {
     buffer->addUInt32(m_created_ticks);
     buffer->addInt24(m_created_transform_compressed[0])
@@ -191,7 +191,7 @@ void AbstractKartAnimation::saveState(BareNetworkString* buffer)
 // ----------------------------------------------------------------------------
 /** Used in constructor of sub-class as no virtual function can be used there.
  */
-void AbstractKartAnimation::restoreBasicState(BareNetworkString* buffer)
+void KartAnimation::restoreBasicState(BareNetworkString* buffer)
 {
     m_created_ticks = buffer->getUInt32();
     m_created_transform_compressed[0] = buffer->getInt24();

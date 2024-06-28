@@ -34,7 +34,7 @@
  *  explosion happens.
  * \ingroup karts
  */
-class ExplosionAnimation: public AbstractKartAnimation
+class ExplosionAnimation: public KartAnimation
 {
 protected:
 friend class KartRewinder;

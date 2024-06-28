@@ -50,6 +50,9 @@
 #include "modes/capture_the_flag.hpp"
 #include "modes/overworld.hpp"
 #include "modes/soccer_world.hpp"
+#include <modes/tag_zombie_arena_battle.hpp>
+#include <modes/team_arena_battle.hpp>
+#include <modes/team_arena_battle_life.hpp>
 #include "network/network_config.hpp"
 #include "network/stk_host.hpp"
 #include "network/protocols/client_lobby.hpp"
@@ -92,6 +95,9 @@ void RaceResultGUI::init()
     m_animation_state = RR_INIT;
 
     m_timer = 0;
+
+    m_player_icon = irr_driver->getTexture(FileManager::GUI_ICON, "player.png");
+    m_zombie_icon = irr_driver->getTexture(FileManager::GUI_ICON, "zombie.png");
 
     getWidget("operations")->setActive(false);
     getWidget("left")->setVisible(false);

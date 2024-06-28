@@ -32,17 +32,23 @@
 #include "states_screens/soccer_setup_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/tracks_and_gp_screen.hpp"
+#include "states_screens/teams_setup_screen.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
-const int CONFIG_CODE_NORMAL    = 0;
-const int CONFIG_CODE_TIMETRIAL = 1;
-const int CONFIG_CODE_FTL       = 2;
-const int CONFIG_CODE_3STRIKES  = 3;
-const int CONFIG_CODE_EASTER    = 4;
-const int CONFIG_CODE_SOCCER    = 5;
-const int CONFIG_CODE_GHOST     = 6;
-const int CONFIG_CODE_LAP_TRIAL = 7;
+const int CONFIG_CODE_NORMAL          = 0;
+const int CONFIG_CODE_TIMETRIAL       = 1;
+const int CONFIG_CODE_FTL             = 2;
+const int CONFIG_CODE_3STRIKES        = 3;
+const int CONFIG_CODE_EASTER          = 4;
+const int CONFIG_CODE_SOCCER          = 5;
+const int CONFIG_CODE_GHOST           = 6;
+const int CONFIG_CODE_LAP_TRIAL       = 7;
+const int CONFIG_CODE_TEAM_ARENA      = 8;
+const int CONFIG_CODE_TAG_Z_ARENA     = 9;
+const int CONFIG_CODE_TAG_Z_S_ARENA   = 10;
+const int CONFIG_CODE_TAG_Z_LS_ARENA  = 11;
+const int CONFIG_CODE_TEAM_ARENA_LIFE = 12;
 
 using namespace GUIEngine;
 
@@ -110,10 +116,22 @@ void RaceSetupScreen::init()
         w2->addItem(name3, IDENT_FTL, RaceManager::getIconOf(RaceManager::MINOR_MODE_FOLLOW_LEADER), false);
     }
 
-    irr::core::stringw name4 = irr::core::stringw(_("Battle")) + L"\n";
+    irr::core::stringw name4 = irr::core::stringw(
+        RaceManager::getNameOf(RaceManager::MINOR_MODE_FREE_FOR_ALL)) + L"\n";
     //FIXME: avoid duplicating descriptions from the help menu!
     name4 += _("Hit others with weapons until they lose all their lives.");
     w2->addItem( name4, IDENT_STRIKES, RaceManager::getIconOf(RaceManager::MINOR_MODE_FREE_FOR_ALL));
+
+    irr::core::stringw name8 = irr::core::stringw("Team arena battle") + L"\n";
+    //FIXME: avoid duplicating descriptions from the help menu!
+    name8 += _("Hit other players' teams with weapons to score points.");
+    w2->addItem(name8, IDENT_TEAM_L, RaceManager::getIconOf(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE));
+
+    irr::core::stringw name9 = irr::core::stringw(
+        RaceManager::getNameOf(RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE)) + L"\n";
+    //FIXME: avoid duplicating descriptions from the help menu!
+    name9 += _("Surviving zombies. Zombies must kill (or touch) all other people (survivor).");
+    w2->addItem(name9, IDENT_TAG_Z, RaceManager::getIconOf(RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE));
 
     irr::core::stringw name5 = irr::core::stringw(
         RaceManager::getNameOf(RaceManager::MINOR_MODE_SOCCER)) + L"\n";
@@ -171,6 +189,15 @@ void RaceSetupScreen::init()
         break;
     case CONFIG_CODE_LAP_TRIAL:
         w2->setSelection(IDENT_LAP_TRIAL, PLAYER_ID_GAME_MASTER, true);
+        break;
+    case CONFIG_CODE_TEAM_ARENA:
+        w2->setSelection(IDENT_TEAM_PT, PLAYER_ID_GAME_MASTER, true);
+        break;
+    case CONFIG_CODE_TAG_Z_ARENA:
+        w2->setSelection(IDENT_TAG_Z, PLAYER_ID_GAME_MASTER, true);
+        break;
+    case CONFIG_CODE_TEAM_ARENA_LIFE:
+        w2->setSelection(IDENT_TEAM_L, PLAYER_ID_GAME_MASTER, true);
         break;
     }
 
@@ -263,6 +290,48 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name,
             RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_LAP_TRIAL);
             UserConfigParams::m_game_mode = CONFIG_CODE_LAP_TRIAL;
             TracksAndGPScreen::getInstance()->push();
+        }
+        else if (selectedMode == IDENT_TEAM_PT)
+        {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM);
+            UserConfigParams::m_game_mode = CONFIG_CODE_TEAM_ARENA;
+            TeamsSetupScreen::getInstance()->push();
+        }
+        else if (selectedMode == IDENT_TEAM_PP)
+        {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER);
+            UserConfigParams::m_game_mode = CONFIG_CODE_TEAM_ARENA;
+            TeamsSetupScreen::getInstance()->push();
+        }
+        else if (selectedMode == IDENT_TEAM_APP)
+        {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER);
+            UserConfigParams::m_game_mode = CONFIG_CODE_TEAM_ARENA;
+            TeamsSetupScreen::getInstance()->push();
+        }
+        else if (selectedMode == IDENT_TEAM_L)
+        {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE);
+            UserConfigParams::m_game_mode = CONFIG_CODE_TEAM_ARENA_LIFE;
+            TeamsSetupScreen::getInstance()->push();
+        }
+        else if (selectedMode == IDENT_TAG_Z)
+        {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE);
+            UserConfigParams::m_game_mode = CONFIG_CODE_TAG_Z_ARENA;
+            ArenasScreen::getInstance()->push();
+        }
+        else if (selectedMode == IDENT_TAG_Z_S)
+        {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE);
+            UserConfigParams::m_game_mode = CONFIG_CODE_TAG_Z_S_ARENA;
+            ArenasScreen::getInstance()->push();
+        }
+        else if (selectedMode == IDENT_TAG_Z_LS)
+        {
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE);
+            UserConfigParams::m_game_mode = CONFIG_CODE_TAG_Z_LS_ARENA;
+            ArenasScreen::getInstance()->push();
         }
         else if (selectedMode == "locked")
         {

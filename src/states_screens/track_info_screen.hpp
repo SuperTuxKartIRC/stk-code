@@ -39,24 +39,48 @@ class Track;
  * \ingroup states_screens
  */
 class TrackInfoScreen : public GUIEngine::Screen,
-                        public GUIEngine::ScreenSingleton<TrackInfoScreen>
+    public GUIEngine::ScreenSingleton<TrackInfoScreen>
 {
     static const int HIGHSCORE_COUNT = 5;
 
     /** A pointer to the track of which the info is shown. */
-    Track *m_track;
+    Track* m_track;
 
     bool m_record_this_race;
 
+    bool m_has_laps;
+
     bool m_is_soccer;
+
+    bool m_is_team_arena;
 
     bool m_is_lap_trial;
 
+    bool m_is_time_trial;
+
+    bool m_is_team_arena_battle;
+
+    bool m_is_tag_zombie_arena_battle;
+
+    bool m_is_teams_mode;
+
+    bool m_is_arena_mode;
+
     bool m_show_ffa_spinner;
+
+    // The option is activate or not
+    bool m_state_powerup;
+
+    bool m_state_nitro;
+
+    bool m_state_banana;
 
     // When there is no need to tab through / click on images/labels, we can add directly
     // irrlicht labels (more complicated uses require the use of our widget set)
-        
+
+    /** The div that contains the highscores. */
+    GUIEngine::Widget* m_race_highscores_div;
+
     /** Spinner for target types. */
     GUIEngine::SpinnerWidget* m_target_type_spinner;
 
@@ -72,6 +96,24 @@ class TrackInfoScreen : public GUIEngine::Screen,
     /* The div that contains the blue ai spinner and label */
     GUIEngine::Widget* m_ai_blue_div;
 
+    /** Spinner for number of blue AI karts. */
+    GUIEngine::SpinnerWidget* m_ai_team3_spinner;
+
+    /** The label besides the blue AI karts spinner. */
+    GUIEngine::LabelWidget* m_ai_team3_label;
+
+    /* The div that contains the blue ai spinner and label */
+    GUIEngine::Widget* m_ai_team3_div;
+
+    /** Spinner for number of blue AI karts. */
+    GUIEngine::SpinnerWidget* m_ai_team4_spinner;
+
+    /** The label besides the blue AI karts spinner. */
+    GUIEngine::LabelWidget* m_ai_team4_label;
+
+    /* The div that contains the blue ai spinner and label */
+    GUIEngine::Widget* m_ai_team4_div;
+
     /* The div that contains the target type spinner and label */
     GUIEngine::Widget* m_target_type_div;
 
@@ -80,6 +122,24 @@ class TrackInfoScreen : public GUIEngine::Screen,
 
     /** The label besides the target value spinner. */
     GUIEngine::LabelWidget* m_target_value_label;
+
+    /** Spinner for life value e.g. in battle mode. */
+    GUIEngine::SpinnerWidget* m_life_value_spinner;
+
+    /** The label besides the life value spinner. */
+    GUIEngine::LabelWidget* m_life_value_label;
+
+    /* The div that contains the kart life spinner and label */
+    GUIEngine::Widget* m_number_life_div;
+
+    /** Spinner for points condition value e.g. in battle mode. */
+    GUIEngine::SpinnerWidget* m_point_value_spinner;
+
+    /** The label besides the points value spinner. */
+    GUIEngine::LabelWidget* m_point_value_label;
+
+    /* The div that contains the winning point spinner and label */
+    GUIEngine::Widget* m_number_point_div;
 
     /** Spinner for number of AI karts. */
     GUIEngine::SpinnerWidget* m_ai_kart_spinner;
@@ -93,20 +153,41 @@ class TrackInfoScreen : public GUIEngine::Screen,
     /** Check box for record race. */
     GUIEngine::CheckBoxWidget* m_record_race;
 
+    /** Icon button for deactivate gift box. */
+    GUIEngine::IconButtonWidget* m_powerup;
+
+    /** Icon button for deactivate bottle of nitro. */
+    GUIEngine::IconButtonWidget* m_nitro;
+
+    /** Icon button for deactivate bananna . */
+    GUIEngine::IconButtonWidget* m_banana;
+
+    /** Icon button for selection powerup page. */
+    GUIEngine::IconButtonWidget* m_powerup_selection;
+
+    /** Icon button for special option page (option like : all speed car are boosted). */
+    GUIEngine::IconButtonWidget* m_special_option;
+
     /** The label of the highscore list. */
     GUIEngine::LabelWidget* m_highscore_label;
 
     /** The actual highscore text values shown. */
     GUIEngine::ListWidget* m_highscore_entries;
-    
+
     irr::gui::STKModifiedSpriteBank* m_icon_bank;
-    
+
     int m_icon_unknown_kart;
 
     void updateHighScores();
     void setSoccerWidgets(bool has_AI);
     void setSoccerTarget(bool time_limit);
     void soccerSpinnerUpdate(bool blue_spinner);
+    void teamsSpinnerUpdate(std::string team);
+    void setTeamArenaBattleWidgets(bool has_AI);
+    void setWidgetsValueZeroDeactivateText(GUIEngine::SpinnerWidget* spinner, GUIEngine::LabelWidget* label, const std::string& normalText, const std::string& zeroText);
+    void changeIconButtonImage(GUIEngine::IconButtonWidget* iconButton, std::string name, bool isActive);
+    void getConfigValue();
+    void setConfigValue();
 
 public:
     TrackInfoScreen();
@@ -117,11 +198,11 @@ public:
     virtual void loadedFromFile() OVERRIDE;
     virtual void tearDown() OVERRIDE;
     virtual void unloaded() OVERRIDE;
-    virtual void eventCallback(GUIEngine::Widget *,const std::string &name ,
-                               const int player_id) OVERRIDE;
+    virtual void eventCallback(GUIEngine::Widget*, const std::string& name,
+        const int player_id) OVERRIDE;
 
     void onEnterPressedInternal();
-    void setTrack(Track *track);
+    void setTrack(Track* track);
 };
 
 #endif

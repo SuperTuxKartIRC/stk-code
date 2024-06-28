@@ -176,7 +176,7 @@ void RubberBall::initializeControlPoints(const Vec3 &xyz)
 }   // initializeControlPoints
 
 // ----------------------------------------------------------------------------
-void RubberBall::setAnimation(AbstractKartAnimation *animation)
+void RubberBall::setAnimation(KartAnimation *animation)
 {
     if (!animation)
     {

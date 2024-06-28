@@ -35,7 +35,7 @@ class Ipo;
  * \ingroup karts
  */
 
-class CannonAnimation: public AbstractKartAnimation
+class CannonAnimation: public KartAnimation
 {
 protected:
 friend class KartRewinder;

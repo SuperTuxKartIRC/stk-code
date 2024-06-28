@@ -24,6 +24,7 @@
 #include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/follow_the_leader.hpp"
+#include "modes/tag_zombie_arena_battle.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "network/network_string.hpp"
 #include "mini_glm.hpp"
@@ -32,6 +33,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <modes/tag_zombie_arena_battle.hpp>
 
 RescueAnimation* RescueAnimation::create(Kart* kart,
                                          bool is_auto_rescue)
@@ -49,7 +51,7 @@ RescueAnimation* RescueAnimation::create(Kart* kart,
  *  \param kart Pointer to the kart which is animated.
  */
 RescueAnimation::RescueAnimation(Kart* kart, bool is_auto_rescue)
-               : AbstractKartAnimation(kart, "RescueAnimation")
+               : KartAnimation(kart, "RescueAnimation")
 {
     m_referee = NULL;
     btTransform prev_trans = kart->getTrans();
@@ -80,6 +82,14 @@ RescueAnimation::RescueAnimation(Kart* kart, bool is_auto_rescue)
         !is_auto_rescue)
     {
         World::getWorld()->kartHit(m_kart->getWorldKartId());
+        if (RaceManager::get()->isTagzArenaBattleMode()) {
+            TagZombieArenaBattle* tzab = dynamic_cast<TagZombieArenaBattle*> (World::getWorld());
+            tzab->setKartNbRescuues(m_kart->getWorldKartId());
+            int nbRescues = tzab->getKartNbRescues(m_kart->getWorldKartId());
+            if (m_kart->getKartTeam() != KART_TEAM_GREEN) {
+                m_kart->setSlowdown(1, nbRescues > 5 ? 0.4f : 0.5f, 0, 900 + (nbRescues * 50));
+            }
+        }
         if (UserConfigParams::m_arena_ai_stats)
         {
             ThreeStrikesBattle* tsb = dynamic_cast<ThreeStrikesBattle*>
@@ -106,7 +116,7 @@ RescueAnimation::RescueAnimation(Kart* kart, bool is_auto_rescue)
 
 //-----------------------------------------------------------------------------
 RescueAnimation::RescueAnimation(Kart* kart, BareNetworkString* b)
-               : AbstractKartAnimation(kart, "RescueAnimation")
+               : KartAnimation(kart, "RescueAnimation")
 {
     m_referee = NULL;
     restoreBasicState(b);
@@ -179,7 +189,7 @@ void RescueAnimation::update(int ticks)
         m_kart->setXYZ(xyz);
         m_kart->setRotation(m_created_transform.getRotation());
     }
-    AbstractKartAnimation::update(ticks);
+    KartAnimation::update(ticks);
 }   // update
 
 // ----------------------------------------------------------------------------
@@ -191,13 +201,13 @@ void RescueAnimation::updateGraphics(float dt)
         m_kart->getNode()->addChild(m_referee->getSceneNode());
     }
     m_referee->setAnimationFrameWithCreatedTicks(m_created_ticks);
-    AbstractKartAnimation::updateGraphics(dt);
+    KartAnimation::updateGraphics(dt);
 }   // updateGraphics
 
 // ----------------------------------------------------------------------------
 void RescueAnimation::saveState(BareNetworkString* buffer)
 {
-    AbstractKartAnimation::saveState(buffer);
+    KartAnimation::saveState(buffer);
     buffer->addInt24(m_rescue_transform_compressed[0])
         .addInt24(m_rescue_transform_compressed[1])
         .addInt24(m_rescue_transform_compressed[2])
@@ -208,6 +218,6 @@ void RescueAnimation::saveState(BareNetworkString* buffer)
 // ----------------------------------------------------------------------------
 void RescueAnimation::restoreState(BareNetworkString* buffer)
 {
-    AbstractKartAnimation::restoreState(buffer);
+    KartAnimation::restoreState(buffer);
     restoreData(buffer);
 }   // restoreState

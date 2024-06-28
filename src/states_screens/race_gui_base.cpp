@@ -907,10 +907,12 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         int lap = info.lap;
 
         // In battle mode mode there is no distance along track etc.
-        if (minor_mode==RaceManager::MINOR_MODE_3_STRIKES ||
-            minor_mode==RaceManager::MINOR_MODE_FREE_FOR_ALL ||
-            minor_mode==RaceManager::MINOR_MODE_CAPTURE_THE_FLAG ||
-            minor_mode==RaceManager::MINOR_MODE_EASTER_EGG ||
+        if (minor_mode==RaceManager::MINOR_MODE_3_STRIKES                             ||
+            minor_mode==RaceManager::MINOR_MODE_FREE_FOR_ALL                          ||
+            minor_mode==RaceManager::MINOR_MODE_CAPTURE_THE_FLAG                      ||
+            RaceManager::get()->isTeamArenaBattleMode()                               ||
+            RaceManager::get()->isTagzArenaBattleMode()                               ||
+            minor_mode==RaceManager::MINOR_MODE_EASTER_EGG                            ||
             minor_mode==RaceManager::MINOR_MODE_SOCCER)
         {
             x = x_base;
@@ -1393,3 +1395,36 @@ void RaceGUIBase::removeReferee()
     }
 }   // removeReferee
 
+video::SColor RaceGUIBase::rgbaColorKartTeamsColor(KartTeam team)
+{
+    return team == KART_TEAM_BLUE      ? video::SColor(255, 0, 0, 255)     :
+           team == KART_TEAM_RED       ? video::SColor(255, 255, 0, 0)     :
+           team == KART_TEAM_GREEN     ? video::SColor(255, 0, 255, 0)     :
+           team == KART_TEAM_ORANGE    ? video::SColor(255, 255, 165, 0)   :
+           team == KART_TEAM_YELLOW    ? video::SColor(255, 255, 255, 0)   :
+           team == KART_TEAM_PURPLE    ? video::SColor(255, 128, 0, 128)   :
+           team == KART_TEAM_PINK      ? video::SColor(255, 255, 192, 203) :
+           team == KART_TEAM_TURQUOISE ? video::SColor(255, 0, 206, 209)   :
+           team == KART_TEAM_DARK_BLUE ? video::SColor(255, 0, 0, 139)     :
+           team == KART_TEAM_CYAN      ? video::SColor(255, 0, 255, 255)   :
+           team == KART_TEAM_DEFAULT   ? video::SColor(255, 255, 182, 193) :
+                                           video::SColor(255, 255, 182, 193);
+
+} // rgbaColorKartTeamsColor
+
+std::string RaceGUIBase::getKartTeamsColorName(KartTeam teamColorName)
+{
+    return teamColorName == KART_TEAM_BLUE ? "blue" :
+           teamColorName == KART_TEAM_RED ? "red" :
+           teamColorName == KART_TEAM_GREEN ? "green" :
+           teamColorName == KART_TEAM_ORANGE ? "orange" :
+           teamColorName == KART_TEAM_YELLOW ? "yellow" :
+           teamColorName == KART_TEAM_PURPLE ? "purple" :
+           teamColorName == KART_TEAM_PINK ? "pink" :
+           teamColorName == KART_TEAM_TURQUOISE ? "turquoise" :
+           teamColorName == KART_TEAM_DARK_BLUE ? "dark_blue" :
+           teamColorName == KART_TEAM_CYAN ? "cyan" :
+           teamColorName == KART_TEAM_DEFAULT ? "pinky" :
+           "pinky";
+
+}

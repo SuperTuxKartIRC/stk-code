@@ -532,10 +532,10 @@ void RichPresence::update(bool force)
                        "addons" : "track_" + trackId);
         }
         assets.add("large_text", trackName);
-        Kart *abstractKart = world->getLocalPlayerKart(0);
-        if (abstractKart)
+        Kart *Kart = world->getLocalPlayerKart(0);
+        if (Kart)
         {
-            const KartProperties* kart = abstractKart->getKartModel()->getKartProperties();
+            const KartProperties* kart = Kart->getKartModel()->getKartProperties();
             if (protocol && protocol->isSpectator())
             {
                 assets.add("small_image", "spectate");
@@ -546,7 +546,7 @@ void RichPresence::update(bool force)
                 if(kart->isAddon())
                 {
                     std::string key = "\"kart_";
-                    key.append(abstractKart->getIdent());
+                    key.append(Kart->getIdent());
                     key.append("\"");
                     auto existing = m_asset_cache.find(key);
                     if (existing == m_asset_cache.end())
@@ -568,7 +568,7 @@ void RichPresence::update(bool force)
                         Log::info("RichPresence", "Couldn't find icon for kart %s", key.c_str());
                     }
                 }
-                assets.add("small_image", useAddon ? "addons" : "kart_" + abstractKart->getIdent());
+                assets.add("small_image", useAddon ? "addons" : "kart_" + Kart->getIdent());
             }
             if (!protocol || !protocol->isSpectator())
             {

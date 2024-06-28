@@ -44,6 +44,7 @@ private:
     GUIEngine::RibbonWidget* m_game_mode_widget;
     GUIEngine::RibbonWidget* m_options_widget;
     GUIEngine::IconButtonWidget* m_ok_widget;
+    GUIEngine::IconButtonWidget* m_more_options_page_widget;
     GUIEngine::IconButtonWidget* m_cancel_widget;
 
     void updateMoreOption(int game_mode);
@@ -81,6 +82,48 @@ public:
             {
                 m_prev_mode = 3;
                 m_prev_value = soccer_goal ? 1 : 0;
+                break;
+            }
+            case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM:
+            {
+                m_prev_mode = 2;
+                m_prev_value = 2;
+                break;
+            }
+            case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER:
+            {
+                m_prev_mode = 2;
+                m_prev_value = 3;
+                break;
+            }
+            case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER:
+            {
+                m_prev_mode = 2;
+                m_prev_value = 4;
+                break;
+            }
+            case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE:
+            {
+                m_prev_mode = 2;
+                m_prev_value = 5;
+                break;
+            }
+            case RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE:
+            {
+                m_prev_mode = 2;
+                m_prev_value = 6;
+                break;
+            }
+            case RaceManager::MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE:
+            {
+                m_prev_mode = 2;
+                m_prev_value = 7;
+                break;
+            }
+            case RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE:
+            {
+                m_prev_mode = 2;
+                m_prev_value = 8;
                 break;
             }
             default:

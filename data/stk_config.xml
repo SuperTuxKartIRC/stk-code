@@ -165,7 +165,7 @@
        gp-lose: Plays when a player fails a grand prix.
        unlock: Plays when a kart, track, or other content is unlocked.
        -->
-  <music title="main_theme.music"
+  <music title="main_theme_2.music"
          default="kart_grand_prix.music"
          race-win="race_win_theme.music"
          race-neutral="race_summary.music"

@@ -79,7 +79,7 @@ public:
     virtual void update(int ticks) OVERRIDE;
     virtual void reset() OVERRIDE;
     virtual void collectedItem(ItemState *item_state) OVERRIDE;
-    virtual void setKartAnimation(AbstractKartAnimation *ka) OVERRIDE;
+    virtual void setKartAnimation(KartAnimation *ka) OVERRIDE;
 
     /** Returns the top speed of this kart. */
     float getTopSpeed() const { return m_top_speed; }

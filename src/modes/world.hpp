@@ -108,8 +108,11 @@ protected:
     /* Team related variables. */
     int m_red_ai;
     int m_blue_ai;
+    int m_green_ai;
+    int m_orange_ai;
     std::map<int, KartTeam> m_kart_team_map;
     std::map<int, unsigned int> m_kart_position_map;
+    std::vector<KartTeam> m_teamsInGame;
 
     /** The list of all karts. */
     KartList                  m_karts;
@@ -117,11 +120,13 @@ protected:
 
     Kart* m_fastest_kart;
     /** Number of eliminated karts. */
-    int         m_eliminated_karts;
+    int              m_eliminated_karts;
     /** Number of eliminated players. */
-    int         m_eliminated_players;
-    /** OVerall number of players. */
-    int         m_num_players;
+    int              m_eliminated_players;
+    /** Overall number of players. */
+    int              m_num_players;
+    /** Number of winning teams. */
+    std::vector<int> m_winning_teams;
 
     bool        m_faster_music_active; // true if faster music was activated
 
@@ -284,8 +289,9 @@ public:
     virtual void    reset(bool restart=false) OVERRIDE;
     virtual void    pause(Phase phase) OVERRIDE;
     virtual void    unpause() OVERRIDE;
-    virtual void    getDefaultCollectibles(int *collectible_type,
-                                           int *amount );
+    virtual void    getDefaultCollectibles(int *collectible_type, int *amount );
+    virtual bool    timerPower();
+    virtual void    getItem(int* collectible_type, int* amount);
     // ------------------------------------------------------------------------
     /** Receives notification if an item is collected. Used for easter eggs. */
     virtual void collectedItem(const Kart *kart,
@@ -297,6 +303,12 @@ public:
     // ------------------------------------------------------------------------
     /** Called to determine whether this race mode uses bonus boxes. */
     virtual bool haveBonusBoxes() { return true; }
+    // ------------------------------------------------------------------------
+    /** Called to determine whether this race mode uses bottle of nitro. */
+    virtual bool haveBottleNitro() { return true; }
+    // ------------------------------------------------------------------------
+    /** Called to determine whether this race mode uses banana. */
+    virtual bool haveBananna() { return true; }
     // ------------------------------------------------------------------------
     /** Returns if this mode should use fast music (if available). */
     virtual bool useFastMusicNearEnd() const { return true; }
@@ -393,10 +405,32 @@ public:
     // ------------------------------------------------------------------------
     virtual bool hasTeam() const                              { return false; }
     // ------------------------------------------------------------------------
+    virtual bool hasTeamPlus() const { return false; }
+    // ------------------------------------------------------------------------
     /** Get the team of kart in world (including AIs) */
     KartTeam getKartTeam(unsigned int kart_id) const;
+    //-------------------------------------------------------------------------
+    int getKartIdTeamIndex(unsigned int kart_id) const;
+    //-------------------------------------------------------------------------
+    int getTeamIndexValue(unsigned int team_index) const;
+    //-------------------------------------------------------------------------
+    int getKartTeamIndex(unsigned int team_id) const;
+    //-------------------------------------------------------------------------
+    int getKartTeamIndex(KartTeam team) const;
     // ------------------------------------------------------------------------
     int getTeamNum(KartTeam team) const;
+    // ------------------------------------------------------------------------
+    int getNumTeams() const { return m_teamsInGame.size(); }
+    // ------------------------------------------------------------------------
+    KartTeam getTeamsInGame(int index) { return m_teamsInGame[index]; }
+    // ------------------------------------------------------------------------
+    void setTeamsInGame(std::vector<KartTeam> kartTeams) { m_teamsInGame = kartTeams; }
+    // ------------------------------------------------------------------------
+    std::vector<int> getWinningTeam() const { return m_winning_teams; }
+    // ------------------------------------------------------------------------
+    void setWinningTeam(int team) { m_winning_teams.clear(); m_winning_teams.push_back(team); }
+    // ------------------------------------------------------------------------
+    void setWinningTeam(std::vector<int> teams) { m_winning_teams = teams; }
     // ------------------------------------------------------------------------
     /** Set the network mode (true if networked) */
     void setNetworkWorld(bool is_networked) { m_is_network_world = is_networked; }
@@ -416,6 +450,8 @@ public:
     }
     // ------------------------------------------------------------------------
     virtual bool isGoalPhase() const { return false; }
+
+    void changeKartTeam(unsigned int kart_id, const KartTeam& new_team);
 };   // World
 
 #endif

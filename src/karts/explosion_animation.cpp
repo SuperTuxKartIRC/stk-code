@@ -90,7 +90,7 @@ ExplosionAnimation *ExplosionAnimation::create(Kart *kart)
 
 // ----------------------------------------------------------------------------
 ExplosionAnimation::ExplosionAnimation(Kart* kart, bool direct_hit)
-                  : AbstractKartAnimation(kart, "ExplosionAnimation")
+                  : KartAnimation(kart, "ExplosionAnimation")
 {
     memset(m_reset_trans_compressed, 0, 16);
     Vec3 normal = m_created_transform.getBasis().getColumn(1).normalized();
@@ -125,7 +125,7 @@ ExplosionAnimation::ExplosionAnimation(Kart* kart, bool direct_hit)
 
 //-----------------------------------------------------------------------------
 ExplosionAnimation::ExplosionAnimation(Kart* kart, BareNetworkString* b)
-                  : AbstractKartAnimation(kart, "ExplosionAnimation")
+                  : KartAnimation(kart, "ExplosionAnimation")
 {
     restoreBasicState(b);
     restoreData(b);
@@ -283,7 +283,7 @@ void ExplosionAnimation::update(int ticks)
         m_kart->setRotation(q);
     }
 
-    AbstractKartAnimation::update(ticks);
+    KartAnimation::update(ticks);
 }   // update
 
 // ----------------------------------------------------------------------------
@@ -297,7 +297,7 @@ void ExplosionAnimation::updateGraphics(float dt)
             m_kart->getKartProperties()->getExplosionInvulnerabilityTime();
         m_kart->showStarEffect(t);
     }
-    AbstractKartAnimation::updateGraphics(dt);
+    KartAnimation::updateGraphics(dt);
 }   // updateGraphics
 
 // ----------------------------------------------------------------------------
@@ -310,7 +310,7 @@ bool ExplosionAnimation::hasResetAlready() const
 // ----------------------------------------------------------------------------
 void ExplosionAnimation::saveState(BareNetworkString* buffer)
 {
-    AbstractKartAnimation::saveState(buffer);
+    KartAnimation::saveState(buffer);
     buffer->addUInt8(m_direct_hit ? 1 : 0);
     if (RaceManager::get()->getMinorMode() ==
         RaceManager::MINOR_MODE_CAPTURE_THE_FLAG && m_direct_hit)
@@ -325,6 +325,6 @@ void ExplosionAnimation::saveState(BareNetworkString* buffer)
 // ----------------------------------------------------------------------------
 void ExplosionAnimation::restoreState(BareNetworkString* buffer)
 {
-    AbstractKartAnimation::restoreState(buffer);
+    KartAnimation::restoreState(buffer);
     restoreData(buffer);
 }   // restoreState

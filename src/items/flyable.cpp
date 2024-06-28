@@ -391,7 +391,7 @@ void Flyable::getLinearKartItemIntersection (const Vec3 &origin,
 
 //-----------------------------------------------------------------------------
 
-void Flyable::setAnimation(AbstractKartAnimation *animation)
+void Flyable::setAnimation(KartAnimation *animation)
 {
     if (animation)
     {

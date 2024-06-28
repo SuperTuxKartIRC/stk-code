@@ -50,9 +50,17 @@ private:
 
     int m_hit_capture_limit;
 
+    int m_battle_number_life;
+
     float m_battle_time_limit;
 
+    int m_nb_ai;
+
+    int m_nb_team;
+
     bool m_reverse;
+
+    bool m_teams_selection;
 
     std::atomic_bool m_is_grand_prix;
 
@@ -141,6 +149,29 @@ public:
     {
         m_hit_capture_limit = hc;
         m_battle_time_limit = time;
+    }
+    // ------------------------------------------------------------------------
+    void setLifeTime(int life, float time)
+    {
+        m_battle_number_life = life;
+        if (m_battle_time_limit==0) {
+            time = 0;
+        }
+        else {
+            m_battle_time_limit = time;
+        }
+
+    }
+    // ------------------------------------------------------------------------
+    void setNbAiTeam(int ai, int team)
+    {
+        m_nb_ai = ai;
+        m_nb_team = team;
+    }
+    // ------------------------------------------------------------------------
+    void setTeamSelection(bool teams_selection)
+    {
+        m_teams_selection = teams_selection;
     }
     // ------------------------------------------------------------------------
     const std::string& getServerNameUtf8() const { return m_server_name_utf8; }

@@ -219,7 +219,7 @@ public:
     static  void init(const XMLNode &node, scene::IMesh *rubberball);
     virtual bool updateAndDelete(int ticks) OVERRIDE;
     virtual bool hit(Kart* kart, PhysicalObject* obj=NULL) OVERRIDE;
-    virtual void setAnimation(AbstractKartAnimation *animation) OVERRIDE;
+    virtual void setAnimation(KartAnimation *animation) OVERRIDE;
     // ------------------------------------------------------------------------
     /** This object does not create an explosion, all affects on
      *  karts are handled by this hit() function. */

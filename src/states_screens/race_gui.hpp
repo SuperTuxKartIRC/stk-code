@@ -88,6 +88,8 @@ private:
     /** Height of the digit font. */
     int              m_font_height;
 
+    float m_elapsedTime = 0;
+
     /** Icon textures (stored as variables to not look up
         their location on every frame) */
     irr::video::ITexture *m_red_team;
@@ -96,7 +98,10 @@ private:
     irr::video::ITexture *m_blue_flag;
     irr::video::ITexture *m_soccer_ball;
     irr::video::ITexture *m_heart_icon;
-    irr::video::ITexture *m_basket_ball_icon;
+    irr::video::ITexture* m_basket_ball_icon;
+    irr::video::ITexture* m_winning_podium_icon; // For special victory win
+    irr::video::ITexture* m_thief_icon;
+    irr::video::ITexture *m_thief_live_icon;
     /** Texture for the hit limit icon*/
     irr::video::ITexture* m_champion;
 
@@ -131,6 +136,11 @@ private:
                                 const core::vector2df &offset,
                                 float min_ratio, int meter_width,
                                 int meter_height, float dt);
+    void drawPowerTime          (const Kart*kart,
+                                const core::vector2df &offset,
+                                float min_ratio, int meter_width,
+                                int meter_height, float dt);
+
 
     /* Helper functions for drawing meters */
 

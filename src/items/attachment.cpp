@@ -585,6 +585,7 @@ void Attachment::update(int ticks)
         break;
     }   // switch
 
+
     // Detach attachment if its time is up.
     if (m_ticks_left <= 0)
         clear();

@@ -40,12 +40,12 @@
  *  \param end_left, end_right: Left and right end points of the line at
  *         which the kart finishes.
  *  \param skid_rot Visual rotation of the kart due to skidding (while this
- *         value can be queried, the AbstractkartAnimation constructor
+ *         value can be queried, the KartAnimation constructor
  *         resets the value to 0, so it needs to be passed in.
  */
 CannonAnimation::CannonAnimation(Kart* kart, CheckCannon* cc,
                                  float skid_rot)
-               : AbstractKartAnimation(kart, "CannonAnimation")
+               : KartAnimation(kart, "CannonAnimation")
 {
     m_flyable = NULL;
     m_created_transform = m_kart->getTrans();
@@ -61,7 +61,7 @@ CannonAnimation::CannonAnimation(Kart* kart, CheckCannon* cc,
 /** The constructor for the cannon animation for kart during rewind.
  */
 CannonAnimation::CannonAnimation(Kart* kart, BareNetworkString* buffer)
-               : AbstractKartAnimation(kart, "CannonAnimation")
+               : KartAnimation(kart, "CannonAnimation")
 {
     restoreBasicState(buffer);
     m_check_cannon = NULL;
@@ -74,7 +74,7 @@ CannonAnimation::CannonAnimation(Kart* kart, BareNetworkString* buffer)
 /** Constructor for a flyable. It sets the kart data to NULL.
  */
 CannonAnimation::CannonAnimation(Flyable* flyable, CheckCannon* cc)
-               : AbstractKartAnimation(NULL, "CannonAnimation")
+               : KartAnimation(NULL, "CannonAnimation")
 {
     m_flyable = flyable;
     m_created_transform = m_flyable->getTrans();
@@ -89,7 +89,7 @@ CannonAnimation::CannonAnimation(Flyable* flyable, CheckCannon* cc)
 /** The constructor for the cannon animation for flyable during rewind.
  */
 CannonAnimation::CannonAnimation(Flyable* flyable, BareNetworkString* buffer)
-               : AbstractKartAnimation(NULL, "CannonAnimation")
+               : KartAnimation(NULL, "CannonAnimation")
 {
     m_flyable = flyable;
     restoreBasicState(buffer);
@@ -107,7 +107,7 @@ CannonAnimation::CannonAnimation(Flyable* flyable, BareNetworkString* buffer)
  *  \param end_left, end_right: Left and right end points of the line at
  *         which the kart finishes.
  *  \param skid_rot Visual rotation of the kart due to skidding (while this
- *         value can be queried, the AbstractkartAnimation constructor
+ *         value can be queried, the KartAnimation constructor
  *         resets the value to 0, so it needs to be passed in.
  */
 void CannonAnimation::init(Ipo *ipo, const Vec3 &start_left,
@@ -352,13 +352,13 @@ void CannonAnimation::update(int ticks)
     else
         m_flyable->setXYZ(curve_xyz + rotated_delta);
 
-    AbstractKartAnimation::update(ticks);
+    KartAnimation::update(ticks);
 }   // update
 
 // ----------------------------------------------------------------------------
 void CannonAnimation::saveState(BareNetworkString* buffer)
 {
-    AbstractKartAnimation::saveState(buffer);
+    KartAnimation::saveState(buffer);
     buffer->addUInt8((uint8_t)m_check_cannon->getIndex());
     // Flyable only use Y in m_delta
     if (m_kart)
@@ -373,7 +373,7 @@ void CannonAnimation::saveState(BareNetworkString* buffer)
 // ----------------------------------------------------------------------------
 void CannonAnimation::restoreState(BareNetworkString* buffer)
 {
-    AbstractKartAnimation::restoreState(buffer);
+    KartAnimation::restoreState(buffer);
     restoreData(buffer);
 }   // restoreState
 

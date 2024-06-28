@@ -128,7 +128,21 @@ void GameSetup::addServerInfo(NetworkString* ns)
         .addUInt8((uint8_t)ServerConfig::m_server_max_players)
         // Reserve for extra spectators
         .addUInt8(0)
-        .addUInt8((uint8_t)sl->getGameMode());
+        // Ne pas ajouter ces 3 informations pour le temps ... 
+        .addUInt8((uint8_t)sl->getGameMode())
+        .addUInt8((uint8_t)sl->getTimeLimit())
+        .addUInt8((uint8_t)sl->getNbAi()); // TODO : Besoins de changement : nb_ai 
+    int i = sl->getGameMode();
+    if (sl->getGameMode()==13) { //tag zombie
+        ns->addUInt8((uint8_t)sl->getNbTag());
+    }
+    else if (sl->getGameMode() == 9 || sl->getGameMode() == 10 || sl->getGameMode() == 11) { //team battle
+        ns->addUInt8((uint8_t)sl->getHitCaptureLimit2()).addUInt8((uint8_t)sl->getNbTeam()).addUInt8((uint8_t)sl->getTeamsSelection());
+    }
+    else if (sl->getGameMode() == 12) { // team battle life
+        ns->addUInt8((uint8_t)sl->getNumberLife()).addUInt8((uint8_t)sl->getNbTeam()).addUInt8((uint8_t)sl->getTeamsSelection());
+    }
+
     if (hasExtraSeverInfo())
     {
         if (isGrandPrix())
@@ -144,6 +158,7 @@ void GameSetup::addServerInfo(NetworkString* ns)
             // Soccer mode
             ns->addUInt8((uint8_t)1).addUInt8(getExtraServerInfo());
         }
+
     }
     else
     {
@@ -202,12 +217,22 @@ void GameSetup::sortPlayersForGame(
         std::mt19937 g(rd());
         std::shuffle(players.begin(), players.end(), g);
     }
-    if (!RaceManager::get()->teamEnabled() ||
+    if (!RaceManager::get()->teamEnabled() || !RaceManager::get()->teamPlusEnabled() || 
         ServerConfig::m_team_choosing)
         return;
+
     for (unsigned i = 0; i < players.size(); i++)
-    {
-        players[i]->setTeam((KartTeam)(i % 2));
+    { // TODO : TEAM Modification
+        if (RaceManager::get()->teamPlusEnabled()) {
+            if (ServerConfig::m_server_game_nb_team > 0) { // Cette condition n'est pas bonne // William Lussier 2023-11-24 14h26
+                players[i]->setTeam((KartTeam)(i % RaceManager::get()->getNbTeams())); // ServerConfig::m_server_game_nb_team
+            }
+            else
+                players[i]->setTeam((KartTeam)(i % 4));
+        }
+        else {
+            players[i]->setTeam((KartTeam)(i % 2));
+        }
     }
 }   // sortPlayersForGame
 

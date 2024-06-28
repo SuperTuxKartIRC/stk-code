@@ -145,6 +145,8 @@ public:
     // ------------------------------------------------------------------------
     float getDefaultKartColor() const          { return m_default_kart_color; }
     // ------------------------------------------------------------------------
+    void setDefaultKartColor(float color) {m_default_kart_color = color; }
+    // ------------------------------------------------------------------------
     uint32_t getOnlineId() const                        { return m_online_id; }
     // ------------------------------------------------------------------------
     bool isOfflineAccount() const                  { return m_online_id == 0; }

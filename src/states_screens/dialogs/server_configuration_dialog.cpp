@@ -25,9 +25,11 @@
 #include "network/network_string.hpp"
 #include "network/protocols/lobby_protocol.hpp"
 #include "network/stk_host.hpp"
+#include "states_screens/dialogs/server_configuration_more_options_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+#include <network/protocols/client_lobby.hpp>
 
 using namespace GUIEngine;
 
@@ -47,6 +49,8 @@ void ServerConfigurationDialog::beforeAddingWidgets()
     assert(m_difficulty_widget != NULL);
     m_ok_widget = getWidget<IconButtonWidget>("ok");
     assert(m_ok_widget != NULL);
+    m_more_options_page_widget = getWidget<IconButtonWidget>("more-options-page");
+    assert(m_more_options_page_widget != NULL);
     m_cancel_widget = getWidget<IconButtonWidget>("cancel");
     assert(m_cancel_widget != NULL);
 }   // beforeAddingWidgets
@@ -83,7 +87,7 @@ GUIEngine::EventPropagation
             m_self_destroy = true;
             return GUIEngine::EVENT_BLOCK;
         }
-        else if (selection == m_ok_widget->m_properties[PROP_ID])
+        else if (selection == m_ok_widget->m_properties[PROP_ID] || selection == m_more_options_page_widget->m_properties[PROP_ID])
         {
             m_self_destroy = true;
             NetworkString change(PROTOCOL_LOBBY_ROOM);
@@ -105,10 +109,44 @@ GUIEngine::EventPropagation
                 case 2:
                 {
                     int v = m_more_options_spinner->getValue();
-                    if (v == 0)
+                    if (v == 0) {
                         change.addUInt8(7).addUInt8(0);
-                    else
+                        RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_FREE_FOR_ALL);
+
+                    }
+                    else if (v == 1) {
                         change.addUInt8(8).addUInt8(0);
+                        RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_CAPTURE_THE_FLAG);
+                    }
+                    else if (v == 2) {
+                        change.addUInt8(9).addUInt8(0);
+                        RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM);
+                    }
+                    else if (v == 3){
+                        change.addUInt8(10).addUInt8(0);
+                    RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER);
+                    }
+                    else if (v == 4) {
+                        change.addUInt8(11).addUInt8(0);
+                        RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER);
+                    }
+                    else if (v == 5) {
+                        change.addUInt8(12).addUInt8(0);
+                        RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE);
+                    }
+                    else if (v == 6) {
+                        change.addUInt8(13).addUInt8(0);
+                        RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE);
+                    }
+                    else if (v == 7) {
+                        change.addUInt8(14).addUInt8(0);
+                        RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE);
+                    }
+                    else if (v == 8) {
+                        change.addUInt8(15).addUInt8(0);
+                        RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE);
+                    }
+
                     break;
                 }
                 case 3:
@@ -121,8 +159,20 @@ GUIEngine::EventPropagation
                 {
                     break;
                 }
+
+               
             }
             STKHost::get()->sendToServer(&change, true);
+            if (selection == m_more_options_page_widget->m_properties[PROP_ID])
+            {
+                auto cl = LobbyProtocol::get<ClientLobby>();
+                if (cl)  // TODO : Est-ce que cette condition est utile ???
+                {
+                    RaceManager::get()->setMinorMode(m_more_options_spinner->getValue());
+                    new ServerConfigurationMoreOptionsDialog(0.8f, 0.8f);
+                }
+                return GUIEngine::EVENT_BLOCK;
+            }
             return GUIEngine::EVENT_BLOCK;
         }
     }
@@ -160,7 +210,19 @@ void ServerConfigurationDialog::updateMoreOption(int game_mode)
             m_more_options_spinner->clearLabels();
             m_more_options_spinner->addLabel(_("Free-For-All"));
             m_more_options_spinner->addLabel(_("Capture The Flag"));
-            m_more_options_spinner->setValue(m_prev_value);
+            m_more_options_spinner->addLabel(_("Team Points"));
+            m_more_options_spinner->addLabel(_("Player with most points"));
+            m_more_options_spinner->addLabel(_("All Player Points"));
+            m_more_options_spinner->addLabel(_("Last team standing"));
+            m_more_options_spinner->addLabel(_("Tag zombie"));
+            m_more_options_spinner->addLabel(_("Monster Arena Battle"));
+            m_more_options_spinner->addLabel(_("Murder Mystery"));
+            if (RaceManager::get()->getMinorModeTarget()==0) {
+                m_more_options_spinner->setValue(m_prev_value);
+            }
+            else {
+                m_more_options_spinner->setValue(RaceManager::get()->getMinorModeTarget());
+            }
             break;
         }
         case 3:

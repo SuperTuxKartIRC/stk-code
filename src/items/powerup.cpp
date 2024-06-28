@@ -115,6 +115,18 @@ void Powerup::update(int ticks)
 {
     // Remove any sound ticks that should have played
     const int remove_ticks = World::getWorld()->getTicksSinceStart() - 1000;
+
+    // TODO : À vérifier // William Lussier 2023-11-23 16h05
+    if (!RaceManager::get()->haveBonusBoxes() && World::getWorld()->timerPower())
+    {
+        m_type = PowerupManager::POWERUP_NOTHING;
+        m_number = 0;
+
+        int type, number;
+        World::getWorld()->getItem(&type, &number);
+        set((PowerupManager::PowerupType)type, number);
+    }
+
     for (auto it = m_played_sound_ticks.begin();
          it != m_played_sound_ticks.end();)
     {

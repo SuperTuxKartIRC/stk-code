@@ -1050,7 +1050,7 @@ void SkiddingAI::evaluateItems(const ItemState *item, Vec3 kart_aim_direction,
 
     // If the item type is not handled here, ignore it
     Item::ItemType type = item->getType();
-    if( type!=Item::ITEM_BANANA    && type!=Item::ITEM_BUBBLEGUM &&
+    if( type!=Item::ITEM_BANANA && type!=Item::ITEM_BUBBLEGUM && //TODO: barrel
         type!=Item::ITEM_BONUS_BOX &&
         type!=Item::ITEM_NITRO_BIG && type!=Item::ITEM_NITRO_SMALL  )
         return;
@@ -1292,7 +1292,6 @@ void SkiddingAI::handleItems(const float dt)
                 m_controls->setLookBack(fire_backwards);
             break;
         }   // POWERUP_CAKE
-
     case PowerupManager::POWERUP_BOWLING:
     case PowerupManager::POWERUP_SMALL_SOCCER_BALL:
         {

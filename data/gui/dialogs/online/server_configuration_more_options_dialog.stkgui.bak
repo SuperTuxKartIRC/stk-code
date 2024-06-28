@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
+        <header id="title" text_align="center" width="80%" align="center" I18N="In the server configuration screen" text="Server Game Options Configuration"/>
+        <spacer height="1%" width="20"/>
+        <box proportion="1" width="90%" layout="vertical-row" align="center">
+
+            <div width="100%" height="fit" layout="horizontal-row" id="time-div">
+                <label id="time-value-text" proportion="1" text_align="left" I18N="In the server creation screen" text="Duration of the game (min)"/>
+                <spinner id="time-value-spinner" proportion="1" min_value="0" max_value="30"/>
+            </div>
+
+            <spacer height="1%" width="20"/>
+
+            <div width="100%" height="fit" layout="horizontal-row" id="nb-ai-div">
+                <label id="nb-ai-value-text" proportion="1" text_align="left" I18N="In the server creation screen" text="Max. number of AI players"/>
+                <spinner id="nb-ai-value-spinner" proportion="1" min_value="0" max_value="30"/>/>
+            </div>
+
+       	    <div width="100%" height="fit" layout="horizontal-row" id="nb-team-div">
+                <label id="nb-ia-value-text" proportion="1" text_align="left" I18N="In the server creation screen" text="Max. number of team"/>
+                <spinner id="nb-team-value-spinner" proportion="1" min_value="0" max_value="30"/>/>
+            </div>
+
+            <spacer height="1%" width="20"/>
+
+            <div width="100%" height="fit" layout="horizontal-row" id="winning-div">
+                <label id="winning-value-text" proportion="1" text_align="left" I18N="In the server creation screen" text="Number of points to win"/>
+                <spinner id="winning-value-spinner" proportion="1" min_value="0" max_value="30"/>
+            </div>
+
+            <div width="100%" height="fit" layout="horizontal-row" id="number-life-div">
+                <label id="life-value-text" proportion="1" text_align="left" I18N="In the server creation screen" text="Number of life"/>
+                <spinner id="life-value-spinner" proportion="1" min_value="0" max_value="30"/>
+            </div>
+
+            <spacer height="2%" width="20"/>
+
+
+    	    <div width="5%" height="fit" layout="horizontal-row">
+                <icon-button id="powerup" icon_align="right" icon="gui/icons/gift.png"/>
+		<icon-button id="nitro" icon_align="right" icon="gui/icons/nitro.png"/>
+		<icon-button id="banana" icon_align="right" icon="gui/icons/banana.png"/>
+		<icon-button id="powerup-selection" icon_align="right" icon="gui/icons/powerups_selection.png"/>
+		<icon-button id="special-option" icon_align="right" icon="gui/icons/heart.png"/>
+            </div>  
+
+
+            <buttonbar id="options" x="0" y="0" width="30%" height="15%" align="center">
+
+                <icon-button id="cancel" width="64" height="64" icon="gui/icons/red_x.png"
+                             I18N="In the server configuration screen" text="Cancel" label_location="bottom"/>
+                <icon-button id="ok" width="64" height="64" icon="gui/icons/green_check.png"
+                             I18N="In the server configuration screen" text="OK" label_location="bottom"/>
+            </buttonbar>
+
+            <spacer height="1f" width="20"/>
+        </box>
+    </div>
+</stkgui>

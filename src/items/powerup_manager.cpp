@@ -39,7 +39,6 @@
 #include "race/race_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
-
 #include <IMesh.h>
 #include "small_soccer_ball.hpp"
 
@@ -155,6 +154,8 @@ void PowerupManager::loadPowerupsModels()
     loadWeights(root, "race-weight-list"    );
     loadWeights(root, "ftl-weight-list"     );
     loadWeights(root, "battle-weight-list"  );
+    loadWeights(root, "teamsarena-weight-list");
+    loadWeights(root, "tagzombie-weight-list");
     loadWeights(root, "soccer-weight-list"  );
     loadWeights(root, "tutorial-weight-list");
 
@@ -813,18 +814,25 @@ void PowerupManager::computeWeightsForRace(int num_karts)
     std::string class_name="";
     switch (RaceManager::get()->getMinorMode())
     {
-    case RaceManager::MINOR_MODE_TIME_TRIAL:       /* fall through */
-    case RaceManager::MINOR_MODE_LAP_TRIAL:       /* fall through */
-    case RaceManager::MINOR_MODE_NORMAL_RACE:      class_name="race";     break;
-    case RaceManager::MINOR_MODE_FOLLOW_LEADER:    class_name="ftl";      break;
-    case RaceManager::MINOR_MODE_3_STRIKES:        class_name="battle";   break;
-    case RaceManager::MINOR_MODE_FREE_FOR_ALL:     class_name="battle";   break;
-    case RaceManager::MINOR_MODE_CAPTURE_THE_FLAG: class_name="battle";   break;
-    case RaceManager::MINOR_MODE_TUTORIAL:         class_name="tutorial"; break;
-    case RaceManager::MINOR_MODE_EASTER_EGG:       /* fall through */
-    case RaceManager::MINOR_MODE_OVERWORLD:
-    case RaceManager::MINOR_MODE_CUTSCENE:
-    case RaceManager::MINOR_MODE_SOCCER:           class_name="soccer";   break;
+    case RaceManager::MINOR_MODE_TIME_TRIAL:                            /* fall through */
+    case RaceManager::MINOR_MODE_LAP_TRIAL:                             /* fall through */
+    case RaceManager::MINOR_MODE_NORMAL_RACE:                           class_name = "race";         break;
+    case RaceManager::MINOR_MODE_FOLLOW_LEADER:                         class_name = "ftl";          break;
+    case RaceManager::MINOR_MODE_3_STRIKES:                             class_name = "battle";       break;
+    case RaceManager::MINOR_MODE_FREE_FOR_ALL:                          class_name = "battle";       break;
+    case RaceManager::MINOR_MODE_CAPTURE_THE_FLAG:                      class_name = "battle";       break;
+    case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM:         class_name = "teamsarena";   break;
+    case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER:       class_name = "teamsarena";   break;
+    case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER:   class_name = "teamsarena";   break;
+    case RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE:                class_name = "teamsarena";   break;
+    case RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE:               class_name = "tagzombie";    break;
+    case RaceManager::MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE:      class_name = "tagzombie";    break;
+    case RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE: class_name = "tagzombie";    break;
+    case RaceManager::MINOR_MODE_TUTORIAL:                              class_name = "tutorial";     break;
+    case RaceManager::MINOR_MODE_EASTER_EGG:                            /* fall through */
+    case RaceManager::MINOR_MODE_OVERWORLD:                           
+    case RaceManager::MINOR_MODE_CUTSCENE:                            
+    case RaceManager::MINOR_MODE_SOCCER:                                class_name="soccer";   break;
     default:
         Log::fatal("PowerupManager", "Invalid minor mode %d - aborting.",
                     RaceManager::get()->getMinorMode());

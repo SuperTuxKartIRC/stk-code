@@ -129,7 +129,7 @@ void ItemManager::loadDefaultItemMeshes()
 
         // Load icons (?? where are these icons used ??)
         std::string icon = "icon-" + item_names[(ItemState::ItemType)i] + ".png";
-        if (preloadIcon(icon))
+        if (preloadIcon(icon) || icon == "icon-barrel.png") //TODO: barrel enlever le || mais ne fontionne pas avec le barrel
             m_icon[i] = icon;
     }   // for i
     delete root;
@@ -361,6 +361,8 @@ Item* ItemManager::placeItem(ItemState::ItemType type, const Vec3& xyz,
     // Make sure this subroutine is not used otherwise (since networking
     // needs to be aware of items added to the track, so this would need
     // to be added).
+
+
     assert(World::getWorld()->getPhase() == WorldStatus::SETUP_PHASE ||
            ProfileWorld::isProfileMode()                               );
     ItemState::ItemType mesh_type = type;

@@ -28,7 +28,7 @@ class Referee;
 /** This triggers a rescue of the specified kart.
  * \ingroup karts
  */
-class RescueAnimation: public AbstractKartAnimation
+class RescueAnimation: public KartAnimation
 {
 protected:
 friend class KartRewinder;

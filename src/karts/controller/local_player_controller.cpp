@@ -419,7 +419,7 @@ void LocalPlayerController::collectedItem(const ItemState &item_state,
     }
     else
     {
-        switch(item_state.getType())
+        switch (item_state.getType())
         {
         case Item::ITEM_BANANA:
         case Item::ITEM_BUBBLEGUM:

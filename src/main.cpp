@@ -580,6 +580,8 @@ void cmdLineHelp()
     "       --soccer-goals     Use goals limit mode in network soccer game.\n"
     "       --capture-limit    Specify capture limit for CTF.\n"
     "       --time-limit       Specify time limit for current game mode.\n"
+    "       --nb-team-battle   Specify number of team in team battle mode.\n"
+    "       --nb-ai-battle     Specify number of ai in team battle mode.\n"
     "       --reverse          Play track in reverse (if allowed)\n"
     "  -f,  --fullscreen       Use fullscreen display.\n"
     "  -w,  --windowed         Use windowed display (default).\n"
@@ -1220,6 +1222,48 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
             RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_CAPTURE_THE_FLAG);
             break;
         }
+        case 6:
+        {
+            ServerConfig::m_server_mode = 9;
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM);
+            break;
+        }
+        case 7:
+        {
+            ServerConfig::m_server_mode = 10;
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER);
+            break;
+        }
+        case 8:
+        {
+            ServerConfig::m_server_mode = 11;
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER);
+            break;
+        }
+        case 9:
+        {
+            ServerConfig::m_server_mode = 12;
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE);
+            break;
+        }
+        case 10:
+        {
+            ServerConfig::m_server_mode = 13;
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE);
+            break;
+        }
+        case 11:
+        {
+            ServerConfig::m_server_mode = 14;
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE);
+            break;
+        }
+        case 12:
+        {
+            ServerConfig::m_server_mode = 15;
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE);
+            break;
+        }
         default:
             Log::warn("main", "Invalid race mode '%d' - ignored.", n);
         }
@@ -1514,6 +1558,16 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
     }
 
     if (CommandLine::has("--capture-limit", &n))
+    {
+        RaceManager::get()->setHitCaptureTime(n, 0.0f);
+    }
+
+    if (CommandLine::has("--nb-team-battle", &n))
+    {
+        RaceManager::get()->setHitCaptureTime(n, 0.0f);
+    }
+    
+    if (CommandLine::has("--nb-ai-battle", &n))
     {
         RaceManager::get()->setHitCaptureTime(n, 0.0f);
     }

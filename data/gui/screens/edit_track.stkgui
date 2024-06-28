@@ -50,16 +50,30 @@
 
                 <spacer height="2%" />
 
-                <!-- Reverse selection and cancel button -->
+                <!-- Reverse and nopowerup selection and cancel button -->
                 <div width="100%" height="fit" layout="horizontal-row">
 
                     <spacer width="5%" />
 
-                    <div width="60%" height="fit" layout="horizontal-row">
+                    <div width="20%" height="fit" layout="horizontal-row">
                         <label id="reverse_label" text_align="left"
                             I18N="In the edit track screen" text="Reverse:" />
                         <spacer width="0.2f" />
                         <checkbox id="reverse" />
+                    </div>
+		     <div width="20%" height="fit" layout="horizontal-row">
+                        <label id="powerup_label" text_align="left"
+                            I18N="In the edit track screen" text="Power-up:" />
+                        <spacer width="0.2f" />
+			<checkbox id="powerup" />
+                    </div>
+
+                    <spacer width="10%" />
+
+		    <div width="5%" height="fit" layout="horizontal-row">
+                        <icon-button id="powerup" icon_align="right" icon="gui/icons/gift.png"/>
+			<icon-button id="boost" icon_align="right" icon="gui/icons/nitro.png"/>
+			<icon-button id="banana" icon_align="right" icon="gui/icons/banana.png"/>
                     </div>
 
                     <spacer width="10%" />

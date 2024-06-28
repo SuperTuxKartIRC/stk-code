@@ -67,6 +67,9 @@
 #include "modes/linear_world.hpp"
 #include "modes/overworld.hpp"
 #include "modes/soccer_world.hpp"
+#include "modes/team_arena_battle.hpp"
+#include "modes/team_arena_battle_life.hpp"
+#include "modes/tag_zombie_arena_battle.hpp"
 #include "network/compress_network_body.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/client_lobby.hpp"
@@ -106,11 +109,13 @@
 #  pragma warning(disable:4355)
 #endif
 
-void Kart::loadKartProperties(const std::string& new_ident,
+void Kart::loadKartProperties(const std::string& new_ident_n,
                                       HandicapLevel handicap,
                                       std::shared_ptr<GE::GERenderInfo> ri,
                                       const KartData& kart_data)
 {
+    const std::string new_ident = new_ident_n; // TODO : Besoins de changement. Cette ligne n'est pas supposer exister ... William Lussier 2023-11-11 14h07
+
     m_kart_properties.reset(new KartProperties());
     KartProperties* tmp_kp = NULL;
     const KartProperties* kp = kart_properties_manager->getKart(new_ident);
@@ -637,6 +642,12 @@ void Kart::setSlowdown(unsigned int category, float max_speed_fraction,
                        int fade_in_time)
 {
     m_max_speed->setSlowdown(category, max_speed_fraction,  fade_in_time);
+}   // setSlowdown
+
+void Kart::setSlowdown(unsigned int category, float max_speed_fraction,
+    int fade_in_time, int duration)
+{
+    m_max_speed->setSlowdown(category, max_speed_fraction, fade_in_time, duration);
 }   // setSlowdown
 
 // -----------------------------------------------------------------------------
@@ -1245,6 +1256,16 @@ void Kart::setRaceResult()
         FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
         m_race_result = ffa->getKartFFAResult(getWorldKartId());
     }
+    else if (RaceManager::get()->isTeamArenaBattleMode())
+    {
+        TeamArenaBattle* tab = dynamic_cast<TeamArenaBattle*>(World::getWorld());
+        m_race_result = tab->hasWin(getWorldKartId());
+    }
+    else if (RaceManager::get()->isTagzArenaBattleMode())
+    {
+        TagZombieArenaBattle* tagz = dynamic_cast<TagZombieArenaBattle*>(World::getWorld());
+        m_race_result = tagz->hasWin(getWorldKartId());
+    }
     else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
     {
         CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
@@ -1311,6 +1332,7 @@ void Kart::collectedItem(ItemState *item_state)
         // Play appropriate custom character sound
         playCustomSFX(SFXManager::CUSTOM_GOO);
         break;
+
     default        : break;
     }   // switch TYPE
 
@@ -2534,7 +2556,7 @@ void Kart::handleZipper(const Material *material, bool play_sound, bool mini_zip
  *  \param ka The new kart animation, or NULL if the current kart animation
  *            is to be stopped.
  */
-void Kart::setKartAnimation(AbstractKartAnimation *ka)
+void Kart::setKartAnimation(KartAnimation *ka)
 {
 #ifdef DEBUG
     if( ( (ka!=NULL) ^ (m_kart_animation!=NULL) ) ==0)

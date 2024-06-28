@@ -30,6 +30,11 @@
                         <spacer width="3%"/>
                         <label id="reverse-text" width="52%" height="fit" I18N="In the grand prix info screen" text="Reverse" text_align="left"/>
                     </div>
+                    <div width="5%" height="fit" layout="horizontal-row">
+                        <icon-button id="powerup" icon_align="right" icon="gui/icons/gift.png"/>
+			<icon-button id="boost" icon_align="right" icon="gui/icons/nitro.png"/>
+			<icon-button id="banana" icon_align="right" icon="gui/icons/banana.png"/>
+                    </div>
                     <spacer width="1" height="1%"/>
                     <div width="100%" height="fit" layout="horizontal-row">
                         <div width="45%" height="fit" layout="horizontal-row">

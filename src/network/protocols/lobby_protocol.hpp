@@ -69,9 +69,11 @@ public:
         LE_SERVER_OWNERSHIP, // Tell client he is now the server owner
         LE_KICK_HOST, // Server owner kicks some other peer in game
         LE_CHANGE_TEAM, // Client wants to change his team
+        LE_CHANGE_TEAM_PLUS, // Client wants to change his team (4 teams)
         LE_BAD_TEAM, // Tell server owner that the team is unbalanced
         LE_BAD_CONNECTION, // High ping or too many packets loss
         LE_CONFIG_SERVER, // Server owner config server game mode or difficulty
+        LE_CONFIG_SERVER_OPTION, // Server owner config server option (some games rules)
         LE_CHANGE_HANDICAP, // Client changes handicap
         LE_LIVE_JOIN, // Client live join or spectate
         LE_LIVE_JOIN_ACK, // Server tell client live join or spectate succeed

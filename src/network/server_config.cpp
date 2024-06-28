@@ -237,6 +237,27 @@ std::pair<RaceManager::MinorRaceModeType, RaceManager::MajorRaceModeType>
         case 8:
             return { RaceManager::MINOR_MODE_CAPTURE_THE_FLAG,
                 RaceManager::MAJOR_MODE_SINGLE };
+        case 9:
+            return { RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_TEAM,
+                RaceManager::MAJOR_MODE_SINGLE };
+        case 10:
+            return { RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_POINTS_PLAYER,
+                RaceManager::MAJOR_MODE_SINGLE };
+        case 11:
+            return { RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_ALL_POINTS_PLAYER,
+                RaceManager::MAJOR_MODE_SINGLE };
+        case 12:
+            return { RaceManager::MINOR_MODE_TEAM_ARENA_BATTLE_LIFE,
+                RaceManager::MAJOR_MODE_SINGLE };
+        case 13:
+            return { RaceManager::MINOR_MODE_TAG_ZOMBIE_ARENA_BATTLE,
+                RaceManager::MAJOR_MODE_SINGLE };
+        case 14:
+            return { RaceManager::MINOR_MODE_TAG_ZOMBIE_SURVIROR_ARENA_BATTLE,
+                RaceManager::MAJOR_MODE_SINGLE };
+        case 15:
+            return { RaceManager::MINOR_MODE_TAG_ZOMBIE_LAST_SURVIROR_ARENA_BATTLE,
+                RaceManager::MAJOR_MODE_SINGLE };
         default:
             break;
     }
@@ -273,6 +294,20 @@ core::stringw getModeName(unsigned id)
             return _("Free-For-All");
         case 8:
             return _("Capture The Flag");
+        case 9:
+            return _("Team Points");
+        case 10:
+            return _("Player with most points");
+        case 11:
+            return _("All Player Points");
+        case 12:
+            return _("Last team standing");
+        case 13:
+            return _("Tag zombie");
+        case 14:
+            return _("Monster Arena Battle");
+        case 15:
+            return _("Murder Mystery");
         default:
             return L"";
     }
@@ -319,7 +354,7 @@ void loadServerLobbyFromConfig()
         m_player_reports_expired_days.revertToDefaults();
     if (m_server_difficulty > RaceManager::DIFFICULTY_LAST)
         m_server_difficulty = RaceManager::DIFFICULTY_LAST;
-    if (m_server_mode > 8)
+    if (m_server_mode > 15)
         m_server_mode = 3;
 
     if (m_official_karts_threshold > 1.0f)
@@ -374,6 +409,9 @@ void loadServerLobbyFromConfig()
     const bool is_gp =
         RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX;
     const bool is_battle = RaceManager::get()->isBattleMode();
+    const bool is_team_arena_battle = RaceManager::get()->isTeamArenaBattleMode();
+    const bool is_tag_zombie = RaceManager::get()->isTagzArenaBattleMode();
+    const bool is_tabl = RaceManager::get()->isTABLifeMode();
 
     std::shared_ptr<LobbyProtocol> server_lobby;
     server_lobby = STKHost::create();
@@ -389,17 +427,32 @@ void loadServerLobbyFromConfig()
     }
     else if (is_battle)
     {
-        if (m_hit_limit <= 0 && m_time_limit_ffa <= 0)
-        {
-            Log::warn("main", "Reset invalid hit and time limit settings");
-            m_hit_limit.revertToDefaults();
-            m_time_limit_ffa.revertToDefaults();
+        if (is_team_arena_battle)
+        { // À vérifier et modifier // William Lussier 2023-11-24 16h31
+            if (is_tabl)
+            {
+                server_lobby->getGameSetup()->setSoccerGoalTarget(m_soccer_goal_target);
+            }
+            else 
+                server_lobby->getGameSetup()->setSoccerGoalTarget(m_soccer_goal_target);
         }
-        if (m_capture_limit <= 0 && m_time_limit_ctf <= 0)
-        {
-            Log::warn("main", "Reset invalid Capture and time limit settings");
-            m_capture_limit.revertToDefaults();
-            m_time_limit_ctf.revertToDefaults();
+        else if (is_tag_zombie)
+        { // À vérifier et modifier // William Lussier 2023-11-24 16h31
+            server_lobby->getGameSetup()->setSoccerGoalTarget(m_soccer_goal_target);
+        }
+        else {
+            if (m_hit_limit <= 0 && m_time_limit_ffa <= 0)
+            {
+                Log::warn("main", "Reset invalid hit and time limit settings");
+                m_hit_limit.revertToDefaults();
+                m_time_limit_ffa.revertToDefaults();
+            }
+            if (m_capture_limit <= 0 && m_time_limit_ctf <= 0)
+            {
+                Log::warn("main", "Reset invalid Capture and time limit settings");
+                m_capture_limit.revertToDefaults();
+                m_time_limit_ctf.revertToDefaults();
+            }
         }
     }
 

@@ -24,6 +24,7 @@
 #include <irrString.h>
 #include <vector2d.h>
 #include <rect.h>
+#include "network/remote_kart_info.hpp"
 #include <dimension2d.h>
 #include <SColor.h>
 namespace irr
@@ -282,6 +283,9 @@ public:
     void recreateGUI();
     virtual void initSize();
 
+    // RGBA color for KartTeamsColor
+    video::SColor rgbaColorKartTeamsColor(KartTeam team);
+    std::string getKartTeamsColorName(KartTeam teamColorName);
 };   // RaceGUIBase
 
 #endif

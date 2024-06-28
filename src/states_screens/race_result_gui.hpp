@@ -113,6 +113,12 @@ private:
         unsigned int     m_laps;
     };   // Rowinfo
 
+    /** The player icons. */
+    video::ITexture* m_player_icon;
+
+    /** The zombie icons. */
+    video::ITexture* m_zombie_icon;
+
     /** The team icons. */
 
     std::vector<RowInfo>       m_all_row_infos, m_all_row_info_waiting;
@@ -216,6 +222,12 @@ private:
     void displayScreenShots();
 
     int  getFontHeight () const;
+
+    struct TeamData {
+        KartTeam team;
+        int x;
+        int y;
+    };
 
 public:
 

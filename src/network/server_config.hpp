@@ -112,6 +112,34 @@ namespace ServerConfig
         "Difficulty in server, 0 is novice, 1 is causal, 2 is intermediate,"
         "3 is expert and 4 is supertux (the most difficult)."));
 
+    SERVER_CFG_PREFIX IntServerConfigParam m_server_game_duration
+        SERVER_CFG_DEFAULT(IntServerConfigParam(0, "server-game-duration",
+            "Duration of the game. If the time is 0, the time (timer) is desactivate"));
+
+    SERVER_CFG_PREFIX IntServerConfigParam m_server_game_point
+        SERVER_CFG_DEFAULT(IntServerConfigParam(5, "server-game-point",
+            "The number of points to win the game"));
+
+    SERVER_CFG_PREFIX IntServerConfigParam m_server_game_life
+        SERVER_CFG_DEFAULT(IntServerConfigParam(5, "server-game-life",
+            "The number of life"));
+
+    SERVER_CFG_PREFIX IntServerConfigParam m_server_game_nb_ai
+        SERVER_CFG_DEFAULT(IntServerConfigParam(0, "server-game-nb-ai",
+            "The number of ai"));
+
+    SERVER_CFG_PREFIX IntServerConfigParam m_server_game_nb_team
+        SERVER_CFG_DEFAULT(IntServerConfigParam(2, "server-game-nb-team",
+            "The number of team"));
+
+    SERVER_CFG_PREFIX IntServerConfigParam m_server_game_nb_tag
+        SERVER_CFG_DEFAULT(IntServerConfigParam(2, "server-game-nb-tag",
+            "The number of tag"));
+
+    SERVER_CFG_PREFIX BoolServerConfigParam m_server_game_teams_selection
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "server-game-teams-selection",
+            "You can chose the teams ?"));
+
     SERVER_CFG_PREFIX IntServerConfigParam m_gp_track_count
         SERVER_CFG_DEFAULT(IntServerConfigParam(3, "gp-track-count",
         "Number of grand prix tracks per game (If grand prix enabled)."));

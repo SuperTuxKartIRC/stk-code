@@ -238,15 +238,26 @@ private:
 
     std::atomic<uint64_t> m_last_success_poll_time;
 
+    // Game options
+    std::atomic<int> m_battle_hit_capture_limit;
+
+    std::atomic<int> m_battle_time_limit;
+
+    std::atomic<int> m_battle_number_life;
+
+    std::atomic<int> m_battle_nb_ia;
+
+    std::atomic<int> m_battle_nb_team;
+
+    std::atomic<bool> m_teams_selection;
+
+    std::atomic<int> m_battle_nb_tag;
+
     uint64_t m_last_unsuccess_poll_time, m_server_started_at, m_server_delay;
 
     // Default game settings if no one has ever vote, and save inside here for
     // final vote (for live join)
     PeerVote* m_default_vote;
-
-    int m_battle_hit_capture_limit;
-
-    float m_battle_time_limit;
 
     unsigned m_item_seed;
 
@@ -270,12 +281,14 @@ private:
     void finishedLoadingLiveJoinClient(Event *event);
     void kickHost(Event* event);
     void changeTeam(Event* event);
+    void changePlusTeam(Event* event);
     void handleChat(Event* event);
     void unregisterServer(bool now,
         std::weak_ptr<ServerLobby> sl = std::weak_ptr<ServerLobby>());
     void updatePlayerList(bool update_when_reset_server = false);
     void updateServerOwner();
     void handleServerConfiguration(Event* event);
+    void handleServerOptionConfiguration(Event* event);
     void updateTracksForMode();
     bool checkPeersReady(bool ignore_ai_peer) const;
     void resetPeersReady()
@@ -405,6 +418,13 @@ public:
     uint8_t getStartupBoostOrPenaltyForKart(uint32_t ping, unsigned kart_id);
     int getDifficulty() const                   { return m_difficulty.load(); }
     int getGameMode() const                      { return m_game_mode.load(); }
+    int getTimeLimit() const { return m_battle_time_limit.load(); }
+    int getNbAi() const { return m_battle_nb_ia.load(); }
+    int getNbTeam() const { return m_battle_nb_team.load(); }
+    int getTeamsSelection() const { return m_teams_selection; } // TODO : Besoins de changements // William Lussier // 2023-11-24 17h02
+    int getNbTag() const { return m_battle_nb_tag.load(); }
+    int getHitCaptureLimit2() const { return m_battle_hit_capture_limit.load(); }
+    int getNumberLife() const { return m_battle_number_life.load(); }
     int getLobbyPlayers() const              { return m_lobby_players.load(); }
     void saveInitialItems(std::shared_ptr<NetworkItemManager> nim);
     void saveIPBanTable(const SocketAddress& addr);

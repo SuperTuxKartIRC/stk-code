@@ -1,0 +1,39 @@
+Voici une liste de chose a faire ou a corriger 
+
+Bug (1-5) :
+	- Le deuximème sous mode de jeu de tag zombie (tag-zombie survivant puissant) ne fonctionne pas (la partie se termine beaucoup trop tôt méthode isRaceOver()) (CORRIGER)
+	- Lorsque les cadeaux, bannnes, nitro sont désactivé, ça ne fonctionne pas toujours (CORRIGER) (A VALIDER)
+	- Bug très récent : les pouvoir rechargable ne fonctionne plus comme il le faut. Donne juste de zipper a l'infini ce qui n'est pas normal (CORRIGER)
+	- Le code pour les compteurs de victoire des modes de jeux Team-Arena (dans world.cpp) selon l'équipe choisit est en commentaire car le code cause problème (CORRIGER)
+	- Les informations dans l'écran de victoire semble être mélanger (CORRIGER)
+	- Corriger le placement des informations dans l'écran de victoire. Corriger le visuel 
+	- Certain pouvoir comme le parachute et l'enclume gère mal la condition d'équipe (ne pas toucher un membre de son équipe)
+	- Lorsqu'on choisit notre équipe en ligne avec l'écran de sélection, le kart est toujours tux (on a jamais réussit a faire afficher le bon kart)
+	- Valeur de configuration pour le nombre de tag n'est pas correct (sauvegarde ou load) (CORRIGER)
+	- Vérifier le nombre max de tag possible
+	- Corriger la méthode generateUniqueRandomNumbers() pour pas ne qu'il y ait de doublon (CORRIGER)
+	- Correction de texte de label pour le mode de jeu tag zombie (CORRIGER)
+	- Bug très rarisime avec les pouvoirs : Parfois le jeux crash pour aucune raion et parfois la ballon de basket est donné dans le cadeau (ne devrait pas) 
+	- La quantité d'un pouvoir donné dans le mode tag-zombie-survivant-puissant a un survivant n'est pas correct. La quantité est supossé d'être de 10 au lieux de 1 mais ça ne fonctionne pas (A FAIRE)
+	- ???
+
+Amélioration (3-7) :
+	- Lorsque toucher (le Barril qui se trouve au sol), le kart devrait exploser et non recevoir un effet de hitBanana() (A FAIRE)
+	- Lorsque toucher par un objet (le Baril qui se trouve au sol), le Baril devrait exploser (A FAIRE)
+	- Lorsqu'une partie est terminer, l'animation de victoire n'est pas jouer (seulement l'animation de défaite est jouer en tout temps) (A FAIRE)
+	- S'assurer que nos mode de jeux ailles des valeurs par défaut acceptable pour le mode en ligne (ex: nb the tag = 1, nb de vie =3, etc...)
+	- Amélioration du troisième sous mode de jeu de team-arena-battle (joueur avec le plus de points) (points player) pour le rendre meilleur et plus le fun a jouer
+	- Lorsqu'un kart devient zombie, sont kart devrait devenir vert. Ça fonctionne en local (un kart a recréer et l'ancien est supprimer) mais en ligne ça cause parfois problème (le joueur est déconnecter et reconnecter très rapidement) 
+	- Meilleur icones ???
+
+Ajout supplémentaire (7) :
+	- Ajout de pouvoir supplémentaire comme le balle de tenis, la balle de baseball, le ballon de voleyball ou la flaque de glue (d'huile)
+	- Ajout de l'item d'urne. Cette item aparait lorsqu'un joueur se fait transformer en zombie (lorsque le survivant meur). L'urne contient une récompense 
+	- Ajout d'un mini système d'évènment surprise pour notre mode de jeu. Comme réduction du temps de recharge des pouvoirs des joueur temporairement pendants 20s, ou désactivation de la mini-map temporairement pendants 15s, ou etc ...
+	- Menu de sélection des pouvoirs (quel pouvoir sera disponible dans le cadeau ou dans la bananne)
+	- Ajout d'un système de brouillard ou d'un système d'assombrisement (obscurité avec peux de lumière) pour donner une meilleur ambiance au mode de jeu zombie
+	- Ajout de succès en rapport a nos mode de jeux ou en rapport a la désactivation des cadeaux, nitro, banannes
+	- Terminer totalement la désactivation de cadeau, nitro et bananne en local (grand prix, meilleur score, replay ???, ghost mode, etc ...)
+
+Important (1-1) :
+	- Créer un instalable (ne fonctionne pas finalement) d'ici (au maximum) le 16 décembre en après midi (A FAIRE)

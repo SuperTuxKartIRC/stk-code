@@ -982,7 +982,7 @@ void SkiddingAI::evaluateItems(const ItemState *item, Vec3 kart_aim_direction,
 
     // If the item type is not handled here, ignore it
     Item::ItemType type = item->getType();
-    if( type!=Item::ITEM_BANANA    && type!=Item::ITEM_BUBBLEGUM &&
+    if( type!=Item::ITEM_BANANA && type!=Item::ITEM_BUBBLEGUM &&
         type!=Item::ITEM_BONUS_BOX &&
         type!=Item::ITEM_NITRO_BIG && type!=Item::ITEM_NITRO_SMALL  )
         return;
@@ -1199,8 +1199,7 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
 
             handleCake(item_skill);
             break;
-        }   // POWERUP_CAKE
-          
+        }   // POWERUP_CAKE    
     case PowerupManager::POWERUP_BOWLING:
         {
             // if the kart has a shield, do not break it by using a bowling ball.
@@ -1840,7 +1839,7 @@ void SkiddingAI::handleSwitch(int item_skill,
           }
        }
            
-       //Bad will store 2 for bananas, 3 for bubble gum
+       //Bad will store 2 for bananas, 3 for bubble gum, 3 for barrel
        for(int i=(int)items_to_avoid.size()-1; i>=0; i--)
        {
            if (items_to_avoid[i]->getType() == Item::ITEM_BUBBLEGUM)

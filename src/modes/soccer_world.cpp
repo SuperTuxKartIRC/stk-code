@@ -439,7 +439,7 @@ void SoccerWorld::update(int ticks)
                 continue;
             if (kart->getKartAnimation())
             {
-                AbstractKartAnimation* ka = kart->getKartAnimation();
+                KartAnimation* ka = kart->getKartAnimation();
                 kart->setKartAnimation(NULL);
                 delete ka;
             }
@@ -717,7 +717,7 @@ void SoccerWorld::resetKartsToSelfGoals()
 
         if (kart->getKartAnimation())
         {
-            AbstractKartAnimation* ka = kart->getKartAnimation();
+            KartAnimation* ka = kart->getKartAnimation();
             kart->setKartAnimation(NULL);
             delete ka;
         }

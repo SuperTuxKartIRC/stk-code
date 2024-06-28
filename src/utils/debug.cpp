@@ -1518,10 +1518,6 @@ void handleStaticAction(int key, int value, bool control_pressed, bool shift_pre
                 {
                     handleContextMenuAction(DEBUG_ATTACHMENT_EXPLOSION);
                 }
-                else
-                {
-                    handleContextMenuAction(DEBUG_POWERUP_PARACHUTE);
-                }
                 break;
             }
             case IRR_KEY_F7:
@@ -1536,7 +1532,7 @@ void handleStaticAction(int key, int value, bool control_pressed, bool shift_pre
                 }
                 else
                 {
-                    handleContextMenuAction(DEBUG_POWERUP_PLUNGER);
+                    handleContextMenuAction(DEBUG_POWERUP_PARACHUTE);
                 }
                 break;
             }
@@ -1552,7 +1548,7 @@ void handleStaticAction(int key, int value, bool control_pressed, bool shift_pre
                 }
                 else
                 {
-                    handleContextMenuAction(DEBUG_POWERUP_SWATTER);
+                    handleContextMenuAction(DEBUG_POWERUP_PLUNGER);
                 }
                 break;
             }
@@ -1568,11 +1564,27 @@ void handleStaticAction(int key, int value, bool control_pressed, bool shift_pre
                 }
                 else
                 {
-                    handleContextMenuAction(DEBUG_POWERUP_SWITCH);
+                    handleContextMenuAction(DEBUG_POWERUP_SWATTER);
                 }
                 break;
             }
             case IRR_KEY_F10:
+            {
+                if (control_pressed)
+                {
+                    handleContextMenuAction(DEBUG_POWERUP_SLIDER);
+                }
+                else if (shift_pressed)
+                {
+                    handleContextMenuAction(DEBUG_GUI_TOGGLE);
+                }
+                else
+                {
+                    handleContextMenuAction(DEBUG_POWERUP_SWITCH);
+                }
+                break;
+            }
+            case IRR_KEY_F11:
             {
                 if (control_pressed)
                 {

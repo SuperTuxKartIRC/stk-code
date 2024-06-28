@@ -45,7 +45,7 @@ namespace irr
     }
 }
 
-class AbstractKartAnimation;
+class KartAnimation;
 class Attachment;
 class btKart;
 class btQuaternion;
@@ -139,7 +139,9 @@ protected:
     float m_effective_steer;
 
     /** A kart animation object to handle rescue, explosion etc. */
-    AbstractKartAnimation *m_kart_animation;
+    KartAnimation *m_kart_animation;
+
+    KartTeam m_kart_team;
 
     /** Node between wheels and kart. Allows kart to be scaled independent of wheels, when being squashed.*/
     irr::scene::IDummyTransformationSceneNode    *m_wheel_box;
@@ -595,6 +597,9 @@ public:
     virtual void   setSlowdown(unsigned int category, float max_speed_fraction,
                                int fade_in_time);
     // ----------------------------------------------------------------------------------------
+    virtual void   setSlowdown(unsigned int category, float max_speed_fraction,
+        int fade_in_time, int duration);
+    // ----------------------------------------------------------------------------------------
     /** Returns how much increased speed time is left over in the given
      *  category.
      *  \param category Which category to report on. */
@@ -675,13 +680,16 @@ public:
     // ------------------------------------------------------------------------
     /** Returns a kart animation (if any), or NULL if currently no kart
      *  animation is being shown. */
-    AbstractKartAnimation *getKartAnimation() { return m_kart_animation; }
+    KartAnimation *getKartAnimation() { return m_kart_animation; }
     // ------------------------------------------------------------------------
-    const AbstractKartAnimation *getKartAnimation() const { return m_kart_animation; }
+    const KartAnimation *getKartAnimation() const { return m_kart_animation; }
     // ------------------------------------------------------------------------
     /** Sets a new kart animation. */
-    virtual void setKartAnimation(AbstractKartAnimation *ka);
+    virtual void setKartAnimation(KartAnimation *ka);
     // ------------------------------------------------------------------------
+    virtual KartTeam getKartTeam() const { return m_kart_team; }
+    // ------------------------------------------------------------------------
+    virtual void setKartTeam(KartTeam kart) { m_kart_team = kart; }
 
     // ========================================================================================
     // NITRO related functions.

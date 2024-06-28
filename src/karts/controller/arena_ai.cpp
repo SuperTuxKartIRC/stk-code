@@ -504,7 +504,6 @@ void ArenaAI::useItems(const float dt)
 
             break;
         }   // POWERUP_CAKE
-
     case PowerupManager::POWERUP_BOWLING:
     case PowerupManager::POWERUP_SMALL_SOCCER_BALL:
     case PowerupManager::POWERUP_VOLLEYBALL: // TODO : NEED CHANGE ??
@@ -547,18 +546,40 @@ void ArenaAI::useItems(const float dt)
         }
 
     // Below powerups won't appear in arena, so skip them
-    case PowerupManager::POWERUP_ZIPPER:
+    case PowerupManager::POWERUP_ZIPPER: // Don't handle switch
+        m_controls->setFire(true);       // (use it no matter what) for now
         break;   // POWERUP_ZIPPER
 
-    case PowerupManager::POWERUP_PLUNGER:
+    case PowerupManager::POWERUP_PLUNGER:// Don't handle switch
+        m_controls->setFire(true);       // (use it no matter what) for now
         break;   // POWERUP_PLUNGER
+
+    case PowerupManager::POWERUP_SUDO:
+        if (m_time_since_last_shot > 3.0f)
+            m_controls->setFire(true);
+        break;   // POWERUP_SUDO
+
+    case PowerupManager::POWERUP_ELECTRO:
+        if (m_time_since_last_shot > 1.0f)
+            m_controls->setFire(true);
+        break;   // POWERUP_ELECTRO
+
+    case PowerupManager::POWERUP_MINI:
+        if (m_time_since_last_shot > 1.0f)
+            m_controls->setFire(true);
+        break;   // POWERUP_MINI
 
     case PowerupManager::POWERUP_SWITCH: // Don't handle switch
         m_controls->setFire(true);       // (use it no matter what) for now
         break;   // POWERUP_SWITCH
 
-    case PowerupManager::POWERUP_PARACHUTE:
+    case PowerupManager::POWERUP_PARACHUTE:// Don't handle switch
+        m_controls->setFire(true);         // (use it no matter what) for now
         break;   // POWERUP_PARACHUTE
+
+    case PowerupManager::POWERUP_ANVIL:  // Don't handle switch
+        m_controls->setFire(true);       // (use it no matter what) for now
+        break;   // POWERUP_ANVIL
 
     case PowerupManager::POWERUP_RUBBERBALL:
         break;
