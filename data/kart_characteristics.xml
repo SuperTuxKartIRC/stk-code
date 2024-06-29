@@ -406,9 +406,8 @@
         <characteristic name="best" />
     </difficulties>
 
- <!-- The different kart types, that can be specified in the kart.xml file -->
+    <!-- The different kart types, that can be specified in the kart.xml file -->
     <kart-types>
-		<!--  light  -->
         <characteristic name="light">
             <turn radius="0:2.5 5:3.6 12:7.5 20:13.6 30:21.8 50:38.2" />
             <engine power="*0.8" max-speed="*0.896"
@@ -439,23 +438,6 @@
             <slipstream duration-factor="*0.8" fade-out-time="*1" />
             <parachute lbound-fraction="0.45" ubound-fraction="0.275" />
         </characteristic>
-
-		<!--   light medium -->
-        <characteristic name="light-medium">
-			<<turn radius="0:2.0 10:7.5 25:15 45:30" />
-            <engine power="*0.8" max-speed="*0.97" brake-factor="*0.92"
-                 max-speed-reverse-ratio="*0.8" />
-            <gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
-                  power-increase="2.8 2.3 1.9 1.5 1.25 1.0" />
-            <mass value="*0.6" />
-            <startup boost="*0.92 *0.92" />
-            <explosion time="*0.92" radius="*0.92" />
-            <nitro engine-force="*0.6" max-speed-increase="*0.9" duration="*1" />
-            <slipstream length="*0.75" collect-time="*0.8"
-                        duration-factor="*0.92" fade-out-time="*1" />
-        </characteristic>
-
-		<!--  medium  -->
         <characteristic name="medium">
             <turn radius="0:2.875 5:4.176 12:8.775 20:16.184 30:25.942 50:45.458" />
             <engine power="*0.875" max-speed="*0.948"
@@ -470,23 +452,6 @@
             <slipstream duration-factor="*0.8" fade-out-time="*1" />
             <parachute lbound-fraction="0.45" ubound-fraction="0.275" />
         </characteristic>
-		
-		<!--   medium medium -->
-        <characteristic name="medium-medium">
-			<turn radius="0:2.45 10:9.1875 25:18.25 45:36.75" />
-            <engine power="*0.9375" max-speed="*1.025" brake-factor="*0.7"
-                    max-speed-reverse-ratio="*0.725" />
-			<gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
-                  power-increase="1.8 1.4 1.6 1.35 1.175 1" />
-            <mass value="*0.875" />
-            <startup boost="*0.7 *0.7" />
-            <explosion time="*0.7" radius="*0.7" />
-            <nitro engine-force="*0.875" consumption="*1.46" max-speed-increase="*1.1" />
-            <slipstream length="*1" collect-time="*1.05"
-                   duration-factor="*0.7" fade-out-time="*1" />
-        </characteristic>
-
-		<!--  heavy  -->
         <characteristic name="heavy">
             <turn radius="0:3.15 5:4.608 12:9.75 20:18.224 30:29.212 50:51.188" />
             <engine power="*1" max-speed="*1"
@@ -502,6 +467,632 @@
                    duration-factor="*0.6" fade-out-time="*1" />
             <parachute lbound-fraction="0.55" ubound-fraction="0.35" />
         </characteristic>
+		
+		
+		<characteristic name="light-speed">
+			<turn radius="0:2.5 5:3.6 12:7.5 20:13.6 30:21.8 50:38.2" />
+			<engine power="*0.7" max-speed="*0.896"
+					max-speed-reverse-ratio="*1.15" />
+			<gear switch-ratio="0.1 0.3 0.55 0.75 1.0 4.0"
+				  power-increase="2.5 2.0 1.7 1.4 1.1 1.0" />
+			<mass value="*0.5778" />
+			<skid reduce-turn-min="0.2" reduce-turn-max="0.895" bonus-force="*0.8 *0.8 *0.8" />
+			<startup boost="*0.9 *0.9" />
+			<explosion duration="*1.1" radius="*1.1" />
+			<nitro engine-force="*0.65" consumption="*1.4" max-speed-increase="*1.1" />
+			<slipstream length="*0.9" collect-time="*0.9"
+						duration-factor="*1" fade-out-time="*1" />
+			<parachute lbound-fraction="0.3" ubound-fraction="0.15" />
+		</characteristic>
+
+		
+		<characteristic name="ultra-light">
+			<turn radius="0:3.0 5:4.2 12:8.5 20:15.6 30:25.8 50:45.0" />
+			<engine power="*0.8" max-speed="*0.896"
+					max-speed-reverse-ratio="*1.15" />
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
+				  power-increase="2.95 2.42 1.99 1.56 1.28 1.0" />
+			<mass value="*0.5778" />
+			<skid reduce-turn-min="0.1" reduce-turn-max="0.8" bonus-force="*0.7 *0.7 *0.7" />
+			<startup boost="*1 *1" />
+			<explosion duration="*1.1" radius="*1.1" />
+			<nitro engine-force="*0.75" consumption="*1.2" max-speed-increase="*1.25" />
+			<slipstream length="*0.8" collect-time="*0.85"
+						duration-factor="*0.9" fade-out-time="*1" />
+			<parachute lbound-fraction="0.3" ubound-fraction="0.15" />
+		</characteristic>
+
+
+		<characteristic name="super-heavy">
+			<turn radius="0:3.5 5:5.0 12:10.0 20:20.0 30:30.0 50:50.0" />
+			<engine power="*1.0423" max-speed="*1.0423"
+					max-speed-reverse-ratio="*0.9" />
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
+				  power-increase="1.9 1.6 1.4 1.2 1.1 1.0" />
+			<mass value="*1.081" />
+			<skid reduce-turn-min="0.3" reduce-turn-max="0.9" bonus-force="*1.1 *1.1 *1.1" />
+			<startup boost="*0.7 *0.7" />
+			<explosion duration="*0.5" radius="*0.5" />
+			<nitro engine-force="*1.1" consumption="*2.0" max-speed-increase="*0.9" />
+			<slipstream length="*1.2" collect-time="*1.2"
+						duration-factor="*0.5" fade-out-time="*0.9" />
+			<parachute lbound-fraction="0.6" ubound-fraction="0.4" />
+		</characteristic>
+
+		
+		<!-- À revoir / Possiblement modifier et mieux balancer -->
+		<characteristic name="nitro-boosted">
+			<turn radius="0:3.0 5:4.5 12:9.0 20:16.5 30:25.0 50:40.0" />
+			<engine power="*0.9" max-speed="*0.95"
+					max-speed-reverse-ratio="*1.1" />
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
+				  power-increase="2.6 2.1 1.8 1.5 1.3 1.0" />
+			<mass value="*0.823" />
+			<skid reduce-turn-min="0.25" reduce-turn-max="0.9" bonus-force="*0.9 *0.9 *0.9" />
+			<startup boost="*0.95 *0.95" />
+			<explosion duration="*0.7" radius="*0.7" />
+			<nitro engine-force="*0.8" consumption="*1.1250" max-speed-increase="*1.25" />
+			<slipstream length="*1.0" collect-time="*1.0"
+						duration-factor="*0.8" fade-out-time="*1.0" />
+			<parachute lbound-fraction="0.5" ubound-fraction="0.3" />
+		</characteristic>
+		
+		
+		<characteristic name="sprint">
+			<turn radius="0:2.2 5:3.2 12:6.5 20:12.0 30:18.0 50:30.0" />
+			<engine power="*0.85" max-speed="*0.92"
+					max-speed-reverse-ratio="*1.1" />
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
+				  power-increase="3.0 2.4 2.0 1.6 1.3 1.0" />
+			<mass value="*0.65" />
+			<skid reduce-turn-min="0.2" reduce-turn-max="0.85" bonus-force="*0.85 *0.85 *0.85" />
+			<startup boost="*1.05 *1.05" />
+			<explosion duration="*0.9" radius="*0.9" />
+			<nitro engine-force="*0.8" consumption="*1.2" max-speed-increase="*1.15" />
+			<slipstream length="*0.85" collect-time="*0.85"
+						duration-factor="*1.0" fade-out-time="*1.0" />
+			<parachute lbound-fraction="0.35" ubound-fraction="0.2" />
+		</characteristic>
+		
+		<characteristic name="endurance">
+			<turn radius="0:3.8 5:5.4 12:10.8 20:19.0 30:28.5 50:46.5" />
+			<engine power="*0.95" max-speed="*1.02" max-speed-reverse-ratio="*1.0" />
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
+				  power-increase="2.3 1.9 1.6 1.4 1.2 1.0" />
+			<mass value="*0.9" />
+			<skid reduce-turn-min="0.27" reduce-turn-max="0.9" bonus-force="*0.95 *0.95 *0.95" />
+			<startup boost="*0.85 *0.85" />
+			<explosion duration="*0.8" radius="*0.8" />
+			<nitro engine-force="*0.9" consumption="*1.5" max-speed-increase="*1.2" />
+			<slipstream length="*1.05" collect-time="*1.05"
+						duration-factor="*0.85" fade-out-time="*1.0" />
+			<parachute lbound-fraction="0.5" ubound-fraction="0.3" />
+		</characteristic>
+
+		
+		<characteristic name="streamliner">
+			<turn radius="0:2.8 5:3.9 12:7.8 20:14.0 30:22.0 50:37.0" />
+			<engine power="*0.85" max-speed="*0.92"
+					max-speed-reverse-ratio="*1.0" />
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
+				  power-increase="2.8 2.3 1.9 1.5 1.2 1.0" />
+			<mass value="*0.7" />
+			<skid reduce-turn-min="0.15" reduce-turn-max="0.8" bonus-force="*0.9 *0.9 *0.9" />
+			<startup boost="*1 *1" />
+			<explosion duration="*1.0" radius="*1.0" />
+			<nitro engine-force="*0.75" consumption="*1.3" max-speed-increase="*1.1" />
+			<slipstream length="*1.0" collect-time="*1.0"
+						duration-factor="*1.2" fade-out-time="*1.2" />
+			<parachute lbound-fraction="0.4" ubound-fraction="0.25" />
+		</characteristic>
+
+
+		<characteristic name="equilibrium-medium">
+			<turn radius="0:2.8 5:4.0 12:8.0 20:14.0 30:22.0 50:40.0" />
+			<engine power="*0.95" max-speed="*0.95"
+					max-speed-reverse-ratio="*1.05" />
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
+				  power-increase="2.5 2.0 1.8 1.5 1.2 1.0" />
+			<mass value="*0.85" />
+			<skid reduce-turn-min="0.2" reduce-turn-max="0.85" bonus-force="*0.85 *0.85 *0.85" />
+			<startup boost="*1.0 *1.0" />
+			<explosion duration="*0.9" radius="*0.9" />
+			<nitro engine-force="*0.9" consumption="*1.2" max-speed-increase="*1.1" />
+			<slipstream length="*0.95" collect-time="*0.95"
+						duration-factor="*1.0" fade-out-time="*1.0" />
+			<parachute lbound-fraction="0.4" ubound-fraction="0.25" />
+		</characteristic>
+
+
+		<characteristic name="balanced-medium">
+			<turn radius="0:3.0 5:4.5 12:9.0 20:15.0 30:24.0 50:42.0" />
+			<engine power="*0.92" max-speed="*0.93"
+					max-speed-reverse-ratio="*1.08" />
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
+				  power-increase="2.6 2.1 1.8 1.5 1.2 1.0" />
+			<mass value="*0.9" />
+			<skid reduce-turn-min="0.22" reduce-turn-max="0.87" bonus-force="*0.9 *0.9 *0.9" />
+			<startup boost="*1.0 *1.0" />
+			<explosion duration="*0.95" radius="*0.95" />
+			<nitro engine-force="*0.88" consumption="*1.25" max-speed-increase="*1.05" />
+			<slipstream length="*0.95" collect-time="*0.95"
+						duration-factor="*1.0" fade-out-time="*1.0" />
+			<parachute lbound-fraction="0.4" ubound-fraction="0.25" />
+		</characteristic>
+
+
+		<characteristic name="all-terrain">
+			<turn radius="0:3.5 5:4.8 12:9.5 20:16.0 30:25.0 50:45.0" />
+			<engine power="*0.85" max-speed="*0.90"
+					max-speed-reverse-ratio="*1.1" />
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
+				  power-increase="2.8 2.3 1.9 1.6 1.3 1.0" />
+			<mass value="*1.081" />
+			<skid reduce-turn-min="0.25" reduce-turn-max="0.90" bonus-force="*0.85 *0.85 *0.85" />
+			<startup boost="*0.95 *0.95" />
+			<explosion duration="*1.1" radius="*1.1" />
+			<nitro engine-force="*0.75" consumption="*1.3" max-speed-increase="*1.1" />
+			<slipstream length="*0.85" collect-time="*0.85"
+						duration-factor="*1.0" fade-out-time="*1.0" />
+			<parachute lbound-fraction="0.4" ubound-fraction="0.25" />
+		</characteristic>
+
+
+		<characteristic name="sport">
+			<turn radius="0:2.7 5:3.9 12:7.2 20:12.5 30:19.0 50:32.0" />
+			<engine power="*0.9" max-speed="*0.95"
+					max-speed-reverse-ratio="*1.05" />
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
+				  power-increase="2.8 2.3 1.9 1.5 1.2 1.0" />
+			<mass value="*0.8" />
+			<skid reduce-turn-min="0.18" reduce-turn-max="0.88" bonus-force="*0.8 *0.8 *0.8" />
+			<startup boost="*0.9 *0.9" />
+			<explosion duration="*0.95" radius="*0.95" />
+			<nitro engine-force="*0.85" consumption="*1.2" max-speed-increase="*1.1" />
+			<slipstream length="*0.85" collect-time="*0.85"
+						duration-factor="*1.05" fade-out-time="*1.05" />
+			<parachute lbound-fraction="0.35" ubound-fraction="0.2" />
+		</characteristic>
+		
+		
+		<characteristic name="adventure">
+			<turn radius="0:3.0 5:4.2 12:8.0 20:14.0 30:21.0 50:36.0" />
+			<engine power="*0.87" max-speed="*0.93"
+					max-speed-reverse-ratio="*1.05" />
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
+				  power-increase="2.6 2.2 1.8 1.4 1.1 1.0" />
+			<mass value="*0.9" />
+			<skid reduce-turn-min="0.22" reduce-turn-max="0.90" bonus-force="*0.85 *0.85 *0.85" />
+			<startup boost="*0.85 *0.85" />
+			<explosion duration="*1.05" radius="*1.05" />
+			<nitro engine-force="*0.8" consumption="*1.3" max-speed-increase="*1.15" />
+			<slipstream length="*0.9" collect-time="*0.9"
+						duration-factor="*1.1" fade-out-time="*1.1" />
+			<parachute lbound-fraction="0.4" ubound-fraction="0.25" />
+		</characteristic>
+
+
+		<characteristic name="light-drift">
+			<turn radius="0:2.7 5:3.8 12:7.8 20:13.6 30:22.0 50:36.5" />
+			<engine power="*0.75" max-speed="*0.85"
+					max-speed-reverse-ratio="*1.2" />
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
+				  power-increase="2.8 2.3 1.9 1.5 1.2 1.0" />
+			<mass value="*0.55" />
+			<skid reduce-turn-min="0.25" reduce-turn-max="0.85" bonus-force="*0.9 *0.9 *0.9" />
+			<startup boost="*0.95 *0.95" />
+			<explosion duration="*1.05" radius="*1.05" />
+			<nitro engine-force="*0.75" consumption="*1.3" max-speed-increase="*1.1" />
+			<slipstream length="*0.85" collect-time="*0.85"
+						duration-factor="*1.0" fade-out-time="*1.0" />
+			<parachute lbound-fraction="0.35" ubound-fraction="0.2" />
+		</characteristic>
+
+
+		<characteristic name="medium-drift">
+			<turn radius="0:3.0 5:4.5 12:9.0 20:16.0 30:24.0 50:40.0" />
+			<engine power="*0.82" max-speed="*0.89"
+					max-speed-reverse-ratio="*1.05" />
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
+				  power-increase="2.5 2.1 1.7 1.3 1.1 1.0" />
+			<mass value="*0.8" />
+			<skid reduce-turn-min="0.15" reduce-turn-max="0.9" bonus-force="*1.0 *1.0 *1.0" time-till-bonus="*0.85 *0.85 *0.85" />
+			<startup boost="*0.9 *0.9" />
+			<explosion duration="*0.95" radius="*0.95" />
+			<nitro engine-force="*0.8" consumption="*1.25" max-speed-increase="*1.1" />
+			<slipstream length="*0.9" collect-time="*0.9"
+						duration-factor="*1.1" fade-out-time="*1.1" />
+			<parachute lbound-fraction="0.4" ubound-fraction="0.3" />
+		</characteristic>
+
+
+		<characteristic name="heavy-drift">
+			<turn radius="0:2.7 5:3.8 12:7.8 20:13.6 30:22.0 50:36.5" />
+			<engine power="*0.9" max-speed="*0.9"
+					max-speed-reverse-ratio="*1.0" />
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
+				  power-increase="2.0 1.7 1.5 1.2 1.1 1.0" />
+			<mass value="*0.9" />
+			<skid reduce-turn-min="0.35" reduce-turn-max="0.95" bonus-force="*1.1 *1.1 *1.1" />
+			<startup boost="*0.8 *0.8" />
+			<explosion duration="*0.85" radius="*0.85" />
+			<nitro engine-force="*0.7" consumption="*1.6" max-speed-increase="*0.8" />
+			<slipstream length="*1.1" collect-time="*1.1"
+						duration-factor="*0.75" fade-out-time="*1.0" />
+			<parachute lbound-fraction="0.5" ubound-fraction="0.35" />
+		</characteristic>
+
+
+		<characteristic name="medium-heavy">
+			<turn radius="0:3.2 5:4.8 12:10.0 20:18.5 30:28.0 50:45.0" />
+			<engine power="*0.95" max-speed="*0.95"
+					max-speed-reverse-ratio="*1.0" />
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
+				  power-increase="2.2 1.85 1.55 1.3 1.1 1.0" />
+			<mass value="*0.95" />
+			<skid reduce-turn-min="0.3" reduce-turn-max="0.9" bonus-force="*1.05 *1.05 *1.05" />
+			<startup boost="*0.85 *0.85" />
+			<explosion duration="*0.9" radius="*0.9" />
+			<nitro engine-force="*0.85" consumption="*1.5" max-speed-increase="*1.0" />
+			<slipstream length="*1.1" collect-time="*1.1"
+						duration-factor="*0.8" fade-out-time="*1.0" />
+			<parachute lbound-fraction="0.5" ubound-fraction="0.35" />
+		</characteristic>
+
+
+		<!-- Low class -->
+		<characteristic name="low-weight">
+			<turn radius="0:2.8 5:3.8 12:7.0 20:13.0 30:20.0 50:33.0" />
+			<engine power="*0.75" max-speed="*0.9"
+					max-speed-reverse-ratio="*1.0" />
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
+				  power-increase="1.9 1.6 1.3 1.1 0.9 0.7" />
+			<mass value="*0.35" />
+			<skid reduce-turn-min="0.2" reduce-turn-max="0.9" bonus-force="*0.85 *0.85 *0.85" />
+			<startup boost="*0.9 *0.9" />
+			<explosion duration="*0.9" radius="*0.9" />
+			<nitro engine-force="*0.85" consumption="*1.3" max-speed-increase="*1.1" />
+			<slipstream length="*1.1" collect-time="*1.1"
+						duration-factor="*0.9" fade-out-time="*1.0" />
+			<parachute lbound-fraction="0.5" ubound-fraction="0.35" />
+		</characteristic>
+		
+		
+
+		<characteristic name="low-speed">
+			<turn radius="0:3.0 5:4.0 12:7.5 20:14.0 30:21.0 50:35.0" />
+			<engine power="*1.0" max-speed="*0.81"
+					max-speed-reverse-ratio="*0.8" />
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
+				  power-increase="2.4 1.9 1.6 1.3 1.0 0.9" />
+			<mass value="*0.85" />
+			<skid reduce-turn-min="0.2" reduce-turn-max="0.9" bonus-force="*0.95 *0.95 *0.95" />
+			<startup boost="*0.85 *0.85" />
+			<explosion duration="*0.8" radius="*0.8" />
+			<nitro engine-force="*0.9" consumption="*1.1" max-speed-increase="*1.1" />
+			<slipstream length="*1.0" collect-time="*1.0"
+						duration-factor="*1.0" fade-out-time="*1.0" />
+			<parachute lbound-fraction="0.4" ubound-fraction="0.3" />
+		</characteristic>
+		
+		<characteristic name="super-low-speed">
+			<turn radius="0:3.0 5:4.0 12:7.5 20:14.0 30:21.0 50:35.0" />
+			<engine power="*1.0" max-speed="*0.84"
+					max-speed-reverse-ratio="*0.8" />
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
+				  power-increase="2.8 2.3 1.9 1.5 1.2 1.0" />
+			<mass value="*0.85" />
+			<skid reduce-turn-min="0.2" reduce-turn-max="0.9" bonus-force="*0.95 *0.95 *0.95" />
+			<startup boost="*0.85 *0.85" />
+			<explosion duration="*0.8" radius="*0.8" />
+			<nitro engine-force="*0.9" consumption="*1.1" max-speed-increase="*1.1" />
+			<slipstream length="*1.0" collect-time="*1.0"
+						duration-factor="*1.0" fade-out-time="*1.0" />
+			<parachute lbound-fraction="0.4" ubound-fraction="0.3" />
+		</characteristic>
+
+
+		
+		<characteristic name="low-acceleration">
+			<turn radius="0:2.8 5:4.0 12:7.5 20:14.0 30:21.0 50:34.0" />
+			<engine power="*0.65" max-speed="*1.0423"
+					max-speed-reverse-ratio="*0.9" />
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
+				  power-increase="1.7 1.4 1.2 1.0 0.9 0.65" />
+			<mass value="*0.8" />
+			<skid reduce-turn-min="0.25" reduce-turn-max="0.9" bonus-force="*1.0 *1.0 *1.0" />
+			<startup boost="*0.95 *0.95" />
+			<explosion duration="*0.8" radius="*0.8" />
+			<nitro engine-force="*1.01" consumption="*1.2" max-speed-increase="*1.2" />
+			<slipstream length="*1.05" collect-time="*1.0"
+						duration-factor="*1.0" fade-out-time="*1.0" />
+			<parachute lbound-fraction="0.4" ubound-fraction="0.3" />
+		</characteristic>
+
+		<characteristic name="super-low-acceleration">
+			<turn radius="0:2.8 5:4.0 12:7.5 20:14.0 30:21.0 50:34.0" />
+			<engine power="*0.7" max-speed="*1.0423"
+					max-speed-reverse-ratio="*0.9" />
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
+				  power-increase="1.7 1.4 1.2 1.0 0.8 0.6" />
+			<mass value="*1.0495" />
+			<skid reduce-turn-min="0.3" reduce-turn-max="0.9" bonus-force="*1.0 *1.0 *1.0" />
+			<startup boost="*1.25 *1.25" />
+			<explosion duration="*0.8" radius="*0.8" />
+			<nitro engine-force="*1.06" consumption="*1.2" max-speed-increase="*1.326" />
+			<slipstream length="*1.1" collect-time="*1.0"
+						duration-factor="*1.0" fade-out-time="*1.0" />
+			<parachute lbound-fraction="0.4" ubound-fraction="0.3" />
+		</characteristic>
+
+
+
+		<characteristic name="low-turn">
+			<turn radius="0:5.0 5:6.5 12:12.0 20:22.0 30:32.0 50:52.0" />
+			<engine power="*0.95" max-speed="*0.92"
+					max-speed-reverse-ratio="*1.0" />
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
+				  power-increase="2.6 2.1 1.8 1.4 1.1 1.0" />
+			<mass value="*0.9" />
+			<skid reduce-turn-min="0.3" reduce-turn-max="0.95" bonus-force="*0.85 *0.85 *0.85" />
+			<startup boost="*0.85 *0.85" />
+			<explosion duration="*0.85" radius="*0.85" />
+			<nitro engine-force="*0.85" consumption="*1.3" max-speed-increase="*1.05" />
+			<slipstream length="*1.0" collect-time="*1.0"
+						duration-factor="*1.0" fade-out-time="*1.0" />
+			<parachute lbound-fraction="0.45" ubound-fraction="0.3" />
+		</characteristic>
+
+		<characteristic name="super-low-turn">
+			<turn radius="0:7.0 5:8.5 12:15.0 20:25.0 30:35.0 50:55.0" />
+			<engine power="*0.93" max-speed="*0.90"
+					max-speed-reverse-ratio="*1.0" />
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
+				  power-increase="2.4 2.0 1.7 1.3 1.0 0.9" />
+			<mass value="*0.9" />
+			<skid reduce-turn-min="0.35" reduce-turn-max="1.0" bonus-force="*0.8 *0.8 *0.8" />
+			<startup boost="*0.8 *0.8" />
+			<explosion duration="*0.85" radius="*0.85" />
+			<nitro engine-force="*0.85" consumption="*1.3" max-speed-increase="*1.05" />
+			<slipstream length="*1.0" collect-time="*1.0"
+						duration-factor="*1.0" fade-out-time="*1.0" />
+			<parachute lbound-fraction="0.45" ubound-fraction="0.3" />
+		</characteristic>
+		
+		<characteristic name="low-drift">
+			<turn radius="0:3.0 5:4.5 12:8.5 20:15.5 30:23.0 50:38.0" />
+			<engine power="*1.0" max-speed="*0.95"
+					max-speed-reverse-ratio="*1.0" />
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
+				  power-increase="2.6 2.1 1.8 1.4 1.1 1.0" />
+			<mass value="*0.9" />
+			<skid reduce-turn-min="0.4" reduce-turn-max="1.1" bonus-force="*0.7 *0.7 *0.7" />
+			<startup boost="*0.9 *0.9" />
+			<explosion duration="*0.85" radius="*0.85" />
+			<nitro engine-force="*0.9" consumption="*1.3" max-speed-increase="*1.1" />
+			<slipstream length="*1.0" collect-time="*1.0"
+						duration-factor="*1.0" fade-out-time="*1.0" />
+			<parachute lbound-fraction="0.4" ubound-fraction="0.3" />
+		</characteristic>
+		
+		<characteristic name="super-low-drift">
+			<turn radius="0:3.2 5:4.8 12:9.0 20:16.0 30:24.0 50:40.0" />
+			<engine power="*1.0" max-speed="*0.95"
+					max-speed-reverse-ratio="*1.0" />
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
+				  power-increase="2.6 2.1 1.8 1.4 1.1 1.0" />
+			<mass value="*0.9" />
+			<skid reduce-turn-min="0.45" reduce-turn-max="1.2" bonus-force="*0.65 *0.65 *0.65" />
+			<startup boost="*0.85 *0.85" />
+			<explosion duration="*0.85" radius="*0.85" />
+			<nitro engine-force="*0.9" consumption="*1.3" max-speed-increase="*1.1" />
+			<slipstream length="*1.0" collect-time="*1.0"
+						duration-factor="*1.0" fade-out-time="*1.0" />
+			<parachute lbound-fraction="0.4" ubound-fraction="0.3" />
+		</characteristic>
+
+
+
+
+
+
+
+
+		
+		<characteristic name="low-nitro">
+			<turn radius="0:3.2 5:4.7 12:9.0 20:16.0 30:25.0 50:42.0" />
+			<engine power="*1" max-speed="*1"
+					max-speed-reverse-ratio="*0.95" />
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
+				  power-increase="2.05 1.74 1.53 1.32 1.16 1.0" />
+			<mass value="*1.0495" />
+			<skid reduce-turn-min="0.28" reduce-turn-max="0.9" bonus-force="*0.9 *0.9 *0.9" />
+			<startup boost="*0.75 *0.75" />
+			<explosion duration="*0.6" radius="*0.6" />
+			<nitro engine-force="*0.4" consumption="*1.6" max-speed-increase="*0.45" />
+			<slipstream length="*1.1" collect-time="*1.1"
+						duration-factor="*0.6" fade-out-time="*1" />
+			<parachute lbound-fraction="0.55" ubound-fraction="0.35" />
+		</characteristic>
+
+
+		<characteristic name="super-low-nitro">
+			<turn radius="0:3.2 5:4.7 12:9.0 20:16.0 30:25.0 50:42.0" />
+			<engine power="*1" max-speed="*1"
+					max-speed-reverse-ratio="*0.95" />
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
+				  power-increase="2.05 1.74 1.53 1.32 1.16 1.0" />
+			<mass value="*0.97" />
+			<skid reduce-turn-min="0.28" reduce-turn-max="0.9" bonus-force="*0.9 *0.9 *0.9" />
+			<startup boost="*0.75 *0.75" />
+			<explosion duration="*0.6" radius="*0.6" />
+			<nitro engine-force="*0.075" consumption="*2.1" max-speed-increase="*0.07" />
+			<slipstream length="*1.1" collect-time="*1.1"
+						duration-factor="*0.6" fade-out-time="*1" />
+			<parachute lbound-fraction="0.55" ubound-fraction="0.35" />
+		</characteristic>
+
+
+
+
+
+
+		<characteristic name="drift-master-original">
+			<turn radius="0:2.375 5:3.676 12:7.775 20:14.184 30:23.942 50:43.458" />
+			<engine power="*0.85" max-speed="*0.95"
+					max-speed-reverse-ratio="*1.05"/>
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
+				  power-increase="2.5 2.08 1.76 1.44 1.22 1" />
+			<mass value="*0.75" />
+			<skid reduce-turn-min="0.3475" reduce-turn-max="0.995" bonus-force="*1.2 *1.2 *1.2" />
+			<startup boost="*0.875 *0.875" />
+			<explosion duration="*0.8" radius="*0.8" />
+			<nitro engine-force="*0.825" consumption="*1.375" max-speed-increase="*1.1" />
+			<slipstream duration-factor="*0.8" fade-out-time="*1" />
+			<parachute lbound-fraction="0.45" ubound-fraction="0.275" />
+		</characteristic>
+		
+		<characteristic name="drift-master">
+			<turn radius="0:2.375 5:3.676 12:7.775 20:14.184 30:23.942 50:43.458" />
+			<engine power="*0.82" max-speed="*0.925" max-speed-reverse-ratio="*1.05"/>
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
+				  power-increase="2.5 2.08 1.76 1.44 1.22 1" />
+			<mass value="*0.75" />
+			<skid reduce-turn-min="0.3475" reduce-turn-max="0.995" bonus-force="*1.2 *1.2 *1.2" />
+			<startup boost="*0.85 *0.85" />
+			<explosion duration="*0.8" radius="*0.8" />
+			<nitro engine-force="*0.8" consumption="*1.4" max-speed-increase="*1.08" />
+			<slipstream duration-factor="*0.8" fade-out-time="*1" />
+			<parachute lbound-fraction="0.45" ubound-fraction="0.275" />
+		</characteristic>
+
+		
+		<characteristic name="slide-king">
+			<turn radius="0:2.625 5:3.926 12:8.275 20:15.184 30:24.942 50:44.458" />
+			<engine power="*0.8" max-speed="*0.85"
+					max-speed-reverse-ratio="*1.05"/>
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
+				  power-increase="2.5 2.08 1.76 1.44 1.22 1" />
+			<mass value="*0.7" />
+			<skid reduce-turn-min="0.3475" reduce-turn-max="0.995" bonus-force="*1.3 *1.3 *1.3" />
+			<startup boost="*0.875 *0.875" />
+			<explosion duration="*0.8" radius="*0.8" />
+			<nitro engine-force="*0.925" consumption="*1.275" max-speed-increase="*1.2" />
+			<slipstream duration-factor="*0.8" fade-out-time="*1" />
+			<parachute lbound-fraction="0.45" ubound-fraction="0.275" />
+		</characteristic>
+		
+		<characteristic name="slipstream-champion">
+			<turn radius="0:2.675 5:4.026 12:8.475 20:15.584 30:25.542 50:45.058" />
+			<engine power="*0.875" max-speed="*1.0"
+					max-speed-reverse-ratio="*1.05"/>
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
+				  power-increase="2.5 2.08 1.76 1.44 1.22 1" />
+			<mass value="*0.65" />
+			<skid reduce-turn-min="0.2475" reduce-turn-max="0.895" bonus-force="*0.875 *0.875 *0.875" />
+			<startup boost="*0.875 *0.875" />
+			<explosion duration="*0.8" radius="*0.8" />
+			<nitro engine-force="*0.925" consumption="*1.275" max-speed-increase="*1.2" />
+			<slipstream duration-factor="*1.3" fade-out-time="*1.2" />
+			<parachute lbound-fraction="0.45" ubound-fraction="0.275" />
+		</characteristic>
+
+		<characteristic name="superboost">
+			<turn radius="0:3.0 5:4.3 12:8.9 20:16.4 30:26.2 50:45.8" />
+			<engine power="*0.85" max-speed="*0.94" max-speed-reverse-ratio="*1.05"/>
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
+				  power-increase="2.5 2.08 1.76 1.44 1.22 1" />
+			<mass value="*0.75" />
+			<skid reduce-turn-min="0.27" reduce-turn-max="0.91" bonus-force="*0.9 *0.9 *0.9" />
+			<startup boost="*1.3 *1.3" />
+			<explosion duration="*0.8" radius="*0.8" />
+			<nitro engine-force="*0.82" consumption="*1.4" max-speed-increase="*1.1" />
+			<slipstream duration-factor="*0.8" fade-out-time="*1" />
+			<parachute lbound-fraction="0.45" ubound-fraction="0.275" />
+		</characteristic>
+
+		<characteristic name="parachutemaster">
+			<turn radius="0:2.875 5:4.176 12:8.775 20:16.184 30:25.942 50:45.458" />
+			<engine power="*0.875" max-speed="*0.948"
+					max-speed-reverse-ratio="*1.05"/>
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
+				  power-increase="2.5 2.08 1.76 1.44 1.22 1" />
+			<mass value="*0.75" />
+			<skid reduce-turn-min="0.2475" reduce-turn-max="0.895" bonus-force="*0.875 *0.875 *0.875" />
+			<startup boost="*0.875 *0.875" />
+			<explosion duration="*0.8" radius="*0.8" />
+			<nitro engine-force="*1.1" consumption="*0.9" max-speed-increase="*1.2" />
+			<slipstream duration-factor="*0.8" fade-out-time="*1" />
+			<parachute lbound-fraction="0.75" ubound-fraction="0.55" />
+		</characteristic>
+
+
+		<characteristic name="super-superboost">
+			<turn radius="0:3.0 5:4.3 12:8.9 20:16.4 30:26.2 50:45.8" />
+			<engine power="*0.85" max-speed="*0.94" max-speed-reverse-ratio="*1.05"/>
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
+				  power-increase="2.5 2.08 1.76 1.44 1.22 1" />
+			<mass value="*0.75" />
+			<skid reduce-turn-min="0.27" reduce-turn-max="0.91" bonus-force="*0.9 *0.9 *0.9" />
+			<startup boost="*6.3 *6.3" />
+			<explosion duration="*1.2" radius="*1.2" />
+			<nitro engine-force="*0.82" consumption="*1.4" max-speed-increase="*1.1" />
+			<slipstream duration-factor="*0.8" fade-out-time="*1" />
+			<parachute lbound-fraction="0.45" ubound-fraction="0.275" />
+		</characteristic>
+
+		<characteristic name="mega-heavy-explode">
+			<turn radius="0:3.5 5:5.0 12:10.0 20:20.0 30:30.0 50:50.0" />
+			<engine power="*1.1423" max-speed="*1.0423" max-speed-reverse-ratio="*0.9" />
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
+				  power-increase="2.0 1.7 1.5 1.3 1.1 1.0" />
+			<mass value="*0.9951" />
+			<skid reduce-turn-min="0.3" reduce-turn-max="0.9" bonus-force="*1.1 *1.1 *1.1" />
+			<startup boost="*0.75 *0.75" />
+			<explosion duration="*4.5" radius="*4.5" />
+			<nitro engine-force="*1.1" consumption="*2.0" max-speed-increase="*0.9" />
+			<slipstream length="*1.2" collect-time="*1.2"
+						duration-factor="*0.5" fade-out-time="*0.9" />
+			<parachute lbound-fraction="0.6" ubound-fraction="0.4" />
+		</characteristic>
+		
+		<characteristic name="mega-heavy">
+			<turn radius="0:3.5 5:5.0 12:10.0 20:20.0 30:30.0 50:50.0" />
+			<engine power="*1.1423" max-speed="*1.0423" max-speed-reverse-ratio="*0.9" />
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
+				  power-increase="2.0 1.7 1.5 1.3 1.1 1.0" />
+			<mass value="*1.021" />
+			<skid reduce-turn-min="0.3" reduce-turn-max="0.9" bonus-force="*1.1 *1.1 *1.1" />
+			<startup boost="*0.75 *0.75" />
+			<explosion duration="*2.5" radius="*2.5" />
+			<nitro engine-force="*1.1" consumption="*2.0" max-speed-increase="*0.9" />
+			<slipstream length="*1.2" collect-time="*1.2"
+						duration-factor="*0.5" fade-out-time="*0.9" />
+			<parachute lbound-fraction="0.6" ubound-fraction="0.4" />
+		</characteristic>
+
+
+
+
+
+
+
+		<characteristic name="super-100-5-stats-base">
+			<turn radius="0:3.5 5:5.0 12:10.0 20:20.0 30:30.0 50:50.0" />
+			<engine power="*1.0423" max-speed="*1.0423"
+					max-speed-reverse-ratio="*0.9" />
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
+				  power-increase="1.9 1.6 1.4 1.2 1.1 1.0" />
+			<mass value="*0.5778" />
+			<skid reduce-turn-min="0.3" reduce-turn-max="0.9" bonus-force="*1.1 *1.1 *1.1" />
+			<startup boost="*0.7 *0.7" />
+			<explosion duration="*0.5" radius="*0.5" />
+			<nitro engine-force="*1.1" consumption="*2.0" max-speed-increase="*0.9" />
+			<slipstream length="*1.2" collect-time="*1.2"
+						duration-factor="*0.5" fade-out-time="*0.9" />
+			<parachute lbound-fraction="0.6" ubound-fraction="0.4" />
+		</characteristic>
+		
     </kart-types>
 
     <!-- Per-player settings/handicaps (or boosts) -->
