@@ -211,8 +211,8 @@ extern "C" {
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "font/font_manager.hpp"
-#include "graphics/camera.hpp"
-#include "graphics/camera_debug.hpp"
+#include "graphics/camera/camera.hpp"
+#include "graphics/camera/camera_debug.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/graphics_restrictions.hpp"
 #include "graphics/irr_driver.hpp"
@@ -2120,7 +2120,6 @@ int main(int argc, char *argv[])
 
     // Up number of maximum concurrent sockets, otherwise we can fail while loading with nxlink
     const SocketInitConfig socketConfig = {
-        .bsdsockets_version = 1,
         .tcp_tx_buf_size        = 0x8000,
         .tcp_rx_buf_size        = 0x10000,
         .tcp_tx_buf_max_size    = 0x40000,

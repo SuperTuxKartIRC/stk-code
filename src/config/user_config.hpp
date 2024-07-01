@@ -414,16 +414,22 @@ namespace UserConfigParams
             PARAM_DEFAULT(  BoolUserConfigParam(true, "music_on",
             &m_audio_group,
             "Whether musics are enabled or not (true or false)") );
+    PARAM_PREFIX IntUserConfigParam         m_sfx_numerator
+            PARAM_DEFAULT(  IntUserConfigParam(10, "sfx_numerator",
+            &m_audio_group, "The value in the audio options SFX spinner") );
     PARAM_PREFIX FloatUserConfigParam       m_sfx_volume
-            PARAM_DEFAULT(  FloatUserConfigParam(0.6f, "sfx_volume",
+            PARAM_DEFAULT(  FloatUserConfigParam(0.2678f, "sfx_volume",
             &m_audio_group, "Volume for sound effects, see openal AL_GAIN "
                             "for interpretation") );
+    PARAM_PREFIX IntUserConfigParam         m_music_numerator
+            PARAM_DEFAULT(  IntUserConfigParam(10, "music_numerator",
+            &m_audio_group, "The value in the audio options music spinner") );
     PARAM_PREFIX FloatUserConfigParam       m_music_volume
-            PARAM_DEFAULT(  FloatUserConfigParam(0.5f, "music_volume",
+            PARAM_DEFAULT(  FloatUserConfigParam(0.2678f, "music_volume",
             &m_audio_group, "Music volume from 0.0 to 1.0") );
 
     PARAM_PREFIX IntUserConfigParam          m_volume_denominator
-            PARAM_DEFAULT(  IntUserConfigParam(10, "volume_denominator",
+            PARAM_DEFAULT(  IntUserConfigParam(15, "volume_denominator",
                             &m_audio_group,
                             "Number of steps for volume adjustment") );
 
@@ -667,7 +673,7 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_force_legacy_device
         PARAM_DEFAULT(BoolUserConfigParam(false, "force_legacy_device",
         &m_video_group, "Force OpenGL 2 context, even if OpenGL 3 is available."));
-    PARAM_PREFIX BoolUserConfigParam        split_screen_horizontally
+    PARAM_PREFIX BoolUserConfigParam        m_split_screen_horizontally
         PARAM_DEFAULT(BoolUserConfigParam(true, "split_screen_horizontally",
             &m_video_group, "When playing a non-square amount of players (e.g. 2),"
             " should it split horizontally (top/bottom)"));
@@ -1238,7 +1244,7 @@ namespace UserConfigParams
                            "If debug logging should be enabled for rich presence") );
 
     PARAM_PREFIX StringUserConfigParam      m_skin_file
-            PARAM_DEFAULT(  StringUserConfigParam("peach", "skin_name",
+            PARAM_DEFAULT(  StringUserConfigParam("classic", "skin_name",
                                                   "Name of the skin to use") );
 
     // ---- settings for minimap display

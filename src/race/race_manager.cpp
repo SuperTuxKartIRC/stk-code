@@ -60,6 +60,7 @@
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/profiler.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/stk_process.hpp"
 #include "utils/string_utils.hpp"
@@ -144,6 +145,8 @@ RaceManager::RaceManager()
     setRecordRace(false);
     setRaceGhostKarts(false);
     setWatchingReplay(false);
+    setBenchmarking(false);
+    m_scheduled_benchmark = false;
     setTrack("jungle");
     m_default_ai_list.clear();
     setNumPlayers(0);
@@ -600,6 +603,7 @@ void RaceManager::startNextRace()
     else
     {
         const bool random_pos_available = !NetworkConfig::get()->isNetworking() &&
+            !m_has_ghost_karts &&
             (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE
             || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL
             || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER);
@@ -984,6 +988,7 @@ void RaceManager::exitRace(bool delete_world)
 
         StateManager::get()->enterGameState();
         setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+        int num_gp_karts = m_num_karts;
         setNumKarts(0);
         setNumPlayers(0);
 
@@ -994,6 +999,7 @@ void RaceManager::exitRace(bool delete_world)
                                   raceWasStartedFromOverworld());
             GrandPrixWin* scene = GrandPrixWin::getInstance();
             scene->push();
+            scene->setNumGPKarts(num_gp_karts); // This must be set before we set karts
             scene->setKarts(winners);
             scene->setPlayerWon(some_human_player_won);
             std::set<std::string> karts;
@@ -1023,6 +1029,7 @@ void RaceManager::exitRace(bool delete_world)
                 scene->setKarts(karts);
             }
         }
+
         kart_properties_manager->onDemandLoadKartTextures(used_karts);
     }
 
@@ -1117,6 +1124,7 @@ void RaceManager::startGP(const GrandPrixData &gp, bool from_overworld,
  * \param trackIdent Internal name of the track to race on
  * \param num_laps   Number of laps to race, or -1 if number of laps is
  *        not relevant in current mode
+ * \param from_overworld If it was started from the Story Mode overworld
  */
 void RaceManager::startSingleRace(const std::string &track_ident,
                                   const int num_laps,
@@ -1310,7 +1318,34 @@ core::stringw RaceManager::getDifficultyName(Difficulty diff) const
         case RaceManager::DIFFICULTY_MEDIUM: return _("Intermediate"); break;
         case RaceManager::DIFFICULTY_HARD:   return _("Expert");   break;
         case RaceManager::DIFFICULTY_BEST:   return _("SuperTux");   break;
-        default:  assert(false);
+        default:    Log::error("RaceManager", "Difficulty level '%u' is unknown.", diff);
+                    // Uncomment to generate a crash and backtrace, if the cause of the
+                    // incorrect difficulty level is unknown (i.e. not online servers' settings)
+                    // assert(false);
     }
     return "";
 }   // getDifficultyName
+
+//---------------------------------------------------------------------------------------------
+/** Set the benchmarking mode as requested, and turn off the profiler if needed. */
+void RaceManager::setBenchmarking(bool benchmark)
+{
+    m_benchmarking = benchmark;
+    m_scheduled_benchmark = false;
+
+    // If the benchmark mode is turned off and the profiler is still activated,
+    // turn the profiler off and reset the drawing mode to default.
+    if (!m_benchmarking && UserConfigParams::m_profiler_enabled)
+    {
+        profiler.desactivate();
+        profiler.setDrawing(true);
+    }
+}   // setBenchmarking
+
+//---------------------------------------------------------------------------------------------
+/** Schedule a benchmark. This function is used because the video options screen
+* might need to be reloaded when switching between old and modern renderer.*/
+void RaceManager::scheduleBenchmark()
+{
+    m_scheduled_benchmark = true;
+}   // scheduleBenchmark

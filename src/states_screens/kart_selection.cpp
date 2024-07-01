@@ -338,7 +338,8 @@ void KartSelectionScreen::beforeAddingWidget()
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     assert( w != NULL );
 
-    w->setItemCountHint( kart_properties_manager->getNumberOfKarts() );
+    // Avoid too many items shown at the same time
+    w->setItemCountHint(std::min((int)kart_properties_manager->getNumberOfKarts(), 20));
 }   // beforeAddingWidget
 
 // ----------------------------------------------------------------------------
@@ -1638,3 +1639,34 @@ bool KartSelectionScreen::useContinueButton() const
 #pragma mark -
 #endif
 
+// ----------------------------------------------------------------------------
+void KartSelectionScreen::onResize()
+{
+    // Remove dispatcher from m_widgets before calculateLayout otherwise a
+    // dummy button is shown in kart screen
+    bool removed_dispatcher = false;
+    if (m_widgets.contains(m_dispatcher))
+    {
+        m_widgets.remove(m_dispatcher);
+        removed_dispatcher = true;
+    }
+    Screen::onResize();
+    if (removed_dispatcher)
+        m_widgets.push_back(m_dispatcher);
+    if (m_multiplayer)
+    {
+        if (m_kart_widgets.size() < 2)
+            addMultiplayerMessage();
+        if (m_kart_widgets.empty())
+            return;
+    }
+    Widget* fullarea = getWidget("playerskarts");
+    int split_width = fullarea->m_w / m_kart_widgets.size();
+    if (m_multiplayer && m_kart_widgets.size() == 1)
+        split_width /= 2;
+    for (unsigned i = 0; i < m_kart_widgets.size(); i++)
+    {
+        m_kart_widgets[i].updateSizeNow(fullarea->m_x + split_width * i,
+            fullarea->m_y, split_width, fullarea->m_h);
+    }
+}   // onResize
