@@ -50,6 +50,8 @@ class TrackInfoScreen : public GUIEngine::Screen,
 
     bool m_is_soccer;
 
+    bool m_is_tab_mode;
+
     bool m_is_lap_trial;
 
     bool m_show_ffa_spinner;

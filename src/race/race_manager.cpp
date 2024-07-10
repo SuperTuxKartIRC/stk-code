@@ -677,9 +677,8 @@ void RaceManager::startNextRace()
             World::setWorld(new FreeForAll());
         else if (m_minor_mode == MINOR_MODE_CAPTURE_THE_FLAG)
             World::setWorld(new CaptureTheFlag());
-
-        //else if (RaceManager::get()->isTABMode())
-        //    World::setWorld(new TeamArenaBattle());
+        else if (RaceManager::get()->isTABMode())
+            World::setWorld(new TeamArenaBattle());
     }
     else if(m_minor_mode==MINOR_MODE_SOCCER)
         World::setWorld(new SoccerWorld());

@@ -107,6 +107,7 @@ void TrackInfoScreen::loadedFromFile()
     screenshot->m_tab_stop = false;
 
     m_is_soccer = false;
+    m_is_tab_mode = false;
     m_show_ffa_spinner = false;
 
 }   // loadedFromFile
@@ -120,6 +121,7 @@ void TrackInfoScreen::beforeAddingWidget()
     m_show_ffa_spinner = RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES || 
                          RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL || 
                          RaceManager::get()->isTABMode();
+    m_is_tab_mode = RaceManager::get()->isTABMode();
 
     m_target_type_div->setCollapsed(!m_is_soccer && !m_show_ffa_spinner, this);
 
@@ -561,14 +563,14 @@ void TrackInfoScreen::onEnterPressedInternal()
     // Create a copy of member variables we still need, since they will
     // not be accessible after dismiss:
     const int num_laps = RaceManager::get()->modeHasLaps() ? m_target_value_spinner->getValue()
-                                                     : -1;
+        : -1;
     const bool option_state = m_option == NULL ? false
-                                               : m_option->getState();
+        : m_option->getState();
     // Avoid negative lap numbers (after e.g. easter egg mode).
-    if(num_laps>=0)
+    if (num_laps >= 0)
         m_track->setActualNumberOfLaps(num_laps);
 
-    if(m_track->hasNavMesh())
+    if (m_track->hasNavMesh())
         UserConfigParams::m_random_arena_item = option_state;
     else
         RaceManager::get()->setReverseTrack(option_state);
@@ -578,17 +580,17 @@ void TrackInfoScreen::onEnterPressedInternal()
     const int local_players = RaceManager::get()->getNumLocalPlayers();
     const bool has_AI =
         (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ||
-         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
-         RaceManager::get()->isSoccerMode() ||
-         RaceManager::get()->isTABMode() ?
-         m_track->hasNavMesh() && (max_arena_players - local_players) > 0 :
-         RaceManager::get()->hasAI());
+            RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
+            RaceManager::get()->isSoccerMode() ||
+            RaceManager::get()->isTABMode() ?
+            m_track->hasNavMesh() && (max_arena_players - local_players) > 0 :
+    RaceManager::get()->hasAI());
 
     int num_ai = 0;
     if (has_AI)
     {
         num_ai = m_ai_kart_spinner->getValue();
-        
+
         if (m_is_soccer) // Soccer mode
             num_ai += m_ai_team2_spinner->getValue();
     }
@@ -596,11 +598,17 @@ void TrackInfoScreen::onEnterPressedInternal()
     const int selected_target_type = m_target_type_spinner->getValue();
     const int selected_target_value = m_target_value_spinner->getValue();
 
-    const bool enable_ffa = m_show_ffa_spinner && selected_target_type != 0;
+    const bool enable_ffa = m_show_ffa_spinner && selected_target_type != 0 && !m_is_tab_mode;
 
     if (enable_ffa)
     {
         RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_FREE_FOR_ALL);
+        RaceManager::get()->setHitCaptureTime(0, static_cast<float>(selected_target_value) * 60);
+    }
+
+    if (m_is_tab_mode) 
+    {
+        RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TAB_POINTS_TEAM);
         RaceManager::get()->setHitCaptureTime(0, static_cast<float>(selected_target_value) * 60);
     }
 
