@@ -52,7 +52,7 @@
                     
                     <spacer width="1" height="1%"/>
                     
-                    <div width="100%" height="fit" layout="horizontal-row" id=""ai-team2-div">
+                    <div width="100%" height="fit" layout="horizontal-row" id="ai-team2-div">
                         <div proportion="1" height="fit" layout="horizontal-row">
                             <spinner id="ai-team2-spinner" width="100%" min_value="1" max_value="20" align="center"
                                      wrap_around="true" />
