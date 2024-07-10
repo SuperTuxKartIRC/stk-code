@@ -371,6 +371,9 @@ private:
     float                            m_time_target;
     int                              m_goal_target;
     int                              m_hit_capture_limit;
+    int                              m_life_target;
+    bool                             m_thief_mode;
+    bool                             m_special_victory_mode;
     int                              m_skipped_tracks_in_gp;
     /** Time target for GP, used in Lap Trial mode */
     float                            m_gp_time_target;
@@ -509,6 +512,14 @@ public:
         m_reverse_track.clear();
         m_reverse_track.push_back(r_t);
     }   // setReverseTrack
+    // ----------------------------------------------------------------------------------------
+    void setThiefMode(bool hasMode) { m_thief_mode = hasMode; }
+    // ----------------------------------------------------------------------------------------
+    bool hasThiefMode() const { return m_thief_mode; }
+    // ----------------------------------------------------------------------------------------
+    void setSpecialVictoryMode(bool hasMode) { m_special_victory_mode = hasMode; }
+    // ----------------------------------------------------------------------------------------
+    bool hasSpecialVictoryMode() const { return m_special_victory_mode; }
     // ----------------------------------------------------------------------------------------
     void setMajorMode(MajorRaceModeType mode) { m_major_mode = mode; }
     // ----------------------------------------------------------------------------------------
@@ -804,6 +815,18 @@ public:
     bool isCTFMode() const       { return m_minor_mode == MINOR_MODE_CAPTURE_THE_FLAG; }
  
     // ----------------------------------------------------------------------------------------
+    bool isTabTPMode() const { return m_minor_mode == MINOR_MODE_TAB_POINTS_TEAM; }
+
+    // ----------------------------------------------------------------------------------------
+    bool isTabPPMode() const { return m_minor_mode == MINOR_MODE_TAB_POINTS_PLAYER; }
+
+    // ----------------------------------------------------------------------------------------
+    bool isTabAPPMode() const { return m_minor_mode == MINOR_MODE_TAB_ALL_POINTS_PLAYER; }
+
+    // ----------------------------------------------------------------------------------------
+    bool isTabLifeMode() const { return m_minor_mode == MINOR_MODE_TAB_LIFE; }
+
+    // ----------------------------------------------------------------------------------------
     bool isEggHuntMode() const   { return m_minor_mode == MINOR_MODE_EASTER_EGG; }
 
     // ----------------------------------------------------------------------------------------
@@ -952,6 +975,13 @@ public:
     }
     // ----------------------------------------------------------------------------------------
     int getHitCaptureLimit() const              { return m_hit_capture_limit; }
+    // ----------------------------------------------------------------------------------------
+    void setLifeTarget(int life)
+    {
+        m_life_target = life;
+    }
+    // ----------------------------------------------------------------------------------------
+    int getLifeTarget() const { return m_life_target; }
     // ----------------------------------------------------------------------------------------
     bool teamEnabled() const
     {
