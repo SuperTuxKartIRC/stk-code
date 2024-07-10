@@ -1631,6 +1631,49 @@ KartTeam World::getKartTeam(unsigned int kart_id) const
 }   // getKartTeam
 
 //-----------------------------------------------------------------------------
+int World::getKartIdTeamIndex(unsigned int kart_id) const
+{
+    auto it = std::find(m_teams_in_game.begin(), m_teams_in_game.end(), getKartTeam(kart_id));
+
+    // Vérification si la valeur est trouvée et retour de l'index si c'est le cas
+    if (it != m_teams_in_game.end())
+        return std::distance(m_teams_in_game.begin(), it);
+    else
+        return -1;
+}   // getKartTeamIndex
+
+    //-------------------------------------------------------------------------
+int World::getTeamIndexValue(unsigned int team_index) const
+{
+    return m_teams_in_game[team_index];
+} // getTeamIndexValue
+
+//-----------------------------------------------------------------------------
+int World::getKartTeamIndex(unsigned int team_id) const
+{
+    auto it = std::find(m_teams_in_game.begin(), m_teams_in_game.end(), (KartTeam)team_id);
+
+    // Vérification si la valeur est trouvée et retour de l'index si c'est le cas
+    if (it != m_teams_in_game.end())
+        return std::distance(m_teams_in_game.begin(), it);
+    else
+        return -1;
+}   // getKartTeamIndex
+
+//-----------------------------------------------------------------------------
+int World::getKartTeamIndex(KartTeam team) const
+{
+    auto it = std::find(m_teams_in_game.begin(), m_teams_in_game.end(), team);
+
+    // Vérification si la valeur est trouvée et retour de l'index si c'est le cas
+    if (it != m_teams_in_game.end())
+        return std::distance(m_teams_in_game.begin(), it);
+    else
+        return -1;
+}   // getKartTeamIndex
+
+
+//-----------------------------------------------------------------------------
 void World::setAITeam()
 {
     int total_teams = getNumTeam(); // RaceManager::get()->getTotalNumberOfTeams();

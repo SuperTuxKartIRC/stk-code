@@ -124,6 +124,8 @@ protected:
     int         m_eliminated_players;
     /** OVerall number of players. */
     int         m_num_players;
+    /** Number of winning teams. */
+    std::vector<int> m_winning_teams;
 
     bool        m_faster_music_active; // true if faster music was activated
 
@@ -399,6 +401,14 @@ public:
     // ------------------------------------------------------------------------
     /** Get the team of kart in world (including AIs) */
     KartTeam getKartTeam(unsigned int kart_id) const;
+    //-------------------------------------------------------------------------
+    int getKartIdTeamIndex(unsigned int kart_id) const;
+    //-------------------------------------------------------------------------
+    int getTeamIndexValue(unsigned int team_index) const;
+    //-------------------------------------------------------------------------
+    int getKartTeamIndex(unsigned int team_id) const;
+    //-------------------------------------------------------------------------
+    int getKartTeamIndex(KartTeam team) const;
     // ------------------------------------------------------------------------
     int getTeamNum(KartTeam team) const;
     // ------------------------------------------------------------------------
@@ -412,6 +422,12 @@ public:
     // ------------------------------------------------------------------------
     void setTeamsInGame(KartTeam team, int index) { m_teams_in_game[index] = team; }
     // ------------------------------------------------------------------------
+    std::vector<int> getWinningTeam() const { return m_winning_teams; }
+    // ------------------------------------------------------------------------
+    void setWinningTeam(int team) { m_winning_teams.clear(); m_winning_teams.push_back(team); }
+    // ------------------------------------------------------------------------
+    void setWinningTeam(std::vector<int> teams) { m_winning_teams = teams; }
+
     /** Set the network mode (true if networked) */
     void setNetworkWorld(bool is_networked) { m_is_network_world = is_networked; }
     // ------------------------------------------------------------------------

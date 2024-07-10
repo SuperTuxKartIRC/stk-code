@@ -250,7 +250,8 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name,
         {
             RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TAB_POINTS_TEAM);
             UserConfigParams::m_game_mode = CONFIG_CODE_TAB_PT;
-            TeamsSetupScreen::getInstance()->push();
+            //TeamsSetupScreen::getInstance()->push();
+            SoccerSetupScreen::getInstance()->push();
         }
         else if (selectedMode == IDENT_EASTER)
         {

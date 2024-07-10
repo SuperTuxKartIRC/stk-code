@@ -530,15 +530,15 @@ void TeamArenaBattle::configureTheifModeValue()
     int multiplierPointThiefNb = 1; // Usefull or not 
 
 
-    if (NetworkConfig::get()->isNetworking() &&
-        NetworkConfig::get()->isServer())
-    {
-        NetworkString p(PROTOCOL_GAME_EVENTS);
-        p.setSynchronous(true);
-        p.addUInt8(GameEventsProtocol::GE_SETUP_GAME);
-        p.addUInt8((uint8_t)m_hasAllTeamVictoryConditions).addUInt8((uint8_t)m_hasThiefMode);
-        STKHost::get()->sendPacketToAllPeers(&p, true);
-    }
+    //if (NetworkConfig::get()->isNetworking() &&
+    //    NetworkConfig::get()->isServer())
+    //{
+    //    NetworkString p(PROTOCOL_GAME_EVENTS);
+    //    p.setSynchronous(true);
+    //    p.addUInt8(GameEventsProtocol::GE_SETUP_GAME);
+    //    p.addUInt8((uint8_t)m_hasAllTeamVictoryConditions).addUInt8((uint8_t)m_hasThiefMode);
+    //    STKHost::get()->sendPacketToAllPeers(&p, true);
+    //}
 }
 
 // ------------------------------------------------------------------------
