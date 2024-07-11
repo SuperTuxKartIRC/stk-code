@@ -779,7 +779,7 @@ public:
         const int id = (int)m_minor_mode;
         // This uses the  numerical id of the mode, see the macros
         // LINEAR_RACE and BATTLE_ARENA above for exact meaning.
-        if (id >= 2000 && id <= 2002) return true;
+        if ((id >= 2000 && id <= 2002) || (id >= 2004 && id <= 2007)) return true;
         else            return false;
     }   // isBattleMode
 

@@ -146,11 +146,12 @@ void PowerupManager::loadPowerupsModels()
         }
     }
     
-    loadWeights(root, "race-weight-list"    );
-    loadWeights(root, "ftl-weight-list"     );
-    loadWeights(root, "battle-weight-list"  );
-    loadWeights(root, "soccer-weight-list"  );
-    loadWeights(root, "tutorial-weight-list");
+    loadWeights(root, "race-weight-list"      );
+    loadWeights(root, "ftl-weight-list"       );
+    loadWeights(root, "battle-weight-list"    );
+    loadWeights(root, "teamsarena-weight-list");
+    loadWeights(root, "soccer-weight-list"    );
+    loadWeights(root, "tutorial-weight-list"  );
 
     delete root;
 
