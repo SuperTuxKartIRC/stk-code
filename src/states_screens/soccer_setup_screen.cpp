@@ -110,7 +110,7 @@ void SoccerSetupScreen::beforeAddingWidget()
     std::string team1_name = (World::getWorld()->getKartTeamsColorName(RaceManager::get()->getTeamsInGame()[0])).c_str();
     std::string team2_name = (World::getWorld()->getKartTeamsColorName(RaceManager::get()->getTeamsInGame()[1])).c_str();
 
-    // Définir les images des boutons
+    // Define icon button images
     m_icon_button_team1->setImage("gui/icons/soccer_ball_" + team1_name + ".png");
     m_icon_button_team1->setText(team1_name_W);
     m_icon_button_team2->setImage("gui/icons/soccer_ball_" + team2_name + ".png");

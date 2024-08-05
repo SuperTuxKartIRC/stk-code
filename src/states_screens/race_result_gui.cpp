@@ -1595,8 +1595,18 @@ void RaceResultGUI::displaySoccerResults()
     //Draw team scores:
     current_y += rect.Height;
     current_x /= 2;
-    irr::video::ITexture* red_icon = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_red.png");
-    irr::video::ITexture* blue_icon = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_blue.png");
+
+
+    core::stringw team1_name_W = (World::getWorld()->getKartTeamsColorName(RaceManager::get()->getTeamsInGame()[0])).c_str();
+    core::stringw team2_name_w = (World::getWorld()->getKartTeamsColorName(RaceManager::get()->getTeamsInGame()[1])).c_str();
+
+    // String versions
+    std::string team1_name = (World::getWorld()->getKartTeamsColorName(RaceManager::get()->getTeamsInGame()[0])).c_str();
+    std::string team2_name = (World::getWorld()->getKartTeamsColorName(RaceManager::get()->getTeamsInGame()[1])).c_str();
+
+    // Define icon button images
+    irr::video::ITexture* red_icon = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_" + team1_name + ".png");
+    irr::video::ITexture* blue_icon = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_" + team2_name + ".png");
 
     int team_icon_width = team_icon_height * (red_icon->getSize().Width / red_icon->getSize().Height);
     core::recti source_rect(core::vector2di(0, 0), red_icon->getSize());
