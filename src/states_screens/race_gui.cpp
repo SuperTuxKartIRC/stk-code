@@ -1326,7 +1326,7 @@ void RaceGUI::drawLap(const AbstractKart* kart,
         }
 
         core::stringw text = StringUtils::toWString(red_score);
-        font->draw(text, pos, video::SColor(255, 255, 0, 0));
+        font->draw(text, pos, world->getWorld()->rgbaColorKartTeamsColor(RaceManager::get()->getTeamsInGame()[0]));
         d = font->getDimension(text.c_str());
         pos += core::position2di(d.Width, 0);
         text = L"-";
@@ -1334,7 +1334,7 @@ void RaceGUI::drawLap(const AbstractKart* kart,
         d = font->getDimension(text.c_str());
         pos += core::position2di(d.Width, 0);
         text = StringUtils::toWString(blue_score);
-        font->draw(text, pos, video::SColor(255, 0, 0, 255));
+        font->draw(text, pos, world->getWorld()->rgbaColorKartTeamsColor(RaceManager::get()->getTeamsInGame()[1]));
         pos += core::position2di(d.Width, 0);
         if (score_limit != -1)
         {
