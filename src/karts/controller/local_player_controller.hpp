@@ -24,7 +24,7 @@
 #include "karts/controller/player_controller.hpp"
 #include <memory>
 
-class AbstractKart;
+class Kart;
 class SFXBase;
 class SFXBuffer;
 class btTransform;
