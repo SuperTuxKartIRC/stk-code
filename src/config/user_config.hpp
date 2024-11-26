@@ -787,8 +787,8 @@ namespace UserConfigParams
             &m_video_group, "Maximum fps, should be at least 60"));
     PARAM_PREFIX BoolUserConfigParam        m_force_legacy_device
         PARAM_DEFAULT(BoolUserConfigParam(false, "force_legacy_device",
-            &m_video_group, "Force OpenGL 2 context, even if OpenGL 3 is available."));
-    PARAM_PREFIX BoolUserConfigParam        split_screen_horizontally
+        &m_video_group, "Force OpenGL 2 context, even if OpenGL 3 is available."));
+    PARAM_PREFIX BoolUserConfigParam        m_split_screen_horizontally
         PARAM_DEFAULT(BoolUserConfigParam(true, "split_screen_horizontally",
             &m_video_group, "When playing a non-square amount of players (e.g. 2),"
             " should it split horizontally (top/bottom)"));
@@ -1359,8 +1359,8 @@ namespace UserConfigParams
             "If debug logging should be enabled for rich presence"));
 
     PARAM_PREFIX StringUserConfigParam      m_skin_file
-        PARAM_DEFAULT(StringUserConfigParam("peach", "skin_name",
-            "Name of the skin to use"));
+            PARAM_DEFAULT(  StringUserConfigParam("classic", "skin_name",
+                                                  "Name of the skin to use") );
 
     // ---- settings for minimap display
     PARAM_PREFIX GroupUserConfigParam        m_minimap_setup_group

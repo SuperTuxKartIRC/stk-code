@@ -23,7 +23,7 @@
 #include "config/player_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
-#include "graphics/camera.hpp"
+#include "graphics/camera/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
@@ -107,9 +107,9 @@ LocalPlayerController::~LocalPlayerController()
 void LocalPlayerController::initParticleEmitter()
 {
     // Attach Particle System
+#ifndef SERVER_ONLY
     m_sky_particles_emitter = nullptr;
     Track *track = Track::getCurrentTrack();
-#ifndef SERVER_ONLY
     if (!GUIEngine::isNoGraphics() &&
         UserConfigParams::m_particles_effects > 1 &&
         track->getSkyParticles() != NULL)
