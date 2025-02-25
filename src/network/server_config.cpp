@@ -373,8 +373,8 @@ void loadServerLobbyFromConfig()
     RaceManager::get()->setDifficulty(RaceManager::Difficulty(difficulty));
 
     if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL &&
-        m_server_max_players > 10)
-        m_server_max_players = 10;
+        m_server_max_players > 30)
+        m_server_max_players = 30;
 
     // Parameters should only be sanity checked, not modified for interpretation (see #5173).
     // A parameter of 0 here means no limit is to be applied.

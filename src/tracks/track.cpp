@@ -658,8 +658,8 @@ void Track::loadTrackInfo()
         m_max_arena_players = 8;
     }
     // Max 10 players supported in arena
-    if (m_max_arena_players > 10)
-        m_max_arena_players = 10;
+    if (m_max_arena_players > 30)
+        m_max_arena_players = 30;
 
 }   // loadTrackInfo
 
