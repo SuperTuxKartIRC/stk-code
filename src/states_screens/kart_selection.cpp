@@ -494,8 +494,6 @@ void KartSelectionScreen::init()
 
 void KartSelectionScreen::tearDown()
 {
-    kart_properties_manager->clearFavoriteKartStatus();
-
 #ifndef SERVER_ONLY
     GE::getGEConfig()->m_enable_draw_call_cache = false;
     GE::GEVulkanDriver* gevk = GE::getVKDriver();
@@ -524,8 +522,10 @@ void KartSelectionScreen::tearDown()
     m_kart_widgets.clearAndDeleteAll();
 
     if (m_must_delete_on_back)
+    {
+        elementsWereDeleted();
         GUIEngine::removeScreen(this);
-
+    }
 }   // tearDown
 
 // ----------------------------------------------------------------------------
@@ -1220,13 +1220,13 @@ void KartSelectionScreen::eventCallback(Widget* widget,
         {
             const KartProperties *kp = kart_properties_manager->getKart(selection);
 
-            if (PlayerManager::getCurrentPlayer()->isFavoriteKart(kp->getNonTranslatedName()))
+            if (PlayerManager::getCurrentPlayer()->isFavoriteKart(kp->getIdent()))
             {
-                PlayerManager::getCurrentPlayer()->removeFavoriteKart(kp->getNonTranslatedName());
+                PlayerManager::getCurrentPlayer()->removeFavoriteKart(kp->getIdent());
             }
             else
             {
-                PlayerManager::getCurrentPlayer()->addFavoriteKart(kp->getNonTranslatedName());
+                PlayerManager::getCurrentPlayer()->addFavoriteKart(kp->getIdent());
             }
             setKartsFromCurrentGroup();
         }
@@ -1674,7 +1674,7 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
                        prop->getAbsoluteIconFile(), LOCKED_BADGE,
                        IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
         }
-        else if (PlayerManager::getCurrentPlayer()->isFavoriteKart(prop->getNonTranslatedName()))
+        else if (PlayerManager::getCurrentPlayer()->isFavoriteKart(prop->getIdent()))
         {
             w->addItem(prop->getName(),
                        prop->getIdent(),

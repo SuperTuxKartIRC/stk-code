@@ -441,10 +441,7 @@ void RaceManager::startNew(bool from_overworld)
                     m_skipped_tracks_in_gp = m_saved_gp->getSkippedTracks();
                     Log::info("RaceManager","%d",isLapTrialMode());
                     if (isLapTrialMode())
-                    {
                         m_gp_time_target = m_saved_gp->getTimeTarget();
-                        m_gp_total_laps = m_saved_gp->getPlayerTotalLaps();
-                    }
                 }   // if m_saved_gp==NULL
             }   // if m_continue_saved_gp
         }   // if !network_world
@@ -808,7 +805,7 @@ void RaceManager::saveGP()
             m_grand_prix.getReverseType(),
             m_skipped_tracks_in_gp,
             isLapTrialMode() ? m_gp_time_target : 0.0f,
-            isLapTrialMode() ? m_gp_total_laps : 0,
+            0,
             m_kart_status);
 
         // If a new GP is saved, delete any other saved data for this
