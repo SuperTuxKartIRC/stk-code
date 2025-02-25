@@ -652,6 +652,8 @@ void PowerupManager::loadPowerup(PowerupType type, const XMLNode &node)
              Bowling::init(node, m_all_meshes[type]);           break;
         case POWERUP_SMALL_SOCCER_BALL:
              SmallSoccerBall::init(node, m_all_meshes[type]);   break;
+        case POWERUP_VOLLEYBALL:
+             Volleyball::init(node, m_all_meshes[type]);   break;
         case POWERUP_PLUNGER:
              Plunger::init(node, m_all_meshes[type]);    break;
         case POWERUP_CAKE:
