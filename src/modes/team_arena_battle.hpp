@@ -47,7 +47,7 @@ private:
     int m_total_hit;
 
     struct BattleInfo
-    {   
+    {
         int  m_scores;
         int  m_number_of_times_hit; // 
         bool m_has_score = false;
@@ -84,17 +84,21 @@ protected:
 
     // Steals a point from the other player if he has at least 1 point. 
     // The player will also lost another point. 
-    bool m_hasThiefMode = false; 
+    bool m_hasThiefMode = false;
     // This means, for example, 10 points for each team. 
     // Touch, for example, 10 players from each team
     bool m_hasAllTeamVictoryConditions = false;
-    
+
+    // Need to be use un the code !!!!! In : updateScores()
+    bool m_has_negatif_team_point = false; // True if a team can have a negatif score (ex: -2) // False if the min score of a team is 0
+    bool m_has_negatif_player_point = true; // True if a player can have a negatif score (ex: -2) // False if the min score of a player is 0
+
     // For the thief Mode 
     int m_nb_point_thief;
     int m_nb_point_player_lose;
     // A player may steal or cause another player to lose more points 
     // depending on how many people he touches during the game. 
-    bool hasMultiplierPointThiefMode = false; 
+    bool hasMultiplierPointThiefMode = false;
     int multiplierPointThiefNb; // Usefull or not 
 public:
     // ------------------------------------------------------------------------
@@ -111,7 +115,7 @@ public:
     void setClockModeFromRaceManager();
     // ------------------------------------------------------------------------
     virtual void getKartsDisplayInfo(
-    std::vector<RaceGUIBase::KartIconDisplayInfo>* info) OVERRIDE;
+        std::vector<RaceGUIBase::KartIconDisplayInfo>* info) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual bool raceHasLaps() OVERRIDE { return false; }
     // ------------------------------------------------------------------------
@@ -155,8 +159,10 @@ public:
     // ------------------------------------------------------------------------
     int getTeamTotalLife(int team) const { return m_teams[getKartTeamIndex(team)].m_total_life; }
     // ------------------------------------------------------------------------
-    int getTeamScore(int team) const 
-    { 
+    int getTeamScore(int team) const
+    {
+        if (m_hasAllTeamVictoryConditions && !RaceManager::get()->isTabLifeMode())
+            return m_teams[getKartTeamIndex(team)].m_opposing_team_touches_win_nb;
         if (RaceManager::get()->isTabAPPMode())
             return m_teams[getKartTeamIndex(team)].m_total_player_get_score;
         else if (RaceManager::get()->isTabLifeMode())
@@ -261,5 +267,7 @@ private:
     void updateScores(int kart_id, int hitter);
     // ------------------------------------------------------------------------
     void updatePlayerLives(int kart_id, int hitter);
+    // ------------------------------------------------------------------------
+    void updateOpposingTeamTouches(int hitter, int team_kart_id, int points);
 };
 #endif // TEAM_ARENA_BATTLE_HPP
