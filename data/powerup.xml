@@ -103,10 +103,10 @@
         max-distance="25"                               />
   <!-- speed="6.8  max-distance="5" force-to-target="10" -->
   <item name="volleyball"     icon="volleyball-icon.png"
-        model="volleyball.spm"speed="0.4"
-        min-height="0.2"      max-height="1.0"
-        force-updown="1"      force-to-target="3"
-        max-distance="2"                               />
+        model="volleyball.spm"speed="20"
+        min-height="0.2"      max-height="3.0"
+        force-updown="0.1"      force-to-target="3"
+        max-distance="32"                               />
   <!--  Note that the characteristics of the nitro-hack bonus mode itself
         are defined in kart_characteristics.xml (so they can be changed by
         difficulty or kart class if so wished)
@@ -308,8 +308,8 @@
               double  ="  0      0     0     0        0       0       0     0      0      0     0     0    0     0      0"
               triple  =" 10      0    15    15        0       0       0     0      0      0     0     0    0    10      0" />
       <!-- This is the entry for the last kart: -->                                                                 
-      <weight single  =" 20      0    15    25        0       0       0     0     15      0     0     0    0    10      5"
-              double  ="  0      0     0     0        0       0       0     0      0      0     0     0    0     5      3"
+      <weight single  =" 20      0    15    25        0       0       0     0     15      0     0     0    0    10      0"
+              double  ="  0      0     0     0        0       0       0     0      0      0     0     0    0     5      0"
               triple  =" 20      0    25    80        0       0       0     0      0      0     0     0    0    10      0" />
     </weights>
   </ftl-weight-list>
@@ -317,9 +317,9 @@
   <battle-weight-list>
     <weights num-karts="1">
       <!--            bubble   cake  bowl zipper  plunger  switch swattr rubber  para  sudo electro mini anvil soccer volleyball -->
-      <weight single  ="10      30    60     0       0       10      30     0      0      0     0     0    0    45      990"
-              double  =" 0       0     0     0       0        0       0     0      0      0     0     0    0    0       990"
-              triple  =" 0       0     5     0       0        0       0     0      0      0     0     0    0    10      990" />
+      <weight single  ="10      30    60     0       0       10      30     0      0      0     0     0    0    45      0"
+              double  =" 0       0     0     0       0        0       0     0      0      0     0     0    0    0       0"
+              triple  =" 0       0     5     0       0        0       0     0      0      0     0     0    0    10      0" />
     </weights>
   </battle-weight-list>
   
