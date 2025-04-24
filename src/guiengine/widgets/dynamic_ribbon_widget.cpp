@@ -90,19 +90,22 @@ DynamicRibbonWidget::~DynamicRibbonWidget()
   * \param[out] itemHeight   how high each item would be in this configuration
   */
 void estimateIconAreaFor(const int rowCount, const int wantedIconWidth,
-                         const int width, const int height,
-                         const float iconAspectRatio, const int maxIcons,
-                         int* visibleItems, int* takenArea, int* itemHeight)
+    const int width, const int height,
+    const float iconAspectRatio, const int maxIcons,
+    int* visibleItems, int* takenArea, int* itemHeight)
 {
     assert(height > 0);
     const int row_height = height / rowCount;
 
-    float icon_height = (float)row_height;
-    float icon_width = row_height * iconAspectRatio;
+    // Limit icon height to prevent them from becoming too large
+    float max_icon_height = std::min((float)row_height, (float)wantedIconWidth / iconAspectRatio * 1.5f); // Max 1.5x original size
+    float min_icon_height = (float)wantedIconWidth / iconAspectRatio * 0.5f; // Min 0.5x original size
+    float icon_height = std::min(std::max((float)row_height, min_icon_height), max_icon_height);
+
+    float icon_width = icon_height * iconAspectRatio;
     *itemHeight = int(icon_height);
 
     const int icons_per_row = std::min(int(width / icon_width), int(width / wantedIconWidth));
-
     *visibleItems = std::min(maxIcons, icons_per_row * rowCount);
     *takenArea = int(*visibleItems * icon_width * icon_height);
 }
