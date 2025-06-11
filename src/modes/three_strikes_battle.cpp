@@ -20,7 +20,7 @@
 #include "main_loop.hpp"
 #include "audio/music_manager.hpp"
 #include "config/user_config.hpp"
-#include "graphics/camera.hpp"
+#include "graphics/camera/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include <ge_render_info.hpp>
 #include "io/file_manager.hpp"
@@ -537,6 +537,30 @@ void ThreeStrikesBattle::getKartsDisplayInfo(
         rank_info.m_text = oss.str().c_str();
     }
 }   // getKartsDisplayInfo
+
+//-----------------------------------------------------------------------------
+std::pair<int, video::SColor> ThreeStrikesBattle::getSpeedometerDigit(
+                                                const AbstractKart *kart) const
+{
+    video::SColor color = video::SColor(255, 255, 255, 255);
+    int id = kart->getWorldKartId();
+    switch(m_kart_info[id].m_lives)
+    {
+        case 3:
+            color = video::SColor(255, 0, 255, 0);
+            break;
+        case 2:
+            color = video::SColor(255, 255, 229, 0);
+            break;
+        case 1:
+            color = video::SColor(255, 255, 0, 0);
+            break;
+        case 0:
+            color = video::SColor(255, 128, 128, 128);
+            break;
+    }
+    return std::make_pair(m_kart_info[id].m_lives, color);
+}   // getSpeedometerDigit
 
 //-----------------------------------------------------------------------------
 void ThreeStrikesBattle::enterRaceOverState()

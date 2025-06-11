@@ -26,7 +26,7 @@
 #include "font/regular_face.hpp"
 #include "graphics/2dutils.hpp"
 #include "graphics/b3d_mesh_loader.hpp"
-#include "graphics/camera.hpp"
+#include "graphics/camera/camera.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/fixed_pipeline_renderer.hpp"
 #include "graphics/glwrap.hpp"
@@ -88,6 +88,8 @@
 #include "utils/translation.hpp"
 #include "utils/vs.hpp"
 
+#include <algorithm>
+#include <cmath>
 #include <irrlicht.h>
 
 #if !defined(SERVER_ONLY) && defined(ANDROID)
@@ -322,38 +324,43 @@ void IrrDriver::updateConfigIfRelevant()
     }
 #endif   // !SERVER_ONLY
 }   // updateConfigIfRelevant
-core::recti IrrDriver::getSplitscreenWindow(int WindowNum) 
+
+// ----------------------------------------------------------------------------
+core::recti IrrDriver::getSplitscreenWindow(int window_num)
 {
-    const int playernum = RaceManager::get()->getNumLocalPlayers();
-    const float playernum_sqrt = sqrtf((float)playernum);
-    
-    int rows = int(  UserConfigParams::split_screen_horizontally
-                   ? ceil(playernum_sqrt)
-                   : round(playernum_sqrt)                       );
-    int cols = int(  UserConfigParams::split_screen_horizontally
-                   ? round(playernum_sqrt)
-                   : ceil(playernum_sqrt)                        );
-    
-    if (rows == 0){rows = 1;}
-    if (cols == 0) {cols = 1;}
-    //This could add a bit of overhang
-    const int width_of_space =
-        int(ceil(   (float)irr_driver->getActualScreenSize().Width
-                  / (float)cols)                                  );
-    const int height_of_space =
-        int (ceil(  (float)irr_driver->getActualScreenSize().Height
-                  / (float)rows)                                   );
+    // Determine the number of columns and rows needed
+    int total_players = RaceManager::get()->getNumLocalPlayers();
+    if (total_players < 1)
+        total_players = 1;
+    int columns = (int)(std::ceil(std::sqrt(total_players)));
+    int rows = (int)(std::ceil((double)(total_players) / columns));
+    if (UserConfigParams::m_split_screen_horizontally)
+        std::swap(columns, rows);
 
-    const int x_grid_Position = WindowNum % cols;
-    const int y_grid_Position = int(floor((WindowNum) / cols));
+    // Calculate the base dimensions of each viewport
+    int base_viewport_width = irr_driver->getActualScreenSize().Width / columns;
+    int base_viewport_height = irr_driver->getActualScreenSize().Height / rows;
 
-//To prevent the viewport going over the right side, we use std::min to ensure the right corners are never larger than the total width
-    return core::recti(
-        x_grid_Position * width_of_space,
-        y_grid_Position * height_of_space,
-        (x_grid_Position * width_of_space) + width_of_space,
-        (y_grid_Position * height_of_space) + height_of_space);
-}
+    // Calculate remaining pixels to distribute
+    int extra_width = irr_driver->getActualScreenSize().Width % columns;
+    int extra_height = irr_driver->getActualScreenSize().Height % rows;
+
+    // Determine the row and column for the given player index
+    int row = window_num / columns;
+    int col = window_num % columns;
+
+    // Calculate the top-left corner of the viewport
+    int viewport_x = col * base_viewport_width;
+    int viewport_y = row * base_viewport_height;
+
+    // Adjust width and height to fully occupy the remaining pixels
+    int viewport_width = base_viewport_width + (col == columns - 1 ? extra_width : 0);
+    int viewport_height = base_viewport_height + (row == rows - 1 ? extra_height : 0);
+
+    return core::recti(core::position2di(viewport_x, viewport_y),
+        core::dimension2du(viewport_width, viewport_height));
+}   // getSplitscreenWindow
+
 // ----------------------------------------------------------------------------
 /** Gets a list of supported video modes from the irrlicht device. This data
  *  is stored in m_modes.
@@ -515,6 +522,8 @@ begin:
                 UserConfigParams::m_scale_rtts_factor;
             GE::getGEConfig()->m_pbr =
                 UserConfigParams::m_dynamic_lights;
+            GE::getGEConfig()->m_ibl =
+                !UserConfigParams::m_degraded_IBL;
 #endif
         }
         else
@@ -796,7 +805,7 @@ begin:
 
     if (UserConfigParams::m_shadows_resolution != 0 &&
         (UserConfigParams::m_shadows_resolution < 512 ||
-         UserConfigParams::m_shadows_resolution > 2048))
+         UserConfigParams::m_shadows_resolution > 4096))
     {
         Log::warn("irr_driver",
                "Invalid value for UserConfigParams::m_shadows_resolution : %i",
@@ -1021,8 +1030,7 @@ bool IrrDriver::moveWindow(int x, int y)
 }
 //-----------------------------------------------------------------------------
 
-void IrrDriver::changeResolution(const int w, const int h,
-                                 const bool fullscreen)
+void IrrDriver::changeResolution(const int w, const int h, const bool fullscreen)
 {
     // update user config values
     UserConfigParams::m_prev_real_width = UserConfigParams::m_real_width;
@@ -1134,6 +1142,7 @@ void IrrDriver::applyResolutionSettings(bool recreate_device)
     // Input manager set first so it recieves SDL joystick event
     // Re-init GUI engine
     GUIEngine::init(m_device, m_video_driver, StateManager::get());
+    GUIEngine::reserveLoadingIcons(3);
     // If not recreate device we need to add the previous joystick manually
     if (!recreate_device)
         input_manager->addJoystick();
@@ -1842,10 +1851,12 @@ void IrrDriver::setAmbientLight(const video::SColorf &light, bool force_SH_compu
 {
 #ifndef SERVER_ONLY
     video::SColorf color = light;
-    color.r = powf(color.r, 1.0f / 2.2f);
-    color.g = powf(color.g, 1.0f / 2.2f);
-    color.b = powf(color.b, 1.0f / 2.2f);
-    
+    if (m_video_driver->getDriverType() != EDT_VULKAN)
+    {
+        color.r = powf(color.r, 1.0f / 2.2f);
+        color.g = powf(color.g, 1.0f / 2.2f);
+        color.b = powf(color.b, 1.0f / 2.2f);
+    }
     m_scene_manager->setAmbientLight(color);
     m_renderer->setAmbientLight(light, force_SH_computation);    
 #endif
@@ -2374,9 +2385,9 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos,
                                        bool sun_, scene::ISceneNode* parent)
 {
 #ifndef SERVER_ONLY
+    if (parent == NULL) parent = m_scene_manager->getRootSceneNode();
     if (CVS->isGLSL())
     {
-        if (parent == NULL) parent = m_scene_manager->getRootSceneNode();
         LightNode *light = NULL;
 
         if (!sun_)
@@ -2398,10 +2409,25 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos,
     }
     else
     {
-        scene::ILightSceneNode* light = m_scene_manager
-               ->addLightSceneNode(m_scene_manager->getRootSceneNode(),
-                                   pos, video::SColorf(r, g, b, 1.0f));
-        light->setRadius(radius);
+        scene::ILightSceneNode* light;
+        if (m_video_driver->getDriverType() == EDT_VULKAN && sun_)
+        {
+            light = m_scene_manager->addLightSceneNode(parent, pos,
+                video::SColorf(r, g, b, 0.2f), 0.26f * M_PI / 180.0f);
+            light->setRotation(-pos);
+            light->setLightType(video::ELT_DIRECTIONAL);
+        }
+        else
+        {
+            video::SColorf color(r, g, b, 1.0f);
+            light = m_scene_manager->addLightSceneNode(parent, pos, color);
+            light->setRadius(radius);
+            if (m_video_driver->getDriverType() == EDT_VULKAN)
+            {
+                video::SLight& data = light->getLightData();
+                data.Attenuation.X = energy;
+            }
+        }
         return light;
     }
 #else

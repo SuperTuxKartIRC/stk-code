@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include "SIrrCreationParameters.h"
 #include "COpenGLExtensionHandler.h"
+#include "COGLES2Driver.h"
 
 #include "guiengine/engine.hpp"
 #include "ge_main.hpp"
@@ -52,6 +53,7 @@ namespace irr
 } // end namespace irr
 
 extern "C" void init_objc(SDL_SysWMinfo* info, float* top, float* bottom, float* left, float* right);
+extern "C" void enable_momentum_scroll();
 extern "C" int handle_app_event(void* userdata, SDL_Event* event);
 extern "C" void Android_initDisplayCutout(float* top, float* bottom, float* left, float* right, int* initial_orientation);
 extern "C" int Android_disablePadding();
@@ -90,6 +92,10 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 	// Switch SDL disables this hint by default: https://github.com/devkitPro/SDL/pull/55#issuecomment-633775255
 	SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "1");
 
+#ifdef ANDROID
+	SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
+#endif
+
 #ifndef MOBILE_STK
 	// Prevent fullscreen minimizes when losing focus
 	if (CreationParams.Fullscreen)
@@ -122,6 +128,10 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 	// create window
 	if (CreationParams.DriverType != video::EDT_NULL)
 	{
+#if defined(_IRR_OSX_PLATFORM_) && !defined(IOS_STK)
+		enable_momentum_scroll();
+#endif
+
 		// create the window, only if we do not use the null device
 		if (!Close && createWindow())
 		{
@@ -142,6 +152,8 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 #endif
 #ifdef ANDROID
 			Android_initDisplayCutout(&TopPadding, &BottomPadding, &LeftPadding, &RightPadding, &InitialOrientation);
+#else
+                        (void)InitialOrientation;
 #endif
 			core::stringc sdlversion = "Compiled SDL Version ";
 			sdlversion += Info.version.major;
@@ -235,6 +247,12 @@ CIrrDeviceSDL::~CIrrDeviceSDL()
 		irr::video::COpenGLExtensionHandler* h = dynamic_cast<irr::video::COpenGLExtensionHandler*>(VideoDriver);
 		if (h)
 			h->clearGLExtensions();
+#endif
+#ifdef _IRR_COMPILE_WITH_OGLES2_
+		irr::video::COGLES2Driver* es2 = dynamic_cast<irr::video::COGLES2Driver*>(VideoDriver);
+		if (es2) {
+			es2->cleanUp();
+		}
 #endif
 		GE::GEVulkanDriver* gevk = dynamic_cast<GE::GEVulkanDriver*>(VideoDriver);
 		if (gevk)
@@ -432,7 +450,7 @@ bool CIrrDeviceSDL::createWindow()
 		}
 	}
 
-	u32 flags = SDL_WINDOW_SHOWN;
+	u32 flags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
 #if !defined(ANDROID) && !defined(__SWITCH__)
 	if (CreationParams.DriverType == video::EDT_OPENGL ||
 		CreationParams.DriverType == video::EDT_OGLES2 ||
@@ -833,14 +851,20 @@ bool CIrrDeviceSDL::run()
 			break;
 
 		case SDL_MOUSEWHEEL:
-			if (SDL_event.wheel.x > 0 || SDL_event.wheel.x < 0)
-				break;
 			irrevent.EventType = irr::EET_MOUSE_INPUT_EVENT;
 			irrevent.MouseInput.Event = irr::EMIE_MOUSE_WHEEL;
 			irrevent.MouseInput.X = MouseX;
 			irrevent.MouseInput.Y = MouseY;
+
 			irrevent.MouseInput.ButtonStates = MouseButtonStates;
-			irrevent.MouseInput.Wheel = SDL_event.wheel.y > 0 ? 1.0f : -1.0f;
+#if SDL_VERSION_ATLEAST(2, 0, 18)
+			irrevent.MouseInput.Wheel = 
+				SDL_event.wheel.preciseX + SDL_event.wheel.preciseY;
+#else
+			irrevent.MouseInput.Wheel = irr::core::clamp<irr::f32>(
+				SDL_event.wheel.x + SDL_event.wheel.y, -1.0f, 1.0f);
+#endif
+
 			postEventFromUser(irrevent);
 			break;
 

@@ -22,8 +22,8 @@ using namespace irr;
 #include <algorithm>
 
 #include "config/user_config.hpp"
-#include "graphics/camera.hpp"
-#include "graphics/camera_debug.hpp"
+#include "graphics/camera/camera.hpp"
+#include "graphics/camera/camera_debug.hpp"
 #include "graphics/2dutils.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
@@ -105,19 +105,19 @@ void RaceGUIMultitouch::recreate()
  */
 void RaceGUIMultitouch::close()
 {
-    if (m_device != NULL)
+    if (m_device)
     {
         m_device->clearButtons();
-    }
-    
-    if (m_device->isAccelerometerActive())
-    {
-        m_device->deactivateAccelerometer();
-    }
 
-    if (m_device->isGyroscopeActive())
-    {
-        m_device->deactivateGyroscope();
+        if (m_device->isAccelerometerActive())
+        {
+            m_device->deactivateAccelerometer();
+        }
+
+        if (m_device->isGyroscopeActive())
+        {
+            m_device->deactivateGyroscope();
+        }
     }
 }   // close
 

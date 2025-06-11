@@ -27,6 +27,7 @@
   */
 
 #include <algorithm>
+#include <array>
 #include <atomic>
 #include <memory>
 #include <string>
@@ -65,7 +66,6 @@ class ItemManager;
 class ModelDefinitionLoader;
 class MovingTexture;
 class MusicInformation;
-class ParticleEmitter;
 class ParticleKind;
 class PhysicalObject;
 class RenderTarget;
@@ -743,7 +743,8 @@ public:
     // ------------------------------------------------------------------------
     bool isAddon() const                                 { return m_is_addon; }
     // ------------------------------------------------------------------------
-    void convertTrackToBullet(scene::ISceneNode *node);
+    void convertTrackToBullet(scene::ISceneNode *node,
+                      std::vector<std::array<btVector3, 3> >* occluder = NULL);
     // ------------------------------------------------------------------------
     CheckManager* getCheckManager() const           { return m_check_manager; }
     // ------------------------------------------------------------------------

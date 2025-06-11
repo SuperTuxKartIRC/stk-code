@@ -20,10 +20,14 @@
 
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/shader.hpp"
+#include "graphics/sp/sp_base.hpp"
+#include "graphics/sp/sp_texture_manager.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "io/file_manager.hpp"
-#include "race/race_manager.hpp"
-#include "replay/replay_play.hpp"
 #include "states_screens/dialogs/custom_video_settings.hpp"
+#include "states_screens/dialogs/recommend_video_settings.hpp"
+#include "utils/profiler.hpp"
 
 #ifndef SERVER_ONLY
 #include <ge_main.hpp>
@@ -50,7 +54,7 @@ void OptionsScreenVideo::initPresets()
     ({
         false /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
         false /* glow */, false /* mlaa */, false /* ssao */, false /* light scatter */,
-        true /* animatedCharacters */, 2 /* particles */, 0 /* image_quality */,
+        true /* animatedCharacters */, 2 /* particles */, 1 /* image_quality */,
         true /* degraded IBL */, 1 /* Geometry Detail */
     });
 
@@ -66,7 +70,7 @@ void OptionsScreenVideo::initPresets()
     ({
         true /* light */, 0 /* shadow */, false /* bloom */, true /* lightshaft */,
         true /* glow */, true /* mlaa */, false /* ssao */, true /* light scatter */,
-        true /* animatedCharacters */, 2 /* particles */, 1 /* image_quality */,
+        true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
         false /* degraded IBL */, 3 /* Geometry Detail */
     });
 
@@ -74,7 +78,7 @@ void OptionsScreenVideo::initPresets()
     ({
         true /* light */, 512 /* shadow */, true /* bloom */, true /* lightshaft */,
         true /* glow */, true /* mlaa */, false /* ssao */, true /* light scatter */,
-        true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
+        true /* animatedCharacters */, 2 /* particles */, 3 /* image_quality */,
         false /* degraded IBL */, 3 /* Geometry Detail */
     });
 
@@ -82,8 +86,16 @@ void OptionsScreenVideo::initPresets()
     ({
         true /* light */, 1024 /* shadow */, true /* bloom */, true /* lightshaft */,
         true /* glow */, true /* mlaa */, true /* ssao */, true /* light scatter */,
-        true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
+        true /* animatedCharacters */, 2 /* particles */, 3 /* image_quality */,
         false /* degraded IBL */, 4 /* Geometry Detail */
+    });
+
+    m_presets.push_back // Level 7
+    ({
+        true /* light */, 2048 /* shadow */, true /* bloom */, true /* lightshaft */,
+        true /* glow */, true /* mlaa */, true /* ssao */, true /* light scatter */,
+        true /* animatedCharacters */, 2 /* particles */, 3 /* image_quality */,
+        false /* degraded IBL */, 5 /* Geometry Detail */
     });
 
     m_blur_presets.push_back
@@ -116,24 +128,33 @@ void OptionsScreenVideo::initPresets()
     m_scale_rtts_custom_presets.push_back({ 0.9f });
     m_scale_rtts_custom_presets.push_back({ 0.95f });
     m_scale_rtts_custom_presets.push_back({ 1.0f });
+    m_scale_rtts_custom_presets.push_back({ 1.25f });
+    m_scale_rtts_custom_presets.push_back({ 1.5f });
+    m_scale_rtts_custom_presets.push_back({ 2.0f });
 
 }   // initPresets
 
 // --------------------------------------------------------------------------------------------
 int OptionsScreenVideo::getImageQuality()
 {
-    if (UserConfigParams::m_anisotropic == 2 &&
+    // applySettings assumes that only the first image quality preset has a different
+    // level of anisotropic filtering from others
+    if (UserConfigParams::m_anisotropic == 4 &&
         (UserConfigParams::m_high_definition_textures & 0x01) == 0x00 &&
         UserConfigParams::m_hq_mipmap == false)
         return 0;
-    if (UserConfigParams::m_anisotropic == 4 &&
-        (UserConfigParams::m_high_definition_textures & 0x01) == 0x01 &&
+    if (UserConfigParams::m_anisotropic == 16 &&
+        (UserConfigParams::m_high_definition_textures & 0x01) == 0x00 &&
         UserConfigParams::m_hq_mipmap == false)
         return 1;
     if (UserConfigParams::m_anisotropic == 16 &&
         (UserConfigParams::m_high_definition_textures & 0x01) == 0x01 &&
-        UserConfigParams::m_hq_mipmap == true)
+        UserConfigParams::m_hq_mipmap == false)
         return 2;
+    if (UserConfigParams::m_anisotropic == 16 &&
+        (UserConfigParams::m_high_definition_textures & 0x01) == 0x01 &&
+        UserConfigParams::m_hq_mipmap == true)
+        return 3;
     return 1;
 }   // getImageQuality
 
@@ -141,26 +162,35 @@ int OptionsScreenVideo::getImageQuality()
 void OptionsScreenVideo::setImageQuality(int quality)
 {
 #ifndef SERVER_ONLY
+    core::dimension2du prev_max_size = irr_driver->getVideoDriver()
+        ->getDriverAttributes().getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
     GE::GEVulkanTextureDescriptor* td = NULL;
     if (GE::getVKDriver())
         td = GE::getVKDriver()->getMeshTextureDescriptor();
     switch (quality)
     {
         case 0:
-            UserConfigParams::m_anisotropic = 2;
-            UserConfigParams::m_high_definition_textures = 0x02;
-            UserConfigParams::m_hq_mipmap = false;
-            if (td)
-                td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_2);
-            break;
-        case 1:
             UserConfigParams::m_anisotropic = 4;
-            UserConfigParams::m_high_definition_textures = 0x03;
+            UserConfigParams::m_high_definition_textures = 0x02;
             UserConfigParams::m_hq_mipmap = false;
             if (td)
                 td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_4);
             break;
+        case 1:
+            UserConfigParams::m_anisotropic = 16;
+            UserConfigParams::m_high_definition_textures = 0x02;
+            UserConfigParams::m_hq_mipmap = false;
+            if (td)
+                td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_16);
+            break;
         case 2:
+            UserConfigParams::m_anisotropic = 16;
+            UserConfigParams::m_high_definition_textures = 0x03;
+            UserConfigParams::m_hq_mipmap = false;
+            if (td)
+                td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_16);
+            break;
+        case 3:
             UserConfigParams::m_anisotropic = 16;
             UserConfigParams::m_high_definition_textures = 0x03;
             UserConfigParams::m_hq_mipmap = true;
@@ -170,14 +200,28 @@ void OptionsScreenVideo::setImageQuality(int quality)
         default:
             assert(false);
     }
+
+    irr_driver->setMaxTextureSize();
+    SP::setMaxTextureSize();
+    core::dimension2du cur_max_size = irr_driver->getVideoDriver()
+        ->getDriverAttributes().getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
+
+    if (CVS->isGLSL())
+    {
+        ShaderBase::killShaders();
+        SP::initSamplers();
+        if (prev_max_size != cur_max_size)
+            SP::SPTextureManager::get()->reloadTexture("");
+    }
+    else if (prev_max_size != cur_max_size)
+        STKTexManager::getInstance()->reloadAllTextures(true/*mesh_texture_only*/);
 #endif
 }   // setImageQuality
 
 // --------------------------------------------------------------------------------------------
 
 OptionsScreenVideo::OptionsScreenVideo() : Screen("options/options_video.stkgui"),
-                                           m_prev_adv_pipline(false),
-                                           m_prev_img_quality(-1)
+                                           m_prev_adv_pipline(false)
 {
     m_inited = false;
     initPresets();
@@ -188,7 +232,7 @@ OptionsScreenVideo::OptionsScreenVideo() : Screen("options/options_video.stkgui"
 void OptionsScreenVideo::loadedFromFile()
 {
     m_inited = false;
-    assert(m_presets.size() == 6);
+    assert(m_presets.size() == 7);
     assert(m_blur_presets.size() == 3);
 
     GUIEngine::SpinnerWidget* gfx =
@@ -209,8 +253,9 @@ void OptionsScreenVideo::loadedFromFile()
 void OptionsScreenVideo::init()
 {
     Screen::init();
+    OptionsCommon::setTabStatus();
+
     m_prev_adv_pipline = UserConfigParams::m_dynamic_lights;
-    m_prev_img_quality = getImageQuality();
     RibbonWidget* ribbon = getWidget<RibbonWidget>("options_choice");
     assert(ribbon != NULL);
     ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
@@ -226,7 +271,11 @@ void OptionsScreenVideo::init()
     vsync->clearLabels();
     //I18N: In the video options
     vsync->addLabel(_("Vertical Sync"));
+#ifdef MOBILE_STK
+    std::set<int> fps = { 30, 60, 120 };
+#else
     std::set<int> fps = { 30, 60, 120, 180, 250, 500, 1000 };
+#endif
     fps.insert(UserConfigParams::m_max_fps);
     for (auto& i : fps)
         vsync->addLabel(core::stringw(i));
@@ -269,6 +318,9 @@ void OptionsScreenVideo::init()
     scale_rtts->addLabel("90%");
     scale_rtts->addLabel("95%");
     scale_rtts->addLabel("100%");
+    scale_rtts->addLabel("125%");
+    scale_rtts->addLabel("150%");
+    scale_rtts->addLabel("200%");
 
     // --- set gfx settings values
     updateGfxSlider();
@@ -295,7 +347,7 @@ void OptionsScreenVideo::init()
     // the graphics engine, start the benchmark when the
     // video settings screen is loaded back afterwards.
     if (RaceManager::get()->isBenchmarkScheduled())
-        startBenchmark();
+        profiler.startBenchmark();
 }   // init
 
 // --------------------------------------------------------------------------------------------
@@ -329,7 +381,8 @@ void OptionsScreenVideo::updateGfxSlider()
             m_presets[l].degraded_ibl == UserConfigParams::m_degraded_IBL &&
             m_presets[l].geometry_detail == (UserConfigParams::m_geometry_level == 0 ? 2 :
                                              UserConfigParams::m_geometry_level == 2 ? 0 :
-                                             UserConfigParams::m_geometry_level))
+                                             UserConfigParams::m_geometry_level) &&
+            UserConfigParams::m_pcss_threshold == 2048)
         {
             gfx->setValue(l + 1);
             found = true;
@@ -399,6 +452,14 @@ void OptionsScreenVideo::updateScaleRTTsSlider()
         {
             scale_rtts_level->setValue(l);
             found = true;
+            if (m_scale_rtts_custom_presets[l].value > 1.0f)
+            {
+                scale_rtts_level->markAsIncorrect();
+            }
+            else
+            {
+                scale_rtts_level->markAsCorrect();
+            }
             break;
         }
     }
@@ -440,50 +501,50 @@ void OptionsScreenVideo::updateTooltip()
     const core::stringw very_high = _("Very High");
     //I18N: in the graphical options tooltip;
     const core::stringw ultra = _("Ultra");
-
+    
     //I18N: in graphical options
-    tooltip = _("Particles Effects: %s",
-        UserConfigParams::m_particles_effects == 2 ? enabled :
-        UserConfigParams::m_particles_effects == 1 ? important_only :
-        disabled);
-
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Animated Characters: %s",
-        UserConfigParams::m_animated_characters ? enabled : disabled);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Dynamic lights: %s",
+    tooltip = _("Dynamic lights: %s",
         UserConfigParams::m_dynamic_lights ? enabled : disabled);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Light scattering: %s",
-        UserConfigParams::m_light_scatter ? enabled : disabled);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Anti-aliasing: %s",
-        UserConfigParams::m_mlaa ? enabled : disabled);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Ambient occlusion: %s",
-        UserConfigParams::m_ssao ? enabled : disabled);
+
     //I18N: in graphical options
     if (UserConfigParams::m_shadows_resolution == 0)
         tooltip = tooltip + L"\n" + _("Shadows: %s", disabled);
     else
         tooltip = tooltip + L"\n" + _("Shadows: %i", UserConfigParams::m_shadows_resolution);
-
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Bloom: %s",
-        UserConfigParams::m_bloom ? enabled : disabled);
-
+    tooltip = tooltip + L"\n" + _("Anti-aliasing: %s",
+        UserConfigParams::m_mlaa ? enabled : disabled);
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Light scattering: %s",
+        UserConfigParams::m_light_scatter ? enabled : disabled);
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Glow (outlines): %s",
         UserConfigParams::m_glow ? enabled : disabled);
-
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Light shaft (God rays): %s",
         UserConfigParams::m_light_shaft ? enabled : disabled);
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Bloom: %s",
+        UserConfigParams::m_bloom ? enabled : disabled);
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Ambient occlusion: %s",
+        UserConfigParams::m_ssao ? enabled : disabled);
+
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Animated Characters: %s",
+        UserConfigParams::m_animated_characters ? enabled : disabled);
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Particles Effects: %s",
+        UserConfigParams::m_particles_effects == 2 ? enabled :
+        UserConfigParams::m_particles_effects == 1 ? important_only :
+        disabled);
 
     //I18N: in graphical options
     int quality = getImageQuality();
     tooltip = tooltip + L"\n" + _("Rendered image quality: %s",
-        quality == 0 ? very_low : quality == 1 ? low : high);
+        quality == 0 ? very_low :
+        quality == 1 ? low      :
+        quality == 2 ? medium   : high);
 
     //I18N: in graphical options
     int geometry_detail = (UserConfigParams::m_geometry_level == 0 ? 2 :
@@ -576,6 +637,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         UserConfigParams::m_geometry_level     = (m_presets[level].geometry_detail == 0 ? 2 :
                                                   m_presets[level].geometry_detail == 2 ? 0 :
                                                   m_presets[level].geometry_detail);
+        UserConfigParams::m_pcss_threshold     = 2048;
 
         updateGfxSlider();
     }
@@ -641,80 +703,46 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
     else if (name == "benchmarkCurrent")
     {
 #ifndef SERVER_ONLY
-        // TODO - Add the possibility to benchmark more tracks and define replay benchmarks in
-        //        a config file
-        const std::string bf_bench("benchmark_black_forest.replay");
-        const bool result = ReplayPlay::get()->addReplayFile(file_manager
-            ->getAsset(FileManager::REPLAY, bf_bench), true/*custom_replay*/);
-
-        if (!result)
-            Log::fatal("OptionsScreenVideo", "Can't open replay for benchmark!");
-
-        // Avoid crashing, when switching between advanced lighting and the old renderer
-        // before starting a performance test, ensure the image quality setting is applied
-        if (m_prev_adv_pipline != UserConfigParams::m_dynamic_lights &&
-            CVS->isGLSL())
-        {
-            irr_driver->sameRestart();
-            // We cannot start the benchmark immediately, in case we just restarted the graphics engine
-            RaceManager::get()->scheduleBenchmark();
-        }
-        else if (m_prev_img_quality != getImageQuality())
-        {
-            // TODO - check if this is enough for the setting to be properly applied
-            irr_driver->setMaxTextureSize();
-            startBenchmark();
-        }
+        // To avoid crashes and ensure the proper settings are used during the benchmark,
+        // we apply the settings. If this doesn't require restarting the screen, we start
+        // the benchmark immediately, otherwise we schedule it to start after the restart.
+        if (applySettings() == 0)
+            profiler.startBenchmark();
         else
-        {
-            startBenchmark();
-        }
+            RaceManager::get()->scheduleBenchmark();
 #endif
     } // benchmarkCurrent
-    // TODO - Add a standard benchmark testing multiple presets
-    /*else if (name == "benchmarkStandard")
+    /*else if (name == "benchmarkRecommend")
     {
-        // DO NOTHING FOR NOW
-    }*/
+        new RecommendVideoSettingsDialog(0.8f, 0.9f);
+    }*/ // benchmarkRecommend
 }   // eventCallback
-
-// --------------------------------------------------------------------------------------------
-
-void OptionsScreenVideo::startBenchmark()
-{
-    RaceManager::get()->setRaceGhostKarts(true);
-    RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
-    ReplayPlay::ReplayData bench_rd = ReplayPlay::get()->getCurrentReplayData();
-    RaceManager::get()->setReverseTrack(bench_rd.m_reverse);
-    RaceManager::get()->setRecordRace(false);
-    RaceManager::get()->setWatchingReplay(true);
-    RaceManager::get()->setDifficulty((RaceManager::Difficulty)bench_rd.m_difficulty);
-
-    // The race manager automatically adds karts for the ghosts
-    RaceManager::get()->setNumKarts(0);
-    RaceManager::get()->setBenchmarking(true); // Also turns off the scheduled benchmark if needed
-    RaceManager::get()->startWatchingReplay(bench_rd.m_track_name, bench_rd.m_laps);
-} // startBenchmark
 
 // --------------------------------------------------------------------------------------------
 
 void OptionsScreenVideo::tearDown()
 {
 #ifndef SERVER_ONLY
-    if (m_prev_adv_pipline != UserConfigParams::m_dynamic_lights &&
-        CVS->isGLSL())
-    {
-        irr_driver->sameRestart();
-    }
-    else if (m_prev_img_quality != getImageQuality())
-    {
-        irr_driver->setMaxTextureSize();
-    }
+    applySettings();
     Screen::tearDown();
     // save changes when leaving screen
     user_config->saveConfig();
 #endif
 }   // tearDown
+
+// --------------------------------------------------------------------------------------------
+/* Returns 1 or 2 if a restart will be done, 0 otherwise */
+int OptionsScreenVideo::applySettings()
+{
+#ifndef SERVER_ONLY
+    if (m_prev_adv_pipline != UserConfigParams::m_dynamic_lights && CVS->isGLSL())
+    {
+        irr_driver->sameRestart();
+        return 1;
+    }
+#endif
+    return 0;
+}   // applySettings
 
 // --------------------------------------------------------------------------------------------
 

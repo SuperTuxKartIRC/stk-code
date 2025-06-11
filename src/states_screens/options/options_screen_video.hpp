@@ -62,7 +62,6 @@ class OptionsScreenVideo : public GUIEngine::Screen, public GUIEngine::ScreenSin
 {
 private:
     bool m_prev_adv_pipline;
-    int m_prev_img_quality;
     OptionsScreenVideo();
     bool m_inited;
     std::vector<GFXPreset> m_presets;
@@ -74,6 +73,8 @@ private:
     void initPresets();
     void startBenchmark();
     static void onScrollResolutionsList(void* data);
+    /* Returns 1 or 2 if a restart will be done, 0 otherwise */
+    int applySettings();
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenVideo>;
 
