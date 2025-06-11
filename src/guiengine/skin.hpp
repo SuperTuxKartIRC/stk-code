@@ -221,6 +221,7 @@ namespace GUIEngine
         float m_hborder_out_portion, m_vborder_out_portion;
         float m_horizontal_inner_padding, m_vertical_inner_padding;
         float m_horizontal_margin, m_vertical_margin;
+        bool m_horizontal_cut, m_vertical_cut;
 
         // this parameter is a bit special since it's the only one that can
         // change at runtime
