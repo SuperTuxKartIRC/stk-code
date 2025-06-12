@@ -626,7 +626,7 @@ void Skin::drawBgImage()
     static core::recti dest;
     static core::recti source_area;
 
-    if(m_bg_image == NULL)
+    if (m_bg_image == NULL)
     {
         int texture_w, texture_h;
         m_bg_image =
@@ -641,28 +641,39 @@ void Skin::drawBgImage()
         const int screen_w = frame_size.Width;
         const int screen_h = frame_size.Height;
 
-        // stretch image vertically to fit
-        float ratio = (float)screen_h / texture_h;
+        float image_ratio = (float)texture_w / texture_h;
+        float screen_ratio = (float)screen_w / screen_h;
 
-        // check that with the vertical stretching, it still fits horizontally
-        while(texture_w*ratio < screen_w) ratio += 0.1f;
+        float ratio;
 
-        texture_w = (int)(texture_w*ratio);
-        texture_h = (int)(texture_h*ratio);
+        if (screen_ratio > image_ratio)
+        {
+            // Screen wider than the image → stretch according to width
+            ratio = (float)screen_w / texture_w;
+        }
+        else
+        {
+            // Screen taller than the image → stretch according to height
+            ratio = (float)screen_h / texture_h;
+        }
 
-        const int clipped_x_space = (texture_w - screen_w);
+        int scaled_w = (int)(texture_w * ratio);
+        int scaled_h = (int)(texture_h * ratio);
 
-        dest = core::recti(-clipped_x_space/2, 0,
-                               screen_w+clipped_x_space/2, screen_h);
+        int offset_x = (screen_w - scaled_w) / 2;
+        int offset_y = (screen_h - scaled_h) / 2;
+
+        dest = core::recti(offset_x, offset_y,
+            offset_x + scaled_w, offset_y + scaled_h);
     }
 
     irr_driver->getVideoDriver()->enableMaterial2D();
     draw2DImage(m_bg_image, dest, source_area,
-                                        /* no clipping */0, /*color*/ 0,
-                                        /*alpha*/false);
+        /* no clipping */0, /*color*/ 0,
+        /*alpha*/false);
     irr_driver->getVideoDriver()->enableMaterial2D(false);
 #endif
-}   // drawBgImage
+} // drawBgImage
 
 // ----------------------------------------------------------------------------
 /** Returns the BoxRenderParams data structure for a given type.
