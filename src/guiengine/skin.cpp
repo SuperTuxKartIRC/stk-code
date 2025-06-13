@@ -77,6 +77,7 @@ namespace SkinConfig
         std::string type;
         std::string state = "neutral";
         std::string image;
+        bool horizontal_cut, vertical_cut;
         bool common_img = false;
         int leftborder = 0, rightborder=0, topborder=0, bottomborder=0;
         float hborder_out_portion = 0.5f, vborder_out_portion = 1.0f;
@@ -97,6 +98,8 @@ namespace SkinConfig
             Log::error("skin", "All elements must have an image\n");
             return;
         }
+        node->get("horizontal-cut", &horizontal_cut);
+        node->get("vertical-cut", &vertical_cut);
 
         node->get("left_border", &leftborder);
         node->get("right_border", &rightborder);
@@ -129,6 +132,8 @@ namespace SkinConfig
         new_param.m_horizontal_margin = horizontal_margin;
         new_param.m_vertical_margin = vertical_margin;
         new_param.m_preserve_h_aspect_ratios = preserve_h_aspect_ratios;
+        new_param.m_horizontal_cut = horizontal_cut;
+        new_param.m_vertical_cut = vertical_cut;
 
         // call last since it calculates coords considering all other
         // parameters

@@ -14,9 +14,9 @@ Here you can configure advanced theming rules for this skin
 <advanced normal_ttf="Inter-UI-Black.ttf NotoSansThai-Black.ttf NotoSansHebrew-Black.ttf NotoSansArabicUI-Black.ttf NotoSansMalayalam-Bold.ttf" />
 
 <!--  Stateless -->
-<element type="background" image="background.jpg"/>
+<element type="background" image="background.jpg" horizontal-cut="false" vertical-cut="false"/>
 
-<element type="bottom-bar" common="y" image="bottom_bar.png" />
+<element type="bottom-bar" common="y" image="bottom_bar.png"/>
 
 <element type="achievement-message" image="achievement.png"
       left_border="130" right_border="13" top_border="13" bottom_border="13"
