@@ -132,8 +132,6 @@ namespace SkinConfig
         new_param.m_horizontal_margin = horizontal_margin;
         new_param.m_vertical_margin = vertical_margin;
         new_param.m_preserve_h_aspect_ratios = preserve_h_aspect_ratios;
-        new_param.m_horizontal_cut = horizontal_cut;
-        new_param.m_vertical_cut = vertical_cut;
 
         // call last since it calculates coords considering all other
         // parameters
@@ -623,62 +621,91 @@ Skin::~Skin()
 void Skin::drawBgImage()
 {
 #ifndef SERVER_ONLY
-    // ---- background image
-    // on one end, making these static is not too clean.
-    // on another end, these variables are really only used locally,
-    // and making them static avoids doing the same stupid computations
-    // every frame
     static core::recti dest;
     static core::recti source_area;
 
     if (m_bg_image == NULL)
     {
         int texture_w, texture_h;
-        m_bg_image =
-            SkinConfig::m_render_params["background::neutral"].getImage();
+        m_bg_image = SkinConfig::m_render_params["background::neutral"].getImage();
         assert(m_bg_image != NULL);
+
         texture_w = m_bg_image->getSize().Width;
         texture_h = m_bg_image->getSize().Height;
-
         source_area = core::recti(0, 0, texture_w, texture_h);
 
         core::dimension2d<u32> frame_size = irr_driver->getActualScreenSize();
         const int screen_w = frame_size.Width;
         const int screen_h = frame_size.Height;
 
+        // Calculate aspect ratios for the image and the screen
         float image_ratio = (float)texture_w / texture_h;
         float screen_ratio = (float)screen_w / screen_h;
 
-        float ratio;
+        float factor_h;
+        float factor_w;
+
+        // ----------------------------------------------------------
+        // 🎯 Goal: Fill the screen without distorting the image.
+        // If the screen is wider than the image, we prefer scaling to fit the width.
+        // If the screen is taller, we prefer scaling to fit the height.
+        //
+        // If cropping is allowed in the preferred direction, we apply uniform scaling.
+        // If not, we stretch the image non-uniformly to avoid cropping.
+        // ----------------------------------------------------------
 
         if (screen_ratio > image_ratio)
         {
-            // Screen wider than the image → stretch according to width
-            ratio = (float)screen_w / texture_w;
+            if (m_horizontal_cut) 
+            {
+                // Screen is wider than the image → scale to fit width, allow vertical crop
+                factor_h = (float)screen_w / texture_w;
+                factor_w = factor_h;
+            }
+            else 
+            {
+                // Cannot crop horizontally → stretch both width and height to fit
+                factor_h = (float)screen_h / texture_h;
+                factor_w = (float)screen_w / texture_w;
+            }
         }
         else
         {
-            // Screen taller than the image → stretch according to height
-            ratio = (float)screen_h / texture_h;
+            if (m_vertical_cut)
+            {
+                // Screen is taller than the image → scale to fit height, allow horizontal crop
+                factor_h = (float)screen_h / texture_h;
+                factor_w = factor_h;
+            }
+            else
+            {
+                // Cannot crop vertically → stretch both width and height to fit
+                factor_h = (float)screen_h / texture_h;
+                factor_w = (float)screen_w / texture_w;
+            }
         }
 
-        int scaled_w = (int)(texture_w * ratio);
-        int scaled_h = (int)(texture_h * ratio);
+        // Scale the original image dimensions
+        int scaled_w = (int)(texture_w * factor_w);
+        int scaled_h = (int)(texture_h * factor_h);
 
+        // Center the image on screen
         int offset_x = (screen_w - scaled_w) / 2;
         int offset_y = (screen_h - scaled_h) / 2;
 
         dest = core::recti(offset_x, offset_y,
-            offset_x + scaled_w, offset_y + scaled_h);
+                           offset_x + scaled_w, offset_y + scaled_h);
     }
 
+    // Render the background image to the screen
     irr_driver->getVideoDriver()->enableMaterial2D();
     draw2DImage(m_bg_image, dest, source_area,
-        /* no clipping */0, /*color*/ 0,
-        /*alpha*/false);
+                /* no clipping */0, /* color */ 0,
+                /* alpha */false);
     irr_driver->getVideoDriver()->enableMaterial2D(false);
 #endif
 } // drawBgImage
+
 
 // ----------------------------------------------------------------------------
 /** Returns the BoxRenderParams data structure for a given type.
