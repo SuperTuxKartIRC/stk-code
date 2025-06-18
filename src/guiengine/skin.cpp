@@ -663,7 +663,7 @@ void Skin::drawBgImage()
 
         if (screen_ratio > image_ratio)
         {
-            bool m_hc = getBoxRenderParams("generic-message::neutral").m_horizontal_cut;
+            bool m_hc = SkinConfig::m_render_params["horizontal-cut"].m_horizontal_cut;
             if (m_hc)
             {
                 // Screen is wider than the image → scale to fit width, allow vertical crop
@@ -679,7 +679,7 @@ void Skin::drawBgImage()
         }
         else
         {
-            bool m_vc = getBoxRenderParams("generic-message::neutral").m_vertical_cut;
+            bool m_vc = SkinConfig::m_render_params["vertical_cut"].m_vertical_cut;
             if (m_vc)
             {
                 // Screen is taller than the image → scale to fit height, allow horizontal crop
