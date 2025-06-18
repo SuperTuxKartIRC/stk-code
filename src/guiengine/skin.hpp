@@ -262,9 +262,12 @@ namespace GUIEngine
         core::rect<s32> m_source_area_bottom_left_yflip;
         core::rect<s32> m_source_area_bottom_right_yflip;
 
+        bool m_horizontal_cut, m_vertical_cut;
+
         BoxRenderParams();
         void setTexture(video::ITexture* image);
         void calculateYFlipIfNeeded();
+        void setBgCut(bool horizontal_cut, bool vertical_cut) { m_horizontal_cut = horizontal_cut, m_vertical_cut = vertical_cut; }
         // --------------------------------------------------------------------
         /** Returns the image for this BoxRenderParams. */
         video::ITexture* getImage() { return m_image; }
@@ -284,7 +287,7 @@ namespace GUIEngine
         video::ITexture* m_bg_image;
         std::vector<Widget*> m_tooltips;
         std::vector<bool> m_tooltip_at_mouse;
-        bool m_horizontal_cut, m_vertical_cut;
+        //bool m_horizontal_cut, m_vertical_cut;
 
         LEAK_CHECK()
 
@@ -449,6 +452,8 @@ namespace GUIEngine
         std::string getThemedIcon(const std::string& relative_path) const;
 
         float getScalingFactor(std::string params, float height);
+
+        // void setBgCut(bool horizontal_cut, bool vertical_cut) { m_horizontal_cut = horizontal_cut, m_vertical_cut = vertical_cut;}
     };   // Skin
 }   // guiengine
 

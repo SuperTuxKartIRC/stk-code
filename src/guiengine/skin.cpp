@@ -101,6 +101,8 @@ namespace SkinConfig
         node->get("horizontal-cut", &horizontal_cut);
         node->get("vertical-cut", &vertical_cut);
 
+        //GUIEngine::BoxRenderParams::setBgCut(horizontal_cut, vertical_cut);
+
         node->get("left_border", &leftborder);
         node->get("right_border", &rightborder);
         node->get("top_border", &topborder);
@@ -132,6 +134,8 @@ namespace SkinConfig
         new_param.m_horizontal_margin = horizontal_margin;
         new_param.m_vertical_margin = vertical_margin;
         new_param.m_preserve_h_aspect_ratios = preserve_h_aspect_ratios;
+        new_param.m_horizontal_cut = horizontal_cut;
+        new_param.m_vertical_cut = vertical_cut;
 
         // call last since it calculates coords considering all other
         // parameters
@@ -472,6 +476,9 @@ BoxRenderParams::BoxRenderParams()
     areas = BODY | LEFT | RIGHT | TOP | BOTTOM;
     m_vertical_flip = false;
     m_y_flip_set = false;
+
+    m_horizontal_cut = true;
+    m_vertical_cut = true;
 }   // BoxRenderParams
 
 // ----------------------------------------------------------------------------
@@ -656,7 +663,8 @@ void Skin::drawBgImage()
 
         if (screen_ratio > image_ratio)
         {
-            if (m_horizontal_cut) 
+            bool m_hc = getBoxRenderParams("generic-message::neutral").m_horizontal_cut;
+            if (m_hc)
             {
                 // Screen is wider than the image → scale to fit width, allow vertical crop
                 factor_h = (float)screen_w / texture_w;
@@ -671,7 +679,8 @@ void Skin::drawBgImage()
         }
         else
         {
-            if (m_vertical_cut)
+            bool m_vc = getBoxRenderParams("generic-message::neutral").m_vertical_cut;
+            if (m_vc)
             {
                 // Screen is taller than the image → scale to fit height, allow horizontal crop
                 factor_h = (float)screen_h / texture_h;
