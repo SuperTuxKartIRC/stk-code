@@ -1370,8 +1370,28 @@ void CGUIEditBox::calculateScrollPos()
 
     s32 cStart = CurrentTextRect.UpperLeftCorner.X + m_scroll_pos +
         m_cursor_distance;
-    // Reserver 2x font height at border to see the clipped text
-    s32 cEnd = cStart + GUIEngine::getFontHeight() * 2;
+    
+    int screen_w = irr_driver->getDevice()->getVideoDriver()->getScreenSize().Width;
+    int box_width = CurrentTextRect.getWidth();
+
+    // Normalize screen width into a 0..1 ratio
+    float ratio = (float)(core::clamp(screen_w, 720, 3840) - 720) / (3840 - 720);
+
+    // Linear interpolation between small-screen and large-screen factors
+    float factor = 0.145f - ratio * (0.145f - 0.045f);
+
+    // Margin based on textbox width and scale factor
+    int dynamic_margin = (int)(box_width * factor);
+
+    // Minimum margin = width of a character
+    int font_margin = font->getDimension(L"W").Width;
+
+    // Final margin with safety bounds
+    int margin = core::clamp(std::max(dynamic_margin, font_margin),
+        10,
+        box_width / 6);
+
+    s32 cEnd = cStart + margin;
 
     if (FrameRect.LowerRightCorner.X < cEnd)
         m_scroll_pos = cEnd - FrameRect.LowerRightCorner.X;
