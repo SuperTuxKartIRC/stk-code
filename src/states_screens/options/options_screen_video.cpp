@@ -21,6 +21,7 @@
 #include "states_screens/options/options_common.hpp"
 
 #include "graphics/central_settings.hpp"
+#include "graphics/graphical_presets.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/shader.hpp"
 #include "graphics/sp/sp_base.hpp"
@@ -40,166 +41,23 @@
 #include <IrrlichtDevice.h>
 
 using namespace GUIEngine;
+using namespace GraphicalPresets;
 
 // --------------------------------------------------------------------------------------------
-void OptionsScreenVideo::initPresets()
-{
-    m_presets.push_back // Level 1
-    ({
-        false /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
-        false /* glow */, false /* mlaa */, false /* ssao */, false /* light scatter */,
-        false /* animatedCharacters */, 1 /* particles */, 0 /* image_quality */,
-        true /* degraded IBL */, 0 /* Geometry Detail */, false /* PCSS */, false /* ssr */
-    });
-
-    m_presets.push_back // Level 2
-    ({
-        false /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
-        false /* glow */, false /* mlaa */, false /* ssao */, false /* light scatter */,
-        true /* animatedCharacters */, 2 /* particles */, 1 /* image_quality */,
-        true /* degraded IBL */, 1 /* Geometry Detail */, false /* PCSS */, false /* ssr */
-    });
-
-    m_presets.push_back // Level 3
-    ({
-        true /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
-        false /* glow */, false /* mlaa */, false /* ssao */, false /* light scatter */,
-        true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
-        true /* degraded IBL */, 2 /* Geometry Detail */, false /* PCSS */, false /* ssr */
-    });
-
-    m_presets.push_back // Level 4
-    ({
-        true /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
-        true /* glow */, true /* mlaa */, false /* ssao */, true /* light scatter */,
-        true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
-        true /* degraded IBL */, 2 /* Geometry Detail */, false /* PCSS */, true /* ssr */
-    });
-
-    m_presets.push_back // Level 5
-    ({
-        true /* light */, 512 /* shadow */, true /* bloom */, true /* lightshaft */,
-        true /* glow */, true /* mlaa */, false /* ssao */, true /* light scatter */,
-        true /* animatedCharacters */, 2 /* particles */, 3 /* image_quality */,
-        false /* degraded IBL */, 3 /* Geometry Detail */, false /* PCSS */, true /* ssr */
-    });
-
-    m_presets.push_back // Level 6
-    ({
-        true /* light */, 1024 /* shadow */, true /* bloom */, true /* lightshaft */,
-        true /* glow */, true /* mlaa */, true /* ssao */, true /* light scatter */,
-        true /* animatedCharacters */, 2 /* particles */, 3 /* image_quality */,
-        false /* degraded IBL */, 4 /* Geometry Detail */, false /* PCSS */, true /* ssr */
-    });
-
-    m_presets.push_back // Level 7
-    ({
-        true /* light */, 2048 /* shadow */, true /* bloom */, true /* lightshaft */,
-        true /* glow */, true /* mlaa */, true /* ssao */, true /* light scatter */,
-        true /* animatedCharacters */, 2 /* particles */, 3 /* image_quality */,
-        false /* degraded IBL */, 5 /* Geometry Detail */, true /* PCSS */, true /* ssr */
-    });
-
-    m_blur_presets.push_back
-    ({
-        false /* motionblur */, false /* depth of field */
-    });
-
-    m_blur_presets.push_back
-    ({
-        true  /* motionblur */, false /* depth of field */
-    });
-
-    m_blur_presets.push_back
-    ({
-        true  /* motionblur */, true  /* depth of field */
-    });
-
-    m_scale_rtts_custom_presets.push_back({ 0.3f });
-    m_scale_rtts_custom_presets.push_back({ 0.35f });
-    m_scale_rtts_custom_presets.push_back({ 0.4f });
-    m_scale_rtts_custom_presets.push_back({ 0.45f });
-    m_scale_rtts_custom_presets.push_back({ 0.5f });
-    m_scale_rtts_custom_presets.push_back({ 0.55f });
-    m_scale_rtts_custom_presets.push_back({ 0.6f });
-    m_scale_rtts_custom_presets.push_back({ 0.65f });
-    m_scale_rtts_custom_presets.push_back({ 0.7f });
-    m_scale_rtts_custom_presets.push_back({ 0.75f });
-    m_scale_rtts_custom_presets.push_back({ 0.8f });
-    m_scale_rtts_custom_presets.push_back({ 0.85f });
-    m_scale_rtts_custom_presets.push_back({ 0.9f });
-    m_scale_rtts_custom_presets.push_back({ 0.95f });
-    m_scale_rtts_custom_presets.push_back({ 1.0f });
-    m_scale_rtts_custom_presets.push_back({ 1.25f });
-    m_scale_rtts_custom_presets.push_back({ 1.5f });
-    m_scale_rtts_custom_presets.push_back({ 2.0f });
-
-}   // initPresets
-
-// --------------------------------------------------------------------------------------------
-int OptionsScreenVideo::getImageQuality()
-{
-    // applySettings assumes that only the first image quality preset has a different
-    // level of anisotropic filtering from others
-    if (UserConfigParams::m_anisotropic == 4 &&
-        (UserConfigParams::m_high_definition_textures & 0x01) == 0x00 &&
-        UserConfigParams::m_hq_mipmap == false)
-        return 0;
-    if (UserConfigParams::m_anisotropic == 16 &&
-        (UserConfigParams::m_high_definition_textures & 0x01) == 0x00 &&
-        UserConfigParams::m_hq_mipmap == false)
-        return 1;
-    if (UserConfigParams::m_anisotropic == 4 &&
-        (UserConfigParams::m_high_definition_textures & 0x01) == 0x01 &&
-        UserConfigParams::m_hq_mipmap == false)
-        return 2;
-    if (UserConfigParams::m_anisotropic == 16 &&
-        (UserConfigParams::m_high_definition_textures & 0x01) == 0x01 &&
-        UserConfigParams::m_hq_mipmap == true)
-        return 3;
-    return 1;
-}   // getImageQuality
-
-// --------------------------------------------------------------------------------------------
-void OptionsScreenVideo::setImageQuality(int quality, bool force_reload_texture)
+void OptionsScreenVideo::updateImageQuality(bool force_reload_texture)
 {
     core::dimension2du prev_max_size = irr_driver->getVideoDriver()
         ->getDriverAttributes().getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
     GE::GEVulkanTextureDescriptor* td = NULL;
     if (GE::getVKDriver())
         td = GE::getVKDriver()->getMeshTextureDescriptor();
-    switch (quality)
+
+    if (td)
     {
-        case 0:
-            UserConfigParams::m_anisotropic = 4;
-            UserConfigParams::m_high_definition_textures = 0x02;
-            UserConfigParams::m_hq_mipmap = false;
-            if (td)
-                td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_4);
-            break;
-        case 1:
-            UserConfigParams::m_anisotropic = 16;
-            UserConfigParams::m_high_definition_textures = 0x02;
-            UserConfigParams::m_hq_mipmap = false;
-            if (td)
-                td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_16);
-            break;
-        case 2:
-            UserConfigParams::m_anisotropic = 4;
-            UserConfigParams::m_high_definition_textures = 0x03;
-            UserConfigParams::m_hq_mipmap = false;
-            if (td)
-                td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_4);
-            break;
-        case 3:
-            UserConfigParams::m_anisotropic = 16;
-            UserConfigParams::m_high_definition_textures = 0x03;
-            UserConfigParams::m_hq_mipmap = true;
-            if (td)
-                td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_16);
-            break;
-        default:
-            assert(false);
+        if (UserConfigParams::m_anisotropic == 4)
+            td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_4);
+        if (UserConfigParams::m_anisotropic == 16)
+            td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_16);
     }
 
     irr_driver->setMaxTextureSize();
@@ -216,40 +74,34 @@ void OptionsScreenVideo::setImageQuality(int quality, bool force_reload_texture)
     }
     else if (prev_max_size != cur_max_size || force_reload_texture)
         STKTexManager::getInstance()->reloadAllTextures(true/*mesh_texture_only*/);
-}   // setImageQuality
+}   // updateImageQuality
 
 // --------------------------------------------------------------------------------------------
-
 OptionsScreenVideo::OptionsScreenVideo() : Screen("options/options_video.stkgui"),
                                            m_prev_adv_pipline(false)
 {
-    m_inited = false;
-    initPresets();
 }   // OptionsScreenVideo
 
 // --------------------------------------------------------------------------------------------
-
 void OptionsScreenVideo::loadedFromFile()
 {
-    m_inited = false;
-    assert(m_presets.size() == 7);
-    assert(m_blur_presets.size() == 3);
+    assert(gfx_presets.size() == 7);
+    assert(blur_presets.size() == 3);
 
     GUIEngine::SpinnerWidget* gfx =
         getWidget<GUIEngine::SpinnerWidget>("gfx_level");
     gfx->m_properties[GUIEngine::PROP_MAX_VALUE] =
-        StringUtils::toString(m_presets.size());
+        StringUtils::toString(gfx_presets.size());
 
     GUIEngine::SpinnerWidget* blur =
         getWidget<GUIEngine::SpinnerWidget>("blur_level");
     blur->m_properties[GUIEngine::PROP_MAX_VALUE] =
-        StringUtils::toString(m_blur_presets.size() - 1);
+        StringUtils::toString(blur_presets.size() - 1);
     blur->m_properties[GUIEngine::PROP_MIN_VALUE] =
         StringUtils::toString(0);
 }   // loadedFromFile
 
 // --------------------------------------------------------------------------------------------
-
 void OptionsScreenVideo::init()
 {
     Screen::init();
@@ -261,8 +113,7 @@ void OptionsScreenVideo::init()
     ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     ribbon->select( "tab_video", PLAYER_ID_GAME_MASTER );
 
-    GUIEngine::SpinnerWidget* gfx =
-        getWidget<GUIEngine::SpinnerWidget>("gfx_level");
+    GUIEngine::SpinnerWidget* gfx = getWidget<GUIEngine::SpinnerWidget>("gfx_level");
     assert( gfx != NULL );
     
     GUIEngine::SpinnerWidget* vsync = getWidget<GUIEngine::SpinnerWidget>("vsync");
@@ -349,48 +200,25 @@ void OptionsScreenVideo::init()
 }   // init
 
 // --------------------------------------------------------------------------------------------
-
 void OptionsScreenVideo::onResize()
 {
     Screen::onResize();
 }   // onResize
 
 // --------------------------------------------------------------------------------------------
-
 void OptionsScreenVideo::updateGfxSlider()
 {
     GUIEngine::SpinnerWidget* gfx = getWidget<GUIEngine::SpinnerWidget>("gfx_level");
     assert( gfx != NULL );
-
-    bool found = false;
-    for (unsigned int l = 0; l < m_presets.size(); l++)
-    {
-        if (m_presets[l].animatedCharacters == UserConfigParams::m_animated_characters &&
-            m_presets[l].particles == UserConfigParams::m_particles_effects &&
-            m_presets[l].image_quality == getImageQuality() &&
-            m_presets[l].bloom == UserConfigParams::m_bloom &&
-            m_presets[l].glow == UserConfigParams::m_glow &&
-            m_presets[l].lights == UserConfigParams::m_dynamic_lights &&
-            m_presets[l].lightshaft == UserConfigParams::m_light_shaft &&
-            m_presets[l].mlaa == UserConfigParams::m_mlaa &&
-            m_presets[l].shadows == UserConfigParams::m_shadows_resolution &&
-            m_presets[l].ssao == UserConfigParams::m_ssao &&
-            m_presets[l].light_scatter == UserConfigParams::m_light_scatter &&
-            m_presets[l].degraded_ibl == UserConfigParams::m_degraded_IBL &&
-            m_presets[l].geometry_detail == UserConfigParams::m_geometry_level &&
-            m_presets[l].pc_soft_shadows == UserConfigParams::m_pcss &&
-            m_presets[l].ssr == UserConfigParams::m_ssr)
-        {
-            gfx->setValue(l + 1);
-            found = true;
-            break;
-        }
-    }
-
-    if (!found)
+    int preset = findCurrentGFXPreset();
+    if (preset == -1) // Current settings don't match a preset
     {
         //I18N: custom video settings
         gfx->setCustomText( _("Custom") );
+    }
+    else
+    {
+        gfx->setValue(preset);
     }
 
     // Enable the blur slider if the modern renderer is used
@@ -403,17 +231,16 @@ void OptionsScreenVideo::updateGfxSlider()
 } // updateGfxSlider
 
 // --------------------------------------------------------------------------------------------
-
 void OptionsScreenVideo::updateBlurSlider()
 {
     GUIEngine::SpinnerWidget* blur = getWidget<GUIEngine::SpinnerWidget>("blur_level");
     assert( blur != NULL );
 
     bool found = false;
-    for (unsigned int l = 0; l < m_blur_presets.size(); l++)
+    for (unsigned int l = 0; l < blur_presets.size(); l++)
     {
-        if (m_blur_presets[l].motionblur == UserConfigParams::m_motionblur &&
-            m_blur_presets[l].dof == UserConfigParams::m_dof)
+        if (blur_presets[l].motionblur == UserConfigParams::m_motionblur &&
+            blur_presets[l].dof == UserConfigParams::m_dof)
         {
             blur->setValue(l);
             found = true;
@@ -431,7 +258,6 @@ void OptionsScreenVideo::updateBlurSlider()
 } // updateBlurSlider
 
 // --------------------------------------------------------------------------------------------
-
 void OptionsScreenVideo::updateScaleRTTsSlider()
 {
     bool rtts_on = (UserConfigParams::m_dynamic_lights && CVS->isGLSL()) ||
@@ -444,13 +270,13 @@ void OptionsScreenVideo::updateScaleRTTsSlider()
 
     bool found = false;
     float rtts_value = (rtts_on) ? UserConfigParams::m_scale_rtts_factor : 1.0f;
-    for (unsigned int l = 0; l < m_scale_rtts_custom_presets.size(); l++)
+    for (unsigned int l = 0; l < scale_rtts_presets.size(); l++)
     {
-        if (m_scale_rtts_custom_presets[l].value == rtts_value)
+        if (scale_rtts_presets[l].value == rtts_value)
         {
             rtts_slider->setValue(l);
             found = true;
-            if (m_scale_rtts_custom_presets[l].value > 1.0f)
+            if (scale_rtts_presets[l].value > 1.0f)
                 rtts_slider->markAsIncorrect();
             else
                 rtts_slider->markAsCorrect();
@@ -467,7 +293,6 @@ void OptionsScreenVideo::updateScaleRTTsSlider()
 } // updateScaleRTTsSlider
 
 // --------------------------------------------------------------------------------------------
-
 void OptionsScreenVideo::updateTooltip()
 {
     GUIEngine::SpinnerWidget* gfx = getWidget<GUIEngine::SpinnerWidget>("gfx_level");
@@ -539,8 +364,7 @@ void OptionsScreenVideo::updateTooltip()
     int quality = getImageQuality();
     tooltip = tooltip + L"\n" + _("Rendered image quality: %s",
         quality == 0 ? very_low :
-        quality == 1 ? low      :
-        quality == 2 ? medium   : high);
+        quality == 1 ? low      : high);
 
     //I18N: in graphical options
     int geometry_detail = UserConfigParams::m_geometry_level;
@@ -555,7 +379,6 @@ void OptionsScreenVideo::updateTooltip()
 }   // updateTooltip
 
 // --------------------------------------------------------------------------------------------
-
 void OptionsScreenVideo::updateBlurTooltip()
 {
     GUIEngine::SpinnerWidget* blur = getWidget<GUIEngine::SpinnerWidget>("blur_level");
@@ -605,32 +428,18 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
             getWidget<GUIEngine::SpinnerWidget>("gfx_level");
         assert( gfx_level != NULL );
 
-        const int level = gfx_level->getValue() - 1;
+        const int level = gfx_level->getValue();
 
         // Enable the blur spinner only if the new renderer is on
-        getWidget<GUIEngine::SpinnerWidget>("blur_level")->setActive(level >= 2);
+        getWidget<GUIEngine::SpinnerWidget>("blur_level")->setActive(level >= 3);
 
         // Same with Render resolution slider
         getWidget<GUIEngine::SpinnerWidget>("scale_rtts")->
             setActive(UserConfigParams::m_dynamic_lights ||
             GE::getDriver()->getDriverType() == video::EDT_VULKAN);
 
-        UserConfigParams::m_animated_characters = m_presets[level].animatedCharacters;
-        UserConfigParams::m_particles_effects = m_presets[level].particles;
-        setImageQuality(m_presets[level].image_quality, false/*force_reload_texture*/);
-        UserConfigParams::m_bloom              = m_presets[level].bloom;
-        UserConfigParams::m_glow               = m_presets[level].glow;
-        UserConfigParams::m_dynamic_lights     = m_presets[level].lights;
-        UserConfigParams::m_light_shaft        = m_presets[level].lightshaft;
-        UserConfigParams::m_mlaa               = m_presets[level].mlaa;
-        UserConfigParams::m_shadows_resolution = m_presets[level].shadows;
-        UserConfigParams::m_ssao               = m_presets[level].ssao;
-        UserConfigParams::m_light_scatter      = m_presets[level].light_scatter;
-        UserConfigParams::m_degraded_IBL       = m_presets[level].degraded_ibl;
-        UserConfigParams::m_geometry_level     = m_presets[level].geometry_detail;
-        UserConfigParams::m_pcss               = m_presets[level].pc_soft_shadows;
-        UserConfigParams::m_ssr                = m_presets[level].ssr;
-
+        applyGFXPreset(level);
+        updateImageQuality(false /* force reload textures */);
         updateGfxSlider();
         setSSR();
     }
@@ -644,8 +453,8 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
 
         if (UserConfigParams::m_dynamic_lights)
         {
-            UserConfigParams::m_motionblur = m_blur_presets[level].motionblur;
-            UserConfigParams::m_dof = m_blur_presets[level].dof;
+            UserConfigParams::m_motionblur = blur_presets[level].motionblur;
+            UserConfigParams::m_dof = blur_presets[level].dof;
         }
 
         updateBlurSlider();
@@ -680,9 +489,9 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         assert( rtts_slider != NULL );
 
         const int level = rtts_slider->getValue();
-        assert(level < (int)m_scale_rtts_custom_presets.size());
+        assert(level < (int)scale_rtts_presets.size());
 
-        UserConfigParams::m_scale_rtts_factor = m_scale_rtts_custom_presets[level].value;
+        UserConfigParams::m_scale_rtts_factor = scale_rtts_presets[level].value;
 
         GE::GEVulkanDriver* gevk = GE::getVKDriver();
         if (gevk && GE::getGEConfig()->m_render_scale != UserConfigParams::m_scale_rtts_factor)
@@ -709,7 +518,6 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
 }   // eventCallback
 
 // --------------------------------------------------------------------------------------------
-
 void OptionsScreenVideo::tearDown()
 {
     applySettings();
@@ -731,7 +539,6 @@ int OptionsScreenVideo::applySettings()
 }   // applySettings
 
 // --------------------------------------------------------------------------------------------
-
 bool OptionsScreenVideo::onEscapePressed()
 {
     GUIEngine::focusNothingForPlayer(PLAYER_ID_GAME_MASTER);
@@ -739,14 +546,6 @@ bool OptionsScreenVideo::onEscapePressed()
 }
 
 // --------------------------------------------------------------------------------------------
-
-void OptionsScreenVideo::unloaded()
-{
-    m_inited = false;
-}   // unloaded
-
-// --------------------------------------------------------------------------------------------
-
 void OptionsScreenVideo::setSSR()
 {
     if (!UserConfigParams::m_ssr)

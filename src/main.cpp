@@ -214,6 +214,7 @@ extern "C" {
 #include "graphics/camera/camera.hpp"
 #include "graphics/camera/camera_debug.hpp"
 #include "graphics/central_settings.hpp"
+#include "graphics/graphical_presets.hpp"
 #include "graphics/graphics_restrictions.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
@@ -686,6 +687,9 @@ void cmdLineHelp()
     "                          with colons (:).\n"
     "       --cutscene=NAME    Launch the specified track as a cutscene.\n"
     "                          This is for internal debugging use only.\n"
+    "       --gfx-preset=n     Set the graphics settings to the selected preset.\n"
+    "                          Valid values for this STK version are between 1 and 7.\n"
+    "                          Other graphic command-line parameters will override the preset.\n"
     "       --enable-glow      Enable glow effect.\n"
     "       --disable-glow     Disable glow effect.\n"
     "       --enable-bloom     Enable bloom effect.\n"
@@ -710,12 +714,20 @@ void cmdLineHelp()
     "       --disable-ibl      Disable image based lighting.\n"
     "       --enable-hd-textures Enable high definition textures.\n"
     "       --disable-hd-textures Disable high definition textures.\n"
+    "       --enable-pcss      Enable percentage-closer soft shadows.\n"
+    "       --disable-pcss     Disable percentage-closer soft-shadows.\n"
+    "       --enable-ssr       Enable screen space reflections.\n"
+    "       --disable-ssr      Disable screen space reflections.\n"
+    "       --enable-light-scatter  Enable light scattering.\n"
+    "       --disable-light-scatter Disable light scattering.\n"  
     "       --enable-dynamic-lights Enable advanced pipeline.\n"
     "       --disable-dynamic-lights Disable advanced pipeline.\n"
     "       --anisotropic=n     Anisotropic filtering quality (0 to disable).\n"
-    "                           Takes precedence over trilinear or bilinear\n"
-    "                           texture filtering.\n"
+    "                           Takes precedence over trilinear or bilinear texture filtering.\n"
     "       --shadows=n         Set resolution of shadows (0 to disable).\n"
+    "       --geometry-level=n  Sets the LoD distances. Supported values range from 0 to 5.\n"
+    "       --rtt-scale=n       Sets the render resolution as a percentage of the base resolution.\n"
+    "                           Only works if dynamic lights are active."
     "       --render-driver=n   Render driver to use (gl or directx9).\n"
     "       --disable-addon-karts Disable loading of addon karts.\n"
     "       --disable-addon-tracks Disable loading of addon tracks.\n"
@@ -935,6 +947,32 @@ int handleCmdLinePreliminary()
     if(CommandLine::has("--windowed") || CommandLine::has("-w"))
         UserConfigParams::m_fullscreen = false;
 
+    int n;
+    if (CommandLine::has("--gfx-preset", &n))
+    {
+        if (n <= 0 || n > (int)GraphicalPresets::gfx_presets.size())
+        {
+            Log::warn("main", "Invalid graphical preset (%i), ignored", n);
+        }
+        else
+        {
+            if ((strcmp(UserConfigParams::m_render_driver.c_str(), "vulkan")   == 0 && n >= 4) ||
+                (strcmp(UserConfigParams::m_render_driver.c_str(), "directx9") == 0 && n >= 3))
+            {
+                Log::warn("main", "Some settings of the selected preset (%i) are not "
+                    "supported by the current renderer!");
+            }
+
+            // Apply the chosen graphical presets
+            if (strcmp(UserConfigParams::m_render_driver.c_str(), "vulkan") == 0 && n <= 2)
+                Log::error("main", "The vulkan renderer does not support the very low presets!");
+            else if (UserConfigParams::m_force_legacy_device)
+                Log::error("main", "The legacy renderer cannot use any of the gfx presets!");
+            else
+                GraphicalPresets::applyGFXPreset(n);
+        }
+    }
+
     // toggle graphical options
     if (CommandLine::has("--enable-glow"))
         UserConfigParams::m_glow = true;
@@ -995,6 +1033,30 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_high_definition_textures =  2 | 1;
     else if (CommandLine::has("--disable-hd-textures"))
         UserConfigParams::m_high_definition_textures = 2;
+    // percentage-closer soft shadows
+    if (CommandLine::has("--enable-pcss"))
+        UserConfigParams::m_pcss = true;
+    else if (CommandLine::has("--disable-pcss"))
+        UserConfigParams::m_pcss = false;
+    // screen space reflections
+    if (CommandLine::has("--enable-ssr"))
+        UserConfigParams::m_ssr = true;
+    else if (CommandLine::has("--disable-ssr"))
+        UserConfigParams::m_ssr = false;
+    // light scattering
+    if (CommandLine::has("--enable-light-scatter"))
+        UserConfigParams::m_light_scatter = true;
+    else if (CommandLine::has("--disable-light-scatter"))
+        UserConfigParams::m_light_scatter = false;
+
+    if (CommandLine::has("--shadows", &n))
+        UserConfigParams::m_shadows_resolution = n;
+    if (CommandLine::has("--anisotropic", &n))
+        UserConfigParams::m_anisotropic = n;
+    if (CommandLine::has("--geometry-level", &n))
+        UserConfigParams::m_geometry_level = n;
+    if (CommandLine::has("--rtt-scale", &n))
+        UserConfigParams::m_scale_rtts_factor = ((float) n) / 100.0f;
 
     // Enable loading grand prix from local directory
     if(CommandLine::has("--add-gp-dir", &s))
@@ -1009,15 +1071,11 @@ int handleCmdLinePreliminary()
                            UserConfigParams::m_additional_gp_directory.c_str());
     }
 
-    int n;
+
     if(CommandLine::has("--xmas", &n))
         UserConfigParams::m_xmas_mode = n;
     if (CommandLine::has("--easter", &n))
         UserConfigParams::m_easter_ear_mode = n;
-    if (CommandLine::has("--shadows", &n))
-        UserConfigParams::m_shadows_resolution = n;
-    if (CommandLine::has("--anisotropic", &n))
-        UserConfigParams::m_anisotropic = n;
 
     // Useful for debugging: the temple navmesh needs 12 minutes in debug
     // mode to compute the distance matrix!!
@@ -2207,6 +2265,9 @@ int main(int argc, char *argv[])
         });
 #endif
     srand(( unsigned ) time( 0 ));
+
+    // Init the graphical presets
+    GraphicalPresets::initPresets();
 
     try
     {
