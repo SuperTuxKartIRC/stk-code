@@ -205,7 +205,7 @@ namespace Online
             }
 
             // User still at main menu screen, push user screen. Note that
-            // this function is called from the main thread, so we can 
+            // this function is called from the main thread, so we can
             // push screens without synchronisations.
             UserScreen::getInstance()->push();
             UserScreen::getInstance()->loginError(getLocalizedInfo(),
@@ -590,7 +590,8 @@ namespace Online
             {
                 message = _P("You have %d new friend request!",
                              "You have %d new friend requests!",
-                             friend_request_count);
+                            /* to pick the plural form */ friend_request_count,
+                            /* to insert in the final string */ friend_request_count);
             }
             else
             {

@@ -141,10 +141,10 @@ void OptionsScreenVideo::init()
         assert(it != fps.end());
         vsync->setValue(1 + std::distance(fps.begin(), it));
     }
-    //I18N: in graphical options. The \n is a newline character, place it where appropriate, two can be used if required.
+    //I18N: in the graphical options. The \n is a newline character, place it where appropriate, two can be used if required.
     core::stringw vsync_tooltip = _("Vsync forces the graphics card to supply a new frame\nonly when the monitor is ready to display it.");
 
-    //I18N: in graphical options.
+    //I18N: in the graphical options.
     vsync_tooltip = vsync_tooltip + L"\n" + _("Vsync will not work if your drivers don't support it.");
 
     vsync->setTooltip(vsync_tooltip);
@@ -174,9 +174,8 @@ void OptionsScreenVideo::init()
     scale_rtts->addLabel("200%");
 
     // --- set gfx settings values
-    updateGfxSlider();
+    updateGfxSlider(); // Also updates the RTTS slider
     updateBlurSlider();
-    updateScaleRTTsSlider();
 
     // ---- forbid changing graphic settings from in-game
     // (we need to disable them last because some items can't be edited when
@@ -184,13 +183,55 @@ void OptionsScreenVideo::init()
     bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
 
     gfx->setActive(!in_game && CVS->isGLSL());
+    // Outside of pauses, the GFX slider update already overwrites the pause tooltip.
+    // Running updatePauseTooltip would incorrectly disable the list of gfx settings.
+    if (in_game && CVS->isGLSL())
+        OptionsCommon::updatePauseTooltip(gfx, true);
+
     getWidget<ButtonWidget>("custom")->setActive(!in_game || !CVS->isGLSL());
-    if (getWidget<SpinnerWidget>("scale_rtts")->isActivated())
+    OptionsCommon::updatePauseTooltip(getWidget<ButtonWidget>("custom"), in_game && CVS->isGLSL());
+
+    if (scale_rtts->isActivated())
     {
-        getWidget<SpinnerWidget>("scale_rtts")->setActive(!in_game ||
-            GE::getDriver()->getDriverType() == video::EDT_VULKAN);
+        scale_rtts->setActive(!in_game || GE::getDriver()->getDriverType() == video::EDT_VULKAN);
+        OptionsCommon::updatePauseTooltip(scale_rtts,
+            in_game && GE::getDriver()->getDriverType() != video::EDT_VULKAN);
     }
+
     getWidget<ButtonWidget>("benchmarkCurrent")->setActive(!in_game);
+    // Handle the setting/unsetting as we use a custom tooltip message
+    if (in_game)
+        getWidget<ButtonWidget>("benchmarkCurrent")->setTooltip(_("Performance tests are not possible during a race."));
+    else
+        getWidget<ButtonWidget>("benchmarkCurrent")->unsetTooltip();
+
+    GUIEngine::SpinnerWidget* bench_select = getWidget<GUIEngine::SpinnerWidget>("benchmarkSelect");
+    assert( bench_select != NULL );
+
+    // Only display the scene selection widget if there are multiple valid replays
+    if (stk_config->m_benchmark_files.size() <= 1)
+    {
+        bench_select->setActive(false);
+        bench_select->setVisible(false);
+        getWidget<LabelWidget>("benchmarkSelect_label")->setVisible(false);
+        // Disable the performance test button if there is no valid replay
+        if (stk_config->m_benchmark_files.size() == 0)
+            getWidget<ButtonWidget>("benchmarkCurrent")->setActive(false);
+    }
+    // Use the replay names as labels for selection
+    // TODO: support user-friendly names for when the game come with multiple default replays
+    else
+    {
+        bench_select->clearLabels();
+        for (auto it = stk_config->m_benchmark_files.begin();
+                it != stk_config->m_benchmark_files.end(); it++)
+        {
+            core::stringw bench_name = StringUtils::utf8ToWide(*it);
+            bench_select->addLabel(bench_name);
+        }
+        // Reset the active benchmark file in case we left and reentered options after changing it
+        stk_config->m_active_benchmark_file = stk_config->m_benchmark_files[0];
+    }
 
     // If a benchmark was requested and the game had to reload
     // the graphics engine, start the benchmark when the
@@ -300,80 +341,80 @@ void OptionsScreenVideo::updateTooltip()
 
     core::stringw tooltip;
 
-    //I18N: in the graphical options tooltip;
-    // indicates a graphical feature is enabled
-    const core::stringw enabled = _("Enabled");
-    //I18N: in the graphical options tooltip;
-    // indicates a graphical feature is disabled
-    const core::stringw disabled = _("Disabled");
-    //I18N: if only important particles effects is enabled
-    const core::stringw important_only = _("Important only");
-
-    //I18N: in the graphical options tooltip;
-    const core::stringw very_low = _("Very Low");
-    //I18N: in the graphical options tooltip;
-    const core::stringw low = _("Low");
-    //I18N: in the graphical options tooltip;
-    const core::stringw medium = _("Medium");
-    //I18N: in the graphical options tooltip;
-    const core::stringw high = _("High");
-    //I18N: in the graphical options tooltip;
-    const core::stringw very_high = _("Very High");
-    //I18N: in the graphical options tooltip;
-    const core::stringw ultra = _("Ultra");
-    
-    //I18N: in graphical options
-    tooltip = _("Dynamic lights: %s",
-        UserConfigParams::m_dynamic_lights ? enabled : disabled);
-
-    //I18N: in graphical options
+    //I18N: in the graphical options
+    tooltip = UserConfigParams::m_dynamic_lights ? _("Dynamic lights: Enabled") :
+                                                   _("Dynamic lights: Disabled");
+    //I18N: in the graphical options
     if (UserConfigParams::m_shadows_resolution == 0)
-        tooltip = tooltip + L"\n" + _("Shadows: %s", disabled);
+    {
+        tooltip = tooltip + L"\n" + _("Shadows: %s", _C("Shadows", "Disabled"));
+        tooltip = tooltip + L"\n" + _("Soft shadows: Disabled");
+    }
     else
+    {
         tooltip = tooltip + L"\n" + _("Shadows: %i", UserConfigParams::m_shadows_resolution);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Anti-aliasing: %s",
-        UserConfigParams::m_mlaa ? enabled : disabled);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Light scattering: %s",
-        UserConfigParams::m_light_scatter ? enabled : disabled);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Glow (outlines): %s",
-        UserConfigParams::m_glow ? enabled : disabled);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Light shaft (God rays): %s",
-        UserConfigParams::m_light_shaft ? enabled : disabled);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Bloom: %s",
-        UserConfigParams::m_bloom ? enabled : disabled);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Ambient occlusion: %s",
-        UserConfigParams::m_ssao ? enabled : disabled);
-    tooltip = tooltip + L"\n" + _("Screen space reflection: %s",
-        UserConfigParams::m_ssr ? enabled : disabled);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Animated Characters: %s",
-        UserConfigParams::m_animated_characters ? enabled : disabled);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Particles Effects: %s",
-        UserConfigParams::m_particles_effects == 2 ? enabled :
-        UserConfigParams::m_particles_effects == 1 ? important_only :
-        disabled);
+        tooltip = tooltip + L"\n" +
+            (UserConfigParams::m_pcss ?  _("Soft shadows: Enabled") :
+                                         _("Soft shadows: Disabled"));
+    }
 
-    //I18N: in graphical options
+    //I18N: in the graphical options
+    tooltip = tooltip + L"\n" +
+        (UserConfigParams::m_mlaa ? _("Anti-aliasing: Enabled") :
+                                    _("Anti-aliasing: Disabled"));
+    //I18N: in the graphical options
+    tooltip = tooltip + L"\n" +
+        (!UserConfigParams::m_degraded_IBL ? _("Image-based lighting: Enabled") :
+                                             _("Image-based lighting: Disabled"));
+    //I18N: in the graphical options
+    tooltip = tooltip + L"\n" +
+        (UserConfigParams::m_light_scatter ? _("Light scattering: Enabled") :
+                                             _("Light scattering: Disabled"));
+    //I18N: in the graphical options
+    tooltip = tooltip + L"\n" +
+        (UserConfigParams::m_glow ? _("Glow (outlines): Enabled") :
+                                    _("Glow (outlines): Disabled"));
+    //I18N: in the graphical options
+    tooltip = tooltip + L"\n" +
+        (UserConfigParams::m_light_shaft ? _("Light shaft (God rays): Enabled") :
+                                           _("Light shaft (God rays): Disabled"));
+    //I18N: in the graphical options
+    tooltip = tooltip + L"\n" +
+        (UserConfigParams::m_bloom ? _("Bloom: Enabled") :
+                                     _("Bloom: Disabled"));
+    //I18N: in the graphical options
+    tooltip = tooltip + L"\n" +
+        (UserConfigParams::m_ssao ? _("Ambient occlusion: Enabled") :
+                                    _("Ambient occlusion: Disabled"));
+    tooltip = tooltip + L"\n" +
+        (UserConfigParams::m_ssr ? _("Screen space reflection: Enabled") :
+                                   _("Screen space reflection: Disabled"));
+    //I18N: in the graphical options
+    tooltip = tooltip + L"\n" +
+        (UserConfigParams::m_animated_characters ? _("Animated characters: Enabled") :
+                                                   _("Animated characters: Disabled"));
+    //I18N: in the graphical options
+    tooltip = tooltip + L"\n" + _("Particle effects: %s",
+        UserConfigParams::m_particles_effects == 2 ? _C("Particle effects", "Enabled")        :
+        UserConfigParams::m_particles_effects == 1 ? _C("Particle effects", "Important only") :
+                                                     _C("Particle effects", "Disabled"));
+
+    //I18N: in the graphical options
     int quality = getImageQuality();
     tooltip = tooltip + L"\n" + _("Rendered image quality: %s",
-        quality == 0 ? very_low :
-        quality == 1 ? low      : high);
+        quality == 0 ? _C("Image quality", "Very low") :
+        quality == 1 ? _C("Image quality", "Low")      :
+                       _C("Image quality", "High"));
 
-    //I18N: in graphical options
+    //I18N: in the graphical options
     int geometry_detail = UserConfigParams::m_geometry_level;
     tooltip = tooltip + L"\n" + _("Geometry detail: %s",
-        geometry_detail == 0 ? very_low  :
-        geometry_detail == 1 ? low       :
-        geometry_detail == 2 ? medium    :
-        geometry_detail == 3 ? high      :
-        geometry_detail == 4 ? very_high : ultra);
+        geometry_detail == 0 ?  _C("Geometry level", "Very low")  :
+        geometry_detail == 1 ?  _C("Geometry level", "Low")       :
+        geometry_detail == 2 ?  _C("Geometry level", "Medium")    :
+        geometry_detail == 3 ?  _C("Geometry level", "High")      :
+        geometry_detail == 4 ?  _C("Geometry level", "Very high") :
+                                _C("Geometry level", "Ultra high"));
 
     gfx->setTooltip(tooltip);
 }   // updateTooltip
@@ -386,16 +427,14 @@ void OptionsScreenVideo::updateBlurTooltip()
 
     core::stringw tooltip;
 
-    const core::stringw enabled = _("Enabled");
-    const core::stringw disabled = _("Disabled");
+    //I18N: in the graphical options
+    tooltip = UserConfigParams::m_motionblur ? _("Motion blur: Enabled") :
+                                               _("Motion blur: Disabled");
 
-    //I18N: in graphical options
-    tooltip = tooltip + _("Motion blur: %s",
-        UserConfigParams::m_motionblur ? enabled : disabled);
-
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Depth of field: %s",
-        UserConfigParams::m_dof ? enabled : disabled);
+    //I18N: in the graphical options
+    tooltip = tooltip + L"\n" +
+        (UserConfigParams::m_dof ? _("Depth of field: Enabled") :
+                                   _("Depth of field: Disabled"));
 
     blur->setTooltip(tooltip);
 }   // updateBlurTooltip
@@ -511,6 +550,16 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         else
             RaceManager::get()->scheduleBenchmark();
     } // benchmarkCurrent
+    else if (name == "benchmarkSelect")
+    {
+        GUIEngine::SpinnerWidget* bench_select = getWidget<GUIEngine::SpinnerWidget>("benchmarkSelect");
+        assert( bench_select != NULL );
+
+        const unsigned int bench_id = bench_select->getValue();
+        assert(bench_id < stk_config->m_benchmark_files.size());
+
+        stk_config->m_active_benchmark_file = stk_config->m_benchmark_files[bench_id];
+    }
     /*else if (name == "benchmarkRecommend")
     {
         new RecommendVideoSettingsDialog(0.8f, 0.9f);
