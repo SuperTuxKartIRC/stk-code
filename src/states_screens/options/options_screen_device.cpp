@@ -15,6 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY // No GUI files in server builds
+
 // Manages includes common to all options screens
 #include "states_screens/options/options_common.hpp"
 
@@ -306,6 +308,12 @@ void OptionsScreenDevice::updateInputButtons()
         const irr::core::stringw item = m_config->getMappingIdString(action);
         if (currently_used_keys.find(item) == currently_used_keys.end())
         {
+            if (item == "none") 
+            {
+                // Use the theme-defined emphasis-color to bring attention to the missing binding
+                actions->emphasisItem(KartActionStrings[action]);
+                continue;
+            }
             currently_used_keys.insert( item );
             if (m_config->isKeyboard()
                 && conflictsBetweenKbdConfig(action, PA_FIRST_GAME_ACTION,
@@ -606,7 +614,7 @@ void OptionsScreenDevice::eventCallback(Widget* widget,
             _("Enter new configuration name, leave empty to revert default value.");
         DeviceConfig *the_config = m_config; //Can't give variable m_config directly
 
-        new GeneralTextFieldDialog(instruction, [] (const irr::core::stringw& text) {},
+        GeneralTextFieldDialog* dialog = new GeneralTextFieldDialog(instruction, [] (const irr::core::stringw& text) {},
             [the_config] (GUIEngine::LabelWidget* lw,
                 GUIEngine::TextBoxWidget* tb)->bool
             {
@@ -615,6 +623,9 @@ void OptionsScreenDevice::eventCallback(Widget* widget,
                 input_manager->getDeviceManager()->save();
                 return true;
             });
+        
+        // Prefill the textbox with the current configuration name
+        dialog->getTextField()->setText(the_config->getConfigName());
     }
     else if (name == "force_feedback")
     {
@@ -684,3 +695,5 @@ bool OptionsScreenDevice::conflictsBetweenKbdConfig(PlayerAction action,
     }
     return false;
 }   // conflictsBetweenKbdConfig
+
+#endif // ifndef SERVER_ONLY

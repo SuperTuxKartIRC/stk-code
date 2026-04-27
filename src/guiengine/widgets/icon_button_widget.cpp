@@ -333,6 +333,7 @@ void IconButtonWidget::setLabelFont()
     }
     else
     {
+        m_label->setOverrideFont(NULL);
         const bool word_wrap = (m_properties[PROP_WORD_WRAP] == "true");
         const int max_w = m_label->getAbsolutePosition().getWidth();
 
@@ -356,7 +357,7 @@ void IconButtonWidget::setLabelFont()
             test_string = test_string.subString(temp_string.size(), test_string.size() - temp_string.size());
 
             if (max_w < (int)GUIEngine::getFont()->getDimension(test_string.c_str()).Width)
-                m_label->setOverrideFont( GUIEngine::getSmallFont() ); 
+                m_label->setOverrideFont( GUIEngine::getSmallFont() );
             else
                 m_label->setOverrideFont( NULL );
         }

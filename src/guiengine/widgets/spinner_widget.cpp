@@ -107,6 +107,7 @@ SpinnerWidget::SpinnerWidget(const bool gauge) : Widget(WTYPE_SPINNER)
     m_right_selected = false;
     m_incorrect       = false;
     m_red_mark_widget = NULL;
+    m_left_arrow = rect<s32>(0, 0, m_h, m_h);
 }
 
 // ------------------------------------------------------------------------
@@ -290,6 +291,7 @@ void SpinnerWidget::resize()
     Widget::resize();
 
     rect<s32> subsize_left_arrow = rect<s32>(0 ,0, m_h, m_h);
+    m_left_arrow = subsize_left_arrow;
     m_children[0].m_element->setRelativePosition(subsize_left_arrow);
     m_badge_x_shift = subsize_left_arrow.getWidth();
 
@@ -569,15 +571,15 @@ void SpinnerWidget::setCustomText(const core::stringw& text)
 
 void SpinnerWidget::onPressed(int x, int y)
 {
-    if (m_children[1].m_deactivated || 
-        m_children[1].m_properties[PROP_ID] != "spinnerbody"  || 
-        !isGauge()) 
-    { 
+    if (m_children[1].m_deactivated ||
+        m_children[1].m_properties[PROP_ID] != "spinnerbody"  ||
+        !isGauge())
+    {
         return;
     }
 
     core::position2di mouse_position(x, y);
-    core::recti body_rect 
+    core::recti body_rect
         = m_children[1].getIrrlichtElement()->getAbsolutePosition();
 
     if (body_rect.isPointInside(mouse_position))

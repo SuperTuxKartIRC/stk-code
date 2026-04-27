@@ -113,7 +113,7 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
         file_manager->getReplayDir() + fn, "r");
     if (fd == NULL) return false;
     auto scoped = [&]() { fclose(fd); };
-    MemUtils::deref<decltype(scoped)> cls(scoped); 
+    MemUtils::deref<decltype(scoped)> cls(scoped);
     ReplayData rd;
 
     // custom_replay is true when full path of filename is given
@@ -259,7 +259,7 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
         {
             Log::warn("Replay", "Track name is empty in replay file, '%s'.", fn.c_str());
             return false;
-        }         
+        }
     }
     else
     {
@@ -283,6 +283,7 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
 
     rd.m_track = t;
 
+    rd.m_info = "";
     fgets(s, 1023, fd);
     if (sscanf(s, "info: %1023s", s1) == 1)
     {
@@ -370,16 +371,27 @@ void ReplayPlay::loadFile(bool second_replay)
                                                             .m_kart_list.size();
     unsigned int lines_to_skip = (rd.m_replay_version == 3) ? 7 : 10;
     lines_to_skip += (rd.m_replay_version == 3) ? num_kart : 2*num_kart;
+    lines_to_skip += (rd.m_info != "") ? 1 : 0;
 
     for (unsigned int i = 0; i < lines_to_skip; i++)
         fgets(s, 1023, fd);
 
     // eof actually doesn't trigger here, since it requires first to try
     // reading behind eof, but still it's clearer this way.
+    unsigned int kart_counter = 0;
     while(!feof(fd))
     {
+        kart_counter++;
         if(fgets(s, 1023, fd)==NULL)  // eof reached
             break;
+        // This may happen e.g. if extra lines are added at the end of the replay file
+        // Going ahead with trying to read another kart data would cause an OOB error
+        if (kart_counter > num_kart)
+        {
+            Log::warn("Replay", "Replay file '%s' doesn't terminate properly..",
+                getReplayFilename(replay_file_number).c_str());
+            break;
+        }
         readKartData(fd, s, second_replay);
     }
 
@@ -476,7 +488,7 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line, bool second_replay)
             }
         }
 
-        //version 4 replays (STK 0.9.4 and higher)
+        //version 4 replays (STK 1.0 and higher)
         else
         {
             if(sscanf(s, "%f  %f %f %f  %f %f %f %f  %f  %f  %f %f %f %f %d  %d %f %d %d %d  %f %d %d %d %d %d\n",

@@ -16,6 +16,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY // No GUI files in server builds
+
 // Manages includes common to all or most options screens
 #include "states_screens/options/options_common.hpp"
 
@@ -25,13 +27,11 @@
 #include "modes/world.hpp"
 #include "states_screens/dialogs/custom_camera_settings.hpp"
 
-#ifndef SERVER_ONLY
 #include <ge_main.hpp>
 #include <ge_vulkan_driver.hpp>
 #include <ge_vulkan_texture_descriptor.hpp>
 #include <SDL_video.h>
 #include "../../lib/irrlicht/source/Irrlicht/CIrrDeviceSDL.h"
-#endif
 
 #include <IrrlichtDevice.h>
 
@@ -112,17 +112,13 @@ void OptionsScreenDisplay::init()
     LabelWidget* full_text = getWidget<LabelWidget>("fullscreenText");
     assert( full_text != NULL );
 
-    LabelWidget* rememberWinposText = 
+    LabelWidget* rememberWinposText =
                                    getWidget<LabelWidget>("rememberWinposText");
     assert( rememberWinposText != NULL );
 #endif
 
-    bool is_vulkan_fullscreen_desktop = false;
-#ifndef SERVER_ONLY
-    is_vulkan_fullscreen_desktop =
-        GE::getDriver()->getDriverType() == video::EDT_VULKAN &&
-        GE::getGEConfig()->m_fullscreen_desktop;
-#endif
+    bool is_vulkan_fullscreen_desktop = GE::getGEConfig()->m_fullscreen_desktop &&
+        GE::getDriver()->getDriverType() == video::EDT_VULKAN;
 
     configResolutionsList();
 
@@ -131,9 +127,16 @@ void OptionsScreenDisplay::init()
     // disabled)
     bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
 
-    res->setActive(!in_game || is_vulkan_fullscreen_desktop);
-    full->setActive(!in_game || is_vulkan_fullscreen_desktop);
+    bool menu_or_vulkan = !in_game || is_vulkan_fullscreen_desktop;
+
+    // Tooltips don't work for dynamic ribbon widgets
+    res->setActive(menu_or_vulkan);
+
+    full->setActive(menu_or_vulkan);
+    OptionsCommon::updatePauseTooltip(full, !menu_or_vulkan);
+
     applyBtn->setActive(!in_game);
+    OptionsCommon::updatePauseTooltip(applyBtn, in_game);
 
 #if defined(MOBILE_STK) || defined(__SWITCH__)
     applyBtn->setVisible(false);
@@ -181,11 +184,7 @@ void OptionsScreenDisplay::configResolutionsList()
     if (res == NULL)
         return;
 
-    bool is_fullscreen_desktop = false;
-#ifndef SERVER_ONLY
-    is_fullscreen_desktop =
-        GE::getGEConfig()->m_fullscreen_desktop;
-#endif
+    bool is_fullscreen_desktop = GE::getGEConfig()->m_fullscreen_desktop;
 
     res->clearItems();
 
@@ -281,7 +280,7 @@ void OptionsScreenDisplay::configResolutionsList()
     {
         const float ratio = it->getRatio();
         char name[32];
-        sprintf(name, "%ix%i", it->width, it->height);
+        snprintf(name, 32, "%ix%i", it->width, it->height);
 
         core::stringw label;
         label += it->width;
@@ -353,7 +352,7 @@ void OptionsScreenDisplay::updateResolutionsList()
         assert(drw->m_rows.size() == 1);
         
         char name[128];
-        sprintf(name, "%ix%i", resolution.width, resolution.height);
+        snprintf(name, 128, "%ix%i", resolution.width, resolution.height);
         
         Widget* w = drw->m_rows[0].findWidgetNamed(name);
         
@@ -385,7 +384,7 @@ void OptionsScreenDisplay::eventCallback(Widget* widget, const std::string& name
         std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
         if (selection != "tab_display")
-			OptionsCommon::switchTab(selection);
+            OptionsCommon::switchTab(selection);
     }
     else if(name == "back")
     {
@@ -431,7 +430,6 @@ void OptionsScreenDisplay::eventCallback(Widget* widget, const std::string& name
         CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
 
         rememberWinpos->setActive(!fullscreen->getState());
-#ifndef SERVER_ONLY
         GE::GEVulkanDriver* gevk = GE::getVKDriver();
         if (gevk && GE::getGEConfig()->m_fullscreen_desktop)
         {
@@ -441,7 +439,6 @@ void OptionsScreenDisplay::eventCallback(Widget* widget, const std::string& name
         }
         else
             updateResolutionsList();
-#endif
     } // fullscreen
     else if (name == "camera_preset")
     {
@@ -505,11 +502,9 @@ void OptionsScreenDisplay::eventCallback(Widget* widget, const std::string& name
 
 void OptionsScreenDisplay::tearDown()
 {
-#ifndef SERVER_ONLY
     Screen::tearDown();
     // save changes when leaving screen
     user_config->saveConfig();
-#endif
 }   // tearDown
 
 // --------------------------------------------------------------------------------------------
@@ -527,4 +522,4 @@ void OptionsScreenDisplay::unloaded()
     m_inited = false;
 }   // unloaded
 
-// --------------------------------------------------------------------------------------------
+#endif // ifndef SERVER_ONLY

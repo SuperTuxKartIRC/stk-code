@@ -292,7 +292,7 @@ void ListWidget::addItem(const std::string& internal_name,
 }
 
 // -----------------------------------------------------------------------------
-void ListWidget::renameCell(const int row_index, const int col_index, 
+void ListWidget::renameCell(const int row_index, const int col_index,
                             const irr::core::stringw &newName, const int icon)
 {
     // May only be called AFTER this widget has been add()ed
@@ -315,7 +315,7 @@ void ListWidget::renameItem(const int row_index,
 }
 
 // -----------------------------------------------------------------------------
-void ListWidget::renameItem(const std::string &internal_name, 
+void ListWidget::renameItem(const std::string &internal_name,
                             const irr::core::stringw &newName, const int icon)
 {
     CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
@@ -644,6 +644,42 @@ EventPropagation ListWidget::moveToNextItem(const bool reverse)
     }
     return EVENT_BLOCK;
 } // moveToNextItem
+
+// -----------------------------------------------------------------------------
+void ListWidget::pageMove(bool up)
+{
+    // if widget is deactivated, do nothing
+    if (m_deactivated) return;
+
+    int item_height = getIrrlichtElement<CGUISTKListBox>()->getItemHeight();
+    int items_per_page = (m_h - getHeaderHeight()) / item_height;
+    int selectionID = (up) ? getSelectionID() - items_per_page
+                           : getSelectionID() + items_per_page;
+    if (selectionID < 0)
+        selectionID = 0;
+    else if (selectionID > getItemCount() - 1)
+        selectionID = getItemCount() - 1;
+
+    setSelectionID(selectionID);
+} // pageMove
+
+// -----------------------------------------------------------------------------
+void ListWidget::listEnd()
+{
+    // if widget is deactivated, do nothing
+    if (m_deactivated) return;
+
+    setSelectionID(getItemCount() - 1);
+} // listEnd
+
+// -----------------------------------------------------------------------------
+void ListWidget::listStart()
+{
+    // if widget is deactivated, do nothing
+    if (m_deactivated) return;
+
+    setSelectionID(0);
+} // listStart
 
 // -----------------------------------------------------------------------------
 int ListWidget::getItemID(const std::string &internalName) const
